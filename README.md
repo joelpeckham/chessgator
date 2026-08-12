@@ -1,9 +1,10 @@
-# Chess Tutor
+# chessgator
 
 A **local-only** chess coach you can play in the browser. Maia is the primary
 human-like opponent; Stockfish provides objective analysis. Games, settings, and
 engine work stay on your device — the production build is a static export with
-no accounts, APIs, or runtime backend.
+no accounts, APIs, or runtime backend. Production is intended at
+[chessgator.com](https://chessgator.com) (custom domain on Vercel).
 
 ## Stack
 

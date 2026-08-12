@@ -173,7 +173,7 @@ function headlineFor(
   }
   if (mode === "playerTurn") return "Your move";
   if (mode === "loading") return "Start a game when you are ready";
-  return "Chess Tutor";
+  return "chessgator";
 }
 
 function detailFor(

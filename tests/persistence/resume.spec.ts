@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const STORAGE_KEY = "chess-tutor:game:v1";
+const STORAGE_KEY = "chessgator:game:v1";
 
 test.describe("local resume + corruption", () => {
   test("reloads resume tree, elo, and reviewing mode", async ({ page }) => {

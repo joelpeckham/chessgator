@@ -14,7 +14,8 @@ const figtree = Figtree({
 });
 
 export const metadata: Metadata = {
-  title: "Chess Tutor",
+  metadataBase: new URL("https://chessgator.com"),
+  title: "chessgator",
   description:
     "Local-only chess coach. Play as White against Maia with Stockfish fallback.",
 };

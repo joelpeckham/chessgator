@@ -78,7 +78,7 @@ export function ChessboardAdapter({
   onMove,
   onPromotionNeeded,
   className,
-  id = "chess-tutor-board",
+  id = "chessgator-board",
 }: ChessboardAdapterProps) {
   const reducedMotion = usePrefersReducedMotion();
   const [selection, setSelection] = useState<{

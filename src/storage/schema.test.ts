@@ -230,7 +230,7 @@ describe("persistence schema", () => {
   });
 
   it("localStorage repository recovers from missing/corrupt data", async () => {
-    const storage = memoryStorage({ "chess-tutor:game:v1": "{not-json" });
+    const storage = memoryStorage({ "chessgator:game:v1": "{not-json" });
     const repo = createLocalStorageGameRepository({ storage });
     expect(await repo.load()).toBeNull();
 
@@ -241,7 +241,7 @@ describe("persistence schema", () => {
     expect(loaded).not.toBeNull();
     expect(loaded!.tree.currentNodeId).toBe(game.tree.currentNodeId);
 
-    storage.setItem("chess-tutor:game:v1", JSON.stringify({ version: 1 }));
+    storage.setItem("chessgator:game:v1", JSON.stringify({ version: 1 }));
     expect(await repo.load()).toBeNull();
 
     await repo.clear();

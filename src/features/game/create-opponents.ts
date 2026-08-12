@@ -12,19 +12,19 @@ export type CreateOpponentsFn = () => OpponentPair;
 
 declare global {
   interface Window {
-    __chessTutorCreateOpponents?: CreateOpponentsFn;
+    __chessgatorCreateOpponents?: CreateOpponentsFn;
   }
 }
 
 /**
  * Resolve primary (Maia) + fallback (Stockfish) opponents.
  * Playwright can inject stubs via `?e2eStub=1`, `?e2eStub=fallback`, or
- * `window.__chessTutorCreateOpponents`.
+ * `window.__chessgatorCreateOpponents`.
  */
 export function createOpponents(): OpponentPair {
   if (typeof window !== "undefined") {
-    if (typeof window.__chessTutorCreateOpponents === "function") {
-      return window.__chessTutorCreateOpponents();
+    if (typeof window.__chessgatorCreateOpponents === "function") {
+      return window.__chessgatorCreateOpponents();
     }
 
     const stub = new URLSearchParams(window.location.search).get("e2eStub");

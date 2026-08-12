@@ -1,4 +1,4 @@
-# Chess Tutor — Roadmap
+# chessgator — Roadmap
 
 ## Vision
 
@@ -106,7 +106,7 @@ Stockfish, large curriculum, multi-game library.
 ## Suggested ownership (target map)
 
 ```
-chess-tutor/
+chessgator/
   public/engine/              # stockfish lite-single (generated, gitignored)
   public/ort/<version>/       # onnxruntime-web WASM (generated, gitignored)
   public/models/              # content-addressed Maia ONNX (generated, gitignored)

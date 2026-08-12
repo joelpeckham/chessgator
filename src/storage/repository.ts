@@ -10,4 +10,4 @@ export interface GameRepository {
   clear(): Promise<void>;
 }
 
-export const GAME_STORAGE_KEY = "chess-tutor:game:v1";
+export const GAME_STORAGE_KEY = "chessgator:game:v1";

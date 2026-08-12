@@ -83,7 +83,7 @@ function formatStatusAnnouncement(args: {
     const who = args.lastMove.color === "w" ? "White" : "Black";
     return `${who} played ${args.lastMove.san}`;
   }
-  return args.opponentMessage ?? "Chess Tutor ready";
+  return args.opponentMessage ?? "chessgator ready";
 }
 
 /**
@@ -651,7 +651,7 @@ export function GameShell() {
         <div className="mx-auto flex w-full max-w-6xl items-end justify-between gap-4">
           <div>
             <p className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
-              Chess Tutor
+              chessgator
             </p>
             <p className="mt-1 max-w-xl text-sm text-muted-foreground">
               Local play against Maia with Stockfish-backed coaching. You are White.

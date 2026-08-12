@@ -20,7 +20,7 @@ export type CreateAnalysisEngineFn = () => AnalysisEngine;
 
 declare global {
   interface Window {
-    __chessTutorCreateAnalysisEngine?: CreateAnalysisEngineFn;
+    __chessgatorCreateAnalysisEngine?: CreateAnalysisEngineFn;
   }
 }
 
@@ -36,8 +36,8 @@ export function createStockfishAnalysisEngine(
  */
 export function createAnalysisEngine(): AnalysisEngine {
   if (typeof window !== "undefined") {
-    if (typeof window.__chessTutorCreateAnalysisEngine === "function") {
-      return window.__chessTutorCreateAnalysisEngine();
+    if (typeof window.__chessgatorCreateAnalysisEngine === "function") {
+      return window.__chessgatorCreateAnalysisEngine();
     }
     const stub = new URLSearchParams(window.location.search).get("e2eStub");
     if (stub === "1" || stub === "fallback" || stub === "coach") {
