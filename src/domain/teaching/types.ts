@@ -30,8 +30,10 @@ export type TeachingInsight = {
    */
   refutationUci: string[];
   classification: MoveClassification;
-  /** Mistakes/inaccuracies auto-expand in the coach UI. */
-  autoExpand: boolean;
+  /** Short mascot line shown as a teaser or fleeting praise. */
+  quip: string;
+  /** Mistakes/blunders nudge the mascot; the lesson stays opt-in. */
+  nudge: boolean;
 };
 
 /** Progressive hint ladder before the player moves. */

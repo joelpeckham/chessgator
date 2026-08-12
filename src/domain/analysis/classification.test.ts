@@ -5,7 +5,7 @@ import {
   classifyPlayedMove,
   evalLossForMover,
   scoreToCpWhite,
-  shouldAutoExpand,
+  shouldNudge,
 } from "@/domain/analysis/classification";
 
 describe("classification thresholds", () => {
@@ -43,11 +43,12 @@ describe("classification thresholds", () => {
     ).toBe("best");
   });
 
-  it("auto-expands only teachable mistakes", () => {
-    expect(shouldAutoExpand("best")).toBe(false);
-    expect(shouldAutoExpand("good")).toBe(false);
-    expect(shouldAutoExpand("inaccuracy")).toBe(true);
-    expect(shouldAutoExpand("blunder")).toBe(true);
+  it("nudges only mistakes and blunders", () => {
+    expect(shouldNudge("best")).toBe(false);
+    expect(shouldNudge("good")).toBe(false);
+    expect(shouldNudge("inaccuracy")).toBe(false);
+    expect(shouldNudge("mistake")).toBe(true);
+    expect(shouldNudge("blunder")).toBe(true);
   });
 });
 

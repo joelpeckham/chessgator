@@ -174,7 +174,7 @@ describe("coaching controller", () => {
     await coach.dispose();
   });
 
-  it("autoExpand insights annotate the suggested move on the board", async () => {
+  it("nudge insights annotate the suggested move on the board", async () => {
     const afterA3 = "rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1";
     const coach = createCoachingController({
       createEngine: () =>
@@ -195,7 +195,7 @@ describe("coaching controller", () => {
             {
               fen: afterA3,
               evidence: {
-                // Large White-eval drop so classification auto-expands.
+                // Large White-eval drop so classification nudges.
                 score: { cp: -180 },
                 bestMoveUci: "e7e5",
                 lines: [{ multipv: 1, score: { cp: -180 }, pvUci: ["e7e5"] }],
@@ -216,7 +216,7 @@ describe("coaching controller", () => {
     });
 
     const insight = coach.getState().insight;
-    expect(insight?.autoExpand).toBe(true);
+    expect(insight?.nudge).toBe(true);
     expect(coach.getState().annotations.arrows.length).toBeGreaterThan(0);
     await coach.dispose();
   });

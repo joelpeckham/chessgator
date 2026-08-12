@@ -16,10 +16,12 @@ test.describe("time travel + branching timeline", () => {
     await chooseLegalMove(page, "d4");
     await expect(page.getByTestId("move-list")).toContainText("d4");
 
-    // Mistake/inaccuracy auto-expands the coach panel.
-    await expect(page.getByTestId("coach-expanded-panel")).toBeVisible({
-      timeout: 10_000,
-    });
+    await expect(page.getByTestId("coach-mascot")).toHaveAttribute(
+      "data-mode",
+      "feedback",
+      { timeout: 10_000 },
+    );
+    await expandCoach(page);
     await expect(page.getByTestId("teaching-card")).toHaveAttribute(
       "data-state",
       "feedback",
@@ -118,9 +120,12 @@ test.describe("time travel + branching timeline", () => {
   }) => {
     await startCoachGame(page);
     await chooseLegalMove(page, "d4");
-    await expect(page.getByTestId("coach-expanded-panel")).toBeVisible({
-      timeout: 10_000,
-    });
+    await expect(page.getByTestId("coach-mascot")).toHaveAttribute(
+      "data-mode",
+      "feedback",
+      { timeout: 10_000 },
+    );
+    await expandCoach(page);
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
       "playerTurn",

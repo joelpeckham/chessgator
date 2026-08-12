@@ -1,11 +1,11 @@
 import {
   type MoveClassification,
-  shouldAutoExpand,
+  shouldNudge,
 } from "@/domain/analysis/classification";
 import type { MoveAnalysisEvidence } from "@/domain/analysis/move-analysis";
 import type { TacticalFacts } from "@/domain/analysis/tactics";
 import { uciToSan } from "@/domain/game/rules";
-import { renderExplanation } from "@/domain/teaching/templates";
+import { renderExplanation, renderQuip } from "@/domain/teaching/templates";
 import type { TeachingConcept, TeachingInsight } from "@/domain/teaching/types";
 
 /**
@@ -65,7 +65,8 @@ export function selectTeachingInsight(
     lineUci: evidence.shortPvUci,
     refutationUci: evidence.refutationUci,
     classification: evidence.classification,
-    autoExpand: shouldAutoExpand(evidence.classification),
+    quip: renderQuip(evidence.classification),
+    nudge: shouldNudge(evidence.classification),
   };
 }
 

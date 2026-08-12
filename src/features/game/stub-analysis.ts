@@ -102,7 +102,7 @@ function defaultStubScripts(): StubAnalysisScript[] {
   const start = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
   // After 1.e4 — Black to move.
   const afterE4 = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1";
-  // After 1.d4 — make d4 a teachable inaccuracy vs e4 (eval drop > 100cp).
+  // After 1.d4 — make d4 a teachable mistake vs e4 (eval drop > 100cp).
   const afterD4 = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1";
   // Queen sortie position (White to move after …g6): saving the queen is best.
   const queenAttacked =

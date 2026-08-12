@@ -41,7 +41,8 @@ describe("teaching selection", () => {
     expect(chooseConcept(moveEvidence)).toBe("best_move");
     const insight = selectTeachingInsight(moveEvidence);
     expect(insight.concept).toBe("best_move");
-    expect(insight.autoExpand).toBe(false);
+    expect(insight.nudge).toBe(false);
+    expect(insight.quip).toBe("That's the one.");
     expect(insight.suggestedMoveUci).toBeNull();
   });
 
@@ -64,7 +65,7 @@ describe("teaching selection", () => {
     const concept = chooseConcept(moveEvidence);
     expect(["piece_safety", "threat", "missed_improvement"]).toContain(concept);
     const insight = selectTeachingInsight(moveEvidence);
-    expect(insight.autoExpand).toBe(true);
+    expect(insight.nudge).toBe(true);
     expect(insight.suggestedMoveUci).toBe("h5e5");
     expect(insight.lineUci[0]).toBe("h5e5");
     expect(insight.lineUci).not.toContain("a2a3");

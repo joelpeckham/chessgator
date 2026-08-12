@@ -41,6 +41,8 @@ export type ShellView = {
   resumed: boolean;
   boardSize: number;
   compact: boolean;
+  mascotBelow: boolean;
+  boardLeft: number;
   liveFen: string;
   statusInput: StatusPresentationInput;
   status: StatusPresentation;
@@ -60,7 +62,6 @@ export type ShellView = {
   notices: FeedbackNotice[];
   coach: {
     expanded: boolean;
-    shouldAutoExpand: boolean;
     insight: TeachingInsight | null;
     analyzing: boolean;
     canUndoHumanMove: boolean;
@@ -70,7 +71,6 @@ export type ShellView = {
     hintDisabled: boolean;
     hintFen: string;
     showTutorLaneHint: boolean;
-    canExpand: boolean;
   };
   timeline: {
     tree: GameTree;
@@ -104,6 +104,8 @@ export function buildShellView(args: {
   lastError: string | null;
   boardSize: number;
   compact: boolean;
+  mascotBelow: boolean;
+  boardLeft: number;
   runtime: GameRuntime;
   ui: ShellChrome;
 }): ShellView {
@@ -165,17 +167,12 @@ export function buildShellView(args: {
   const visibleInsight = runtime.coaching.insightDismissed
     ? null
     : runtime.coaching.insight;
-  const shouldAutoExpand =
-    Boolean(visibleInsight?.autoExpand) && !ui.coachUserCollapsedAuto;
-  const coachExpandedEffective =
-    ui.coachExpanded || (shouldAutoExpand && Boolean(visibleInsight));
+  const coachExpanded = ui.coachExpanded;
 
   const showCoachAnnotations =
     !isViewingNonLive &&
     !runtime.coachUnavailable &&
-    (coachExpandedEffective ||
-      Boolean(visibleInsight?.autoExpand) ||
-      Boolean(runtime.coaching.hint));
+    (coachExpanded || Boolean(runtime.coaching.hint));
 
   const badgeMode: SessionMode = isReviewing ? "reviewing" : mode;
   const statusInput: StatusPresentationInput = {
@@ -239,6 +236,8 @@ export function buildShellView(args: {
     resumed: args.resumed,
     boardSize: args.boardSize,
     compact: args.compact,
+    mascotBelow: args.mascotBelow,
+    boardLeft: args.boardLeft,
     liveFen,
     statusInput,
     status,
@@ -257,8 +256,7 @@ export function buildShellView(args: {
     isViewingNonLive,
     notices,
     coach: {
-      expanded: coachExpandedEffective,
-      shouldAutoExpand,
+      expanded: coachExpanded,
       insight: visibleInsight,
       analyzing,
       canUndoHumanMove,
@@ -270,11 +268,6 @@ export function buildShellView(args: {
       hintDisabled: !interactive || Boolean(runtime.coachUnavailable),
       hintFen: liveFen,
       showTutorLaneHint: Boolean(tutorLine),
-      canExpand:
-        Boolean(visibleInsight) ||
-        Boolean(runtime.coaching.hint) ||
-        analyzing ||
-        runtime.coach.getCachedInsight(tree.currentNodeId) != null,
     },
     timeline: {
       tree,

@@ -27,9 +27,11 @@ export const CLASSIFICATION_THRESHOLDS = {
   // blunder: anything above mistakeMaxLossCp
 } as const;
 
-/** Classifications that should auto-expand the teaching card. */
-export const AUTO_EXPAND_CLASSIFICATIONS: ReadonlySet<MoveClassification> =
-  new Set(["inaccuracy", "mistake", "blunder"]);
+/** Classifications that nudge the mascot (teaser, not auto-open). */
+export const NUDGE_CLASSIFICATIONS: ReadonlySet<MoveClassification> = new Set([
+  "mistake",
+  "blunder",
+]);
 
 /**
  * Approximate a White-perspective score as centipawns for loss math.
@@ -93,6 +95,6 @@ export function classifyPlayedMove(input: {
   return classifyEvalLoss(input.lossCp);
 }
 
-export function shouldAutoExpand(classification: MoveClassification): boolean {
-  return AUTO_EXPAND_CLASSIFICATIONS.has(classification);
+export function shouldNudge(classification: MoveClassification): boolean {
+  return NUDGE_CLASSIFICATIONS.has(classification);
 }

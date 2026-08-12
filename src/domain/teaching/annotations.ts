@@ -51,7 +51,7 @@ export function annotationsFromInsight(
     }
   }
 
-  if (insight?.suggestedMoveUci && insight.autoExpand && evidence) {
+  if (insight?.suggestedMoveUci && evidence) {
     const uci = insight.suggestedMoveUci;
     if (uci.length >= 4) {
       arrows.push({

@@ -69,7 +69,7 @@ test.describe("composed real-engine shell", () => {
       "error",
     );
 
-    await expect(page.getByTestId("coach-strip")).toBeVisible();
+    await expect(page.getByTestId("coach-mascot")).toBeVisible();
     await expandCoach(page);
     await expect(page.getByTestId("teaching-card")).toHaveAttribute(
       "data-state",

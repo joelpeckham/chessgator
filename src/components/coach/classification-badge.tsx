@@ -13,7 +13,7 @@ export function ClassificationBadge({
   testId?: string;
   className?: string;
 }) {
-  const variant = insight.autoExpand
+  const variant = insight.nudge
     ? "destructive"
     : insight.classification === "best"
       ? "default"

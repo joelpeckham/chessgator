@@ -22,7 +22,7 @@ export type TeachingCardProps = {
 
 /**
  * Expanded coach detail content (explanation, actions, hints).
- * Mounted inside CoachRail's upward-floating panel.
+ * Mounted inside the mascot speech balloon.
  */
 export function TeachingCard({
   insight,

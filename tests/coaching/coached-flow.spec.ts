@@ -12,29 +12,26 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
   }) => {
     await startCoachGame(page);
 
-    await expect(page.getByTestId("coach-strip")).toBeVisible();
+    await expect(page.getByTestId("coach-mascot")).toBeVisible();
     await expectCoachCollapsed(page);
 
-    // Progressive hint ladder opens the expanded panel.
-    await page.getByTestId("coach-strip").getByTestId("hint-button").click();
-    await expect(page.getByTestId("coach-expanded-panel")).toBeVisible();
+    // Progressive hint ladder opens the balloon.
+    await page.getByTestId("coach-mascot").getByTestId("hint-button").click();
+    await expect(page.getByTestId("coach-balloon")).toBeVisible();
     await expect(page.getByTestId("hint-ladder")).toHaveAttribute(
       "data-hint-level",
       "0",
     );
     await expect(page.getByTestId("hint-question")).toBeVisible();
 
-    await page
-      .getByTestId("coach-expanded-panel")
-      .getByTestId("hint-button")
-      .click();
+    await page.getByTestId("coach-balloon").getByTestId("hint-button").click();
     await expect(page.getByTestId("hint-ladder")).toHaveAttribute(
       "data-hint-level",
       "1",
     );
     await expect(page.getByTestId("hint-squares")).toBeVisible();
 
-    // Collapse without dismissing — Escape collapses the panel.
+    // Collapse without dismissing — Escape collapses the balloon.
     await page.keyboard.press("Escape");
     await expectCoachCollapsed(page);
 
@@ -43,15 +40,16 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
     await chooseLegalMove(page, "e4");
     await expect(page.getByTestId("move-list")).toContainText("e4");
 
-    // Best moves stay collapsed on the rail.
-    await expect(page.getByTestId("coach-strip")).toHaveAttribute(
+    // Best moves stay collapsed; the face reacts.
+    await expect(page.getByTestId("coach-mascot")).toHaveAttribute(
       "data-mode",
       "feedback",
       { timeout: 10_000 },
     );
     await expectCoachCollapsed(page);
-    await expect(page.getByTestId("classification-badge-strip")).toContainText(
-      "Best",
+    await expect(page.getByTestId("coach-mascot")).toHaveAttribute(
+      "data-expression",
+      "really-happy",
     );
 
     const boardAfterBest = await page.getByTestId("board-frame").boundingBox();
@@ -112,28 +110,39 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
     );
   });
 
-  test("mistake auto-expands once; collapse is not dismiss", async ({
+  test("mistake nudges without opening; collapse is not dismiss", async ({
     page,
   }) => {
     await startCoachGame(page);
     await chooseLegalMove(page, "d4");
 
-    await expect(page.getByTestId("coach-expanded-panel")).toBeVisible({
-      timeout: 10_000,
-    });
+    await expect(page.getByTestId("coach-mascot")).toHaveAttribute(
+      "data-mode",
+      "feedback",
+      { timeout: 10_000 },
+    );
+    await expectCoachCollapsed(page);
+    await expect(page.getByTestId("coach-mascot")).toHaveAttribute(
+      "data-expression",
+      "surprised",
+    );
+    await expect(page.getByTestId("coach-teaser")).toBeVisible();
+
+    await expandCoach(page);
     await expect(page.getByTestId("teaching-card")).toHaveAttribute(
       "data-state",
       "feedback",
     );
     await expect(page.getByTestId("explore-line-button")).toBeVisible();
 
-    // Collapse via Escape — insight remains available on the strip.
+    // Collapse via Escape — insight remains available on the mascot.
     await page.keyboard.press("Escape");
     await expectCoachCollapsed(page);
-    await expect(page.getByTestId("coach-strip")).toHaveAttribute(
+    await expect(page.getByTestId("coach-mascot")).toHaveAttribute(
       "data-mode",
       "feedback",
     );
+    await expect(page.getByTestId("coach-teaser")).toBeVisible();
 
     await expandCoach(page);
     await expect(page.getByTestId("teaching-card")).toHaveAttribute(
@@ -141,9 +150,9 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
       "feedback",
     );
 
-    // Dismiss clears insight from the rail.
+    await page.keyboard.press("Escape");
     await page.getByTestId("dismiss-teaching-card").click();
-    await expect(page.getByTestId("coach-strip")).toHaveAttribute(
+    await expect(page.getByTestId("coach-mascot")).toHaveAttribute(
       "data-mode",
       "idle",
     );

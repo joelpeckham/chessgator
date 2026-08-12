@@ -37,7 +37,7 @@ export function ShellFrame({
       <header className="flex h-12 shrink-0 items-center justify-between gap-3 border-b border-border px-3 sm:px-4">
         {header}
       </header>
-      <main className="relative isolate flex min-h-0 flex-1 items-center justify-center overflow-hidden px-3 py-2">
+      <main className="relative isolate flex min-h-0 flex-1 flex-col overflow-hidden">
         {children}
       </main>
       <footer

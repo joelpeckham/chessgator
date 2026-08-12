@@ -9,7 +9,7 @@ export type HintLadderProps = {
   fen?: string | null;
   disabled?: boolean;
   onRequestHint: () => void;
-  /** Compact mode: button only, no body (for coach rail strip). */
+  /** Compact mode: button only, no body (for the idle mascot). */
   compact?: boolean;
 };
 

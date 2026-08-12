@@ -27,7 +27,6 @@ export type ShellChrome = {
   promotion: { from: string; to: string } | null;
   settingsOpen: boolean;
   coachExpanded: boolean;
-  coachUserCollapsedAuto: boolean;
   expandedOverflowKeys: string[];
   navMessage: string | null;
   dismissedNotices: ReadonlySet<string>;
@@ -40,7 +39,6 @@ export type ShellUi = ShellChrome & {
   setPromotion: (value: { from: string; to: string } | null) => void;
   setSettingsOpen: (open: boolean) => void;
   setCoachExpanded: (expanded: boolean) => void;
-  setCoachUserCollapsedAuto: (collapsed: boolean) => void;
   setExpandedOverflowKeys: (keys: string[]) => void;
   dismissNotice: (id: string) => void;
   applyPlayerMove: (move: BoardMove | GameMove) => boolean;
@@ -51,7 +49,7 @@ export type ShellUi = ShellChrome & {
   handleRetryEngines: () => Promise<void>;
   handleSelectTimelineNode: (nodeId: string) => void;
   handleReturnLive: () => void;
-  handleCoachExpandedChange: (next: boolean, shouldAutoExpand: boolean) => void;
+  handleCoachExpandedChange: (next: boolean) => void;
   handleDismissCoach: () => void;
   handleRequestHint: () => void;
   handleOpenCoach: () => void;
@@ -67,7 +65,6 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
   const [reviewNodeId, setReviewNodeId] = useState<string | null>(null);
   const [previewNodeId, setPreviewNodeId] = useState<string | null>(null);
   const [coachExpanded, setCoachExpanded] = useState(false);
-  const [coachUserCollapsedAuto, setCoachUserCollapsedAuto] = useState(false);
   const [expandedOverflowKeys, setExpandedOverflowKeys] = useState<string[]>(
     [],
   );
@@ -104,7 +101,6 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     setReviewNodeId(null);
     setPreviewNodeId(null);
     setCoachExpanded(false);
-    setCoachUserCollapsedAuto(false);
   }
 
   function requestOpponent(): void {
@@ -167,7 +163,6 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     setPromotion(null);
     setReviewNodeId(null);
     setPreviewNodeId(null);
-    setCoachUserCollapsedAuto(false);
     setCoachExpanded(false);
     runtime.coach.resetHints();
 
@@ -256,13 +251,7 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     setPreviewNodeId(null);
   }
 
-  function handleCoachExpandedChange(
-    next: boolean,
-    shouldAutoExpand: boolean,
-  ): void {
-    if (!next && shouldAutoExpand) {
-      setCoachUserCollapsedAuto(true);
-    }
+  function handleCoachExpandedChange(next: boolean): void {
     setCoachExpanded(next);
     if (next) {
       runtime.coach.showInsight(useGameStore.getState().tree.currentNodeId);
@@ -307,7 +296,6 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     promotion,
     settingsOpen,
     coachExpanded,
-    coachUserCollapsedAuto,
     expandedOverflowKeys,
     navMessage,
     dismissedNotices,
@@ -317,7 +305,6 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     setPromotion,
     setSettingsOpen,
     setCoachExpanded,
-    setCoachUserCollapsedAuto,
     setExpandedOverflowKeys,
     dismissNotice,
     applyPlayerMove,

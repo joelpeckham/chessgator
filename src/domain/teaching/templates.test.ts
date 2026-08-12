@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   hintQuestionForPosition,
   renderExplanation,
+  renderQuip,
 } from "@/domain/teaching/templates";
 
 const ctx = {
@@ -30,5 +31,13 @@ describe("hintQuestionForPosition", () => {
         inCheck: true,
       }),
     ).toContain("in check");
+  });
+});
+
+describe("renderQuip", () => {
+  it("keeps mascot lines short", () => {
+    expect(renderQuip("best")).toBe("That's the one.");
+    expect(renderQuip("mistake")).toBe("That was shaky.");
+    expect(renderQuip("blunder")).toBe("Want to look at that?");
   });
 });

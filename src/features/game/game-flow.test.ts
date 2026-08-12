@@ -97,7 +97,8 @@ describe("trySuggestedMove", () => {
         lineUci: ["g1f3", "b8c6"],
         refutationUci: [],
         classification: "inaccuracy",
-        autoExpand: true,
+        quip: "There's better.",
+        nudge: false,
       } satisfies TeachingInsight,
       evidence: {
         gameNodeId: tree.currentNodeId,

@@ -4,7 +4,11 @@ import { RiSettings3Line } from "@remixicon/react";
 import { BoardPreviewVeil } from "@/components/board/board-preview-veil";
 import { ChessboardAdapter } from "@/components/board/chessboard-adapter";
 import { ChessgatorWordmark } from "@/components/brand/chessgator-wordmark";
-import { CoachRail } from "@/components/coach/coach-rail";
+import {
+  CoachMascot,
+  MASCOT_DOCK_HEIGHT_PX,
+  MASCOT_DOCK_WIDTH_PX,
+} from "@/components/coach/coach-mascot";
 import { FeedbackStack } from "@/components/coach/feedback-stack";
 import { PromotionDialog } from "@/components/game/promotion-dialog";
 import { SettingsSheet } from "@/components/game/settings-sheet";
@@ -88,12 +92,47 @@ export function GameShellLayout({
           </>
         }
         footer={
-          <>
-            <CoachRail
+          <MoveTimeline
+            tree={view.timeline.tree}
+            graph={view.timeline.graph}
+            reviewNodeId={view.timeline.reviewNodeId}
+            previewNodeId={view.timeline.previewNodeId}
+            disabled={view.timeline.disabled}
+            compact={view.timeline.compact}
+            expandedOverflowKeys={view.timeline.expandedOverflowKeys}
+            onExpandedOverflowChange={(keys) =>
+              ui.setExpandedOverflowKeys([...keys])
+            }
+            onSelectNode={ui.handleSelectTimelineNode}
+            onPreviewNode={ui.setPreviewNodeId}
+            onReturnLive={ui.handleReturnLive}
+            onOpenCoach={ui.handleOpenCoach}
+            className="rounded-none border-0 bg-transparent shadow-none ring-0"
+          />
+        }
+      >
+        <div
+          className={
+            view.mascotBelow
+              ? "flex min-h-0 flex-1 flex-col"
+              : "relative min-h-0 flex-1"
+          }
+        >
+          <div
+            className={
+              view.mascotBelow
+                ? "order-2 flex shrink-0 items-end pl-6 pr-3 pb-3 pt-1"
+                : "absolute bottom-0 left-0 z-20 flex flex-col justify-end pl-6 pr-5 pb-3 pt-2"
+            }
+            style={
+              view.mascotBelow
+                ? { height: MASCOT_DOCK_HEIGHT_PX }
+                : { width: MASCOT_DOCK_WIDTH_PX }
+            }
+          >
+            <CoachMascot
               expanded={view.coach.expanded}
-              onExpandedChange={(next) =>
-                ui.handleCoachExpandedChange(next, view.coach.shouldAutoExpand)
-              }
+              onExpandedChange={ui.handleCoachExpandedChange}
               insight={view.coach.insight}
               analyzing={view.coach.analyzing}
               canUndoHumanMove={view.coach.canUndoHumanMove}
@@ -109,52 +148,60 @@ export function GameShellLayout({
               hintDisabled={view.coach.hintDisabled}
               hintFen={view.coach.hintFen}
               showTutorLaneHint={view.coach.showTutorLaneHint}
-              canExpand={view.coach.canExpand}
               onRequestHint={ui.handleRequestHint}
+              compact={view.mascotBelow}
             />
-            <MoveTimeline
-              tree={view.timeline.tree}
-              graph={view.timeline.graph}
-              reviewNodeId={view.timeline.reviewNodeId}
-              previewNodeId={view.timeline.previewNodeId}
-              disabled={view.timeline.disabled}
-              compact={view.timeline.compact}
-              expandedOverflowKeys={view.timeline.expandedOverflowKeys}
-              onExpandedOverflowChange={(keys) =>
-                ui.setExpandedOverflowKeys([...keys])
+          </div>
+          <div
+            className={
+              view.mascotBelow
+                ? "flex min-h-0 min-w-0 flex-1 items-center justify-center px-4 pt-3"
+                : "absolute"
+            }
+            style={
+              view.mascotBelow
+                ? undefined
+                : {
+                    left: view.boardLeft,
+                    bottom: 12,
+                    width: view.boardSize,
+                    height: view.boardSize,
+                  }
+            }
+          >
+            <div
+              className={
+                view.mascotBelow
+                  ? "relative shrink-0"
+                  : "relative h-full w-full"
               }
-              onSelectNode={ui.handleSelectTimelineNode}
-              onPreviewNode={ui.setPreviewNodeId}
-              onReturnLive={ui.handleReturnLive}
-              onOpenCoach={ui.handleOpenCoach}
-              className="rounded-none border-0 bg-transparent shadow-none ring-0"
-            />
-          </>
-        }
-      >
-        <div
-          className="relative shrink-0"
-          style={{
-            width: view.boardSize,
-            height: view.boardSize,
-          }}
-          data-testid="board-frame"
-        >
-          <ChessboardAdapter
-            fen={view.board.fen}
-            interactive={view.board.interactive}
-            lastMove={view.board.lastMove}
-            isCheck={view.board.isCheck}
-            checkSquare={view.board.checkSquare}
-            highlightSquares={view.board.highlightSquares}
-            ghostSquares={[]}
-            squareLabels={view.board.labels}
-            arrows={view.board.arrows}
-            onMove={ui.applyPlayerMove}
-            onPromotionNeeded={(from, to) => ui.setPromotion({ from, to })}
-            className="h-full w-full"
-          />
-          <BoardPreviewVeil active={view.isViewingNonLive} />
+              style={
+                view.mascotBelow
+                  ? {
+                      width: view.boardSize,
+                      height: view.boardSize,
+                    }
+                  : undefined
+              }
+              data-testid="board-frame"
+            >
+              <ChessboardAdapter
+                fen={view.board.fen}
+                interactive={view.board.interactive}
+                lastMove={view.board.lastMove}
+                isCheck={view.board.isCheck}
+                checkSquare={view.board.checkSquare}
+                highlightSquares={view.board.highlightSquares}
+                ghostSquares={[]}
+                squareLabels={view.board.labels}
+                arrows={view.board.arrows}
+                onMove={ui.applyPlayerMove}
+                onPromotionNeeded={(from, to) => ui.setPromotion({ from, to })}
+                className="h-full w-full"
+              />
+              <BoardPreviewVeil active={view.isViewingNonLive} />
+            </div>
+          </div>
         </div>
 
         <FeedbackStack

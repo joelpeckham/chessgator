@@ -23,6 +23,19 @@ export function classificationLabel(
   return CLASSIFICATION_LABEL[classification];
 }
 
+const CLASSIFICATION_QUIP: Record<MoveClassification, string> = {
+  best: "That's the one.",
+  excellent: "Nice.",
+  good: "Solid.",
+  inaccuracy: "There's better.",
+  mistake: "That was shaky.",
+  blunder: "Want to look at that?",
+};
+
+export function renderQuip(classification: MoveClassification): string {
+  return CLASSIFICATION_QUIP[classification];
+}
+
 export function renderExplanation(
   concept: TeachingConcept,
   ctx: TemplateContext,

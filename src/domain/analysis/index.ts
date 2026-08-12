@@ -1,12 +1,12 @@
 export type { MoveClassification } from "@/domain/analysis/classification";
 export {
-  AUTO_EXPAND_CLASSIFICATIONS,
   CLASSIFICATION_THRESHOLDS,
   classifyEvalLoss,
   classifyPlayedMove,
   evalLossForMover,
+  NUDGE_CLASSIFICATIONS,
   scoreToCpWhite,
-  shouldAutoExpand,
+  shouldNudge,
 } from "@/domain/analysis/classification";
 export type {
   BuildMoveAnalysisInput,

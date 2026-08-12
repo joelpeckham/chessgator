@@ -21,24 +21,18 @@ export async function chooseLegalMove(page: Page, san: string): Promise<void> {
   await expect(page.getByTestId("settings-sheet")).toBeHidden();
 }
 
-/** Expand the coach rail detail panel if it is collapsed. */
+/** Expand the coach balloon if it is collapsed. */
 export async function expandCoach(page: Page): Promise<void> {
-  await expect(page.getByTestId("coach-strip")).toBeVisible();
-  if ((await page.getByTestId("coach-expanded-panel").count()) > 0) return;
-  const expand = page.getByTestId("coach-expand");
-  if ((await expand.count()) > 0 && (await expand.isEnabled())) {
-    await expand.click();
-  } else {
-    // Idle strip: open via Hint so the expanded panel mounts.
-    await page.getByTestId("hint-button").click();
-  }
-  await expect(page.getByTestId("coach-expanded-panel")).toBeVisible();
+  await expect(page.getByTestId("coach-mascot")).toBeVisible();
+  if ((await page.getByTestId("coach-balloon").count()) > 0) return;
+  await page.getByTestId("coach-gator").click();
+  await expect(page.getByTestId("coach-balloon")).toBeVisible();
 }
 
-/** Assert the coach detail panel is collapsed (rail still present). */
+/** Assert the coach balloon is collapsed (mascot still present). */
 export async function expectCoachCollapsed(page: Page): Promise<void> {
-  await expect(page.getByTestId("coach-strip")).toBeVisible();
-  await expect(page.getByTestId("coach-expanded-panel")).toHaveCount(0);
+  await expect(page.getByTestId("coach-mascot")).toBeVisible();
+  await expect(page.getByTestId("coach-balloon")).toHaveCount(0);
 }
 
 /** Wait for an auto-started stubbed playable game (`?e2eStub=1`). */

@@ -17,7 +17,7 @@ test.describe("accessibility + responsive smoke", () => {
       "aria-live",
       "polite",
     );
-    await expect(page.getByTestId("coach-strip")).toBeVisible();
+    await expect(page.getByTestId("coach-mascot")).toBeVisible();
 
     await chooseLegalMove(page, "e4");
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
@@ -71,13 +71,13 @@ test.describe("accessibility + responsive smoke", () => {
     });
   });
 
-  test("mobile viewport: coach rail, touch targets, board stability", async ({
+  test("mobile viewport: coach mascot, touch targets, board stability", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await startStubGame(page);
 
-    await expect(page.getByTestId("coach-strip")).toBeVisible();
+    await expect(page.getByTestId("coach-mascot")).toBeVisible();
     const boardBefore = await page.getByTestId("board-frame").boundingBox();
 
     await chooseLegalMove(page, "e4");
@@ -87,7 +87,7 @@ test.describe("accessibility + responsive smoke", () => {
       { timeout: 10_000 },
     );
 
-    // Best move stays collapsed; expand via rail.
+    // Best move stays collapsed; expand via mascot.
     await expandCoach(page);
     const boardAfter = await page.getByTestId("board-frame").boundingBox();
     expect(boardBefore).toBeTruthy();
@@ -109,7 +109,7 @@ test.describe("accessibility + responsive smoke", () => {
     expect(nodeBox!.height).toBeGreaterThanOrEqual(44);
 
     await page.keyboard.press("Escape");
-    await expect(page.getByTestId("coach-expanded-panel")).toHaveCount(0);
+    await expect(page.getByTestId("coach-balloon")).toHaveCount(0);
 
     // No horizontal overflow of board/timeline.
     const shellBox = await page.getByTestId("game-shell").boundingBox();
