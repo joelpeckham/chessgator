@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Stockfish smoke</title>
+  </head>
+  <body>
+    <p>Stockfish worker / WASM smoke harness</p>
+    <script type="module">
+      /**
+       * Expose a narrow smoke runner used by Playwright.
+       * Loads our typed worker, which nests the versioned lite-single asset.
+       */
+      async function runStockfishSmoke() {
+        const worker = new Worker("/generated/stockfish-worker.js", {
+          type: "module",
+        });
+
+        const once = (predicate, timeoutMs = 30000) =>
+          new Promise((resolve, reject) => {
+            const timer = setTimeout(() => {
+              worker.removeEventListener("message", onMessage);
+              reject(new Error("Stockfish smoke timed out"));
+            }, timeoutMs);
+
+            function onMessage(event) {
+              if (!predicate(event.data)) return;
+              clearTimeout(timer);
+              worker.removeEventListener("message", onMessage);
+              resolve(event.data);
+            }
+
+            worker.addEventListener("message", onMessage);
+          });
+
+        const readyPromise = once((msg) => msg?.type === "ready");
+        worker.postMessage({
+          type: "init",
+          requestId: "smoke-init",
+          engineUrl: "/engine/stockfish-18-lite-single.js#/engine/stockfish-18-lite-single.wasm",
+        });
+        await readyPromise;
+
+        const resultPromise = once((msg) => msg?.type === "result" || msg?.type === "error");
+        worker.postMessage({
+          type: "analyze",
+          requestId: "smoke-analyze",
+          gameNodeId: "smoke-node",
+          fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+          multipv: 1,
+          movetimeMs: 200,
+        });
+
+        const result = await resultPromise;
+        if (result.type === "error") {
+          worker.terminate();
+          throw new Error(result.message);
+        }
+
+        const disposePromise = once((msg) => msg?.type === "disposed");
+        worker.postMessage({ type: "dispose", requestId: "smoke-dispose" });
+        await disposePromise;
+        worker.terminate();
+
+        return {
+          bestMoveUci: result.evidence?.bestMoveUci ?? null,
+          score: result.evidence?.score ?? null,
+          sideToMove: result.evidence?.sideToMove ?? null,
+        };
+      }
+
+      window.__runStockfishSmoke = runStockfishSmoke;
+    </script>
+  </body>
+</html>

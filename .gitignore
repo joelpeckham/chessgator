@@ -12,6 +12,11 @@
 
 # testing
 /coverage
+/test-results/
+/blob-report/
+/playwright-report/
+/tests/stockfish/.generated/
+/tests/maia/.generated/
 
 # next.js
 /.next/
@@ -39,3 +44,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# generated engine / model assets (see scripts/prepare-assets.mjs / prepare:ort)
+/public/engine/
+/public/models/
+/public/ort/

@@ -1,7 +1,15 @@
 import type { NextConfig } from "next";
 
+/**
+ * Static export only: no Node.js server after `next build`.
+ * Image Optimization requires a runtime server, so local images stay unoptimized.
+ * Response headers (e.g. COOP/COEP) must be configured on the static host, not here.
+ */
 const nextConfig: NextConfig = {
-  /* config options here */
+  output: "export",
+  images: {
+    unoptimized: true,
+  },
 };
 
 export default nextConfig;

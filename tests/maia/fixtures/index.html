@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Maia smoke</title>
+  </head>
+  <body>
+    <p>Maia worker / ONNX smoke harness</p>
+    <script type="module">
+      /**
+       * Expose a narrow smoke runner used by Playwright.
+       * Loads our typed worker against the pinned Maia3 5M fp16 asset.
+       */
+      async function runMaiaSmoke() {
+        const worker = new Worker("/generated/maia-worker.js", {
+          type: "module",
+        });
+
+        const once = (predicate, timeoutMs = 120000) =>
+          new Promise((resolve, reject) => {
+            const timer = setTimeout(() => {
+              worker.removeEventListener("message", onMessage);
+              reject(new Error("Maia smoke timed out"));
+            }, timeoutMs);
+
+            function onMessage(event) {
+              if (!predicate(event.data)) return;
+              clearTimeout(timer);
+              worker.removeEventListener("message", onMessage);
+              resolve(event.data);
+            }
+
+            worker.addEventListener("message", onMessage);
+          });
+
+        const readyPromise = once(
+          (msg) => msg?.type === "ready" || msg?.type === "error",
+        );
+        worker.postMessage({
+          type: "init",
+          requestId: "smoke-init",
+          modelUrl: "/models/maia3-5m.fp16.ca22fc303197.onnx",
+          wasmPaths: "/ort/1.27.0/",
+        });
+        const ready = await readyPromise;
+        if (ready.type === "error") {
+          worker.terminate();
+          throw new Error(ready.message);
+        }
+
+        const resultPromise = once(
+          (msg) => msg?.type === "result" || msg?.type === "error",
+        );
+        worker.postMessage({
+          type: "infer",
+          requestId: "smoke-infer",
+          gameNodeId: "smoke-node",
+          fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+          selfElo: 1500,
+          oppoElo: 1500,
+          temperature: 0,
+          topP: 1,
+        });
+
+        const result = await resultPromise;
+        if (result.type === "error") {
+          worker.terminate();
+          throw new Error(result.message);
+        }
+
+        const disposePromise = once((msg) => msg?.type === "disposed");
+        worker.postMessage({ type: "dispose", requestId: "smoke-dispose" });
+        await disposePromise;
+        worker.terminate();
+
+        return {
+          moveUci: result.moveUci ?? null,
+          candidates: result.candidates ?? [],
+          executionProvider: ready.executionProvider ?? null,
+          value: result.value ?? null,
+        };
+      }
+
+      window.__runMaiaSmoke = runMaiaSmoke;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,35 @@
+{
+  "parityLevel": "structural",
+  "notes": "Hand-checked against CSSLab/maia3 get_all_possible_moves / tokenize_board. Not official Python model outputs.",
+  "moveIndices": {
+    "a1a1": 0,
+    "e2e4": 796,
+    "h8h8": 4095,
+    "a7a8q": 4096,
+    "e7e8q": 4240,
+    "h7h8n": 4351
+  },
+  "startposOccupied": [
+    ["a1", 3],
+    ["b1", 1],
+    ["c1", 2],
+    ["d1", 4],
+    ["e1", 5],
+    ["f1", 2],
+    ["g1", 1],
+    ["h1", 3],
+    ["a2", 0],
+    ["e2", 0],
+    ["h2", 0],
+    ["a7", 6],
+    ["e7", 6],
+    ["a8", 9],
+    ["b8", 7],
+    ["c8", 8],
+    ["d8", 10],
+    ["e8", 11],
+    ["f8", 8],
+    ["g8", 7],
+    ["h8", 9]
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "$schema_comment": "Pinned engine/model assets for reproducible local builds. Checksums are SHA-256 of the file bytes.",
+  "assets": [
+    {
+      "id": "stockfish-18-lite-single-js",
+      "kind": "copy",
+      "description": "Stockfish.js 18 lite single-thread loader (GPL-3.0)",
+      "sourcePackage": "stockfish",
+      "sourcePackageVersion": "18.0.8",
+      "sourcePath": "node_modules/stockfish/bin/stockfish-18-lite-single.js",
+      "destination": "public/engine/stockfish-18-lite-single.js",
+      "sha256": "5243fd9b276cab7dfe3ad1d43ab9ead73568fac76468c614242977a210c4a391",
+      "license": "GPL-3.0",
+      "sourceUrl": "https://github.com/nmrugg/stockfish.js"
+    },
+    {
+      "id": "stockfish-18-lite-single-wasm",
+      "kind": "copy",
+      "description": "Stockfish.js 18 lite single-thread WASM (GPL-3.0)",
+      "sourcePackage": "stockfish",
+      "sourcePackageVersion": "18.0.8",
+      "sourcePath": "node_modules/stockfish/bin/stockfish-18-lite-single.wasm",
+      "destination": "public/engine/stockfish-18-lite-single.wasm",
+      "sha256": "a8fbc05ec6920b56d7485826dcb02c5ffd2826bcbf751cf973046f237a9096f1",
+      "license": "GPL-3.0",
+      "sourceUrl": "https://github.com/nmrugg/stockfish.js"
+    },
+    {
+      "id": "onnxruntime-web-wasm",
+      "kind": "copy",
+      "description": "ONNX Runtime Web WASM (MIT)",
+      "sourcePackage": "onnxruntime-web",
+      "sourcePackageVersion": "1.27.0",
+      "sourcePath": "node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.wasm",
+      "destination": "public/ort/1.27.0/ort-wasm-simd-threaded.wasm",
+      "sha256": "d1ab1b94b16a65b29d710d0b587b29e7bed336827577623913479b8afe8113e6",
+      "bytes": 13479978,
+      "license": "MIT",
+      "sourceUrl": "https://github.com/microsoft/onnxruntime"
+    },
+    {
+      "id": "onnxruntime-web-mjs",
+      "kind": "copy",
+      "description": "ONNX Runtime Web WASM loader (MIT)",
+      "sourcePackage": "onnxruntime-web",
+      "sourcePackageVersion": "1.27.0",
+      "sourcePath": "node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.mjs",
+      "destination": "public/ort/1.27.0/ort-wasm-simd-threaded.mjs",
+      "sha256": "0a1e718d99c41b22c21f2520ff4f9e883a6b5533856e398d21816ee8eb8185d3",
+      "bytes": 24180,
+      "license": "MIT",
+      "sourceUrl": "https://github.com/microsoft/onnxruntime"
+    },
+    {
+      "id": "onnxruntime-web-jsep-wasm",
+      "kind": "copy",
+      "description": "ONNX Runtime Web JSEP WASM (MIT)",
+      "sourcePackage": "onnxruntime-web",
+      "sourcePackageVersion": "1.27.0",
+      "sourcePath": "node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.jsep.wasm",
+      "destination": "public/ort/1.27.0/ort-wasm-simd-threaded.jsep.wasm",
+      "sha256": "78feeeb3d08f6bcee94d938ed322f69073bb8076b5f9d34697a574ffba8deb48",
+      "bytes": 26827543,
+      "license": "MIT",
+      "sourceUrl": "https://github.com/microsoft/onnxruntime"
+    },
+    {
+      "id": "onnxruntime-web-jsep-mjs",
+      "kind": "copy",
+      "description": "ONNX Runtime Web JSEP loader (MIT)",
+      "sourcePackage": "onnxruntime-web",
+      "sourcePackageVersion": "1.27.0",
+      "sourcePath": "node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.jsep.mjs",
+      "destination": "public/ort/1.27.0/ort-wasm-simd-threaded.jsep.mjs",
+      "sha256": "3ee381d20a80f51a788a1c4a5872f6f1d047538dd4342f4af00062de5f9ea4c6",
+      "bytes": 46614,
+      "license": "MIT",
+      "sourceUrl": "https://github.com/microsoft/onnxruntime"
+    },
+    {
+      "id": "maia3-5m-fp16-onnx",
+      "kind": "download",
+      "description": "Maia3 5M fp16 browser ONNX export (AGPL-3.0)",
+      "url": "https://huggingface.co/bqrio/maia3-onnx/resolve/f2582c005a63a034e493d93736ecdd6291dd82e7/maia3-5m.fp16.onnx",
+      "destination": "public/models/maia3-5m.fp16.ca22fc303197.onnx",
+      "sha256": "ca22fc3031975932e693f9758149302efc177749165443ed52de828add8864fa",
+      "bytes": 10755531,
+      "license": "AGPL-3.0",
+      "sourceUrl": "https://huggingface.co/bqrio/maia3-onnx/blob/f2582c005a63a034e493d93736ecdd6291dd82e7/maia3-5m.fp16.onnx",
+      "upstreamModel": "https://huggingface.co/UofTCSSLab/Maia3-5M",
+      "upstreamCode": "https://github.com/CSSLab/maia3"
+    }
+  ]
+}
