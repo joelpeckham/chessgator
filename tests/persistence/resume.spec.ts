@@ -25,17 +25,35 @@ test.describe("local resume + corruption", () => {
       { timeout: 10_000 },
     );
 
-    // Wait for debounced persist.
-    await page.waitForTimeout(500);
+    // Wait for debounced persist (250ms) to write a valid snapshot.
+    await expect
+      .poll(async () => {
+        const raw = await page.evaluate(
+          (key) => localStorage.getItem(key),
+          STORAGE_KEY,
+        );
+        if (!raw) return null;
+        try {
+          return JSON.parse(raw) as {
+            version?: number;
+            maiaElo?: number;
+            tree?: { children?: Array<{ uci?: string }> };
+            currentPath?: unknown;
+          };
+        } catch {
+          return null;
+        }
+      })
+      .toMatchObject({
+        version: 2,
+        maiaElo: 1600,
+        tree: { children: [{ uci: "e2e4" }] },
+      });
     const raw = await page.evaluate(
       (key) => localStorage.getItem(key),
       STORAGE_KEY,
     );
-    expect(raw).toBeTruthy();
-    const parsed = JSON.parse(raw!);
-    expect(parsed.version).toBe(2);
-    expect(parsed.maiaElo).toBe(1600);
-    expect(parsed.tree.children?.[0]?.uci).toBe("e2e4");
+    const parsed = JSON.parse(raw!) as { currentPath?: unknown };
     expect(Array.isArray(parsed.currentPath)).toBe(true);
 
     await page.reload();

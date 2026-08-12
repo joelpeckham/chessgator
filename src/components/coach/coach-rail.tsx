@@ -46,6 +46,11 @@ function deriveStripMode(args: {
   return "idle";
 }
 
+/** Stable callback ref: focus close when the expanded panel mounts. */
+function focusCloseOnMount(node: HTMLButtonElement | null): void {
+  node?.focus();
+}
+
 /**
  * Fixed-height coach strip above the timeline. Expanded details float upward
  * out of document flow so the board never reflows.
@@ -69,8 +74,6 @@ export function CoachRail({
   className,
 }: CoachRailProps) {
   const expandButtonRef = useRef<HTMLButtonElement>(null);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const wasExpanded = useRef(false);
 
   const visibleInsight = dismissed ? null : insight;
   const stripMode = deriveStripMode({
@@ -79,14 +82,10 @@ export function CoachRail({
     hint,
   });
 
-  useEffect(() => {
-    if (expanded && !wasExpanded.current) {
-      closeButtonRef.current?.focus();
-    } else if (!expanded && wasExpanded.current) {
-      expandButtonRef.current?.focus();
-    }
-    wasExpanded.current = expanded;
-  }, [expanded]);
+  function collapse(): void {
+    onExpandedChange(false);
+    expandButtonRef.current?.focus();
+  }
 
   useEffect(() => {
     if (!expanded) return;
@@ -94,6 +93,7 @@ export function CoachRail({
       if (event.key === "Escape") {
         event.preventDefault();
         onExpandedChange(false);
+        expandButtonRef.current?.focus();
       }
     }
     window.addEventListener("keydown", onKey);
@@ -180,7 +180,13 @@ export function CoachRail({
               aria-expanded={expanded}
               aria-controls="coach-expanded-panel"
               data-testid="coach-expand"
-              onClick={() => onExpandedChange(!expanded)}
+              onClick={() => {
+                if (expanded) {
+                  collapse();
+                } else {
+                  onExpandedChange(true);
+                }
+              }}
             >
               <RiArrowUpSLine
                 className={cn("transition-transform", expanded && "rotate-180")}
@@ -198,7 +204,7 @@ export function CoachRail({
               data-testid="dismiss-teaching-card"
               onClick={() => {
                 onDismiss();
-                onExpandedChange(false);
+                collapse();
               }}
             >
               <RiCloseLine />
@@ -215,14 +221,14 @@ export function CoachRail({
         >
           <div className="relative px-3 py-3 sm:px-4">
             <Button
-              ref={closeButtonRef}
+              ref={focusCloseOnMount}
               type="button"
               size="icon-xs"
               variant="ghost"
               className="absolute top-2 right-2 z-10"
               aria-label="Collapse coach feedback"
               data-testid="collapse-teaching-card"
-              onClick={() => onExpandedChange(false)}
+              onClick={collapse}
             >
               <RiCloseLine />
             </Button>

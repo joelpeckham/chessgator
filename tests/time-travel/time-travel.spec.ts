@@ -57,17 +57,16 @@ test.describe("time travel + branching timeline", () => {
       .locator('[data-testid="move-list"] [data-timeline-node="true"]')
       .filter({ hasText: /d4/ })
       .first();
-    if (await d4Node.count()) {
-      await d4Node.click();
-      await expect(page.getByTestId("timeline-status")).toContainText(
-        /Reviewing|d4/i,
-      );
-      // Prev/Next follow the selected branch.
-      await page.getByTestId("timeline-prev").click();
-      await expect(page.getByTestId("timeline-status")).toContainText(
-        /start|Reviewing/i,
-      );
-    }
+    await expect(d4Node).toBeVisible();
+    await d4Node.click();
+    await expect(page.getByTestId("timeline-status")).toContainText(
+      /Reviewing|d4/i,
+    );
+    // Prev/Next follow the selected branch.
+    await page.getByTestId("timeline-prev").click();
+    await expect(page.getByTestId("timeline-status")).toContainText(
+      /start|Reviewing/i,
+    );
   });
 
   test("timeline jump keeps earlier lines", async ({ page }) => {

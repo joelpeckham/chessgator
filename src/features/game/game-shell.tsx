@@ -63,8 +63,12 @@ const BOARD_MAX_PX = 960;
 const BOARD_MIN_PX = 200;
 const COMPACT_BREAKPOINT_PX = 640;
 
+function subscribeViewport(onStoreChange: () => void): () => void {
+  window.addEventListener("resize", onStoreChange);
+  return () => window.removeEventListener("resize", onStoreChange);
+}
+
 function computeBoardSize(): number {
-  if (typeof window === "undefined") return 640;
   const availW = window.innerWidth - VIEWPORT_PAD_PX;
   const availH =
     window.innerHeight - HEADER_RESERVE_PX - FOOTER_CHROME_PX - VIEWPORT_PAD_PX;
@@ -75,7 +79,6 @@ function computeBoardSize(): number {
 }
 
 function computeCompact(): boolean {
-  if (typeof window === "undefined") return false;
   return window.innerWidth < COMPACT_BREAKPOINT_PX;
 }
 
@@ -162,8 +165,16 @@ export function GameShell() {
   );
   const [engineNoticeArmed, setEngineNoticeArmed] = useState(false);
   // Client-only shell — size once from viewport; resize updates, coach chrome does not.
-  const [boardSize, setBoardSize] = useState(computeBoardSize);
-  const [compact, setCompact] = useState(computeCompact);
+  const boardSize = useSyncExternalStore(
+    subscribeViewport,
+    computeBoardSize,
+    () => 640,
+  );
+  const compact = useSyncExternalStore(
+    subscribeViewport,
+    computeCompact,
+    () => false,
+  );
   const lastAnnouncedInsightId = useRef<string | null>(null);
   const lastAnnouncedHintLevel = useRef<number | null>(null);
   const requestSeq = useRef(0);
@@ -295,16 +306,6 @@ export function GameShell() {
   useEffect(() => {
     void hydrate();
   }, [hydrate]);
-
-  useEffect(() => {
-    const apply = () => {
-      setBoardSize(computeBoardSize());
-      setCompact(computeCompact());
-    };
-    apply();
-    window.addEventListener("resize", apply);
-    return () => window.removeEventListener("resize", apply);
-  }, []);
 
   // Polite coach / hint announcements via the shared live region.
   useEffect(() => {

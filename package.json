@@ -10,7 +10,7 @@
     "build": "next build",
     "format": "biome check --write .",
     "format:check": "biome ci .",
-    "lint": "oxlint && eslint --ignore-pattern 'public/engine/**' --ignore-pattern 'public/models/**' --ignore-pattern 'public/ort/**' --ignore-pattern 'tests/stockfish/.generated/**' --ignore-pattern 'tests/maia/.generated/**'",
+    "lint": "oxlint --deny-warnings && eslint --max-warnings 0 --ignore-pattern 'public/engine/**' --ignore-pattern 'public/models/**' --ignore-pattern 'public/ort/**' --ignore-pattern 'tests/stockfish/.generated/**' --ignore-pattern 'tests/maia/.generated/**'",
     "typecheck": "tsc --noEmit",
     "knip": "knip",
     "analyze": "next experimental-analyze",
