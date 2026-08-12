@@ -1,18 +1,25 @@
 import { describe, expect, it } from "vitest";
 import {
-  createGameSession,
+  createInitialTree,
   createVariationExplorer,
   exitVariationExplorer,
   getMainlinePath,
-  jumpToGameNode,
+  jumpToNode,
   listMainlineChild,
-  playMove,
+  playMoveOnTree,
   stepVariationBack,
   stepVariationForward,
   tryInsteadFromExplorer,
   validateVariationLine,
 } from "@/domain/game";
 import { DEFAULT_POSITION } from "@/domain/game/rules";
+import type { GameTree } from "@/domain/game/types";
+
+function play(tree: GameTree, uci: string): GameTree {
+  const result = playMoveOnTree(tree, tree.currentNodeId, uci);
+  if (!result) throw new Error(`Illegal move ${uci}`);
+  return result.tree;
+}
 
 describe("variation explorer", () => {
   it("validates a Stockfish-style UCI line and stops on illegals", () => {
@@ -27,18 +34,18 @@ describe("variation explorer", () => {
   });
 
   it("steps through ghost nodes without stealing the main line", () => {
-    let game = createGameSession();
-    game = playMove(game, "e2e4").session;
-    game = playMove(game, "e7e5").session;
-    const originId = game.tree.currentNodeId;
-    const mainChildBefore = listMainlineChild(game.tree, game.tree.rootId);
+    let tree = createInitialTree();
+    tree = play(tree, "e2e4");
+    tree = play(tree, "e7e5");
+    const originId = tree.currentNodeId;
+    const mainChildBefore = listMainlineChild(tree, tree.rootId);
 
-    const started = createVariationExplorer(game.tree, originId, [
+    const started = createVariationExplorer(tree, originId, [
       "g1f3",
       "b8c6",
     ]);
     expect(started).not.toBeNull();
-    let tree = started!.tree;
+    tree = started!.tree;
     let explorer = started!.explorer;
 
     const fwd1 = stepVariationForward(tree, explorer);
@@ -54,7 +61,6 @@ describe("variation explorer", () => {
     explorer = fwd2!.explorer;
     expect(explorer.stepIndex).toBe(2);
 
-    // Main line from the root is unchanged (still e4).
     expect(listMainlineChild(tree, tree.rootId)?.id).toBe(mainChildBefore?.id);
     expect(getMainlinePath(tree).map((n) => n.move?.uci)).toEqual([
       undefined,
@@ -74,18 +80,17 @@ describe("variation explorer", () => {
   });
 
   it("Try instead promotes the first ply and restores a clean origin sibling set", () => {
-    let game = createGameSession();
-    game = playMove(game, "e2e4").session;
-    const afterE4 = game.tree.currentNodeId;
+    let tree = createInitialTree();
+    tree = play(tree, "e2e4");
+    const afterE4 = tree.currentNodeId;
 
-    // Explore an alternate from the root while keeping e4.
-    game = jumpToGameNode(game, game.tree.rootId).session;
-    const started = createVariationExplorer(game.tree, game.tree.rootId, [
+    tree = jumpToNode(tree, tree.rootId)!;
+    const started = createVariationExplorer(tree, tree.rootId, [
       "d2d4",
       "d7d5",
     ]);
     expect(started).not.toBeNull();
-    let tree = started!.tree;
+    tree = started!.tree;
     let explorer = started!.explorer;
     const stepped = stepVariationForward(tree, explorer);
     expect(stepped).not.toBeNull();
@@ -98,7 +103,6 @@ describe("variation explorer", () => {
     expect(tried!.node.isVariation).toBe(false);
     expect(tried!.tree.currentNodeId).toBe(tried!.node.id);
 
-    // e4 branch preserved; d4 is now the preferred mainline child.
     const root = tried!.tree.nodes[tried!.tree.rootId]!;
     expect(root.childIds).toContain(afterE4);
     expect(listMainlineChild(tried!.tree, root.id)?.id).toBe(tried!.node.id);
@@ -108,24 +112,23 @@ describe("variation explorer", () => {
   });
 
   it("exit removes nested ghosts when first ply reused a committed child", () => {
-    let game = createGameSession();
-    game = playMove(game, "e2e4").session;
-    const e4Id = game.tree.currentNodeId;
-    game = playMove(game, "e7e5").session;
-    const e5Id = game.tree.currentNodeId;
-    // Legitimate committed descendant under e5 (must survive exit).
-    game = playMove(game, "b1c3").session;
-    const committedNc3Id = game.tree.currentNodeId;
+    let tree = createInitialTree();
+    tree = play(tree, "e2e4");
+    const e4Id = tree.currentNodeId;
+    tree = play(tree, "e7e5");
+    const e5Id = tree.currentNodeId;
+    tree = play(tree, "b1c3");
+    const committedNc3Id = tree.currentNodeId;
+    const rootId = tree.rootId;
 
-    // Explore from root: first ply reuses committed e4, then nested ghosts.
-    const started = createVariationExplorer(game.tree, game.tree.rootId, [
+    const started = createVariationExplorer(tree, rootId, [
       "e2e4",
       "e7e5",
       "g1f3",
       "b8c6",
     ]);
     expect(started).not.toBeNull();
-    let tree = started!.tree;
+    tree = started!.tree;
     let explorer = started!.explorer;
 
     for (let i = 0; i < 4; i += 1) {
@@ -145,7 +148,7 @@ describe("variation explorer", () => {
     expect(ghostIds.length).toBeGreaterThan(0);
 
     const exited = exitVariationExplorer(tree, explorer);
-    expect(exited.currentNodeId).toBe(game.tree.rootId);
+    expect(exited.currentNodeId).toBe(rootId);
     expect(exited.nodes[e4Id]).toBeDefined();
     expect(exited.nodes[e5Id]).toBeDefined();
     expect(exited.nodes[committedNc3Id]).toBeDefined();
@@ -158,35 +161,34 @@ describe("variation explorer", () => {
     ).toBe(false);
   });
 
-  it("preserves branches when jumping / taking back after exploration", () => {
-    let game = createGameSession();
-    game = playMove(game, "e2e4").session;
-    game = playMove(game, "e7e5").session;
-    const leaf = game.tree.currentNodeId;
-    const count = Object.keys(game.tree.nodes).length;
+  it("preserves branches when jumping after exploration", () => {
+    let tree = createInitialTree();
+    tree = play(tree, "e2e4");
+    tree = play(tree, "e7e5");
+    const leaf = tree.currentNodeId;
+    const count = Object.keys(tree.nodes).length;
 
-    game = jumpToGameNode(game, game.tree.rootId).session;
-    game = playMove(game, "d2d4").session;
-    expect(Object.keys(game.tree.nodes).length).toBeGreaterThan(count);
+    tree = jumpToNode(tree, tree.rootId)!;
+    tree = play(tree, "d2d4");
+    expect(Object.keys(tree.nodes).length).toBeGreaterThan(count);
 
-    game = jumpToGameNode(game, leaf).session;
-    expect(game.tree.currentNodeId).toBe(leaf);
-    expect(game.tree.nodes[leaf]?.move?.uci).toBe("e7e5");
+    tree = jumpToNode(tree, leaf)!;
+    expect(tree.currentNodeId).toBe(leaf);
+    expect(tree.nodes[leaf]?.move?.uci).toBe("e7e5");
   });
 
   it("blunder explore line + Try instead commits suggestedMoveUci, not the mistake", () => {
-    // Simulate a position where White blundered a2a3 instead of h5e5.
     const fenBefore =
       "rnbqkbnr/pppp1p1p/6p1/4p2Q/4P3/8/PPPP1PPP/RNB1KBNR w KQkq - 0 3";
-    let game = createGameSession({ fen: fenBefore });
-    game = playMove(game, "a2a3").session;
-    const blunderId = game.tree.currentNodeId;
-    const originId = game.tree.rootId;
+    let tree = createInitialTree(fenBefore);
+    tree = play(tree, "a2a3");
+    const blunderId = tree.currentNodeId;
+    const originId = tree.rootId;
 
     const improvement = ["h5e5", "d7d6"];
-    const started = createVariationExplorer(game.tree, originId, improvement);
+    const started = createVariationExplorer(tree, originId, improvement);
     expect(started).not.toBeNull();
-    let tree = started!.tree;
+    tree = started!.tree;
     let explorer = started!.explorer;
     const stepped = stepVariationForward(tree, explorer);
     expect(stepped).not.toBeNull();
@@ -202,7 +204,6 @@ describe("variation explorer", () => {
     expect(tried!.node.move?.uci).toBe("h5e5");
     expect(tried!.node.id).not.toBe(blunderId);
     expect(listMainlineChild(tried!.tree, originId)?.move?.uci).toBe("h5e5");
-    // Prior blunder branch remains visible as a sibling.
     expect(
       tried!.tree.nodes[originId]!.childIds.some(
         (id) => tried!.tree.nodes[id]?.move?.uci === "a2a3",

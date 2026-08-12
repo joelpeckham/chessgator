@@ -3,34 +3,19 @@ import {
   evalLossForMover,
   type MoveClassification,
 } from "@/domain/analysis/classification";
-import { toAnalysisSummary } from "@/domain/analysis/score";
 import {
   collectTacticalFacts,
   type TacticalFacts,
 } from "@/domain/analysis/tactics";
 import type {
   AnalysisEvidence,
-  AnalysisSummary,
   EvaluationScore,
   PrincipalVariation,
 } from "@/domain/analysis/types";
-import { tryApplyMove } from "@/domain/game/rules";
+import { legalUciPrefix } from "@/domain/game/rules";
 import type { GameMove } from "@/domain/game/types";
 
-/** Keep only the legal UCI prefix from `fen` (domain-local; mirrors engine helper). */
-function legalPvPrefix(fen: string, pvUci: readonly string[]): string[] {
-  const legal: string[] = [];
-  let current = fen;
-  for (const raw of pvUci) {
-    const applied = tryApplyMove(current, raw.trim().toLowerCase());
-    if (!applied) break;
-    legal.push(applied.move.uci);
-    current = applied.fenAfter;
-  }
-  return legal;
-}
-
-/** Max plies kept for teaching / show-line. */
+/** Max plies kept for teaching / explore-line display. */
 export const SHORT_PV_MAX_PLIES = 4;
 
 /**
@@ -63,11 +48,6 @@ export type MoveAnalysisEvidence = {
   tacticalFacts: TacticalFacts;
   before: AnalysisEvidence;
   after: AnalysisEvidence;
-  /**
-   * Optional Maia policy probability for the played move.
-   * When shown in UI, label as model-predicted likelihood — not population frequency.
-   */
-  maiaPredictedLikelihood?: number;
 };
 
 export type BuildMoveAnalysisInput = {
@@ -78,7 +58,6 @@ export type BuildMoveAnalysisInput = {
   fenAfter: string;
   before: AnalysisEvidence;
   after: AnalysisEvidence;
-  maiaPredictedLikelihood?: number;
   shortPvMaxPlies?: number;
 };
 
@@ -111,7 +90,7 @@ export function buildMoveAnalysisEvidence(
 
   const bestLine = alternatives[0]?.pvUci ?? [];
   // Improvement line always starts from fenBefore (best / MultiPV #1).
-  const shortPvUci = legalPvPrefix(input.fenBefore, bestLine).slice(0, maxPlies);
+  const shortPvUci = legalUciPrefix(input.fenBefore, bestLine).slice(0, maxPlies);
 
   // Refutation is separate: from the played position, never prefixed with the
   // mistake itself (Explore / Try instead must not replay the blunder).
@@ -120,7 +99,7 @@ export function buildMoveAnalysisEvidence(
     (classification === "mistake" || classification === "blunder") &&
     input.after.lines[0]?.pvUci?.length
   ) {
-    refutationUci = legalPvPrefix(
+    refutationUci = legalUciPrefix(
       input.fenAfter,
       input.after.lines[0].pvUci,
     ).slice(0, maxPlies);
@@ -150,20 +129,5 @@ export function buildMoveAnalysisEvidence(
     tacticalFacts,
     before: input.before,
     after: input.after,
-    ...(input.maiaPredictedLikelihood !== undefined
-      ? { maiaPredictedLikelihood: input.maiaPredictedLikelihood }
-      : {}),
   };
-}
-
-/** Compact tree summary for persistence / node attachment. */
-export function evidenceToSummary(
-  evidence: MoveAnalysisEvidence,
-): AnalysisSummary {
-  return toAnalysisSummary({
-    scoreWhite: evidence.evalAfter,
-    sideToMove: evidence.sideThatMoved === "w" ? "b" : "w",
-    bestMoveUci: evidence.bestMoveUci,
-    classification: evidence.classification,
-  });
 }

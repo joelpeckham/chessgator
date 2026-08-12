@@ -1,20 +1,47 @@
 import { describe, expect, it, vi } from "vitest";
 import type { AnalysisEvidence } from "@/domain/analysis/types";
 import { tryApplyMove } from "@/domain/game/rules";
+import { createCoachingController } from "@/features/game/coaching-controller";
 import {
   createStubAnalysisEngine,
-  type AnalysisEngine,
-} from "@/features/game/analysis-engine";
-import { createCoachingController } from "@/features/game/coaching-controller";
+  type StockfishClientLike,
+} from "@/features/game/stub-analysis";
 
 const START =
   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
+function createSlowEngine(gate: Promise<void>): StockfishClientLike {
+  return {
+    status: () => "ready",
+    initialize: async () => {},
+    setCurrentGameNodeId: () => {},
+    cancel: () => {},
+    cancelAll: () => {},
+    dispose: async () => {},
+    analyze: async (opts) => {
+      await gate;
+      return {
+        requestId: opts.requestId,
+        gameNodeId: opts.gameNodeId,
+        fen: opts.fen,
+        sideToMove: "w",
+        score: { cp: 0 },
+        bestMoveUci: "e2e4",
+        lines: [{ multipv: 1, score: { cp: 0 }, pvUci: ["e2e4"] }],
+      } satisfies AnalysisEvidence;
+    },
+  };
+}
+
+function stubCoach() {
+  return createCoachingController({
+    createEngine: () => createStubAnalysisEngine({ delayMs: 0 }),
+  });
+}
+
 describe("coaching controller", () => {
   it("analyzes a player move into evidence + insight", async () => {
-    const coach = createCoachingController({
-      createEngine: () => createStubAnalysisEngine({ delayMs: 0 }),
-    });
+    const coach = stubCoach();
     expect(await coach.start()).toBe(true);
 
     const applied = tryApplyMove(START, "e2e4")!;
@@ -29,7 +56,6 @@ describe("coaching controller", () => {
     expect(evidence).not.toBeNull();
     expect(evidence!.classification).toBe("best");
     expect(coach.getState().insight?.concept).toBe("best_move");
-    expect(coach.getState().cardExpanded).toBe(false);
     await coach.dispose();
   });
 
@@ -39,28 +65,9 @@ describe("coaching controller", () => {
       release = resolve;
     });
 
-    const slow: AnalysisEngine = {
-      status: () => "ready",
-      initialize: async () => {},
-      setCurrentGameNodeId: () => {},
-      cancel: () => {},
-      cancelAll: () => {},
-      dispose: async () => {},
-      analyze: async (opts) => {
-        await gate;
-        return {
-          requestId: opts.requestId,
-          gameNodeId: opts.gameNodeId,
-          fen: opts.fen,
-          sideToMove: "w",
-          score: { cp: 0 },
-          bestMoveUci: "e2e4",
-          lines: [{ multipv: 1, score: { cp: 0 }, pvUci: ["e2e4"] }],
-        } satisfies AnalysisEvidence;
-      },
-    };
-
-    const coach = createCoachingController({ createEngine: () => slow });
+    const coach = createCoachingController({
+      createEngine: () => createSlowEngine(gate),
+    });
     await coach.start();
     const applied = tryApplyMove(START, "e2e4")!;
 
@@ -89,28 +96,9 @@ describe("coaching controller", () => {
       release = resolve;
     });
 
-    const slow: AnalysisEngine = {
-      status: () => "ready",
-      initialize: async () => {},
-      setCurrentGameNodeId: () => {},
-      cancel: () => {},
-      cancelAll: () => {},
-      dispose: async () => {},
-      analyze: async (opts) => {
-        await gate;
-        return {
-          requestId: opts.requestId,
-          gameNodeId: opts.gameNodeId,
-          fen: opts.fen,
-          sideToMove: "w",
-          score: { cp: 0 },
-          bestMoveUci: "e2e4",
-          lines: [{ multipv: 1, score: { cp: 0 }, pvUci: ["e2e4"] }],
-        } satisfies AnalysisEvidence;
-      },
-    };
-
-    const coach = createCoachingController({ createEngine: () => slow });
+    const coach = createCoachingController({
+      createEngine: () => createSlowEngine(gate),
+    });
     await coach.start();
     const applied = tryApplyMove(START, "e2e4")!;
     const pending = coach.analyzePlayerMove({
@@ -139,28 +127,9 @@ describe("coaching controller", () => {
       release = resolve;
     });
 
-    const slow: AnalysisEngine = {
-      status: () => "ready",
-      initialize: async () => {},
-      setCurrentGameNodeId: () => {},
-      cancel: () => {},
-      cancelAll: () => {},
-      dispose: async () => {},
-      analyze: async (opts) => {
-        await gate;
-        return {
-          requestId: opts.requestId,
-          gameNodeId: opts.gameNodeId,
-          fen: opts.fen,
-          sideToMove: "w",
-          score: { cp: 0 },
-          bestMoveUci: "e2e4",
-          lines: [{ multipv: 1, score: { cp: 0 }, pvUci: ["e2e4"] }],
-        } satisfies AnalysisEvidence;
-      },
-    };
-
-    const coach = createCoachingController({ createEngine: () => slow });
+    const coach = createCoachingController({
+      createEngine: () => createSlowEngine(gate),
+    });
     await coach.start();
     const applied = tryApplyMove(START, "e2e4")!;
     const pending = coach.analyzePlayerMove({
@@ -176,7 +145,6 @@ describe("coaching controller", () => {
     expect(coach.getState().phase).toBe("ready");
     expect(coach.getState().evidence).toBeNull();
     expect(coach.getState().insight).toBeNull();
-    expect(coach.getState().cardExpanded).toBe(false);
 
     release();
     await expect(pending).resolves.toBeNull();
@@ -185,9 +153,7 @@ describe("coaching controller", () => {
   });
 
   it("after clearFeedback, Explore cannot target a prior analyzed node", async () => {
-    const coach = createCoachingController({
-      createEngine: () => createStubAnalysisEngine({ delayMs: 0 }),
-    });
+    const coach = stubCoach();
     await coach.start();
     const applied = tryApplyMove(START, "e2e4")!;
     await coach.analyzePlayerMove({
@@ -200,7 +166,7 @@ describe("coaching controller", () => {
     expect(coach.getState().evidence?.gameNodeId).toBe("node-e4");
     expect(coach.getState().insight?.lineUci.length).toBeGreaterThan(0);
 
-    // Timeline jump / takeback clears feedback so Explore has no stale target.
+    // Timeline jump / undo clears feedback so Explore has no stale target.
     coach.clearFeedback();
     const after = coach.getState();
     expect(after.phase).toBe("ready");
@@ -210,32 +176,56 @@ describe("coaching controller", () => {
     await coach.dispose();
   });
 
-  it("show-line toggles board annotations from insight PV", async () => {
+  it("autoExpand insights annotate the suggested move on the board", async () => {
+    const afterA3 =
+      "rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1";
     const coach = createCoachingController({
-      createEngine: () => createStubAnalysisEngine({ delayMs: 0 }),
+      createEngine: () =>
+        createStubAnalysisEngine({
+          delayMs: 0,
+          scripts: [
+            {
+              fen: START,
+              evidence: {
+                score: { cp: 40 },
+                bestMoveUci: "e2e4",
+                lines: [
+                  { multipv: 1, score: { cp: 40 }, pvUci: ["e2e4", "e7e5"] },
+                  { multipv: 2, score: { cp: -80 }, pvUci: ["a2a3"] },
+                ],
+              },
+            },
+            {
+              fen: afterA3,
+              evidence: {
+                // Large White-eval drop so classification auto-expands.
+                score: { cp: -180 },
+                bestMoveUci: "e7e5",
+                lines: [{ multipv: 1, score: { cp: -180 }, pvUci: ["e7e5"] }],
+              },
+            },
+          ],
+        }),
     });
     await coach.start();
-    const applied = tryApplyMove(START, "e2e4")!;
+    const applied = tryApplyMove(START, "a2a3")!;
+    expect(applied.fenAfter.startsWith(afterA3.split(" ")[0]!)).toBe(true);
     await coach.analyzePlayerMove({
-      requestId: "line",
+      requestId: "annotate",
       gameNodeId: "n",
       fenBefore: START,
       fenAfter: applied.fenAfter,
       playedMove: applied.move,
     });
 
-    coach.setShowLine(true);
-    expect(coach.getState().showLine).toBe(true);
+    const insight = coach.getState().insight;
+    expect(insight?.autoExpand).toBe(true);
     expect(coach.getState().annotations.arrows.length).toBeGreaterThan(0);
-    coach.setShowLine(false);
-    expect(coach.getState().showLine).toBe(false);
     await coach.dispose();
   });
 
   it("escalates progressive hints", async () => {
-    const coach = createCoachingController({
-      createEngine: () => createStubAnalysisEngine({ delayMs: 0 }),
-    });
+    const coach = stubCoach();
     await coach.start();
     const h0 = await coach.escalateHint({
       fen: START,
@@ -262,7 +252,7 @@ describe("coaching controller", () => {
     });
 
     let call = 0;
-    const engine: AnalysisEngine = {
+    const engine: StockfishClientLike = {
       status: () => "ready",
       initialize: async () => {},
       setCurrentGameNodeId: () => {},
@@ -313,9 +303,7 @@ describe("coaching controller", () => {
   });
 
   it("clearFeedback resets takeback/retry UI state", async () => {
-    const coach = createCoachingController({
-      createEngine: () => createStubAnalysisEngine({ delayMs: 0 }),
-    });
+    const coach = stubCoach();
     await coach.start();
     const applied = tryApplyMove(START, "e2e4")!;
     await coach.analyzePlayerMove({
@@ -337,9 +325,7 @@ describe("coaching controller", () => {
   });
 
   it("start succeeds after dispose (Strict Mode cleanup)", async () => {
-    const coach = createCoachingController({
-      createEngine: () => createStubAnalysisEngine({ delayMs: 0 }),
-    });
+    const coach = stubCoach();
 
     await coach.dispose();
     expect(await coach.start()).toBe(true);

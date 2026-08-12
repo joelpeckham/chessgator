@@ -17,10 +17,6 @@ export function createChess(fen: string = DEFAULT_POSITION): Chess {
   return new Chess(fen);
 }
 
-export function getFen(chess: Chess): string {
-  return chess.fen();
-}
-
 export function getTurn(fen: string): Color {
   return createChess(fen).turn();
 }
@@ -46,11 +42,6 @@ export function toGameMove(move: Move): GameMove {
 
 export function moveToUci(move: Pick<Move, "from" | "to" | "promotion">): string {
   return `${move.from}${move.to}${move.promotion ?? ""}`;
-}
-
-export function moveToSan(fen: string, input: MoveInput): string | null {
-  const applied = tryApplyMove(fen, input);
-  return applied?.move.san ?? null;
 }
 
 export function sanToUci(fen: string, san: string): string | null {
@@ -108,6 +99,27 @@ export function getLegalMoves(fen: string, square?: Square | string): GameMove[]
 
 export function isLegalMove(fen: string, input: MoveInput): boolean {
   return tryApplyMove(fen, input) !== null;
+}
+
+/** Return the UCI move only when it is legal in `fen`; otherwise null. */
+export function validateLegalUci(fen: string, uci: string | null | undefined): string | null {
+  if (!uci) return null;
+  const normalized = uci.trim().toLowerCase();
+  if (!isLegalMove(fen, normalized)) return null;
+  return normalized;
+}
+
+/** Walk a UCI line from fen, keeping only the legal prefix. */
+export function legalUciPrefix(fen: string, pvUci: readonly string[]): string[] {
+  const legal: string[] = [];
+  let currentFen = fen;
+  for (const raw of pvUci) {
+    const applied = tryApplyMove(currentFen, raw.trim().toLowerCase());
+    if (!applied) break;
+    legal.push(applied.move.uci);
+    currentFen = applied.fenAfter;
+  }
+  return legal;
 }
 
 export type AppliedMove = {

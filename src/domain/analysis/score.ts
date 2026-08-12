@@ -1,4 +1,4 @@
-import type { AnalysisSummary, EvaluationScore } from "@/domain/analysis/types";
+import type { EvaluationScore } from "@/domain/analysis/types";
 
 export type SideToMove = "w" | "b";
 
@@ -34,22 +34,6 @@ export function negateScore(score: EvaluationScore): EvaluationScore {
   if (score.cp !== undefined) next.cp = -score.cp;
   if (score.mate !== undefined) next.mate = -score.mate;
   return next;
-}
-
-/** Compact tree summary uses side-to-move perspective. */
-export function toAnalysisSummary(input: {
-  scoreWhite: EvaluationScore;
-  sideToMove: SideToMove;
-  bestMoveUci?: string | null;
-  classification?: string;
-}): AnalysisSummary {
-  const stm = scoreToSideToMove(input.scoreWhite, input.sideToMove);
-  const summary: AnalysisSummary = {};
-  if (stm.cp !== undefined) summary.evalCp = stm.cp;
-  if (stm.mate !== undefined) summary.mate = stm.mate;
-  if (input.bestMoveUci) summary.bestMoveUci = input.bestMoveUci;
-  if (input.classification) summary.classification = input.classification;
-  return summary;
 }
 
 /** Prefer mate over cp when both appear (should not happen from clean UCI). */

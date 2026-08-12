@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { createGameSession, playMove } from "@/domain/game";
+import { createInitialTree, createSessionState, playMoveOnTree } from "@/domain/game";
 import {
   normalizeSessionForResume,
   useGameStore,
@@ -26,7 +26,7 @@ describe("game store adapter", () => {
     });
   });
 
-  it("exposes commands without requiring raw tree mutation", () => {
+  it("exposes tree ops without requiring raw tree mutation", () => {
     const store = useGameStore.getState();
     store.startGame();
     expect(store.playMove("e2e4")).toBe(true);
@@ -51,14 +51,14 @@ describe("game store adapter", () => {
     expect(useGameStore.getState().lastError).toBe("Illegal move");
   });
 
-  it("setMode error preserves message in lastError and session", () => {
+  it("setMode error preserves message in lastError only", () => {
     useGameStore.getState().startGame();
     expect(
       useGameStore.getState().setMode("error", "Engines failed to start"),
     ).toBe(true);
     const state = useGameStore.getState();
     expect(state.session.mode).toBe("error");
-    expect(state.session.errorMessage).toBe("Engines failed to start");
+    expect(state.session.errorMessage).toBeNull();
     expect(state.lastError).toBe("Engines failed to start");
   });
 
@@ -87,10 +87,28 @@ describe("game store adapter", () => {
     expect(useGameStore.getState().history().map((m) => m.uci)).toEqual(["e2e4"]);
   });
 
+  it("hydrates resigned games as gameOver", async () => {
+    const storage = memoryStorage();
+    const repo = createLocalStorageGameRepository({ storage });
+
+    useGameStore.getState().startGame();
+    useGameStore.getState().playMove("e2e4");
+    useGameStore.getState().resign();
+    await useGameStore.getState().persist(repo);
+
+    useGameStore.setState({ ...useGameStore.getInitialState() });
+    expect(await useGameStore.getState().hydrate(repo)).toBe(true);
+    expect(useGameStore.getState().session.mode).toBe("gameOver");
+    expect(useGameStore.getState().session.terminalReason).toBe("resignation");
+  });
+
   it("normalizes transient modes on resume", () => {
-    let game = createGameSession({ mode: "analyzing" });
-    game = playMove(game, "e2e4", { afterMode: "analyzing" }).session;
-    const normalized = normalizeSessionForResume(game);
+    let tree = createInitialTree();
+    tree = playMoveOnTree(tree, tree.rootId, "e2e4")!.tree;
+    const normalized = normalizeSessionForResume({
+      tree,
+      session: createSessionState("analyzing"),
+    });
     expect(normalized.session.mode).toBe("reviewing");
   });
 });

@@ -18,8 +18,7 @@ import {
   sideToMoveFromFen,
   sortedLines,
 } from "@/engines/stockfish/uci-parse";
-import { tryApplyMove } from "@/domain/game/rules";
-import { validateLegalUci } from "@/engines/stockfish/validate-move";
+import { tryApplyMove, validateLegalUci } from "@/domain/game/rules";
 
 type EngineWorker = Worker;
 

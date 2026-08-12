@@ -73,16 +73,14 @@ describe("teaching selection", () => {
     expect(insight.explanation.length).toBeGreaterThan(10);
   });
 
-  it("templates mention model-predicted likelihood, not population frequency", () => {
+  it("templates render classification without Maia likelihood", () => {
     const text = renderExplanation("solid_move", {
       playedSan: "Nf3",
       suggestedSan: null,
       classification: "good",
       evalLossCp: 15,
-      maiaPredictedLikelihood: 0.42,
     });
-    expect(text).toMatch(/model-predicted likelihood/i);
-    expect(text).not.toMatch(/of players|population frequency of/i);
-    expect(text).toContain("42%");
+    expect(text).toMatch(/Nf3/);
+    expect(text).not.toMatch(/model-predicted likelihood|population frequency/i);
   });
 });

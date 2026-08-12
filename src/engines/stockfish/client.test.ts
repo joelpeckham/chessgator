@@ -80,7 +80,7 @@ function createFakeTransport(options?: {
 }
 
 describe("StockfishClient", () => {
-  it("queues opponent work ahead of background while busy", async () => {
+  it("queues user work ahead of background while busy", async () => {
     const { transport, emit, sent } = createFakeTransport();
     const client = new StockfishClient({ transport, timeoutBufferMs: 5_000 });
     await client.initialize();
@@ -103,7 +103,7 @@ describe("StockfishClient", () => {
       requestId: "r2",
       gameNodeId: "n1",
       fen: DEFAULT_POSITION,
-      priority: "opponent",
+      priority: "user",
       movetimeMs: 50,
     });
     const third = client.analyze({

@@ -1,12 +1,8 @@
 import type { AnalysisEvidence } from "@/domain/analysis/types";
-import type { AnalyzeOptions, StockfishClient } from "@/engines/stockfish";
-import { StockfishClient as StockfishClientImpl } from "@/engines/stockfish";
+import type { AnalyzeOptions } from "@/engines/stockfish";
 
-/**
- * Narrow analysis façade used by coaching. StockfishClient satisfies this;
- * Playwright injects a deterministic stub.
- */
-export type AnalysisEngine = {
+/** Minimal StockfishClient surface used by coaching (and e2e stubs). */
+export type StockfishClientLike = {
   status: () => string;
   initialize: () => Promise<void>;
   analyze: (options: AnalyzeOptions) => Promise<AnalysisEvidence>;
@@ -16,36 +12,7 @@ export type AnalysisEngine = {
   dispose: () => Promise<void>;
 };
 
-export type CreateAnalysisEngineFn = () => AnalysisEngine;
-
-declare global {
-  interface Window {
-    __chessgatorCreateAnalysisEngine?: CreateAnalysisEngineFn;
-  }
-}
-
-export function createStockfishAnalysisEngine(
-  client?: StockfishClient,
-): AnalysisEngine {
-  const engine = client ?? new StockfishClientImpl({ defaultMovetimeMs: 180 });
-  return engine;
-}
-
-/**
- * Resolve the coaching analysis engine. Uses `?e2eStub=` / window hook when present.
- */
-export function createAnalysisEngine(): AnalysisEngine {
-  if (typeof window !== "undefined") {
-    if (typeof window.__chessgatorCreateAnalysisEngine === "function") {
-      return window.__chessgatorCreateAnalysisEngine();
-    }
-    const stub = new URLSearchParams(window.location.search).get("e2eStub");
-    if (stub === "1" || stub === "fallback" || stub === "coach") {
-      return createStubAnalysisEngine();
-    }
-  }
-  return createStockfishAnalysisEngine();
-}
+export type CreateAnalysisEngineFn = () => StockfishClientLike;
 
 export type StubAnalysisScript = {
   /** Match by fen prefix or exact fen. */
@@ -59,11 +26,12 @@ export type StubAnalysisScript = {
 
 /**
  * Deterministic MultiPV-ish replies for coached-flow Playwright tests.
+ * Never touches workers or network.
  */
 export function createStubAnalysisEngine(options?: {
   scripts?: StubAnalysisScript[];
   delayMs?: number;
-}): AnalysisEngine {
+}): StockfishClientLike {
   const scripts = options?.scripts ?? defaultStubScripts();
   const delayMs = options?.delayMs ?? 15;
   let statusValue = "idle";

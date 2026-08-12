@@ -1,20 +1,8 @@
-import { expect, test, type Page } from "@playwright/test";
-
-async function chooseLegalMove(page: Page, san: string) {
-  await page.getByTestId("accessible-move-select").click();
-  await page.getByRole("option", { name: new RegExp(`^${san}\\b`) }).click();
-}
-
-async function startCoachGame(page: Page) {
-  await page.goto("/?e2eStub=coach");
-  await expect(page.getByTestId("game-shell")).toBeVisible();
-  await page.getByTestId("start-button").click();
-  await expect(page.getByTestId("status-badge")).toHaveAttribute(
-    "data-mode",
-    "playerTurn",
-    { timeout: 15_000 },
-  );
-}
+import { expect, test } from "@playwright/test";
+import {
+  chooseLegalMove,
+  startCoachGame,
+} from "../shared/playwright-helpers";
 
 test.describe("time travel + variation explorer", () => {
   test("branch preservation, variation stepping, origin restore, try instead", async ({
@@ -34,7 +22,7 @@ test.describe("time travel + variation explorer", () => {
       { timeout: 10_000 },
     );
 
-    await page.getByTestId("toggle-teaching-card").click();
+    await expect(page.getByTestId("explore-line-button")).toBeVisible();
     await page.getByTestId("explore-line-button").click();
     await expect(page.getByTestId("variation-explorer")).toBeVisible();
     await expect(page.getByTestId("variation-explorer")).toHaveAttribute(
@@ -87,15 +75,15 @@ test.describe("time travel + variation explorer", () => {
       { timeout: 10_000 },
     );
 
-    await page.getByTestId("timeline-takeback").click();
-    await expect(page.getByTestId("live-region")).toContainText(/back/i);
+    await page.getByRole("option", { name: /Start/i }).click();
+    await expect(page.getByTestId("live-region")).toContainText(/start|Jumped/i);
     await expect(page.getByTestId("move-list")).toContainText("e4");
 
     await page.getByRole("option", { name: /e4/ }).first().click();
     await expect(page.getByTestId("live-region")).toContainText(/e4/i);
   });
 
-  test("timeline takeback clears coaching so Explore cannot target old node", async ({
+  test("undo my move clears coaching so Explore cannot target old node", async ({
     page,
   }) => {
     await startCoachGame(page);
@@ -109,17 +97,17 @@ test.describe("time travel + variation explorer", () => {
       { timeout: 10_000 },
     );
 
-    await page.getByTestId("toggle-teaching-card").click();
     await expect(page.getByTestId("explore-line-button")).toBeVisible();
 
-    await page.getByTestId("timeline-takeback").click();
-    await expect(page.getByTestId("live-region")).toContainText(/back/i);
+    await page.getByTestId("takeback-retry-button").click();
+    await expect(page.getByTestId("live-region")).toContainText(/undo|try/i);
     await expect(page.getByTestId("teaching-card")).toHaveAttribute(
       "data-state",
       "empty",
     );
     await expect(page.getByTestId("explore-line-button")).toHaveCount(0);
     await expect(page.getByTestId("variation-explorer")).toHaveCount(0);
+    await expect(page.getByTestId("timeline-takeback")).toHaveCount(0);
     await expect(page.getByTestId("status-badge")).not.toHaveAttribute(
       "data-mode",
       "analyzing",

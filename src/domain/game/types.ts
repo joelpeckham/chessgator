@@ -1,7 +1,6 @@
 import type { Color, PieceSymbol, Square } from "chess.js";
-import type { AnalysisSummary } from "@/domain/analysis/types";
 
-export type { Color, PieceSymbol, Square, AnalysisSummary };
+export type { Color, PieceSymbol, Square };
 
 /** Input accepted by move-application helpers (object or UCI/SAN string). */
 export type MoveInput =
@@ -57,7 +56,6 @@ export type GameNode = {
   /** Move that led to this node; null for the root. */
   move: GameMove | null;
   ply: number;
-  analysis: AnalysisSummary | null;
   /**
    * Ghost / exploration line (e.g. Variation Explorer).
    * Not part of the committed main line unless promoted via "Try instead".
@@ -95,3 +93,13 @@ export type GameSession = {
   tree: GameTree;
   session: SessionState;
 };
+
+export function createSessionState(
+  mode: SessionMode = "loading",
+): SessionState {
+  return {
+    mode,
+    errorMessage: null,
+    terminalReason: null,
+  };
+}

@@ -12,8 +12,6 @@ export {
   type MaiaInferResult,
 } from "@/engines/maia/client";
 
-export { MaiaOpponent, type MaiaOpponentOptions } from "@/engines/maia/opponent";
-
 export {
   encodeTokensForBrowserExport,
   eloTensors,
@@ -66,5 +64,3 @@ export {
   type MaiaWorkerRequest,
   type MaiaWorkerResponse,
 } from "@/engines/maia/protocol";
-
-export { validateLegalUci } from "@/engines/maia/validate-move";

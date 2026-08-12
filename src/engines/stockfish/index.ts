@@ -11,8 +11,6 @@ export {
   type StockfishClientStatus,
 } from "@/engines/stockfish/client";
 
-export { StockfishOpponent, type StockfishOpponentOptions } from "@/engines/stockfish/opponent";
-
 export {
   applyInfoLine,
   parseBestMove,
@@ -38,5 +36,3 @@ export {
   type StockfishWorkerRequest,
   type StockfishWorkerResponse,
 } from "@/engines/stockfish/protocol";
-
-export { validateLegalUci, validatePvUci } from "@/engines/stockfish/validate-move";

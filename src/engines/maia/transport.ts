@@ -3,56 +3,22 @@ import type {
   MaiaWorkerResponse,
 } from "@/engines/maia/protocol";
 import { isMaiaWorkerResponse } from "@/engines/maia/protocol";
+import {
+  createBrowserWorkerTransport as createSharedBrowserWorkerTransport,
+  type WorkerLike,
+  type WorkerTransport,
+} from "@/engines/shared/worker-transport";
+
+export type { WorkerLike };
 
 /**
  * Narrow transport so Node unit tests never touch `Worker` / browser globals.
  * Production uses `createBrowserWorkerTransport`.
  */
-export type MaiaTransport = {
-  postMessage(message: MaiaWorkerRequest): void;
-  subscribe(listener: (message: MaiaWorkerResponse) => void): () => void;
-  terminate(): void;
-};
-
-export type WorkerLike = {
-  postMessage(message: unknown): void;
-  addEventListener(
-    type: "message",
-    listener: (event: MessageEvent<unknown>) => void,
-  ): void;
-  removeEventListener(
-    type: "message",
-    listener: (event: MessageEvent<unknown>) => void,
-  ): void;
-  terminate(): void;
-};
+export type MaiaTransport = WorkerTransport<MaiaWorkerRequest, MaiaWorkerResponse>;
 
 export function createBrowserWorkerTransport(worker: WorkerLike): MaiaTransport {
-  const listeners = new Set<(message: MaiaWorkerResponse) => void>();
-
-  const onMessage = (event: MessageEvent<unknown>) => {
-    if (!isMaiaWorkerResponse(event.data)) return;
-    for (const listener of listeners) listener(event.data);
-  };
-
-  worker.addEventListener("message", onMessage);
-
-  return {
-    postMessage(message) {
-      worker.postMessage(message);
-    },
-    subscribe(listener) {
-      listeners.add(listener);
-      return () => {
-        listeners.delete(listener);
-      };
-    },
-    terminate() {
-      worker.removeEventListener("message", onMessage);
-      listeners.clear();
-      worker.terminate();
-    },
-  };
+  return createSharedBrowserWorkerTransport(worker, isMaiaWorkerResponse);
 }
 
 /** Create the default Next/bundler worker pointing at our typed entry. */

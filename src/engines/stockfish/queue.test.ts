@@ -2,13 +2,11 @@ import { describe, expect, it } from "vitest";
 import { PriorityQueue } from "@/engines/stockfish/queue";
 
 describe("PriorityQueue", () => {
-  it("orders opponent before user before background", () => {
+  it("orders user before background", () => {
     const q = new PriorityQueue<string>();
     q.enqueue("bg", "background", "bg");
     q.enqueue("user", "user", "user");
-    q.enqueue("opp", "opponent", "opp");
-    expect(q.idsInOrder()).toEqual(["opp", "user", "bg"]);
-    expect(q.dequeue()?.id).toBe("opp");
+    expect(q.idsInOrder()).toEqual(["user", "bg"]);
     expect(q.dequeue()?.id).toBe("user");
     expect(q.dequeue()?.id).toBe("bg");
   });
@@ -24,7 +22,7 @@ describe("PriorityQueue", () => {
   it("removes queued jobs by id", () => {
     const q = new PriorityQueue<string>();
     q.enqueue("keep", "user", "k");
-    q.enqueue("drop", "opponent", "d");
+    q.enqueue("drop", "background", "d");
     expect(q.remove("drop")).toBe(true);
     expect(q.has("drop")).toBe(false);
     expect(q.idsInOrder()).toEqual(["keep"]);

@@ -1,7 +1,6 @@
 export type {
   AnalysisEvidence,
   AnalysisPriority,
-  AnalysisSummary,
   EvaluationScore,
   PrincipalVariation,
 } from "@/domain/analysis/types";
@@ -14,7 +13,6 @@ export {
   pickPrimaryScore,
   scoreFromSideToMove,
   scoreToSideToMove,
-  toAnalysisSummary,
 } from "@/domain/analysis/score";
 
 export type { MoveClassification } from "@/domain/analysis/classification";
@@ -45,5 +43,4 @@ export type {
 export {
   SHORT_PV_MAX_PLIES,
   buildMoveAnalysisEvidence,
-  evidenceToSummary,
 } from "@/domain/analysis/move-analysis";

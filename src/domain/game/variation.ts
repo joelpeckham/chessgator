@@ -1,4 +1,4 @@
-import { tryApplyMove } from "@/domain/game/rules";
+import { legalUciPrefix } from "@/domain/game/rules";
 import {
   getNode,
   jumpToNode,
@@ -30,15 +30,7 @@ export function validateVariationLine(
   originFen: string,
   lineUci: readonly string[],
 ): string[] {
-  let fen = originFen;
-  const validated: string[] = [];
-  for (const uci of lineUci) {
-    const applied = tryApplyMove(fen, uci);
-    if (!applied) break;
-    validated.push(applied.move.uci);
-    fen = applied.fenAfter;
-  }
-  return validated;
+  return legalUciPrefix(originFen, lineUci);
 }
 
 export function createVariationExplorer(
@@ -118,38 +110,6 @@ export function stepVariationBack(
   };
 }
 
-/** Jump to an absolute step within the explorer path (0…line length). */
-export function jumpVariationStep(
-  tree: GameTree,
-  explorer: VariationExplorerState,
-  stepIndex: number,
-): { tree: GameTree; explorer: VariationExplorerState } | null {
-  if (stepIndex < 0 || stepIndex > explorer.lineUci.length) return null;
-
-  let nextTree = tree;
-  let nextExplorer = explorer;
-
-  while (nextExplorer.stepIndex < stepIndex) {
-    const advanced = stepVariationForward(nextTree, nextExplorer);
-    if (!advanced) return null;
-    nextTree = advanced.tree;
-    nextExplorer = advanced.explorer;
-  }
-
-  if (nextExplorer.stepIndex > stepIndex) {
-    const targetId = nextExplorer.pathNodeIds[stepIndex];
-    if (!targetId) return null;
-    const jumped = jumpToNode(nextTree, targetId);
-    if (!jumped) return null;
-    return {
-      tree: jumped,
-      explorer: { ...nextExplorer, stepIndex },
-    };
-  }
-
-  return { tree: nextTree, explorer: nextExplorer };
-}
-
 /**
  * Return to the exact origin and prune ghost nodes created by this explorer.
  *
@@ -220,28 +180,4 @@ export function tryInsteadFromExplorer(
   next = jumpToNode(next, node.id) ?? next;
 
   return { tree: next, node };
-}
-
-/**
- * Collect ghost nodes along the current explorer path (excluding origin)
- * for board overlay rendering.
- */
-export function variationOverlayNodes(
-  tree: GameTree,
-  explorer: VariationExplorerState,
-): GameNode[] {
-  return explorer.pathNodeIds
-    .slice(1, explorer.stepIndex + 1)
-    .map((id) => tree.nodes[id])
-    .filter((node): node is GameNode => Boolean(node));
-}
-
-/** Discard a specific variation root (first ghost under origin) and its subtree. */
-export function discardVariationRoot(
-  tree: GameTree,
-  variationRootId: string,
-): GameTree | null {
-  const node = tree.nodes[variationRootId];
-  if (!node?.isVariation) return null;
-  return pruneSubtree(tree, variationRootId);
 }

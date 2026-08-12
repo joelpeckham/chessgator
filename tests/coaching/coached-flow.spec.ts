@@ -1,25 +1,14 @@
-import { expect, test, type Page } from "@playwright/test";
-
-async function chooseLegalMove(page: Page, san: string) {
-  await page.getByTestId("accessible-move-select").click();
-  await page.getByRole("option", { name: new RegExp(`^${san}\\b`) }).click();
-}
+import { expect, test } from "@playwright/test";
+import {
+  chooseLegalMove,
+  startCoachGame,
+} from "../shared/playwright-helpers";
 
 test.describe("coaching slice (deterministic engine stubs)", () => {
-  test("hints, compact feedback, show-line, takeback-and-retry", async ({
-    page,
-  }) => {
-    await page.goto("/?e2eStub=coach");
+  test("hints, full feedback, explore line, undo my move", async ({ page }) => {
+    await startCoachGame(page);
 
-    await expect(page.getByTestId("game-shell")).toBeVisible();
     await expect(page.getByTestId("coach-panel")).toBeVisible();
-
-    await page.getByTestId("start-button").click();
-    await expect(page.getByTestId("status-badge")).toHaveAttribute(
-      "data-mode",
-      "playerTurn",
-      { timeout: 15_000 },
-    );
 
     // Progressive hint ladder before moving.
     await page.getByTestId("hint-button").click();
@@ -46,19 +35,15 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
     );
     await expect(page.getByTestId("teaching-card")).toHaveAttribute(
       "data-state",
-      "compact",
+      "feedback",
     );
     await expect(page.getByTestId("classification-badge")).toContainText("Best");
+    await expect(page.getByTestId("teaching-explanation")).toBeVisible();
+    await expect(page.getByTestId("concept-badge")).toHaveCount(0);
+    await expect(page.getByTestId("show-line-button")).toHaveCount(0);
+    await expect(page.getByTestId("toggle-teaching-card")).toHaveCount(0);
 
-    await page.getByTestId("show-line-button").click();
-    await expect(page.getByTestId("show-line-button")).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
-    await page.getByTestId("toggle-teaching-card").click();
-    await expect(page.getByTestId("shown-line")).toBeVisible();
-
-    // Opponent replies, then take back White's move and retry.
+    // Opponent replies, then undo White's move and retry.
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
       "playerTurn",
@@ -75,5 +60,6 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
       "empty",
     );
     await expect(page.getByTestId("move-list")).toContainText("No moves yet");
+    await expect(page.getByTestId("live-region")).toContainText(/undo|try/i);
   });
 });

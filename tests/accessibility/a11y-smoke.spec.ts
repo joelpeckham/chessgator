@@ -1,4 +1,8 @@
 import { expect, test } from "@playwright/test";
+import {
+  chooseLegalMove,
+  startStubGame,
+} from "../shared/playwright-helpers";
 
 test.describe("accessibility + responsive smoke", () => {
   test("keyboard timeline, live region, reduced motion, tablet layout", async ({
@@ -7,22 +11,13 @@ test.describe("accessibility + responsive smoke", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.setViewportSize({ width: 900, height: 1200 });
 
-    await page.goto("/?e2eStub=1");
-    await expect(page.getByTestId("game-shell")).toBeVisible();
+    await startStubGame(page);
     await expect(page.getByTestId("live-region")).toHaveAttribute(
       "aria-live",
       "polite",
     );
 
-    await page.getByTestId("start-button").click();
-    await expect(page.getByTestId("status-badge")).toHaveAttribute(
-      "data-mode",
-      "playerTurn",
-      { timeout: 15_000 },
-    );
-
-    await page.getByTestId("accessible-move-select").click();
-    await page.getByRole("option", { name: /^e4\b/ }).click();
+    await chooseLegalMove(page, "e4");
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
       "playerTurn",

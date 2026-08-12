@@ -1,5 +1,4 @@
 export type {
-  AnalysisSummary,
   Color,
   GameMove,
   GameNode,
@@ -14,6 +13,8 @@ export type {
   Square,
 } from "@/domain/game/types";
 
+export { createSessionState } from "@/domain/game/types";
+
 export {
   BOOTSTRAP_ROOT_ID,
   createNodeId,
@@ -23,14 +24,13 @@ export {
 export {
   DEFAULT_POSITION,
   createChess,
-  getFen,
   getLegalMoves,
   getStatus,
   getStatusAlongPath,
   getTurn,
   isLegalMove,
   isValidFen,
-  moveToSan,
+  legalUciPrefix,
   moveToUci,
   parseUci,
   replayMoves,
@@ -39,6 +39,7 @@ export {
   tryApplyMove,
   uciToSan,
   validateFen,
+  validateLegalUci,
 } from "@/domain/game/rules";
 
 export {
@@ -53,48 +54,20 @@ export {
   getStatusAtNode,
   jumpToNode,
   listMainlineChild,
-  listVariationChildren,
   playMoveOnTree,
   promoteVariation,
   pruneSubtree,
   pruneVariationChildren,
-  setNodeAnalysis,
   takebackOne,
 } from "@/domain/game/tree";
 export type { PlayMoveOnTreeOptions } from "@/domain/game/tree";
 
 export {
   createVariationExplorer,
-  discardVariationRoot,
   exitVariationExplorer,
-  jumpVariationStep,
   stepVariationBack,
   stepVariationForward,
   tryInsteadFromExplorer,
   validateVariationLine,
-  variationOverlayNodes,
 } from "@/domain/game/variation";
 export type { VariationExplorerState } from "@/domain/game/variation";
-
-export {
-  SESSION_TRANSITIONS,
-  canTransition,
-  createSessionState,
-  enterError,
-  listTransitions,
-  transitionSession,
-} from "@/domain/game/session";
-
-export type { CommandResult } from "@/domain/game/commands";
-export {
-  createGameSession,
-  currentFen,
-  currentStatus,
-  jumpToGameNode,
-  playMove,
-  resign,
-  retryMove,
-  setSessionMode,
-  startGame,
-  takeback,
-} from "@/domain/game/commands";

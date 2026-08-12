@@ -1,6 +1,5 @@
 import {
   buildMoveAnalysisEvidence,
-  evidenceToSummary,
   type MoveAnalysisEvidence,
 } from "@/domain/analysis";
 import type { GameMove } from "@/domain/game";
@@ -12,12 +11,13 @@ import {
   type HintStep,
   type TeachingInsight,
 } from "@/domain/teaching";
-import {
-  createAnalysisEngine,
-  type AnalysisEngine,
-  type CreateAnalysisEngineFn,
-} from "@/features/game/analysis-engine";
+import { StockfishClient } from "@/engines/stockfish";
 import { markEnd, markStart } from "@/features/game/perf-marks";
+import {
+  createStubAnalysisEngine,
+  type CreateAnalysisEngineFn,
+  type StockfishClientLike,
+} from "@/features/game/stub-analysis";
 
 export type CoachingPhase =
   | "idle"
@@ -38,8 +38,6 @@ export type CoachingControllerState = {
   message: string | null;
   evidence: MoveAnalysisEvidence | null;
   insight: TeachingInsight | null;
-  cardExpanded: boolean;
-  showLine: boolean;
   hintLevel: HintLevel;
   hint: HintStep | null;
   annotations: BoardAnnotation;
@@ -51,7 +49,6 @@ export type AnalyzePlayerMoveInput = {
   fenBefore: string;
   fenAfter: string;
   playedMove: GameMove;
-  maiaPredictedLikelihood?: number;
   movetimeMs?: number;
 };
 
@@ -68,17 +65,22 @@ export type CoachingController = {
     sideToMove?: "w" | "b";
   }) => Promise<HintStep | null>;
   resetHints: () => void;
-  setShowLine: (show: boolean) => void;
-  setCardExpanded: (expanded: boolean) => void;
   clearFeedback: () => void;
   cancelPending: () => void;
   dispose: () => Promise<void>;
 };
 
 export type CreateCoachingControllerOptions = {
+  /** Injectable StockfishClient-like factory (tests / e2e stubs). */
   createEngine?: CreateAnalysisEngineFn;
   defaultMovetimeMs?: number;
 };
+
+declare global {
+  interface Window {
+    __chessgatorCreateAnalysisEngine?: CreateAnalysisEngineFn;
+  }
+}
 
 const EMPTY_ANNOTATIONS: BoardAnnotation = {
   highlightSquares: [],
@@ -91,8 +93,6 @@ const IDLE: CoachingControllerState = {
   message: null,
   evidence: null,
   insight: null,
-  cardExpanded: false,
-  showLine: false,
   hintLevel: 0,
   hint: null,
   annotations: EMPTY_ANNOTATIONS,
@@ -105,11 +105,11 @@ const IDLE: CoachingControllerState = {
 export function createCoachingController(
   options: CreateCoachingControllerOptions = {},
 ): CoachingController {
-  const createEngine = options.createEngine ?? createAnalysisEngine;
+  const createEngine = options.createEngine ?? resolveDefaultEngine;
   const defaultMovetimeMs = options.defaultMovetimeMs ?? 180;
   const listeners = new Set<() => void>();
 
-  let engine: AnalysisEngine | null = null;
+  let engine: StockfishClientLike | null = null;
   let disposed = false;
   let activeRequestId: string | null = null;
   let generation = 0;
@@ -127,7 +127,6 @@ export function createCoachingController(
   function annotationsFromInsight(
     insight: TeachingInsight | null,
     evidence: MoveAnalysisEvidence | null,
-    showLine: boolean,
     hint: HintStep | null,
   ): BoardAnnotation {
     const highlightSquares = new Set<string>();
@@ -159,26 +158,7 @@ export function createCoachingController(
       }
     }
 
-    if (showLine && insight) {
-      const line = insight.lineUci.length
-        ? insight.lineUci
-        : insight.suggestedMoveUci
-          ? [insight.suggestedMoveUci]
-          : [];
-      for (const uci of line) {
-        if (uci.length < 4) continue;
-        arrows.push({
-          from: uci.slice(0, 2),
-          to: uci.slice(2, 4),
-          color: "var(--foreground)",
-        });
-        highlightSquares.add(uci.slice(0, 2));
-        highlightSquares.add(uci.slice(2, 4));
-      }
-      if (line[0] && line[0].length >= 4) {
-        labels.push({ square: line[0].slice(2, 4), text: "line" });
-      }
-    } else if (insight?.suggestedMoveUci && insight.autoExpand && evidence) {
+    if (insight?.suggestedMoveUci && insight.autoExpand && evidence) {
       const uci = insight.suggestedMoveUci;
       if (uci.length >= 4) {
         arrows.push({
@@ -202,7 +182,6 @@ export function createCoachingController(
     const annotations = annotationsFromInsight(
       next.insight,
       next.evidence,
-      next.showLine,
       next.hint,
     );
     setState({ ...partial, annotations });
@@ -266,10 +245,8 @@ export function createCoachingController(
         message: "Analyzing your move…",
         evidence: null,
         insight: null,
-        cardExpanded: false,
         hint: null,
         hintLevel: 0,
-        showLine: false,
         annotations: EMPTY_ANNOTATIONS,
       });
 
@@ -331,7 +308,6 @@ export function createCoachingController(
           fenAfter: input.fenAfter,
           before,
           after,
-          maiaPredictedLikelihood: input.maiaPredictedLikelihood,
         });
         const insight = selectTeachingInsight(evidence);
 
@@ -340,8 +316,6 @@ export function createCoachingController(
           message: null,
           evidence,
           insight,
-          cardExpanded: insight.autoExpand,
-          showLine: false,
           hint: null,
           hintLevel: 0,
         });
@@ -412,14 +386,6 @@ export function createCoachingController(
       refreshAnnotations({ hint: null, hintLevel: 0 });
     },
 
-    setShowLine(show) {
-      refreshAnnotations({ showLine: show });
-    },
-
-    setCardExpanded(expanded) {
-      setState({ cardExpanded: expanded });
-    },
-
     clearFeedback() {
       this.cancelPending();
       const phase =
@@ -430,8 +396,6 @@ export function createCoachingController(
         phase,
         evidence: null,
         insight: null,
-        cardExpanded: false,
-        showLine: false,
         hint: null,
         hintLevel: 0,
         annotations: EMPTY_ANNOTATIONS,
@@ -473,5 +437,15 @@ export function createCoachingController(
   };
 }
 
-/** Re-export for callers that attach summaries to the tree. */
-export { evidenceToSummary };
+function resolveDefaultEngine(): StockfishClientLike {
+  if (typeof window !== "undefined") {
+    if (typeof window.__chessgatorCreateAnalysisEngine === "function") {
+      return window.__chessgatorCreateAnalysisEngine();
+    }
+    const stub = new URLSearchParams(window.location.search).get("e2eStub");
+    if (stub === "1" || stub === "fallback" || stub === "coach") {
+      return createStubAnalysisEngine();
+    }
+  }
+  return new StockfishClient({ defaultMovetimeMs: 180 });
+}

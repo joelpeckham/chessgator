@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://chessgator.com"),
   title: "chessgator",
   description:
-    "Local-only chess coach. Play as White against Maia with Stockfish fallback.",
+    "Local-only chess coach. Play as White against Maia with Stockfish coaching analysis.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

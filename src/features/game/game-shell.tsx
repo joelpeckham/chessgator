@@ -13,7 +13,6 @@ import {
   getCurrentNode,
   getMoveHistory,
   getNode,
-  getPathFenHistory,
   getStatusAtNode,
   getTurn,
   stepVariationBack,
@@ -26,23 +25,23 @@ import {
 import { AccessibleMoveSelect } from "@/components/board/accessible-move-select";
 import { ChessboardAdapter } from "@/components/board/chessboard-adapter";
 import type { BoardMove } from "@/components/board/move-utils";
-import { CoachPanel } from "@/components/coach/coach-panel";
+import { HintLadder } from "@/components/coach/hint-ladder";
+import { TeachingCard } from "@/components/coach/teaching-card";
 import { GameControls } from "@/components/controls/game-controls";
-import { LiveRegion } from "@/components/game/live-region";
 import { PromotionDialog } from "@/components/game/promotion-dialog";
 import { StatusPanel } from "@/components/game/status-panel";
 import { MoveTimeline } from "@/components/timeline/move-timeline";
 import { VariationExplorer } from "@/components/timeline/variation-explorer";
 import {
   createCoachingController,
-  evidenceToSummary,
   type CoachingController,
 } from "@/features/game/coaching-controller";
 import {
-  createOpponentController,
-  type OpponentController,
-} from "@/features/game/opponent-controller";
+  createMaiaSession,
+  type MaiaSession,
+} from "@/features/game/maia-session";
 import { useGameStore } from "@/features/game/game-store";
+import { getStatusPresentation } from "@/features/game/status-copy";
 
 function kingSquareFromFen(fen: string, color: "w" | "b"): string | null {
   const board = fen.split(" ")[0] ?? "";
@@ -67,25 +66,6 @@ function kingSquareFromFen(fen: string, color: "w" | "b"): string | null {
   return null;
 }
 
-function formatStatusAnnouncement(args: {
-  mode: string;
-  lastMove: GameMove | null;
-  opponentMessage: string | null;
-  coachMessage: string | null;
-  gameOverText: string | null;
-  navigationMessage: string | null;
-}): string {
-  if (args.navigationMessage) return args.navigationMessage;
-  if (args.gameOverText) return args.gameOverText;
-  if (args.opponentMessage && args.mode === "loading") return args.opponentMessage;
-  if (args.mode === "analyzing" && args.coachMessage) return args.coachMessage;
-  if (args.lastMove) {
-    const who = args.lastMove.color === "w" ? "White" : "Black";
-    return `${who} played ${args.lastMove.san}`;
-  }
-  return args.opponentMessage ?? "chessgator ready";
-}
-
 /**
  * Client-only game composition. All workers, Zustand, and browser APIs stay here
  * (or below) so `page.tsx` can remain a static Server Component shell.
@@ -101,7 +81,6 @@ export function GameShell() {
   const resumePlay = useGameStore((s) => s.resumePlay);
   const playMove = useGameStore((s) => s.playMove);
   const jumpToNode = useGameStore((s) => s.jumpToNode);
-  const takeback = useGameStore((s) => s.takeback);
   const retryMove = useGameStore((s) => s.retryMove);
   const resign = useGameStore((s) => s.resign);
   const setMode = useGameStore((s) => s.setMode);
@@ -110,17 +89,15 @@ export function GameShell() {
   const hydrate = useGameStore((s) => s.hydrate);
   const persist = useGameStore((s) => s.persist);
 
-  const [controller] = useState<OpponentController>(() =>
-    createOpponentController(),
-  );
+  const [maiaSession] = useState<MaiaSession>(() => createMaiaSession());
   const [coach] = useState<CoachingController>(() =>
     createCoachingController(),
   );
 
-  const opponent = useSyncExternalStore(
-    controller.subscribe,
-    controller.getState,
-    controller.getState,
+  const maia = useSyncExternalStore(
+    maiaSession.subscribe,
+    maiaSession.getState,
+    maiaSession.getState,
   );
   const coaching = useSyncExternalStore(
     coach.subscribe,
@@ -147,21 +124,13 @@ export function GameShell() {
 
   const interactive =
     mode === "playerTurn" &&
-    opponent.phase === "ready" &&
+    maia.phase === "ready" &&
     getTurn(currentFen) === "w" &&
     !exploring;
 
   const checkSquare =
     currentStatus.isCheck && !currentStatus.isGameOver
       ? kingSquareFromFen(currentFen, currentStatus.turn)
-      : null;
-
-  const terminalReason = session.terminalReason ?? currentStatus.reason;
-  const gameOverText =
-    mode === "gameOver"
-      ? terminalReason === "resignation"
-        ? "You resigned. Game over."
-        : `Game over. ${currentStatus.result}.`
       : null;
 
   const ghostOverlay = useMemo(() => {
@@ -212,12 +181,15 @@ export function GameShell() {
     return [...coaching.annotations.arrows, ...ghostOverlay.arrows];
   }, [coaching.annotations.arrows, ghostOverlay.arrows]);
 
-  const announce = formatStatusAnnouncement({
+  const statusPresentation = getStatusPresentation({
     mode,
-    lastMove,
-    opponentMessage: opponent.message,
+    status: currentStatus,
+    terminalReason: session.terminalReason,
+    maia,
+    lastError: lastError ?? session.errorMessage,
+    coachUnavailable,
     coachMessage: coaching.message,
-    gameOverText,
+    lastMove,
     navigationMessage: navMessage,
   });
 
@@ -240,16 +212,15 @@ export function GameShell() {
     session.mode,
     session.terminalReason,
     preferences.maiaElo,
-    preferences.playerColor,
     persist,
   ]);
 
   useEffect(() => {
     return () => {
-      void controller.dispose();
+      void maiaSession.dispose();
       void coach.dispose();
     };
-  }, [controller, coach]);
+  }, [maiaSession, coach]);
 
   useEffect(() => {
     if (!navMessage) return;
@@ -257,21 +228,38 @@ export function GameShell() {
     return () => clearTimeout(id);
   }, [navMessage]);
 
+  function exitExplorer(options?: { announce?: boolean }): void {
+    if (!explorer) return;
+    const next = exitVariationExplorer(useGameStore.getState().tree, explorer);
+    replaceTree(next);
+    setExplorer(null);
+    if (options?.announce) {
+      setMode("reviewing");
+      setNavMessage("Returned to origin position");
+    }
+  }
+
+  function resetEnginesAndExplorer(options?: { clearCoach?: boolean }): void {
+    maiaSession.cancelPending();
+    coach.cancelPending();
+    if (options?.clearCoach) {
+      coach.clearFeedback();
+    }
+    exitExplorer();
+  }
+
   async function requestOpponentMove(): Promise<void> {
     const state = useGameStore.getState();
     if (state.session.mode !== "opponentThinking") return;
 
     const nodeId = state.tree.currentNodeId;
     const nodeFen = state.fen();
-    const path = getPathFenHistory(state.tree, nodeId);
-    const historyFens = path.slice(0, -1);
     const requestId = `opp-${++requestSeq.current}`;
 
-    const result = await controller.chooseMove({
+    const result = await maiaSession.chooseMove({
       requestId,
       gameNodeId: nodeId,
       fen: nodeFen,
-      historyFens,
       selfElo: state.preferences.maiaElo,
       oppoElo: state.preferences.maiaElo,
       movetimeMs: 400,
@@ -282,7 +270,7 @@ export function GameShell() {
       if (latest.session.mode === "opponentThinking") {
         latest.setMode(
           "error",
-          controller.getState().message ?? "Opponent failed to move",
+          maiaSession.getState().message ?? "Maia failed to move",
         );
       }
       return;
@@ -294,7 +282,7 @@ export function GameShell() {
     if (!applied) {
       latest.setMode(
         "error",
-        latest.lastError ?? "Opponent returned an illegal move",
+        latest.lastError ?? "Maia returned an illegal move",
       );
     }
   }
@@ -307,10 +295,9 @@ export function GameShell() {
     const node = getNode(useGameStore.getState().tree, args.gameNodeId);
     if (!node) return;
 
-    let evidence = null;
     if (!coachUnavailable && coach.getState().phase !== "failed") {
       const requestId = `coach-${++requestSeq.current}`;
-      evidence = await coach.analyzePlayerMove({
+      await coach.analyzePlayerMove({
         requestId,
         gameNodeId: args.gameNodeId,
         fenBefore: args.fenBefore,
@@ -322,13 +309,6 @@ export function GameShell() {
     const latest = useGameStore.getState();
     if (latest.tree.currentNodeId !== args.gameNodeId) return;
     if (latest.session.mode !== "analyzing") return;
-
-    if (evidence) {
-      useGameStore
-        .getState()
-        .attachAnalysis(args.gameNodeId, evidenceToSummary(evidence));
-    }
-
     const status = getStatusAtNode(latest.tree, args.gameNodeId);
     if (status.isGameOver) {
       latest.setMode("gameOver");
@@ -340,42 +320,44 @@ export function GameShell() {
   }
 
   async function ensureEnginesReady(): Promise<boolean> {
-    const oppReady = controller.getState().phase === "ready";
+    const maiaReady = maiaSession.getState().phase === "ready";
     const coachReady = coach.getState().phase === "ready";
-    if (oppReady && coachReady) {
+    if (maiaReady && coachReady) {
       setCoachUnavailable(null);
       return true;
     }
 
-    const [oppOk, coachOk] = await Promise.all([
-      oppReady ? Promise.resolve(true) : controller.start(),
+    const [maiaOk, coachOk] = await Promise.all([
+      maiaReady ? Promise.resolve(true) : maiaSession.start(),
       coachReady ? Promise.resolve(true) : coach.start(),
     ]);
 
-    if (oppOk && coachOk) {
+    if (maiaOk && coachOk) {
       setCoachUnavailable(null);
-    } else if (oppOk && !coachOk) {
+    } else if (maiaOk && !coachOk) {
       setCoachUnavailable(
         coach.getState().message ??
           "Coach analysis unavailable — play continues without post-move feedback.",
       );
+    } else if (!maiaOk) {
+      setMode(
+        "error",
+        maiaSession.getState().message ?? "Maia failed to start",
+      );
     }
 
-    return oppOk;
+    return maiaOk;
   }
 
   async function handleStart(): Promise<void> {
     if (startingRef.current) return;
     startingRef.current = true;
-    controller.cancelPending();
-    coach.cancelPending();
-    coach.clearFeedback();
-    exitExplorerQuiet();
+    resetEnginesAndExplorer({ clearCoach: true });
 
     const ok = await ensureEnginesReady();
     if (!ok) {
       startingRef.current = false;
-      setMode("error", controller.getState().message ?? "Engines failed");
+      setMode("error", maiaSession.getState().message ?? "Maia failed to start");
       return;
     }
 
@@ -409,73 +391,34 @@ export function GameShell() {
   }
 
   async function handleRestart(): Promise<void> {
-    controller.cancelPending();
-    coach.cancelPending();
-    coach.clearFeedback();
-    exitExplorerQuiet();
+    resetEnginesAndExplorer({ clearCoach: true });
     useGameStore.setState({ resumed: false });
     await handleStart();
   }
 
   function handleResign(): void {
-    controller.cancelPending();
-    coach.cancelPending();
-    exitExplorerQuiet();
+    resetEnginesAndExplorer();
     resign("black");
   }
 
-  function handleTakebackRetry(): void {
-    controller.cancelPending();
-    coach.cancelPending();
-    coach.clearFeedback();
-    exitExplorerQuiet();
+  function handleUndoMyMove(): void {
+    resetEnginesAndExplorer({ clearCoach: true });
     const history = useGameStore.getState().history();
     const last = history[history.length - 1];
     if (last?.color === "b") {
       retryMove();
     }
     retryMove();
-    setNavMessage("Took back — try a different move");
-  }
-
-  function handleTimelineTakeback(): void {
-    controller.cancelPending();
-    coach.cancelPending();
-    coach.clearFeedback();
-    exitExplorerQuiet();
-    if (takeback()) {
-      setNavMessage("Moved back one ply — earlier lines kept");
-    }
+    setNavMessage("Undid your last move — try a different one");
   }
 
   function handleJump(nodeId: string): void {
-    controller.cancelPending();
-    coach.cancelPending();
-    coach.clearFeedback();
-    exitExplorerQuiet();
+    resetEnginesAndExplorer({ clearCoach: true });
     if (jumpToNode(nodeId)) {
       const node = getNode(useGameStore.getState().tree, nodeId);
       const label = node?.move?.san ?? "start";
       setNavMessage(`Jumped to ${label}`);
     }
-  }
-
-  function exitExplorerQuiet(): void {
-    if (!explorer) return;
-    const next = exitVariationExplorer(useGameStore.getState().tree, explorer);
-    replaceTree(next);
-    setExplorer(null);
-    coach.setShowLine(false);
-  }
-
-  function handleExitExplorer(): void {
-    if (!explorer) return;
-    const next = exitVariationExplorer(useGameStore.getState().tree, explorer);
-    replaceTree(next);
-    setExplorer(null);
-    coach.setShowLine(false);
-    setMode("reviewing");
-    setNavMessage("Returned to origin position");
   }
 
   function handleExploreLine(): void {
@@ -501,13 +444,11 @@ export function GameShell() {
       setNavMessage("Could not explore that line from this position");
       return;
     }
-    controller.cancelPending();
+    maiaSession.cancelPending();
     coach.cancelPending();
     replaceTree(started.tree);
     setExplorer(started.explorer);
     setMode("reviewing");
-    coach.setShowLine(true);
-    coach.setCardExpanded(true);
     setNavMessage(
       "Exploring better line — Try instead commits the suggested move",
     );
@@ -603,7 +544,7 @@ export function GameShell() {
       mode === "gameOver" ||
       mode === "error" ||
       (mode === "reviewing" && resumed)) &&
-    opponent.phase !== "starting" &&
+    maia.phase !== "starting" &&
     coaching.phase !== "starting";
   const canResign =
     !exploring &&
@@ -612,14 +553,14 @@ export function GameShell() {
       mode === "analyzing" ||
       mode === "reviewing");
   const canRestart =
-    opponent.phase === "ready" ||
+    maia.phase === "ready" ||
     mode === "gameOver" ||
     mode === "error" ||
     mode === "playerTurn" ||
     mode === "opponentThinking" ||
     mode === "analyzing" ||
     mode === "reviewing";
-  const canTakebackRetry =
+  const canUndoMyMove =
     !exploring &&
     moves.some((m) => m.color === "w") &&
     (mode === "playerTurn" ||
@@ -634,8 +575,6 @@ export function GameShell() {
       mode === "analyzing" ||
       mode === "gameOver" ||
       mode === "opponentThinking");
-  const canTimelineTakeback =
-    canTimelineNav && Boolean(getCurrentNode(tree).parentId);
 
   return (
     <div
@@ -645,7 +584,15 @@ export function GameShell() {
       data-resumed={resumed ? "true" : "false"}
     >
       <div className="pointer-events-none absolute inset-0 game-shell-backdrop" aria-hidden />
-      <LiveRegion message={announce} />
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+        data-testid="live-region"
+      >
+        {statusPresentation.announcement}
+      </div>
 
       <header className="relative z-10 border-b border-border/60 px-4 py-4 sm:px-6">
         <div className="mx-auto flex w-full max-w-6xl items-end justify-between gap-4">
@@ -680,11 +627,6 @@ export function GameShell() {
             onMove={applyPlayerMove}
             onPromotionNeeded={(from, to) => setPromotion({ from, to })}
           />
-          <p className="max-w-prose text-center text-xs text-muted-foreground">
-            Drag, click a piece then a square, or use the keyboard move list.
-            Legal targets, coach hints, and variation ghosts use patterns and
-            labels — not color alone.
-          </p>
         </div>
 
         <aside className="flex w-full flex-col gap-5 rounded-3xl bg-card/80 p-4 shadow-sm ring-1 ring-foreground/5 backdrop-blur-sm md:w-88 md:shrink-0 lg:w-96">
@@ -692,7 +634,7 @@ export function GameShell() {
             mode={mode}
             status={currentStatus}
             terminalReason={session.terminalReason}
-            opponent={opponent}
+            maia={maia}
             lastError={lastError ?? session.errorMessage}
             coachUnavailable={coachUnavailable}
           />
@@ -705,7 +647,7 @@ export function GameShell() {
             canRestart={canRestart}
             resumeAvailable={resumed && mode === "reviewing"}
             starting={
-              opponent.phase === "starting" || coaching.phase === "starting"
+              maia.phase === "starting" || coaching.phase === "starting"
             }
             onStart={() => {
               void handleStart();
@@ -716,47 +658,40 @@ export function GameShell() {
             }}
           />
 
-          <CoachPanel
-            insight={coaching.insight}
-            hint={coaching.hint}
-            expanded={coaching.cardExpanded}
-            showLine={coaching.showLine}
-            analyzing={coaching.phase === "analyzing" || mode === "analyzing"}
-            exploringLine={exploring}
-            hintsDisabled={!interactive || Boolean(coachUnavailable)}
-            canTakebackRetry={canTakebackRetry}
-            onToggleExpanded={() =>
-              coach.setCardExpanded(!coaching.cardExpanded)
-            }
-            onShowLine={() => {
-              if (coaching.phase === "analyzing" || mode === "analyzing") return;
-              const next = !coaching.showLine;
-              coach.setShowLine(next);
-              if (next) coach.setCardExpanded(true);
-            }}
-            onExploreLine={
-              coaching.phase === "analyzing" ||
-              mode === "analyzing" ||
-              coachUnavailable
-                ? undefined
-                : handleExploreLine
-            }
-            onTakebackRetry={handleTakebackRetry}
-            onRequestHint={() => {
-              if (coachUnavailable) return;
-              void coach.escalateHint({
-                fen: currentFen,
-                gameNodeId: tree.currentNodeId,
-                sideToMove: "w",
-              });
-            }}
-          />
+          <div className="flex flex-col gap-4" data-testid="coach-panel">
+            <TeachingCard
+              insight={coaching.insight}
+              analyzing={coaching.phase === "analyzing" || mode === "analyzing"}
+              exploringLine={exploring}
+              canTakebackRetry={canUndoMyMove}
+              onExploreLine={
+                coaching.phase === "analyzing" ||
+                mode === "analyzing" ||
+                coachUnavailable
+                  ? undefined
+                  : handleExploreLine
+              }
+              onTakebackRetry={handleUndoMyMove}
+            />
+            <HintLadder
+              hint={coaching.hint}
+              disabled={!interactive || Boolean(coachUnavailable)}
+              onRequestHint={() => {
+                if (coachUnavailable) return;
+                void coach.escalateHint({
+                  fen: currentFen,
+                  gameNodeId: tree.currentNodeId,
+                  sideToMove: "w",
+                });
+              }}
+            />
+          </div>
 
           <VariationExplorer
             explorer={explorer}
             onStepBack={handleVariationBack}
             onStepForward={handleVariationForward}
-            onExit={handleExitExplorer}
+            onExit={() => exitExplorer({ announce: true })}
             onTryInstead={handleTryInstead}
           />
 
@@ -772,8 +707,6 @@ export function GameShell() {
             tree={tree}
             disabled={!canTimelineNav}
             onJump={handleJump}
-            onTakeback={handleTimelineTakeback}
-            canTakeback={canTimelineTakeback}
           />
         </aside>
       </main>

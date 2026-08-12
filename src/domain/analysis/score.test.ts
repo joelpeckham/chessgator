@@ -4,7 +4,6 @@ import {
   pickPrimaryScore,
   scoreFromSideToMove,
   scoreToSideToMove,
-  toAnalysisSummary,
 } from "@/domain/analysis/score";
 
 describe("score normalization", () => {
@@ -23,19 +22,6 @@ describe("score normalization", () => {
     const white = { cp: -90 };
     expect(scoreToSideToMove(white, "b")).toEqual({ cp: 90 });
     expect(scoreToSideToMove(white, "w")).toEqual({ cp: -90 });
-  });
-
-  it("builds AnalysisSummary in side-to-move perspective", () => {
-    expect(
-      toAnalysisSummary({
-        scoreWhite: { cp: -50 },
-        sideToMove: "b",
-        bestMoveUci: "e7e5",
-      }),
-    ).toEqual({
-      evalCp: 50,
-      bestMoveUci: "e7e5",
-    });
   });
 
   it("negates and prefers mate", () => {

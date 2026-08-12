@@ -1,9 +1,5 @@
-import { expect, test, type Page } from "@playwright/test";
-
-async function chooseLegalMove(page: Page, san: string) {
-  await page.getByTestId("accessible-move-select").click();
-  await page.getByRole("option", { name: new RegExp(`^${san}\\b`) }).click();
-}
+import { expect, test } from "@playwright/test";
+import { chooseLegalMove } from "../shared/playwright-helpers";
 
 /**
  * One Chromium smoke against the built static export with real Maia + Stockfish.
@@ -29,9 +25,6 @@ test.describe("composed real-engine shell", () => {
       "data-mode",
       "playerTurn",
     );
-    await expect(page.getByTestId("opponent-source-badge")).toBeVisible({
-      timeout: 5_000,
-    });
 
     await chooseLegalMove(page, "e4");
     await expect(page.getByTestId("move-list")).toContainText("e4");
@@ -45,30 +38,36 @@ test.describe("composed real-engine shell", () => {
       )
       .toMatch(/analyzing|opponentThinking|playerTurn|reviewing/);
 
-    await expect(page.getByTestId("move-list")).toHaveText(/.+/);
+    // Root "Start" plus White's e4 is already two rows — wait for Black's reply.
     await expect
       .poll(
         async () => {
-          const text = await page.getByTestId("move-list").innerText();
-          return text.trim().split("\n").filter(Boolean).length;
+          const nodes = page.locator(
+            '[data-testid="move-list"] [data-timeline-node="true"]',
+          );
+          return nodes.count();
         },
         { timeout: 180_000 },
       )
-      .toBeGreaterThanOrEqual(2);
+      .toBeGreaterThanOrEqual(3);
 
-    // Coaching should leave analyzing and either show a card or stay ready.
+    // Wait until post-move coaching finishes and play has advanced past analyzing.
     await expect
       .poll(
         async () =>
-          page.getByTestId("teaching-card").getAttribute("data-state"),
+          page.getByTestId("status-badge").getAttribute("data-mode"),
         { timeout: 180_000 },
       )
-      .toMatch(/empty|compact|expanded/);
+      .toMatch(/opponentThinking|playerTurn|reviewing|gameOver/);
 
-    const mode = await page
-      .getByTestId("status-badge")
-      .getAttribute("data-mode");
-    expect(mode).not.toBe("error");
-    expect(mode).not.toBe("analyzing");
+    await expect(page.getByTestId("status-badge")).not.toHaveAttribute(
+      "data-mode",
+      "error",
+    );
+
+    await expect(page.getByTestId("teaching-card")).toHaveAttribute(
+      "data-state",
+      /empty|feedback/,
+    );
   });
 });

@@ -1,6 +1,5 @@
-export type {
-  OpponentEngine,
-  OpponentEngineStatus,
-  OpponentMoveRequest,
-  OpponentMoveResult,
-} from "@/engines/shared/opponent";
+export {
+  createBrowserWorkerTransport,
+  type WorkerLike,
+  type WorkerTransport,
+} from "@/engines/shared/worker-transport";

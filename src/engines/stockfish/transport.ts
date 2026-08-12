@@ -3,56 +3,25 @@ import type {
   StockfishWorkerResponse,
 } from "@/engines/stockfish/protocol";
 import { isStockfishWorkerResponse } from "@/engines/stockfish/protocol";
+import {
+  createBrowserWorkerTransport as createSharedBrowserWorkerTransport,
+  type WorkerLike,
+  type WorkerTransport,
+} from "@/engines/shared/worker-transport";
+
+export type { WorkerLike };
 
 /**
  * Narrow transport so Node unit tests never touch `Worker` / browser globals.
  * Production uses `createBrowserWorkerTransport`.
  */
-export type StockfishTransport = {
-  postMessage(message: StockfishWorkerRequest): void;
-  subscribe(listener: (message: StockfishWorkerResponse) => void): () => void;
-  terminate(): void;
-};
-
-export type WorkerLike = {
-  postMessage(message: unknown): void;
-  addEventListener(
-    type: "message",
-    listener: (event: MessageEvent<unknown>) => void,
-  ): void;
-  removeEventListener(
-    type: "message",
-    listener: (event: MessageEvent<unknown>) => void,
-  ): void;
-  terminate(): void;
-};
+export type StockfishTransport = WorkerTransport<
+  StockfishWorkerRequest,
+  StockfishWorkerResponse
+>;
 
 export function createBrowserWorkerTransport(worker: WorkerLike): StockfishTransport {
-  const listeners = new Set<(message: StockfishWorkerResponse) => void>();
-
-  const onMessage = (event: MessageEvent<unknown>) => {
-    if (!isStockfishWorkerResponse(event.data)) return;
-    for (const listener of listeners) listener(event.data);
-  };
-
-  worker.addEventListener("message", onMessage);
-
-  return {
-    postMessage(message) {
-      worker.postMessage(message);
-    },
-    subscribe(listener) {
-      listeners.add(listener);
-      return () => {
-        listeners.delete(listener);
-      };
-    },
-    terminate() {
-      worker.removeEventListener("message", onMessage);
-      listeners.clear();
-      worker.terminate();
-    },
-  };
+  return createSharedBrowserWorkerTransport(worker, isStockfishWorkerResponse);
 }
 
 /** Create the default Next/bundler worker pointing at our typed entry. */

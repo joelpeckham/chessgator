@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { AnalysisEvidence } from "@/domain/analysis/types";
-import {
-  buildMoveAnalysisEvidence,
-  evidenceToSummary,
-} from "@/domain/analysis/move-analysis";
+import { buildMoveAnalysisEvidence } from "@/domain/analysis/move-analysis";
 import { tryApplyMove } from "@/domain/game/rules";
 
 function ev(
@@ -40,7 +37,6 @@ describe("move analysis evidence", () => {
     expect(evidence.classification).toBe("best");
     expect(evidence.shortPvUci[0]).toBe("e2e4");
     expect(evidence.tacticalFacts.developedPiece).toBe(false);
-    expect(evidenceToSummary(evidence).classification).toBe("best");
   });
 
   it("keeps blunder refutation separate from the best-move improvement line", () => {

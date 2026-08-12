@@ -2,27 +2,10 @@
  * Engine-neutral analysis types.
  *
  * Score perspective convention:
- * - Live analysis (`EvaluationScore`, `AnalysisEvidence`) uses **White's perspective**:
- *   positive centipawns / mate means White is better / White mates.
- * - Compact tree storage (`AnalysisSummary`) keeps **side-to-move perspective**
- *   for a small, position-local snapshot (positive = side to move is better).
- * Convert with helpers in `./score`.
+ * Live analysis (`EvaluationScore`, `AnalysisEvidence`) uses **White's perspective**:
+ * positive centipawns / mate means White is better / White mates.
+ * Convert with helpers in `./score` when a side-to-move view is needed.
  */
-
-/**
- * Engine-neutral analysis summary attached to a game-tree node.
- * Workers and coaching layers enrich this later; the game domain only stores it.
- */
-export type AnalysisSummary = {
-  /** Centipawn evaluation from the side to move's perspective, if available. */
-  evalCp?: number;
-  /** Mate in N (positive = side to move mates), if available. */
-  mate?: number;
-  /** Best move in UCI, if available. */
-  bestMoveUci?: string;
-  /** Compact classification label (e.g. blunder, inaccuracy). */
-  classification?: string;
-};
 
 /** Centipawn or mate score from White's perspective. */
 export type EvaluationScore = {
@@ -64,10 +47,9 @@ export type AnalysisEvidence = {
 };
 
 /** Priority bands for the single Stockfish work queue (lower = sooner). */
-export type AnalysisPriority = "opponent" | "user" | "background";
+export type AnalysisPriority = "user" | "background";
 
 export const ANALYSIS_PRIORITY_RANK: Record<AnalysisPriority, number> = {
-  opponent: 0,
-  user: 1,
-  background: 2,
+  user: 0,
+  background: 1,
 };

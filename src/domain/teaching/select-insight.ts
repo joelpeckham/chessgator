@@ -51,7 +51,6 @@ export function selectTeachingInsight(
     suggestedSan: suggestedMoveSan,
     classification: evidence.classification,
     evalLossCp: evidence.evalLossCp,
-    maiaPredictedLikelihood: evidence.maiaPredictedLikelihood,
   });
 
   const confidence = computeConfidence(evidence, concept);
@@ -66,9 +65,6 @@ export function selectTeachingInsight(
     refutationUci: evidence.refutationUci,
     classification: evidence.classification,
     autoExpand: shouldAutoExpand(evidence.classification),
-    ...(evidence.maiaPredictedLikelihood !== undefined
-      ? { maiaPredictedLikelihood: evidence.maiaPredictedLikelihood }
-      : {}),
   };
 }
 

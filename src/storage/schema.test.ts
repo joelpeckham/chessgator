@@ -1,14 +1,15 @@
 import { describe, expect, it } from "vitest";
 import {
-  createGameSession,
-  jumpToGameNode,
-  playMove,
+  createInitialTree,
+  jumpToNode,
+  playMoveOnTree,
+  type GameTree,
 } from "@/domain/game";
 import { createLocalStorageGameRepository } from "@/storage/local-storage";
-import { migratePersistedGame } from "@/storage/migrate";
 import {
-  parsePersistedGame,
-  toGameSession,
+  GAME_STORAGE_KEY,
+  parseSavedGame,
+  reconstructGame,
   toPersistedGame,
 } from "@/storage/schema";
 
@@ -25,226 +26,133 @@ function memoryStorage(initial: Record<string, string> = {}) {
   };
 }
 
-describe("persistence schema", () => {
-  it("round-trips a branched game without Chess instances", () => {
-    let game = createGameSession();
-    game = playMove(game, "e2e4").session;
-    game = playMove(game, "e7e5").session;
-    game = jumpToGameNode(game, game.tree.rootId).session;
-    game = playMove(game, "d2d4").session;
+function play(tree: GameTree, uci: string): GameTree {
+  return playMoveOnTree(tree, tree.currentNodeId, uci)!.tree;
+}
 
-    const persisted = toPersistedGame(game, {
-      preferences: { maiaElo: 1200, playerColor: "w" },
-    });
+describe("persistence schema v2", () => {
+  it("round-trips a branched game without Chess instances", () => {
+    let tree = createInitialTree();
+    tree = play(tree, "e2e4");
+    tree = play(tree, "e7e5");
+    tree = jumpToNode(tree, tree.rootId)!;
+    tree = play(tree, "d2d4");
+
+    const persisted = toPersistedGame(tree, { maiaElo: 1200 });
     const json = JSON.parse(JSON.stringify(persisted)) as unknown;
     expect(JSON.stringify(json)).not.toMatch(/pending|worker|Chess/i);
+    expect(persisted.version).toBe(2);
+    expect(persisted.tree.children).toHaveLength(2);
+    // d4 is preferred mainline (index 0); e4 is sibling at index 1.
+    expect(persisted.tree.children![0]!.uci).toBe("d2d4");
+    expect(persisted.currentPath).toEqual([0]);
 
-    const parsed = parsePersistedGame(json);
+    const parsed = parseSavedGame(json);
     expect(parsed).not.toBeNull();
-    const restored = toGameSession(parsed!);
-    expect(restored.tree.currentNodeId).toBe(game.tree.currentNodeId);
-    expect(Object.keys(restored.tree.nodes)).toEqual(
-      Object.keys(game.tree.nodes),
-    );
+    const restored = reconstructGame(parsed!);
+    expect(restored).not.toBeNull();
+    expect(restored!.maiaElo).toBe(1200);
     expect(
-      Object.values(restored.tree.nodes).every(
-        (node) => typeof node.isVariation === "boolean",
-      ),
+      Object.values(restored!.tree.nodes).every((n) => n.isVariation === false),
     ).toBe(true);
+    expect(
+      restored!.tree.nodes[restored!.tree.currentNodeId]?.move?.uci,
+    ).toBe("d2d4");
+    const root = restored!.tree.nodes[restored!.tree.rootId]!;
+    expect(root.childIds).toHaveLength(2);
   });
 
-  it("treats missing isVariation as false for older snapshots", () => {
-    let game = createGameSession();
-    game = playMove(game, "e2e4").session;
-    const persisted = toPersistedGame(game);
-    const legacy = JSON.parse(JSON.stringify(persisted)) as {
-      tree: { nodes: Record<string, { isVariation?: boolean }> };
-    };
-    for (const node of Object.values(legacy.tree.nodes)) {
-      delete node.isVariation;
-    }
-    const parsed = parsePersistedGame(legacy);
-    expect(parsed).not.toBeNull();
-    expect(
-      Object.values(toGameSession(parsed!).tree.nodes).every(
-        (n) => n.isVariation === false,
-      ),
-    ).toBe(true);
+  it("excludes variation ghosts from the persisted tree", () => {
+    let tree = createInitialTree();
+    tree = play(tree, "e2e4");
+    const ghost = playMoveOnTree(tree, tree.rootId, "d2d4", {
+      asVariation: true,
+    });
+    expect(ghost).not.toBeNull();
+    tree = ghost!.tree;
+
+    const persisted = toPersistedGame(tree, { maiaElo: 1500 });
+    expect(persisted.tree.children).toHaveLength(1);
+    expect(persisted.tree.children![0]!.uci).toBe("e2e4");
+    // Current pointer was on a ghost — path falls back to committed ancestor (root).
+    expect(persisted.currentPath).toEqual([]);
   });
 
-  it("rejects corrupt and incomplete payloads", () => {
-    expect(parsePersistedGame(null)).toBeNull();
-    expect(parsePersistedGame({ version: 1 })).toBeNull();
-    expect(parsePersistedGame({ version: 99, updatedAt: "x" })).toBeNull();
+  it("rejects corrupt JSON and wrong versions", () => {
+    expect(parseSavedGame(null)).toBeNull();
+    expect(parseSavedGame({ version: 1 })).toBeNull();
+    expect(parseSavedGame({ version: 99 })).toBeNull();
     expect(
-      parsePersistedGame({
-        version: 1,
-        updatedAt: "2020-01-01T00:00:00.000Z",
-        tree: { rootId: "a", currentNodeId: "missing", nodes: {} },
-        session: {
-          mode: "playerTurn",
-          errorMessage: null,
-          terminalReason: null,
-        },
+      parseSavedGame({
+        version: 2,
+        rootFen: "not-a-fen",
+        currentPath: [],
+        tree: {},
+        maiaElo: 1500,
       }),
     ).toBeNull();
   });
 
-  it("rejects parent cycles, invalid FENs, and illegal parent-to-child moves", () => {
+  it("fails closed on illegal child UCI during reconstruct", () => {
     const startFen =
       "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-    const afterE4 =
-      "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
-    const cyclic = {
-      version: 1 as const,
-      updatedAt: "2020-01-01T00:00:00.000Z",
+    const parsed = parseSavedGame({
+      version: 2,
+      rootFen: startFen,
+      currentPath: [0],
       tree: {
-        rootId: "root",
-        currentNodeId: "a",
-        nodes: {
-          root: {
-            id: "root",
-            parentId: null,
-            childIds: [],
-            fen: startFen,
-            move: null,
-            ply: 0,
-            analysis: null,
-          },
-          a: {
-            id: "a",
-            parentId: "b",
-            childIds: ["b"],
-            fen: afterE4,
-            move: {
-              from: "e2",
-              to: "e4",
-              san: "e4",
-              uci: "e2e4",
-              color: "w",
-              piece: "p",
-            },
-            ply: 1,
-            analysis: null,
-          },
-          b: {
-            id: "b",
-            parentId: "a",
-            childIds: [],
-            fen: afterE4,
-            move: {
-              from: "e7",
-              to: "e5",
-              san: "e5",
-              uci: "e7e5",
-              color: "b",
-              piece: "p",
-            },
-            ply: 2,
-            analysis: null,
-          },
-        },
+        children: [{ uci: "e7e5" }],
       },
-      session: {
-        mode: "playerTurn" as const,
-        errorMessage: null,
-        terminalReason: null,
-      },
-    };
-    expect(parsePersistedGame(cyclic)).toBeNull();
-
-    const badFen = {
-      version: 1 as const,
-      updatedAt: "2020-01-01T00:00:00.000Z",
-      tree: {
-        rootId: "root",
-        currentNodeId: "root",
-        nodes: {
-          root: {
-            id: "root",
-            parentId: null,
-            childIds: [],
-            fen: "not-a-fen",
-            move: null,
-            ply: 0,
-            analysis: null,
-          },
-        },
-      },
-      session: {
-        mode: "playerTurn" as const,
-        errorMessage: null,
-        terminalReason: null,
-      },
-    };
-    expect(parsePersistedGame(badFen)).toBeNull();
-
-    const illegalChild = {
-      version: 1 as const,
-      updatedAt: "2020-01-01T00:00:00.000Z",
-      tree: {
-        rootId: "root",
-        currentNodeId: "child",
-        nodes: {
-          root: {
-            id: "root",
-            parentId: null,
-            childIds: ["child"],
-            fen: startFen,
-            move: null,
-            ply: 0,
-            analysis: null,
-          },
-          child: {
-            id: "child",
-            parentId: "root",
-            childIds: [],
-            fen: afterE4,
-            move: {
-              from: "e7",
-              to: "e5",
-              san: "e5",
-              uci: "e7e5",
-              color: "b",
-              piece: "p",
-            },
-            ply: 1,
-            analysis: null,
-          },
-        },
-      },
-      session: {
-        mode: "playerTurn" as const,
-        errorMessage: null,
-        terminalReason: null,
-      },
-    };
-    expect(parsePersistedGame(illegalChild)).toBeNull();
+      maiaElo: 1500,
+    });
+    expect(parsed).not.toBeNull();
+    expect(reconstructGame(parsed!)).toBeNull();
   });
 
-  it("migratePersistedGame fails closed on invalid data", () => {
-    expect(migratePersistedGame(undefined).ok).toBe(false);
-    expect(migratePersistedGame("nope").ok).toBe(false);
-    expect(migratePersistedGame({ version: 2 }).ok).toBe(false);
+  it("fails closed on invalid currentPath indexes", () => {
+    const tree = play(createInitialTree(), "e2e4");
+    const persisted = toPersistedGame(tree, { maiaElo: 1500 });
+    const badPath = { ...persisted, currentPath: [9] };
+    expect(reconstructGame(badPath)).toBeNull();
+  });
+
+  it("persists elo and resignation flag", () => {
+    const tree = play(createInitialTree(), "e2e4");
+    const persisted = toPersistedGame(tree, {
+      maiaElo: 1600,
+      resigned: true,
+    });
+    expect(persisted.maiaElo).toBe(1600);
+    expect(persisted.resigned).toBe(true);
+    const restored = reconstructGame(persisted)!;
+    expect(restored.maiaElo).toBe(1600);
+    expect(restored.resigned).toBe(true);
   });
 
   it("localStorage repository recovers from missing/corrupt data", async () => {
-    const storage = memoryStorage({ "chessgator:game:v1": "{not-json" });
+    const storage = memoryStorage({ [GAME_STORAGE_KEY]: "{not-json" });
     const repo = createLocalStorageGameRepository({ storage });
     expect(await repo.load()).toBeNull();
 
-    let game = createGameSession();
-    game = playMove(game, "e2e4").session;
-    await repo.save(toPersistedGame(game));
+    const tree = play(createInitialTree(), "e2e4");
+    await repo.save(toPersistedGame(tree, { maiaElo: 1500 }));
     const loaded = await repo.load();
     expect(loaded).not.toBeNull();
-    expect(loaded!.tree.currentNodeId).toBe(game.tree.currentNodeId);
+    expect(loaded!.tree.children?.[0]?.uci).toBe("e2e4");
 
-    storage.setItem("chessgator:game:v1", JSON.stringify({ version: 1 }));
+    storage.setItem(GAME_STORAGE_KEY, JSON.stringify({ version: 2 }));
     expect(await repo.load()).toBeNull();
 
     await repo.clear();
     expect(await repo.load()).toBeNull();
+  });
+
+  it("clears legacy v1 key on load", async () => {
+    const storage = memoryStorage({
+      "chessgator:game:v1": JSON.stringify({ version: 1 }),
+    });
+    const repo = createLocalStorageGameRepository({ storage });
+    expect(await repo.load()).toBeNull();
+    expect(storage.getItem("chessgator:game:v1")).toBeNull();
   });
 });

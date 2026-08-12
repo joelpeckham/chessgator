@@ -1,42 +1,34 @@
 "use client";
 
 import { create } from "zustand";
-import type { AnalysisSummary } from "@/domain/analysis";
 import {
   createBootstrapTree,
+  createInitialTree,
   createSessionState,
-  currentFen,
-  currentStatus,
   getCurrentNode,
-  getLegalMoves,
   getMoveHistory,
   getStatusAtNode,
-  jumpToGameNode,
-  playMove,
-  resign,
-  retryMove,
-  setNodeAnalysis,
-  setSessionMode,
-  startGame,
-  takeback,
+  jumpToNode,
+  playMoveOnTree,
+  takebackOne,
   type GameMove,
   type GameSession,
   type GameStatus,
   type GameTree,
   type MoveInput,
   type SessionMode,
+  type SessionState,
 } from "@/domain/game";
 import {
   createLocalStorageGameRepository,
-  toGameSession,
+  reconstructGame,
   toPersistedGame,
   type GameRepository,
-  type PersistedGame,
+  type SavedGameV2,
 } from "@/storage";
 
 export type GameStorePreferences = {
   maiaElo: number;
-  playerColor: "w" | "b";
 };
 
 export type GameStoreState = {
@@ -51,7 +43,6 @@ export type GameStoreState = {
   /** Derived helpers — components should not mutate tree/session directly. */
   fen: () => string;
   status: () => GameStatus;
-  legalMoves: () => GameMove[];
   history: () => GameMove[];
 
   startGame: (fen?: string) => void;
@@ -65,7 +56,6 @@ export type GameStoreState = {
   jumpToNode: (nodeId: string) => boolean;
   takeback: () => boolean;
   retryMove: () => boolean;
-  attachAnalysis: (nodeId: string, analysis: AnalysisSummary | null) => boolean;
   resign: (winner?: "white" | "black") => boolean;
   setMode: (mode: SessionMode, errorMessage?: string | null) => boolean;
   setMaiaElo: (elo: number) => void;
@@ -116,23 +106,32 @@ export function normalizeSessionForResume(game: GameSession): GameSession {
 
 const defaultPreferences: GameStorePreferences = {
   maiaElo: 1500,
-  playerColor: "w",
 };
 
-function asGameSession(state: Pick<GameStoreState, "tree" | "session">): GameSession {
-  return { tree: state.tree, session: state.session };
-}
+const PLAYABLE_MODES: ReadonlySet<SessionMode> = new Set([
+  "playerTurn",
+  "opponentThinking",
+  "reviewing",
+  "analyzing",
+]);
 
-function applySession(
-  set: (partial: Partial<GameStoreState>) => void,
-  game: GameSession,
-  lastError: string | null = null,
-): void {
-  set({
-    tree: game.tree,
-    session: game.session,
-    lastError,
-  });
+const RETRYABLE_MODES: ReadonlySet<SessionMode> = new Set([
+  "playerTurn",
+  "opponentThinking",
+  "analyzing",
+  "reviewing",
+  "gameOver",
+]);
+
+function sessionState(
+  mode: SessionMode,
+  terminalReason: SessionState["terminalReason"] = null,
+): SessionState {
+  return {
+    mode,
+    errorMessage: null,
+    terminalReason,
+  };
 }
 
 function defaultRepository(): GameRepository {
@@ -152,27 +151,28 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   resumed: false,
   lastError: null,
 
-  fen: () => currentFen(asGameSession(get())),
-  status: () => currentStatus(asGameSession(get())),
-  legalMoves: () => getLegalMoves(getCurrentNode(get().tree).fen),
+  fen: () => getCurrentNode(get().tree).fen,
+  status: () => getStatusAtNode(get().tree, get().tree.currentNodeId),
   history: () => getMoveHistory(get().tree, get().tree.currentNodeId),
 
   startGame: (fen?: string) => {
-    const result = startGame(fen);
-    applySession(set, result.session, null);
-    set({ hydrated: true, resumed: false });
+    set({
+      tree: createInitialTree(fen),
+      session: sessionState("playerTurn"),
+      lastError: null,
+      hydrated: true,
+      resumed: false,
+    });
   },
 
   resumePlay: () => {
-    const status = currentStatus(asGameSession(get()));
+    const status = get().status();
     if (status.isGameOver) {
       set({
-        session: {
-          mode: "gameOver",
-          errorMessage: null,
-          terminalReason:
-            get().session.terminalReason ?? status.reason,
-        },
+        session: sessionState(
+          "gameOver",
+          get().session.terminalReason ?? status.reason,
+        ),
         lastError: null,
       });
       return;
@@ -180,11 +180,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     const mode: SessionMode =
       status.turn === "w" ? "playerTurn" : "opponentThinking";
     set({
-      session: {
-        mode,
-        errorMessage: null,
-        terminalReason: null,
-      },
+      session: sessionState(mode),
       lastError: null,
     });
   },
@@ -194,79 +190,145 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   },
 
   playMove: (input, options) => {
-    const result = playMove(asGameSession(get()), input, options);
-    if (!result.ok) {
-      set({ lastError: result.error });
+    const { tree, session } = get();
+    if (!PLAYABLE_MODES.has(session.mode)) {
+      set({ lastError: `Cannot play a move while in mode ${session.mode}` });
       return false;
     }
-    applySession(set, result.session, null);
+
+    const played = playMoveOnTree(tree, tree.currentNodeId, input, {
+      asVariation: options?.asVariation,
+    });
+    if (!played) {
+      set({ lastError: "Illegal move" });
+      return false;
+    }
+
+    const status = getStatusAtNode(played.tree, played.tree.currentNodeId);
+    let mode: SessionMode =
+      options?.afterMode ??
+      (session.mode === "opponentThinking" ? "playerTurn" : "opponentThinking");
+    let terminalReason: SessionState["terminalReason"] = null;
+
+    if (status.isGameOver) {
+      mode = "gameOver";
+      terminalReason = status.reason;
+    }
+
+    set({
+      tree: played.tree,
+      session: sessionState(mode, terminalReason),
+      lastError: null,
+    });
     return true;
   },
 
   jumpToNode: (nodeId) => {
-    const result = jumpToGameNode(asGameSession(get()), nodeId);
-    if (!result.ok) {
-      set({ lastError: result.error });
-      return false;
-    }
-    applySession(set, result.session, null);
-    return true;
-  },
-
-  takeback: () => {
-    const result = takeback(asGameSession(get()));
-    if (!result.ok) {
-      set({ lastError: result.error });
-      return false;
-    }
-    applySession(set, result.session, null);
-    return true;
-  },
-
-  retryMove: () => {
-    const result = retryMove(asGameSession(get()));
-    if (!result.ok) {
-      set({ lastError: result.error });
-      return false;
-    }
-    applySession(set, result.session, null);
-    return true;
-  },
-
-  attachAnalysis: (nodeId, analysis) => {
-    const nextTree = setNodeAnalysis(get().tree, nodeId, analysis);
+    const nextTree = jumpToNode(get().tree, nodeId);
     if (!nextTree) {
       set({ lastError: `Unknown node: ${nodeId}` });
       return false;
     }
-    set({ tree: nextTree, lastError: null });
+
+    const status = getStatusAtNode(nextTree, nodeId);
+    if (status.isGameOver) {
+      set({
+        tree: nextTree,
+        session: sessionState("gameOver", status.reason),
+        lastError: null,
+      });
+      return true;
+    }
+
+    set({
+      tree: nextTree,
+      session: sessionState("reviewing"),
+      lastError: null,
+    });
     return true;
   },
 
-  resign: (winner = "black") => {
-    const result = resign(asGameSession(get()), winner);
-    if (!result.ok) {
-      set({ lastError: result.error });
+  takeback: () => {
+    const nextTree = takebackOne(get().tree);
+    if (!nextTree) {
+      set({ lastError: "Nothing to take back" });
       return false;
     }
-    applySession(set, result.session, null);
+
+    const { mode } = get().session;
+    const nextMode: SessionMode =
+      mode === "gameOver" ||
+      mode === "analyzing" ||
+      mode === "playerTurn" ||
+      mode === "opponentThinking"
+        ? "reviewing"
+        : mode;
+
+    set({
+      tree: nextTree,
+      session: sessionState(nextMode),
+      lastError: null,
+    });
+    return true;
+  },
+
+  retryMove: () => {
+    const { session } = get();
+    if (!RETRYABLE_MODES.has(session.mode)) {
+      set({ lastError: `Cannot retry while in mode ${session.mode}` });
+      return false;
+    }
+
+    const nextTree = takebackOne(get().tree);
+    if (!nextTree) {
+      set({ lastError: "Nothing to retry" });
+      return false;
+    }
+
+    // v1: human plays White.
+    const status = getStatusAtNode(nextTree, nextTree.currentNodeId);
+    const mode: SessionMode =
+      status.turn === "w" ? "playerTurn" : "opponentThinking";
+
+    set({
+      tree: nextTree,
+      session: sessionState(mode),
+      lastError: null,
+    });
+    return true;
+  },
+
+  resign: (_winner = "black") => {
+    void _winner;
+    const { session } = get();
+    if (session.mode === "loading" || session.mode === "error") {
+      set({ lastError: `Cannot resign while in mode ${session.mode}` });
+      return false;
+    }
+
+    set({
+      session: sessionState("gameOver", "resignation"),
+      lastError: null,
+    });
     return true;
   },
 
   setMode: (mode, errorMessage) => {
-    const result = setSessionMode(asGameSession(get()), mode, { errorMessage });
-    if (!result.ok) {
-      set({ lastError: result.error });
-      return false;
-    }
-    // Keep engine/session error text in lastError so StatusPanel can show it.
-    applySession(
-      set,
-      result.session,
-      mode === "error"
-        ? (result.session.session.errorMessage ?? errorMessage ?? null)
-        : null,
-    );
+    const prev = get().session;
+    const terminalReason =
+      mode === "gameOver"
+        ? prev.terminalReason
+        : mode === "loading"
+          ? null
+          : prev.terminalReason;
+
+    set({
+      session: sessionState(mode, terminalReason),
+      lastError:
+        mode === "error"
+          ? (errorMessage ?? prev.errorMessage ?? "Unknown error")
+          : null,
+    });
     return true;
   },
 
@@ -274,7 +336,6 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     const clamped = Math.min(1900, Math.max(1100, Math.round(elo / 100) * 100));
     set({
       preferences: {
-        ...get().preferences,
         maiaElo: clamped,
       },
     });
@@ -287,17 +348,32 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         set({ hydrated: true, resumed: false });
         return false;
       }
-      const game = normalizeSessionForResume(toGameSession(loaded));
-      // Touch path status so illegal FENs / cycles that slipped past parse throw here.
+      const reconstructed = reconstructGame(loaded);
+      if (!reconstructed) {
+        set({
+          hydrated: true,
+          resumed: false,
+          lastError: "Saved game was corrupt and could not be restored",
+        });
+        return false;
+      }
+
+      const baseSession: GameSession = {
+        tree: reconstructed.tree,
+        session: reconstructed.resigned
+          ? sessionState("gameOver", "resignation")
+          : createSessionState("reviewing"),
+      };
+      const game = normalizeSessionForResume(baseSession);
       getStatusAtNode(game.tree, game.tree.currentNodeId);
-      applySession(set, game, null);
       set({
+        tree: game.tree,
+        session: game.session,
+        lastError: null,
         hydrated: true,
         resumed: Object.keys(game.tree.nodes).length > 1,
         preferences: {
-          maiaElo: loaded.preferences?.maiaElo ?? defaultPreferences.maiaElo,
-          playerColor:
-            loaded.preferences?.playerColor ?? defaultPreferences.playerColor,
+          maiaElo: reconstructed.maiaElo,
         },
       });
       return true;
@@ -313,8 +389,9 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
   persist: async (repository = defaultRepository()) => {
     const state = get();
-    const snapshot: PersistedGame = toPersistedGame(asGameSession(state), {
-      preferences: state.preferences,
+    const snapshot: SavedGameV2 = toPersistedGame(state.tree, {
+      maiaElo: state.preferences.maiaElo,
+      resigned: state.session.terminalReason === "resignation",
     });
     await repository.save(snapshot);
   },

@@ -1,4 +1,3 @@
-import type { AnalysisSummary } from "@/domain/analysis/types";
 import { BOOTSTRAP_ROOT_ID, createNodeId } from "@/domain/game/id";
 import {
   DEFAULT_POSITION,
@@ -31,7 +30,6 @@ function createTreeWithRootId(fen: string, rootId: string): GameTree {
     fen,
     move: null,
     ply: 0,
-    analysis: null,
     isVariation: false,
   };
   return {
@@ -170,7 +168,6 @@ export function playMoveOnTree(
     fen: status.fen,
     move: applied.move,
     ply: fromNode.ply + 1,
-    analysis: null,
     isVariation: asVariation,
   };
 
@@ -216,20 +213,6 @@ export function takebackOne(tree: GameTree): GameTree | null {
   return jumpToNode(tree, current.parentId);
 }
 
-export function setNodeAnalysis(
-  tree: GameTree,
-  nodeId: string,
-  analysis: AnalysisSummary | null,
-): GameTree | null {
-  const node = tree.nodes[nodeId];
-  if (!node) {
-    return null;
-  }
-  const nodes = cloneNodes(tree.nodes);
-  nodes[nodeId] = { ...node, analysis };
-  return { ...tree, nodes };
-}
-
 /**
  * First committed (non-variation) child.
  * Ghost exploration lines stay siblings without stealing the main line.
@@ -249,18 +232,6 @@ export function listMainlineChild(
     }
   }
   return null;
-}
-
-/** Collect variation siblings under a node (direct children only). */
-export function listVariationChildren(
-  tree: GameTree,
-  nodeId: string,
-): GameNode[] {
-  const node = tree.nodes[nodeId];
-  if (!node) return [];
-  return node.childIds
-    .map((id) => tree.nodes[id])
-    .filter((child): child is GameNode => Boolean(child?.isVariation));
 }
 
 /** Walk the committed main line from root (includes root). Cycle-safe. */

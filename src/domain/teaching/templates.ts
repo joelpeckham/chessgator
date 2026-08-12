@@ -6,8 +6,6 @@ export type TemplateContext = {
   suggestedSan: string | null;
   classification: MoveClassification;
   evalLossCp: number;
-  /** Model-predicted likelihood 0–1 from Maia, if available. */
-  maiaPredictedLikelihood?: number;
 };
 
 const CLASSIFICATION_LABEL: Record<MoveClassification, string> = {
@@ -68,14 +66,6 @@ export function renderExplanation(
       break;
     default:
       base = `${ctx.playedSan}: ${CLASSIFICATION_LABEL[ctx.classification]}.${better}`;
-  }
-
-  if (
-    ctx.maiaPredictedLikelihood !== undefined &&
-    Number.isFinite(ctx.maiaPredictedLikelihood)
-  ) {
-    const pct = Math.round(ctx.maiaPredictedLikelihood * 100);
-    base += ` Maia’s model-predicted likelihood for this move was about ${pct}% (not a population frequency).`;
   }
 
   return base.trim();

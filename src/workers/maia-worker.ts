@@ -21,7 +21,7 @@ import {
   stableSoftmax,
   topKFromLogits,
 } from "@/engines/maia/sample";
-import { validateLegalUci } from "@/engines/maia/validate-move";
+import { validateLegalUci } from "@/domain/game/rules";
 import { indexToMove } from "@/engines/maia/vocabulary";
 
 type WorkerScope = {

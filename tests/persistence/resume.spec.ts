@@ -1,22 +1,19 @@
 import { expect, test } from "@playwright/test";
+import {
+  chooseLegalMove,
+  startStubGame,
+} from "../shared/playwright-helpers";
 
-const STORAGE_KEY = "chessgator:game:v1";
+const STORAGE_KEY = "chessgator:game:v2";
 
 test.describe("local resume + corruption", () => {
   test("reloads resume tree, elo, and reviewing mode", async ({ page }) => {
-    await page.goto("/?e2eStub=1");
-    await page.getByTestId("start-button").click();
-    await expect(page.getByTestId("status-badge")).toHaveAttribute(
-      "data-mode",
-      "playerTurn",
-      { timeout: 15_000 },
-    );
+    await startStubGame(page);
 
     await page.getByTestId("maia-elo-select").click();
     await page.getByRole("option", { name: "1600" }).click();
 
-    await page.getByTestId("accessible-move-select").click();
-    await page.getByRole("option", { name: /^e4\b/ }).click();
+    await chooseLegalMove(page, "e4");
     await expect(page.getByTestId("move-list")).toContainText("e4");
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
@@ -29,8 +26,10 @@ test.describe("local resume + corruption", () => {
     const raw = await page.evaluate((key) => localStorage.getItem(key), STORAGE_KEY);
     expect(raw).toBeTruthy();
     const parsed = JSON.parse(raw!);
-    expect(parsed.preferences.maiaElo).toBe(1600);
-    expect(parsed.tree.currentNodeId).toBeTruthy();
+    expect(parsed.version).toBe(2);
+    expect(parsed.maiaElo).toBe(1600);
+    expect(parsed.tree.children?.[0]?.uci).toBe("e2e4");
+    expect(Array.isArray(parsed.currentPath)).toBe(true);
 
     await page.reload();
     await expect(page.getByTestId("game-shell")).toHaveAttribute(
@@ -48,6 +47,7 @@ test.describe("local resume + corruption", () => {
     );
     await expect(page.getByTestId("move-list")).toContainText("e4");
     await expect(page.getByTestId("start-button")).toContainText("Continue");
+    await expect(page.getByTestId("maia-elo-select")).toContainText("1600");
 
     await page.getByTestId("start-button").click();
     await expect(page.getByTestId("status-badge")).toHaveAttribute(

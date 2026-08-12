@@ -1,7 +1,7 @@
 # chessgator
 
-A **local-only** chess coach you can play in the browser. Maia is the primary
-human-like opponent; Stockfish provides objective analysis. Games, settings, and
+A **local-only** chess coach you can play in the browser. Maia is the human-like
+opponent; Stockfish provides objective coaching analysis. Games, settings, and
 engine work stay on your device — the production build is a static export with
 no accounts, APIs, or runtime backend. Production is intended at
 [chessgator.com](https://chessgator.com) (custom domain on Vercel).
@@ -13,6 +13,26 @@ no accounts, APIs, or runtime backend. Production is intended at
 - Rules: `chess.js`
 - Opponent: Maia3 5M (ONNX Runtime Web)
 - Analysis: Stockfish 18 lite single-thread (WASM worker)
+- State: Zustand store over a branch-capable game tree
+- Persistence: compact localStorage (`chessgator:game:v2`)
+
+## Architecture
+
+```
+src/
+  domain/game/        # rules, immutable tree, variation explorer
+  domain/analysis/    # classifications + move evidence
+  domain/teaching/    # insights and progressive hints
+  engines/maia/       # MaiaClient + worker protocol
+  engines/stockfish/  # StockfishClient + UCI queue (coaching only)
+  features/game/      # Zustand store, GameShell, Maia/coaching sessions
+  storage/            # compact v2 reconstruct-on-load persistence
+  components/         # board, coach, timeline, UI primitives
+```
+
+Play as White against Maia. After each move, Stockfish coaches. The move timeline
+preserves branches; “Explore better line” steps ghost futures before you commit.
+Closing the tab resumes the local game from `localStorage`.
 
 ## Prerequisites
 
@@ -41,10 +61,15 @@ Generated files land in `public/engine/`, `public/ort/<version>/`, and
 | `bun run prepare:assets` | Fetch/copy + verify engine/ORT/model assets |
 | `bun run lint` | ESLint |
 | `bun run typecheck` | `tsc --noEmit` |
-| `bun run test` | Vitest unit tests (includes static-host config checks) |
+| `bun run test` | Vitest unit tests |
+| `bun run test:static-host` | Cache-header / asset-path gate (needs `out/`) |
 | `bun run test:stockfish` | Real Stockfish worker/WASM browser smoke |
 | `bun run test:maia` | Real Maia worker/ONNX browser smoke |
-| `bun run test:game` | Playable-slice e2e (stub engines) |
+| `bun run test:game` | Playable-slice e2e (stub Maia) |
+| `bun run test:coaching` | Coaching-slice e2e (stub engines) |
+| `bun run test:time-travel` | Timeline + variation explorer e2e |
+| `bun run test:persistence` | Local resume / corruption e2e |
+| `bun run test:accessibility` | Keyboard / live region / layout smoke |
 | `bun run test:composed` | Composed shell smoke with real Maia/Stockfish |
 | `bun run build` | Prepare assets, then static `next build` → `out/` |
 
@@ -62,5 +87,5 @@ redistribution notes.
 
 ## Product direction
 
-See [`ROADMAP.md`](./ROADMAP.md) for the local-only implementation sequence
-(domain → Stockfish → Maia → playable slice → coaching → time travel → polish).
+See [`ROADMAP.md`](./ROADMAP.md) for the shipped local-only baseline and what is
+intentionally out of scope.

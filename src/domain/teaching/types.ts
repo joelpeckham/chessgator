@@ -32,11 +32,6 @@ export type TeachingInsight = {
   classification: MoveClassification;
   /** Mistakes/inaccuracies auto-expand in the coach UI. */
   autoExpand: boolean;
-  /**
-   * Optional Maia policy probability for the played move.
-   * UI must describe this as model-predicted likelihood, not population frequency.
-   */
-  maiaPredictedLikelihood?: number;
 };
 
 /** Progressive hint ladder before the player moves. */

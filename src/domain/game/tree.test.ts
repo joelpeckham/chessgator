@@ -1,19 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
-  createGameSession,
+  createBootstrapTree,
+  createInitialTree,
   getAncestors,
   getMoveHistory,
   getStatusAtNode,
-  jumpToGameNode,
+  jumpToNode,
   listMainlineChild,
-  playMove,
-  retryMove,
-  takeback,
-} from "@/domain/game";
-import {
-  createBootstrapTree,
-  createInitialTree,
   playMoveOnTree,
+  takebackOne,
 } from "@/domain/game/tree";
 
 describe("game tree", () => {
@@ -40,54 +35,50 @@ describe("game tree", () => {
   });
 
   it("reuses an existing branch when the same move is replayed", () => {
-    let game = createGameSession();
-    const first = playMove(game, "e2e4");
-    expect(first.ok).toBe(true);
-    game = first.session;
-    const childId = game.tree.currentNodeId;
+    let tree = createInitialTree();
+    const first = playMoveOnTree(tree, tree.rootId, "e2e4");
+    expect(first).not.toBeNull();
+    tree = first!.tree;
+    const childId = tree.currentNodeId;
 
-    const jumped = jumpToGameNode(game, game.tree.rootId);
-    expect(jumped.ok).toBe(true);
-    game = jumped.session;
-
-    const again = playMove(game, "e2e4");
-    expect(again.ok).toBe(true);
-    expect(again.session.tree.currentNodeId).toBe(childId);
-    expect(Object.keys(again.session.tree.nodes)).toHaveLength(
-      Object.keys(game.tree.nodes).length,
+    tree = jumpToNode(tree, tree.rootId)!;
+    const again = playMoveOnTree(tree, tree.rootId, "e2e4");
+    expect(again).not.toBeNull();
+    expect(again!.tree.currentNodeId).toBe(childId);
+    expect(Object.keys(again!.tree.nodes)).toHaveLength(
+      Object.keys(tree.nodes).length,
     );
   });
 
   it("creates a sibling branch for an alternate move", () => {
-    let game = createGameSession();
-    game = playMove(game, "e2e4").session;
-    const e4Node = game.tree.currentNodeId;
+    let tree = createInitialTree();
+    tree = playMoveOnTree(tree, tree.rootId, "e2e4")!.tree;
+    const e4Node = tree.currentNodeId;
 
-    game = jumpToGameNode(game, game.tree.rootId).session;
-    game = playMove(game, "d2d4").session;
+    tree = jumpToNode(tree, tree.rootId)!;
+    tree = playMoveOnTree(tree, tree.rootId, "d2d4")!.tree;
 
-    const root = game.tree.nodes[game.tree.rootId]!;
+    const root = tree.nodes[tree.rootId]!;
     expect(root.childIds).toHaveLength(2);
     expect(root.childIds).toContain(e4Node);
-    expect(root.childIds).toContain(game.tree.currentNodeId);
-    expect(e4Node).not.toBe(game.tree.currentNodeId);
+    expect(root.childIds).toContain(tree.currentNodeId);
+    expect(e4Node).not.toBe(tree.currentNodeId);
   });
 
   it("makes a newly committed alternate the preferred mainline child", () => {
-    let game = createGameSession();
-    game = playMove(game, "e2e4").session;
-    const e4Node = game.tree.currentNodeId;
+    let tree = createInitialTree();
+    tree = playMoveOnTree(tree, tree.rootId, "e2e4")!.tree;
+    const e4Node = tree.currentNodeId;
 
-    game = jumpToGameNode(game, game.tree.rootId).session;
-    game = playMove(game, "d2d4").session;
-    const d4Node = game.tree.currentNodeId;
+    tree = jumpToNode(tree, tree.rootId)!;
+    tree = playMoveOnTree(tree, tree.rootId, "d2d4")!.tree;
+    const d4Node = tree.currentNodeId;
 
-    const root = game.tree.nodes[game.tree.rootId]!;
+    const root = tree.nodes[tree.rootId]!;
     expect(root.childIds[0]).toBe(d4Node);
-    expect(listMainlineChild(game.tree, root.id)?.id).toBe(d4Node);
-    // Prior e4 branch is preserved and not the preferred child while on d4.
+    expect(listMainlineChild(tree, root.id)?.id).toBe(d4Node);
     expect(root.childIds).toContain(e4Node);
-    expect(game.tree.nodes[e4Node]?.move?.uci).toBe("e2e4");
+    expect(tree.nodes[e4Node]?.move?.uci).toBe("e2e4");
   });
 
   it("getAncestors stops on parent cycles instead of hanging", () => {
@@ -106,7 +97,6 @@ describe("game tree", () => {
           fen: tree.nodes[rootId]!.fen,
           move: null,
           ply: 1,
-          analysis: null,
           isVariation: false,
         },
         [b]: {
@@ -116,7 +106,6 @@ describe("game tree", () => {
           fen: tree.nodes[rootId]!.fen,
           move: null,
           ply: 2,
-          analysis: null,
           isVariation: false,
         },
       },
@@ -126,35 +115,30 @@ describe("game tree", () => {
     expect(ancestors.length).toBeLessThanOrEqual(2);
   });
 
-  it("navigates with jump / takeback / retry without losing branches", () => {
-    let game = createGameSession();
-    game = playMove(game, "e2e4").session;
-    game = playMove(game, "e7e5").session;
-    const leaf = game.tree.currentNodeId;
-    const nodeCount = Object.keys(game.tree.nodes).length;
+  it("navigates with jump / takeback without losing branches", () => {
+    let tree = createInitialTree();
+    tree = playMoveOnTree(tree, tree.currentNodeId, "e2e4")!.tree;
+    tree = playMoveOnTree(tree, tree.currentNodeId, "e7e5")!.tree;
+    const leaf = tree.currentNodeId;
+    const nodeCount = Object.keys(tree.nodes).length;
 
-    const back = takeback(game);
-    expect(back.ok).toBe(true);
-    game = back.session;
-    expect(game.tree.nodes[leaf]).toBeDefined();
-    expect(Object.keys(game.tree.nodes)).toHaveLength(nodeCount);
-
-    const retried = retryMove(game);
-    expect(retried.ok).toBe(true);
-    game = retried.session;
-    expect(game.session.mode).toBe("playerTurn");
-    expect(Object.keys(game.tree.nodes)).toHaveLength(nodeCount);
+    const back = takebackOne(tree);
+    expect(back).not.toBeNull();
+    tree = back!;
+    expect(tree.nodes[leaf]).toBeDefined();
+    expect(Object.keys(tree.nodes)).toHaveLength(nodeCount);
+    expect(jumpToNode(tree, leaf)?.currentNodeId).toBe(leaf);
   });
 
   it("detects checkmate through the tree path", () => {
-    let game = createGameSession();
+    let tree = createInitialTree();
     for (const uci of ["f2f3", "e7e5", "g2g4", "d8h4"]) {
-      const result = playMove(game, uci);
-      expect(result.ok).toBe(true);
-      game = result.session;
+      const result = playMoveOnTree(tree, tree.currentNodeId, uci);
+      expect(result).not.toBeNull();
+      tree = result!.tree;
     }
-    const status = getStatusAtNode(game.tree, game.tree.currentNodeId);
+    const status = getStatusAtNode(tree, tree.currentNodeId);
     expect(status.isCheckmate).toBe(true);
-    expect(game.session.mode).toBe("gameOver");
+    expect(status.isGameOver).toBe(true);
   });
 });

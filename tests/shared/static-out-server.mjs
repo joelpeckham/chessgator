@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "../..");
 const OUT = path.join(ROOT, "out");
-const PORT = Number(process.env.GAME_E2E_PORT || 4175);
+const PORT = Number(process.env.E2E_PORT || 4175);
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -75,5 +75,5 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, "127.0.0.1", () => {
-  console.log(`game e2e server on http://127.0.0.1:${PORT}`);
+  console.log(`e2e server on http://127.0.0.1:${PORT}`);
 });

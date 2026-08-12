@@ -1,37 +1,16 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { chooseLegalMove, startStubGame } from "../shared/playwright-helpers";
 
-async function chooseLegalMove(page: Page, san: string) {
-  await page.getByTestId("accessible-move-select").click();
-  await page.getByRole("option", { name: new RegExp(`^${san}\\b`) }).click();
-}
-
-test.describe("playable slice (stub opponents)", () => {
+test.describe("playable slice (stub Maia)", () => {
   test("complete flow: start, move, opponent reply, resign, restart", async ({
     page,
   }) => {
-    await page.goto("/?e2eStub=1");
+    await startStubGame(page);
 
-    await expect(page.getByTestId("game-shell")).toBeVisible();
     await expect(page.getByTestId("chessboard")).toBeVisible();
-    await expect(page.getByTestId("status-badge")).toHaveAttribute(
-      "data-mode",
-      "loading",
-    );
 
     await page.getByTestId("maia-elo-select").click();
     await page.getByRole("option", { name: "1600" }).click();
-
-    await page.getByTestId("start-button").click();
-    await expect(page.getByTestId("status-badge")).toHaveAttribute(
-      "data-opponent-phase",
-      "ready",
-      { timeout: 10_000 },
-    );
-    await expect(page.getByTestId("status-badge")).toHaveAttribute(
-      "data-mode",
-      "playerTurn",
-    );
-    await expect(page.getByTestId("opponent-source-badge")).toContainText("Maia");
 
     await chooseLegalMove(page, "e4");
     await expect(page.getByTestId("move-list")).toContainText("e4");
@@ -59,26 +38,5 @@ test.describe("playable slice (stub opponents)", () => {
       { timeout: 10_000 },
     );
     await expect(page.getByTestId("move-list")).toContainText("No moves yet");
-  });
-
-  test("shows Stockfish fallback when Maia init fails", async ({ page }) => {
-    await page.goto("/?e2eStub=fallback");
-
-    await page.getByTestId("start-button").click();
-    await expect(page.getByTestId("status-badge")).toHaveAttribute(
-      "data-opponent-source",
-      "stockfish",
-      { timeout: 10_000 },
-    );
-    await expect(page.getByTestId("status-detail")).toContainText(
-      /Maia unavailable/i,
-    );
-    await expect(page.getByTestId("opponent-source-badge")).toContainText(
-      "Stockfish",
-    );
-    await expect(page.getByTestId("status-badge")).toHaveAttribute(
-      "data-mode",
-      "playerTurn",
-    );
   });
 });

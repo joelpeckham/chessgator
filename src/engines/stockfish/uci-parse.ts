@@ -7,7 +7,7 @@ import type {
   EvaluationScore,
   PrincipalVariation,
 } from "@/domain/analysis/types";
-import { validatePvUci } from "@/engines/stockfish/validate-move";
+import { legalUciPrefix } from "@/domain/game/rules";
 
 export type ParsedInfoLine = {
   multipv: number;
@@ -142,7 +142,7 @@ export function applyInfoLine(
   const scoreStm = info.score ?? {};
   const scoreWhite = pickPrimaryScore(scoreFromSideToMove(scoreStm, sideToMove));
   const existing = linesByMultipv.get(info.multipv);
-  const pvUci = validatePvUci(fen, info.pvUci.length ? info.pvUci : existing?.pvUci ?? []);
+  const pvUci = legalUciPrefix(fen, info.pvUci.length ? info.pvUci : existing?.pvUci ?? []);
 
   linesByMultipv.set(info.multipv, {
     multipv: info.multipv,

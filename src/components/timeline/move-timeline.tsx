@@ -8,7 +8,6 @@ import {
   type GameNode,
   type GameTree,
 } from "@/domain/game";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export type TimelineEntry = {
@@ -25,8 +24,6 @@ export type MoveTimelineProps = {
   tree: GameTree;
   disabled?: boolean;
   onJump: (nodeId: string) => void;
-  onTakeback?: () => void;
-  canTakeback?: boolean;
   className?: string;
 };
 
@@ -96,8 +93,6 @@ export function MoveTimeline({
   tree,
   disabled = false,
   onJump,
-  onTakeback,
-  canTakeback = false,
   className,
 }: MoveTimelineProps) {
   const entries = useMemo(() => buildTimelineEntries(tree), [tree]);
@@ -149,21 +144,7 @@ export function MoveTimeline({
       className={cn("flex flex-col gap-2", className)}
       data-testid="move-timeline"
     >
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="text-xs font-medium text-muted-foreground">Timeline</h2>
-        {onTakeback ? (
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            disabled={disabled || !canTakeback}
-            onClick={onTakeback}
-            data-testid="timeline-takeback"
-          >
-            Take back
-          </Button>
-        ) : null}
-      </div>
+      <h2 className="text-xs font-medium text-muted-foreground">Timeline</h2>
 
       <div
         ref={listRef}
