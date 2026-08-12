@@ -6,6 +6,7 @@ import { styleBoardAnnotations } from "@/components/board/annotation-style";
 import { BoardPreviewVeil } from "@/components/board/board-preview-veil";
 import { ChessboardAdapter } from "@/components/board/chessboard-adapter";
 import { lastMoveSquares } from "@/components/board/move-utils";
+import { ChessgatorWordmark } from "@/components/brand/chessgator-wordmark";
 import { CoachRail } from "@/components/coach/coach-rail";
 import { FeedbackStack } from "@/components/coach/feedback-stack";
 import { PromotionDialog } from "@/components/game/promotion-dialog";
@@ -247,9 +248,7 @@ export function GameShell(props: GameRuntimeOptions = {}) {
 
         <header className="flex h-12 shrink-0 items-center justify-between gap-3 border-b border-border px-3 sm:px-4">
           <div className="flex min-w-0 items-center gap-2.5">
-            <p className="font-heading text-base font-semibold tracking-tight sm:text-lg">
-              chessgator
-            </p>
+            <ChessgatorWordmark />
             <Badge
               variant={statusPresentation.badgeVariant}
               data-testid="status-badge"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { ChessgatorWordmark } from "@/components/brand/chessgator-wordmark";
 import { createCoachingController } from "@/features/game/coaching-controller";
 import { GameShell } from "@/features/game/game-shell";
 import { createStubAnalysisEngine } from "@/features/game/stub-analysis";
@@ -19,7 +20,7 @@ function GameShellPlaceholder() {
       aria-busy="true"
     >
       <header className="flex h-12 shrink-0 items-center justify-between gap-3 border-b border-border px-3 sm:px-4">
-        <div className="h-6 w-36 animate-pulse rounded-md bg-muted/40" />
+        <ChessgatorWordmark />
         <div className="size-8 animate-pulse rounded-full bg-muted/40" />
       </header>
       <main className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden px-3 py-2">
