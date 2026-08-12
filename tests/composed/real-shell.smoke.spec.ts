@@ -1,5 +1,9 @@
 import { expect, test } from "@playwright/test";
-import { chooseLegalMove, openSettings } from "../shared/playwright-helpers";
+import {
+  chooseLegalMove,
+  expandCoach,
+  openSettings,
+} from "../shared/playwright-helpers";
 
 /**
  * One Chromium smoke against the built static export with real Maia + Stockfish.
@@ -67,9 +71,8 @@ test.describe("composed real-engine shell", () => {
       "error",
     );
 
-    if ((await page.getByTestId("teaching-card").count()) === 0) {
-      await page.getByTestId("toggle-teaching-card").click();
-    }
+    await expect(page.getByTestId("coach-strip")).toBeVisible();
+    await expandCoach(page);
     await expect(page.getByTestId("teaching-card")).toHaveAttribute(
       "data-state",
       /empty|feedback|analyzing/,

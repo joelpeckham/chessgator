@@ -1,0 +1,254 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import type { HintStep, TeachingInsight } from "@/domain/teaching";
+import { classificationLabel } from "@/domain/teaching";
+import { TeachingCard } from "@/components/coach/teaching-card";
+import { HintLadder } from "@/components/coach/hint-ladder";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { cn } from "@/lib/utils";
+import { RiArrowUpSLine, RiCloseLine } from "@remixicon/react";
+
+/** Fixed coach rail height — always reserved so the board never shifts. */
+export const COACH_RAIL_PX = 40;
+
+export type CoachRailProps = {
+  expanded: boolean;
+  onExpandedChange: (expanded: boolean) => void;
+  insight: TeachingInsight | null;
+  analyzing: boolean;
+  dismissed: boolean;
+  canTakebackRetry: boolean;
+  onTakebackRetry: () => void;
+  onTrySuggested?: () => void;
+  onDismiss: () => void;
+  hint: HintStep | null;
+  hintDisabled?: boolean;
+  hintFen?: string | null;
+  onRequestHint: () => void;
+  showTutorLaneHint?: boolean;
+  canExpand?: boolean;
+  className?: string;
+};
+
+type StripMode = "idle" | "analyzing" | "feedback" | "hints";
+
+function deriveStripMode(args: {
+  analyzing: boolean;
+  insight: TeachingInsight | null;
+  hint: HintStep | null;
+}): StripMode {
+  if (args.analyzing) return "analyzing";
+  if (args.hint && !args.insight) return "hints";
+  if (args.insight) return "feedback";
+  return "idle";
+}
+
+/**
+ * Fixed-height coach strip above the timeline. Expanded details float upward
+ * out of document flow so the board never reflows.
+ */
+export function CoachRail({
+  expanded,
+  onExpandedChange,
+  insight,
+  analyzing,
+  dismissed,
+  canTakebackRetry,
+  onTakebackRetry,
+  onTrySuggested,
+  onDismiss,
+  hint,
+  hintDisabled = false,
+  hintFen = null,
+  onRequestHint,
+  showTutorLaneHint = false,
+  canExpand = true,
+  className,
+}: CoachRailProps) {
+  const expandButtonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const wasExpanded = useRef(false);
+
+  const visibleInsight = dismissed ? null : insight;
+  const stripMode = deriveStripMode({
+    analyzing,
+    insight: visibleInsight,
+    hint,
+  });
+
+  useEffect(() => {
+    if (expanded && !wasExpanded.current) {
+      closeButtonRef.current?.focus();
+    } else if (!expanded && wasExpanded.current) {
+      expandButtonRef.current?.focus();
+    }
+    wasExpanded.current = expanded;
+  }, [expanded]);
+
+  useEffect(() => {
+    if (!expanded) return;
+    function onKey(event: KeyboardEvent): void {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onExpandedChange(false);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [expanded, onExpandedChange]);
+
+  const summary =
+    stripMode === "analyzing"
+      ? "Analyzing your move…"
+      : stripMode === "feedback" && visibleInsight
+        ? visibleInsight.explanation
+        : stripMode === "hints" && hint
+          ? hint.question
+          : "Feedback after your move";
+
+  return (
+    <div
+      className={cn(
+        "coach-rail relative z-20 shrink-0 border-b border-border bg-background",
+        className,
+      )}
+      style={{ height: COACH_RAIL_PX }}
+      data-testid="coach-rail"
+    >
+      <div
+        className="flex h-10 min-h-10 max-h-10 items-center gap-2 overflow-hidden px-2 sm:px-3"
+        role="region"
+        aria-label="Coach feedback"
+        data-testid="coach-strip"
+        data-mode={stripMode}
+        data-hint-level={hint?.level ?? "none"}
+        data-expanded={expanded ? "true" : "false"}
+      >
+        {stripMode === "analyzing" ? (
+          <Spinner className="size-3.5 shrink-0" />
+        ) : stripMode === "feedback" && visibleInsight ? (
+          <Badge
+            variant={
+              visibleInsight.autoExpand
+                ? "destructive"
+                : visibleInsight.classification === "best"
+                  ? "default"
+                  : "secondary"
+            }
+            className="shrink-0"
+            data-testid="classification-badge-strip"
+          >
+            {classificationLabel(visibleInsight.classification)}
+          </Badge>
+        ) : (
+          <span className="shrink-0 text-xs font-medium text-muted-foreground">
+            Coach
+          </span>
+        )}
+
+        <p className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+          {summary}
+        </p>
+
+        <div className="flex shrink-0 items-center gap-1">
+          {!expanded && (stripMode === "idle" || stripMode === "hints") ? (
+            <HintLadder
+              hint={hint}
+              fen={hintFen}
+              disabled={hintDisabled}
+              onRequestHint={() => {
+                onRequestHint();
+                onExpandedChange(true);
+              }}
+              compact
+            />
+          ) : null}
+
+          {canExpand && stripMode !== "idle" && stripMode !== "analyzing" ? (
+            <Button
+              ref={expandButtonRef}
+              type="button"
+              size="icon-xs"
+              variant="ghost"
+              className="size-8"
+              aria-label={expanded ? "Hide coach feedback" : "Show coach feedback"}
+              aria-expanded={expanded}
+              aria-controls="coach-expanded-panel"
+              data-testid="coach-expand"
+              onClick={() => onExpandedChange(!expanded)}
+            >
+              <RiArrowUpSLine
+                className={cn(
+                  "transition-transform",
+                  expanded && "rotate-180",
+                )}
+              />
+            </Button>
+          ) : null}
+
+          {stripMode === "feedback" ? (
+            <Button
+              type="button"
+              size="icon-xs"
+              variant="ghost"
+              className="size-8"
+              aria-label="Dismiss coach feedback"
+              data-testid="dismiss-teaching-card"
+              onClick={() => {
+                onDismiss();
+                onExpandedChange(false);
+              }}
+            >
+              <RiCloseLine />
+            </Button>
+          ) : null}
+        </div>
+      </div>
+
+      {expanded ? (
+        <div
+          id="coach-expanded-panel"
+          className="coach-expanded-panel"
+          data-testid="coach-expanded-panel"
+        >
+          <div className="relative px-3 py-3 sm:px-4">
+            <Button
+              ref={closeButtonRef}
+              type="button"
+              size="icon-xs"
+              variant="ghost"
+              className="absolute top-2 right-2 z-10"
+              aria-label="Collapse coach feedback"
+              data-testid="collapse-teaching-card"
+              onClick={() => onExpandedChange(false)}
+            >
+              <RiCloseLine />
+            </Button>
+            <TeachingCard
+              insight={visibleInsight}
+              analyzing={analyzing}
+              canTakebackRetry={canTakebackRetry}
+              onTakebackRetry={onTakebackRetry}
+              onTrySuggested={onTrySuggested}
+              hint={hint}
+              hintDisabled={hintDisabled}
+              hintFen={hintFen}
+              showTutorLaneHint={showTutorLaneHint}
+              onRequestHint={
+                onRequestHint
+                  ? () => {
+                      onRequestHint();
+                      onExpandedChange(true);
+                    }
+                  : undefined
+              }
+            />
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}

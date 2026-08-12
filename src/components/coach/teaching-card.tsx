@@ -2,7 +2,7 @@
 
 import type { HintStep, TeachingInsight } from "@/domain/teaching";
 import { classificationLabel } from "@/domain/teaching";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { HintLadder } from "@/components/coach/hint-ladder";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -16,8 +16,15 @@ export type TeachingCardProps = {
   hint?: HintStep | null;
   hintDisabled?: boolean;
   onRequestHint?: () => void;
+  /** FEN for converting hint UCI lines to SAN. */
+  hintFen?: string | null;
+  showTutorLaneHint?: boolean;
 };
 
+/**
+ * Expanded coach detail content (explanation, actions, hints).
+ * Mounted inside CoachRail's upward-floating panel.
+ */
 export function TeachingCard({
   insight,
   analyzing = false,
@@ -27,82 +34,74 @@ export function TeachingCard({
   hint = null,
   hintDisabled = false,
   onRequestHint,
+  hintFen = null,
+  showTutorLaneHint = false,
 }: TeachingCardProps) {
-  const level = hint?.level ?? -1;
-  const nextHintLabel =
-    level < 0
-      ? "Hint"
-      : level === 0
-        ? "Squares"
-        : level === 1
-          ? "Candidate"
-          : level === 2
-            ? "Line"
-            : "Maxed";
-
   if (analyzing) {
     return (
-      <Alert
-        className="shadow-sm"
+      <div
+        className="flex items-start gap-2"
         data-testid="teaching-card"
         data-state="analyzing"
+        role="region"
+        aria-labelledby="coach-expanded-title"
       >
         <Spinner />
-        <AlertTitle>Coach</AlertTitle>
-        <AlertDescription>Analyzing your move…</AlertDescription>
-      </Alert>
+        <div>
+          <h3 id="coach-expanded-title" className="text-sm font-medium">
+            Coach
+          </h3>
+          <p className="text-sm text-muted-foreground">Analyzing your move…</p>
+        </div>
+      </div>
     );
   }
 
   if (!insight) {
     return (
-      <Alert
-        className="shadow-sm"
+      <div
+        className="flex flex-col gap-2"
         data-testid="teaching-card"
         data-state="empty"
+        role="region"
+        aria-labelledby="coach-expanded-title"
       >
-        <div className="col-span-full flex items-center justify-between gap-2 pr-7">
+        <div className="flex items-center justify-between gap-2">
           <div className="min-w-0">
-            <AlertTitle className="mb-0">Coach</AlertTitle>
-            <AlertDescription className="text-xs">
+            <h3 id="coach-expanded-title" className="text-sm font-medium">
+              Coach
+            </h3>
+            <p className="text-xs text-muted-foreground">
               Feedback appears after each move.
-            </AlertDescription>
+            </p>
           </div>
-          {onRequestHint ? (
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              className="shrink-0"
-              disabled={hintDisabled || level >= 3}
-              onClick={onRequestHint}
-              data-testid="hint-button"
-            >
-              {nextHintLabel}
-            </Button>
-          ) : null}
         </div>
-        {hint ? <HintBody hint={hint} /> : null}
-        <div
-          className="sr-only"
-          data-testid="hint-ladder"
-          data-hint-level={hint?.level ?? "none"}
-          aria-label="Progressive hints"
-        />
-      </Alert>
+        {onRequestHint ? (
+          <HintLadder
+            hint={hint}
+            fen={hintFen}
+            disabled={hintDisabled}
+            onRequestHint={onRequestHint}
+          />
+        ) : null}
+      </div>
     );
   }
 
   return (
-    <Alert
-      className="gap-1.5 py-2.5 shadow-sm"
+    <div
+      className="flex flex-col gap-2"
       data-testid="teaching-card"
       data-state="feedback"
       data-classification={insight.classification}
       data-concept={insight.concept}
+      role="region"
+      aria-labelledby="coach-expanded-title"
     >
-      <div className="col-span-full flex flex-wrap items-center gap-2 pr-7">
-        <AlertTitle className="mb-0">Coach</AlertTitle>
+      <div className="flex flex-wrap items-center gap-2">
+        <h3 id="coach-expanded-title" className="text-sm font-medium">
+          Coach
+        </h3>
         <Badge
           variant={
             insight.autoExpand
@@ -116,20 +115,39 @@ export function TeachingCard({
           {classificationLabel(insight.classification)}
         </Badge>
       </div>
-      <AlertDescription
-        className="col-span-full text-pretty"
+      <p
+        className="text-sm text-pretty"
         data-testid="teaching-explanation"
       >
         {insight.explanation}
-      </AlertDescription>
+      </p>
       {insight.suggestedMoveSan ? (
-        <p className="col-span-full text-sm" data-testid="suggested-move">
+        <p className="text-sm" data-testid="suggested-move">
           <span className="text-muted-foreground">Try instead: </span>
           <span className="font-medium">{insight.suggestedMoveSan}</span>
         </p>
       ) : null}
-      {hint ? <HintBody hint={hint} /> : null}
-      <div className="col-span-full flex flex-wrap gap-1.5 pt-0.5">
+      {showTutorLaneHint ? (
+        <p className="text-xs text-muted-foreground" data-testid="tutor-lane-hint">
+          Alternate line shown on the timeline (dashed diamond).
+        </p>
+      ) : null}
+      {onRequestHint ? (
+        <HintLadder
+          hint={hint}
+          fen={hintFen}
+          disabled={hintDisabled}
+          onRequestHint={onRequestHint}
+        />
+      ) : hint ? (
+        <HintLadder
+          hint={hint}
+          fen={hintFen}
+          disabled
+          onRequestHint={() => undefined}
+        />
+      ) : null}
+      <div className="flex flex-wrap gap-1.5 pt-0.5">
         {onTrySuggested && insight.suggestedMoveUci ? (
           <Button
             type="button"
@@ -151,59 +169,7 @@ export function TeachingCard({
         >
           Undo my move
         </Button>
-        {onRequestHint ? (
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            disabled={hintDisabled || level >= 3}
-            onClick={onRequestHint}
-            data-testid="hint-button"
-          >
-            {nextHintLabel}
-          </Button>
-        ) : null}
       </div>
-      <div
-        className="sr-only"
-        data-testid="hint-ladder"
-        data-hint-level={hint?.level ?? "none"}
-        aria-label="Progressive hints"
-      />
-    </Alert>
-  );
-}
-
-function HintBody({ hint }: { hint: HintStep }) {
-  return (
-    <div
-      className="col-span-full rounded-lg bg-muted/50 px-2.5 py-1.5 text-sm"
-      data-testid="hint-content"
-      data-hint-level={hint.level}
-    >
-      <p data-testid="hint-question">{hint.question}</p>
-      {hint.level >= 1 && hint.highlightSquares.length > 0 ? (
-        <p
-          className="mt-1 text-xs text-muted-foreground"
-          data-testid="hint-squares"
-        >
-          Focus squares: {hint.highlightSquares.join(", ")}
-          <span className="sr-only">
-            {" "}
-            (also marked on the board with dashed outlines)
-          </span>
-        </p>
-      ) : null}
-      {hint.level >= 2 && hint.candidateMoveSan ? (
-        <p className="mt-1 font-medium" data-testid="hint-candidate">
-          Candidate: {hint.candidateMoveSan}
-        </p>
-      ) : null}
-      {hint.level >= 3 && hint.lineUci.length > 0 ? (
-        <p className="mt-1 font-mono text-xs" data-testid="hint-line">
-          Line: {hint.lineUci.join(" ")}
-        </p>
-      ) : null}
     </div>
   );
 }

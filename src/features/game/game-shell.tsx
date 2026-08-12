@@ -24,9 +24,16 @@ import {
   FeedbackStack,
   type FeedbackNotice,
 } from "@/components/coach/feedback-stack";
+import {
+  CoachRail,
+  COACH_RAIL_PX,
+} from "@/components/coach/coach-rail";
 import { PromotionDialog } from "@/components/game/promotion-dialog";
 import { SettingsSheet } from "@/components/game/settings-sheet";
-import { MoveTimeline } from "@/components/timeline/move-timeline";
+import {
+  MoveTimeline,
+  TIMELINE_GRAPH_HEIGHT_PX,
+} from "@/components/timeline/move-timeline";
 import {
   buildBranchGraph,
   isVirtualTimelineId,
@@ -45,25 +52,37 @@ import {
 } from "@/features/game/maia-session";
 import { useGameStore } from "@/features/game/game-store";
 import { getStatusPresentation } from "@/features/game/status-copy";
+import { classificationLabel } from "@/domain/teaching";
 import { RiSettings3Line } from "@remixicon/react";
 
 /** Reserved chrome so board size ignores floating coach/toasts. */
 const HEADER_RESERVE_PX = 48;
-/** Sticky timeline bar (includes branch lanes + transport). */
-const TIMELINE_RESERVE_PX = 196;
+/** Timeline status row + fixed graph + transport chrome. */
+const TIMELINE_CHROME_PX = TIMELINE_GRAPH_HEIGHT_PX + 36;
+/** Fixed footer footprint: coach rail + timeline (never grows with expansion). */
+const FOOTER_CHROME_PX = COACH_RAIL_PX + TIMELINE_CHROME_PX;
 const VIEWPORT_PAD_PX = 24;
 const BOARD_MAX_PX = 960;
 const BOARD_MIN_PX = 200;
+const COMPACT_BREAKPOINT_PX = 640;
 
 function computeBoardSize(): number {
   if (typeof window === "undefined") return 640;
   const availW = window.innerWidth - VIEWPORT_PAD_PX;
   const availH =
-    window.innerHeight - HEADER_RESERVE_PX - TIMELINE_RESERVE_PX - VIEWPORT_PAD_PX;
+    window.innerHeight -
+    HEADER_RESERVE_PX -
+    FOOTER_CHROME_PX -
+    VIEWPORT_PAD_PX;
   return Math.max(
     BOARD_MIN_PX,
     Math.min(BOARD_MAX_PX, Math.floor(Math.min(availW, availH))),
   );
+}
+
+function computeCompact(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.innerWidth < COMPACT_BREAKPOINT_PX;
 }
 
 function kingSquareFromFen(fen: string, color: "w" | "b"): string | null {
@@ -132,8 +151,16 @@ export function GameShell() {
   );
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [reviewNodeId, setReviewNodeId] = useState<string | null>(null);
-  const [tutorPinned, setTutorPinned] = useState(false);
+  const [coachExpanded, setCoachExpanded] = useState(false);
+  const [coachUserCollapsedAuto, setCoachUserCollapsedAuto] = useState(false);
+  const [expandedOverflowKeys, setExpandedOverflowKeys] = useState<string[]>(
+    [],
+  );
   const [navMessage, setNavMessage] = useState<string | null>(null);
+  const [coachAnnouncement, setCoachAnnouncement] = useState<string | null>(
+    null,
+  );
+  const [hintAnnouncement, setHintAnnouncement] = useState<string | null>(null);
   const [coachUnavailable, setCoachUnavailable] = useState<string | null>(null);
   const [dismissedNotices, setDismissedNotices] = useState<Set<string>>(
     () => new Set(),
@@ -141,6 +168,9 @@ export function GameShell() {
   const [engineNoticeArmed, setEngineNoticeArmed] = useState(false);
   // Client-only shell — size once from viewport; resize updates, coach chrome does not.
   const [boardSize, setBoardSize] = useState(computeBoardSize);
+  const [compact, setCompact] = useState(computeCompact);
+  const lastAnnouncedInsightId = useRef<string | null>(null);
+  const lastAnnouncedHintLevel = useRef<number | null>(null);
   const requestSeq = useRef(0);
   const bootstrappedRef = useRef(false);
   const persistTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -155,8 +185,16 @@ export function GameShell() {
 
   const tutorLine = useMemo(() => {
     const insight = coaching.insight;
-    if (!insight?.lineUci.length || !coaching.evidence) return null;
-    const analyzedId = coaching.evidence.gameNodeId;
+    const evidence = coaching.evidence;
+    if (!insight?.lineUci.length || !evidence) return null;
+    // Coach lane is only for a true player alternate — never a PV that
+    // continues through the played move into the opponent's reply.
+    if (!insight.suggestedMoveUci) return null;
+    const playedUci = evidence.playedMove.uci.toLowerCase();
+    const firstPly = insight.lineUci[0]?.toLowerCase();
+    if (!firstPly || firstPly === playedUci) return null;
+
+    const analyzedId = evidence.gameNodeId;
     const analyzed = getNode(tree, analyzedId);
     const originId = analyzed?.parentId ?? tree.rootId;
     const origin = getNode(tree, originId);
@@ -170,7 +208,10 @@ export function GameShell() {
     });
   }, [coaching.insight, coaching.evidence, tree]);
 
-  const futureLine = coaching.futureLine;
+  // Engine continuations are player-facing only — never while Black to move.
+  const liveTurn = getTurn(liveFen);
+  const futureLine =
+    liveTurn === "w" && !isReviewing ? coaching.futureLine : null;
 
   const graph = useMemo(
     () =>
@@ -179,8 +220,20 @@ export function GameShell() {
         reviewNodeId,
         futureLine,
         tutorLine,
+        expandedOverflowKeys,
+        maxLaneSide: compact ? 1 : 2,
+        showEngineLine: compact ? !tutorLine : liveTurn === "w",
+        showCoachLine: Boolean(tutorLine),
       }),
-    [tree, reviewNodeId, futureLine, tutorLine],
+    [
+      tree,
+      reviewNodeId,
+      futureLine,
+      tutorLine,
+      expandedOverflowKeys,
+      compact,
+      liveTurn,
+    ],
   );
 
   const boardFen = resolveReviewFen(tree, graph, reviewNodeId);
@@ -209,12 +262,29 @@ export function GameShell() {
       ? kingSquareFromFen(boardFen, boardStatus.turn)
       : null;
 
-  const boardHighlights = coaching.annotations.highlightSquares;
-  const boardLabels = coaching.annotations.labels;
-  const boardArrows = coaching.annotations.arrows;
+  const analyzing =
+    coaching.phase === "analyzing" || mode === "analyzing";
+  const visibleInsight = coaching.insightDismissed ? null : coaching.insight;
+  const shouldAutoExpand =
+    Boolean(visibleInsight?.autoExpand) && !coachUserCollapsedAuto;
+  const coachExpandedEffective =
+    coachExpanded || (shouldAutoExpand && Boolean(visibleInsight));
+
+  const showCoachAnnotations =
+    !isReviewing &&
+    !coachUnavailable &&
+    (coachExpandedEffective ||
+      Boolean(visibleInsight?.autoExpand) ||
+      Boolean(coaching.hint));
+
+  const boardHighlights = showCoachAnnotations
+    ? coaching.annotations.highlightSquares
+    : [];
+  const boardLabels = showCoachAnnotations ? coaching.annotations.labels : [];
+  const boardArrows = showCoachAnnotations ? coaching.annotations.arrows : [];
 
   const statusPresentation = getStatusPresentation({
-    mode,
+    mode: isReviewing ? "reviewing" : mode,
     status: currentStatus,
     terminalReason: session.terminalReason,
     maia,
@@ -223,6 +293,8 @@ export function GameShell() {
     coachMessage: coaching.message,
     lastMove,
     navigationMessage: navMessage,
+    coachAnnouncement,
+    hintAnnouncement,
     enginesWarming,
   });
 
@@ -231,11 +303,44 @@ export function GameShell() {
   }, [hydrate]);
 
   useEffect(() => {
-    const apply = () => setBoardSize(computeBoardSize());
+    const apply = () => {
+      setBoardSize(computeBoardSize());
+      setCompact(computeCompact());
+    };
     apply();
     window.addEventListener("resize", apply);
     return () => window.removeEventListener("resize", apply);
   }, []);
+
+  // Polite coach / hint announcements via the shared live region.
+  useEffect(() => {
+    if (!visibleInsight) {
+      lastAnnouncedInsightId.current = null;
+      return;
+    }
+    const key = `${coaching.evidence?.gameNodeId ?? ""}:${visibleInsight.classification}:${visibleInsight.explanation.slice(0, 40)}`;
+    if (lastAnnouncedInsightId.current === key) return;
+    lastAnnouncedInsightId.current = key;
+    setCoachAnnouncement(
+      `${classificationLabel(visibleInsight.classification)}. ${visibleInsight.explanation}`,
+    );
+    const t = setTimeout(() => setCoachAnnouncement(null), 4000);
+    return () => clearTimeout(t);
+  }, [visibleInsight, coaching.evidence?.gameNodeId]);
+
+  useEffect(() => {
+    if (!coaching.hint) {
+      lastAnnouncedHintLevel.current = null;
+      return;
+    }
+    if (lastAnnouncedHintLevel.current === coaching.hint.level) return;
+    lastAnnouncedHintLevel.current = coaching.hint.level;
+    setHintAnnouncement(
+      `Hint ${coaching.hint.level + 1} of 4. ${coaching.hint.question}`,
+    );
+    const t = setTimeout(() => setHintAnnouncement(null), 3500);
+    return () => clearTimeout(t);
+  }, [coaching.hint]);
 
   useEffect(() => {
     void maiaSession.start();
@@ -325,6 +430,12 @@ export function GameShell() {
     const tipId = tree.currentNodeId;
     const tip = getNode(tree, tipId);
     if (!tip) return;
+    // Only project engine futures on White's turn so the timeline never
+    // suggests moves for the opponent.
+    if (getTurn(tip.fen) !== "w") {
+      coach.clearFuture();
+      return;
+    }
     void coach.projectFuture({
       fen: tip.fen,
       gameNodeId: tipId,
@@ -338,6 +449,8 @@ export function GameShell() {
       coach.clearFeedback();
     }
     setReviewNodeId(null);
+    setCoachExpanded(false);
+    setCoachUserCollapsedAuto(false);
   }
 
   async function requestOpponentMove(): Promise<void> {
@@ -450,7 +563,7 @@ export function GameShell() {
     resetPending({ clearCoach: true });
     useGameStore.setState({ resumed: false });
     startGame();
-    setTutorPinned(false);
+    setExpandedOverflowKeys([]);
     setNavMessage("New game started");
   }
 
@@ -473,18 +586,18 @@ export function GameShell() {
   function handleSelectTimelineNode(nodeId: string): void {
     if (nodeId === tree.currentNodeId) {
       setReviewNodeId(null);
-      setNavMessage("Returned to live position");
       return;
     }
     setReviewNodeId(nodeId);
     const graphNode = graph.nodes.find((n) => n.id === nodeId);
-    const label = graphNode?.san ?? "position";
-    setNavMessage(`Viewing ${label}`);
+    if (graphNode?.kind === "tutor") {
+      coach.showInsight(graphNode.sourceNodeId);
+      setCoachExpanded(true);
+    }
   }
 
   function handleReturnLive(): void {
     setReviewNodeId(null);
-    setNavMessage("Returned to live position");
   }
 
   function handleTrySuggested(): void {
@@ -537,6 +650,8 @@ export function GameShell() {
     if (!ok) return false;
     setPromotion(null);
     setReviewNodeId(null);
+    setCoachUserCollapsedAuto(false);
+    setCoachExpanded(false);
     coach.resetHints();
 
     const latest = useGameStore.getState();
@@ -592,21 +707,18 @@ export function GameShell() {
       variant: "destructive",
       dismissible: false,
     });
-  } else if (navMessage && !dismissedNotices.has("nav")) {
+  } else if (
+    navMessage &&
+    !dismissedNotices.has("nav") &&
+    // Keep only high-signal notices (resume/new game); review uses timeline status.
+    /resumed|new game|undid|trying|could not|loaded finished/i.test(navMessage)
+  ) {
     notices.push({
       id: "nav",
       title: navMessage,
       dismissible: true,
     });
   }
-
-  const tutorVisible =
-    !coaching.insightDismissed &&
-    (tutorPinned ||
-      Boolean(coaching.insight) ||
-      coaching.phase === "analyzing" ||
-      mode === "analyzing" ||
-      Boolean(coaching.hint));
 
   return (
     <TooltipProvider>
@@ -635,7 +747,7 @@ export function GameShell() {
             <Badge
               variant={statusPresentation.badgeVariant}
               data-testid="status-badge"
-              data-mode={mode}
+              data-mode={isReviewing ? "reviewing" : mode}
               data-opponent-phase={maia.phase}
             >
               {statusPresentation.badgeLabel}
@@ -688,27 +800,53 @@ export function GameShell() {
               setDismissedNotices((prev) => new Set(prev).add(id));
               if (id === "nav") setNavMessage(null);
             }}
-            tutorOpen={tutorVisible}
-            insight={coaching.insight}
-            analyzing={
-              coaching.phase === "analyzing" || mode === "analyzing"
-            }
+          />
+        </main>
+
+        <footer
+          className="sticky bottom-0 z-20 shrink-0 border-t border-border bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/80"
+          data-testid="timeline-bar"
+        >
+          <CoachRail
+            expanded={coachExpandedEffective}
+            onExpandedChange={(next) => {
+              if (!next && shouldAutoExpand) {
+                setCoachUserCollapsedAuto(true);
+              }
+              setCoachExpanded(next);
+              if (next) {
+                coach.showInsight(tree.currentNodeId);
+              }
+            }}
+            insight={visibleInsight}
+            analyzing={analyzing}
+            dismissed={coaching.insightDismissed}
             canTakebackRetry={canUndoMyMove}
             onTakebackRetry={handleUndoMyMove}
             onTrySuggested={
-              coaching.insight?.suggestedMoveUci && !coachUnavailable
+              visibleInsight?.suggestedMoveUci && !coachUnavailable
                 ? handleTrySuggested
                 : undefined
             }
-            onDismissTutor={() => {
+            onDismiss={() => {
               coach.dismissInsight();
-              setTutorPinned(false);
+              setCoachExpanded(false);
+              setCoachAnnouncement("Coach feedback dismissed.");
+              setTimeout(() => setCoachAnnouncement(null), 2000);
             }}
             hint={coaching.hint}
             hintDisabled={!interactive || Boolean(coachUnavailable)}
+            hintFen={liveFen}
+            showTutorLaneHint={Boolean(tutorLine)}
+            canExpand={
+              Boolean(visibleInsight) ||
+              Boolean(coaching.hint) ||
+              analyzing ||
+              coach.getCachedInsight(tree.currentNodeId) != null
+            }
             onRequestHint={() => {
               if (coachUnavailable) return;
-              setTutorPinned(true);
+              setCoachExpanded(true);
               coach.showInsight();
               void coach.escalateHint({
                 fen: liveFen,
@@ -717,30 +855,22 @@ export function GameShell() {
               });
             }}
           />
-        </main>
-
-        <footer
-          className="sticky bottom-0 z-20 shrink-0 border-t border-border bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/80"
-          data-testid="timeline-bar"
-        >
           <MoveTimeline
             tree={tree}
             reviewNodeId={reviewNodeId}
             futureLine={futureLine}
             tutorLine={tutorLine}
             disabled={mode === "error"}
-            tutorOpen={tutorVisible}
-            canOpenTutor={true}
+            compact={compact}
+            expandedOverflowKeys={expandedOverflowKeys}
+            onExpandedOverflowChange={(keys) =>
+              setExpandedOverflowKeys([...keys])
+            }
             onSelectNode={handleSelectTimelineNode}
             onReturnLive={handleReturnLive}
-            onToggleTutor={() => {
-              if (tutorVisible) {
-                coach.dismissInsight();
-                setTutorPinned(false);
-              } else {
-                coach.showInsight(tree.currentNodeId);
-                setTutorPinned(true);
-              }
+            onOpenCoach={() => {
+              coach.showInsight(tree.currentNodeId);
+              setCoachExpanded(true);
             }}
             className="rounded-none border-0 bg-transparent shadow-none ring-0"
           />
@@ -748,7 +878,10 @@ export function GameShell() {
 
         <SettingsSheet
           open={settingsOpen}
-          onOpenChange={setSettingsOpen}
+          onOpenChange={(open) => {
+            setSettingsOpen(open);
+            if (open) setCoachExpanded(false);
+          }}
           maiaElo={preferences.maiaElo}
           onMaiaEloChange={setMaiaElo}
           fen={liveFen}

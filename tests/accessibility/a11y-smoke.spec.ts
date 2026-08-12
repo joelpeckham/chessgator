@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import {
   chooseLegalMove,
+  expandCoach,
   startStubGame,
 } from "../shared/playwright-helpers";
 
@@ -16,6 +17,7 @@ test.describe("accessibility + responsive smoke", () => {
       "aria-live",
       "polite",
     );
+    await expect(page.getByTestId("coach-strip")).toBeVisible();
 
     await chooseLegalMove(page, "e4");
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
@@ -29,13 +31,19 @@ test.describe("accessibility + responsive smoke", () => {
     const timeline = page.getByTestId("move-list");
     await timeline.focus();
     await page.keyboard.press("Home");
-    await expect(page.getByTestId("live-region")).toContainText(
-      /start|Viewing|Returned/i,
+    await expect(page.getByTestId("timeline-status")).toContainText(
+      /Reviewing|start/i,
     );
     await page.keyboard.press("End");
-    await expect(page.getByTestId("live-region")).toContainText(
-      /e4|live|Returned|Viewing/i,
-    );
+    await expect(page.getByTestId("timeline-status")).toContainText(/Live/i);
+
+    // Single listbox tab stop — option nodes are not separately tabbable.
+    const optionTabIndexes = await page
+      .locator('[data-testid="move-list"] [role="option"]')
+      .evaluateAll((els) =>
+        els.map((el) => (el as HTMLElement).tabIndex),
+      );
+    expect(optionTabIndexes.every((t) => t === -1)).toBe(true);
 
     // Board squares expose non-color semantics via aria-label (last move / flags).
     await expect(
@@ -55,6 +63,57 @@ test.describe("accessibility + responsive smoke", () => {
 
     await page.screenshot({
       path: "test-results/board-first-ui.png",
+      fullPage: true,
+    });
+  });
+
+  test("mobile viewport: coach rail, touch targets, board stability", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await startStubGame(page);
+
+    await expect(page.getByTestId("coach-strip")).toBeVisible();
+    const boardBefore = await page.getByTestId("board-frame").boundingBox();
+
+    await chooseLegalMove(page, "e4");
+    await expect(page.getByTestId("status-badge")).toHaveAttribute(
+      "data-mode",
+      "playerTurn",
+      { timeout: 10_000 },
+    );
+
+    // Best move stays collapsed; expand via rail.
+    await expandCoach(page);
+    const boardAfter = await page.getByTestId("board-frame").boundingBox();
+    expect(boardBefore).toBeTruthy();
+    expect(boardAfter).toBeTruthy();
+    expect(
+      Math.abs((boardAfter!.width ?? 0) - (boardBefore!.width ?? 0)),
+    ).toBeLessThanOrEqual(1);
+    expect(
+      Math.abs((boardAfter!.y ?? 0) - (boardBefore!.y ?? 0)),
+    ).toBeLessThanOrEqual(1);
+
+    // Transport controls meet touch target size on narrow viewports.
+    const prev = page.getByTestId("timeline-prev");
+    const prevBox = await prev.boundingBox();
+    expect(prevBox).toBeTruthy();
+    expect(prevBox!.width).toBeGreaterThanOrEqual(44);
+    expect(prevBox!.height).toBeGreaterThanOrEqual(44);
+
+    await page.keyboard.press("Escape");
+    await expect(page.getByTestId("coach-expanded-panel")).toHaveCount(0);
+
+    // No horizontal overflow of board/timeline.
+    const shellBox = await page.getByTestId("game-shell").boundingBox();
+    const boardBox = await page.getByTestId("chessboard").boundingBox();
+    const timelineBox = await page.getByTestId("move-timeline").boundingBox();
+    expect(boardBox!.width).toBeLessThanOrEqual((shellBox!.width ?? 390) + 1);
+    expect(timelineBox!.width).toBeLessThanOrEqual((shellBox!.width ?? 390) + 1);
+
+    await page.screenshot({
+      path: "test-results/board-first-ui-mobile.png",
       fullPage: true,
     });
   });

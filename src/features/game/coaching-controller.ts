@@ -72,6 +72,8 @@ export type CoachingController = {
     gameNodeId: string;
     movetimeMs?: number;
   }) => Promise<ProjectedLine | null>;
+  /** Clear the engine future line (e.g. while it is Black's turn). */
+  clearFuture: () => void;
   getCachedInsight: (gameNodeId: string) => TeachingInsight | null;
   dismissInsight: () => void;
   showInsight: (gameNodeId?: string | null) => void;
@@ -477,6 +479,13 @@ export function createCoachingController(
       } catch {
         return null;
       }
+    },
+
+    clearFuture() {
+      setState({
+        futureLine: null,
+        futureNodeId: null,
+      });
     },
 
     getCachedInsight(gameNodeId) {

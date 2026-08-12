@@ -31,16 +31,20 @@ export function selectTeachingInsight(
   evidence: MoveAnalysisEvidence,
 ): TeachingInsight {
   const concept = chooseConcept(evidence);
+  // Best moves have no "try instead" — don't pick MultiPV #2 as a fake alternate.
   const suggestedMoveUci =
-    evidence.bestMoveUci &&
-    evidence.bestMoveUci.toLowerCase() !== evidence.playedMove.uci.toLowerCase()
-      ? evidence.bestMoveUci
-      : evidence.alternatives.find(
-          (line) =>
-            line.pvUci[0] &&
-            line.pvUci[0].toLowerCase() !==
-              evidence.playedMove.uci.toLowerCase(),
-        )?.pvUci[0] ?? null;
+    evidence.classification === "best"
+      ? null
+      : evidence.bestMoveUci &&
+          evidence.bestMoveUci.toLowerCase() !==
+            evidence.playedMove.uci.toLowerCase()
+        ? evidence.bestMoveUci
+        : evidence.alternatives.find(
+            (line) =>
+              line.pvUci[0] &&
+              line.pvUci[0].toLowerCase() !==
+                evidence.playedMove.uci.toLowerCase(),
+          )?.pvUci[0] ?? null;
 
   const suggestedMoveSan = suggestedMoveUci
     ? uciToSan(evidence.fenBefore, suggestedMoveUci)
