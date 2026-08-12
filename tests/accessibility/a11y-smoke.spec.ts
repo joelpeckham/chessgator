@@ -5,7 +5,7 @@ import {
 } from "../shared/playwright-helpers";
 
 test.describe("accessibility + responsive smoke", () => {
-  test("keyboard timeline, live region, reduced motion, tablet layout", async ({
+  test("keyboard timeline, live region, reduced motion, board-first layout", async ({
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
@@ -29,25 +29,32 @@ test.describe("accessibility + responsive smoke", () => {
     const timeline = page.getByTestId("move-list");
     await timeline.focus();
     await page.keyboard.press("Home");
-    await expect(page.getByTestId("live-region")).toContainText(/start|Jumped/i);
+    await expect(page.getByTestId("live-region")).toContainText(
+      /start|Viewing|Returned/i,
+    );
     await page.keyboard.press("End");
-    await expect(page.getByTestId("live-region")).toContainText(/e4|Jumped/i);
+    await expect(page.getByTestId("live-region")).toContainText(
+      /e4|live|Returned|Viewing/i,
+    );
 
     // Board squares expose non-color semantics via aria-label (last move / flags).
     await expect(
       page.locator('[data-square][aria-label*="last move"]').first(),
     ).toBeVisible();
 
-    // Tablet-ish layout: board + aside both present without horizontal clip.
+    // Board-first layout: board and timeline fit within the shell width.
     const shellBox = await page.getByTestId("game-shell").boundingBox();
     const boardBox = await page.getByTestId("chessboard").boundingBox();
+    const timelineBox = await page.getByTestId("move-timeline").boundingBox();
     expect(shellBox).toBeTruthy();
     expect(boardBox).toBeTruthy();
+    expect(timelineBox).toBeTruthy();
     expect(boardBox!.width).toBeGreaterThan(200);
     expect(boardBox!.width).toBeLessThanOrEqual((shellBox!.width ?? 900) + 1);
+    expect(timelineBox!.width).toBeLessThanOrEqual((shellBox!.width ?? 900) + 1);
 
     await page.screenshot({
-      path: "test-results/time-travel-polish.png",
+      path: "test-results/board-first-ui.png",
       fullPage: true,
     });
   });

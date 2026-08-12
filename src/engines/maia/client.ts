@@ -97,6 +97,7 @@ export class MaiaClient {
   private currentGameNodeId: string | null = null;
   private generation = 0;
   private executionProvider: "webgpu" | "wasm" | null = null;
+  private cancelInitialization: ((error: Error) => void) | null = null;
 
   constructor(options: MaiaClientOptions = {}) {
     this.transport = options.transport ?? createDefaultMaiaTransport();
@@ -139,37 +140,66 @@ export class MaiaClient {
     this.statusValue = "downloading";
     this.initPromise = new Promise<void>((resolve, reject) => {
       const requestId = `init-${this.generation++}`;
-      const timer = this.setTimer(() => {
-        this.statusValue = "failed";
-        reject(new Error("Maia init timed out"));
-      }, 120_000);
+      const resources: {
+        timer?: unknown;
+        unsubscribe: (() => void) | null;
+      } = { unsubscribe: null };
+      let settled = false;
 
-      const off = this.transport.subscribe((msg) => {
+      const cleanup = (): boolean => {
+        if (settled) return false;
+        settled = true;
+        if (resources.timer !== undefined) {
+          this.clearTimer(resources.timer);
+        }
+        resources.unsubscribe?.();
+        if (this.cancelInitialization === cancel) {
+          this.cancelInitialization = null;
+        }
+        return true;
+      };
+      const cancel = (error: Error): void => {
+        if (!cleanup()) return;
+        reject(error);
+      };
+      const fail = (error: Error): void => {
+        if (!cleanup()) return;
+        this.statusValue = "failed";
+        reject(error);
+      };
+
+      resources.unsubscribe = this.transport.subscribe((msg) => {
         if (msg.type === "status" && msg.requestId === requestId) {
           if (msg.phase === "downloading") this.statusValue = "downloading";
           if (msg.phase === "initializing") this.statusValue = "initializing";
           return;
         }
         if (msg.type === "ready" && msg.requestId === requestId) {
-          this.clearTimer(timer);
-          off();
+          if (!cleanup()) return;
           this.executionProvider = msg.executionProvider;
           this.statusValue = "ready";
           resolve();
         } else if (msg.type === "error" && msg.requestId === requestId) {
-          this.clearTimer(timer);
-          off();
-          this.statusValue = "failed";
-          reject(new Error(msg.message));
+          fail(new Error(msg.message));
         }
       });
 
-      this.post({
-        type: "init",
-        requestId,
-        modelUrl: this.modelUrl,
-        wasmPaths: this.wasmPaths,
-      });
+      this.cancelInitialization = cancel;
+      resources.timer = this.setTimer(
+        () => fail(new Error("Maia init timed out")),
+        120_000,
+      );
+
+      try {
+        this.post({
+          type: "init",
+          requestId,
+          modelUrl: this.modelUrl,
+          wasmPaths: this.wasmPaths,
+        });
+      } catch (error) {
+        fail(error instanceof Error ? error : new Error(String(error)));
+      }
     }).finally(() => {
       this.initPromise = null;
     });
@@ -240,7 +270,11 @@ export class MaiaClient {
 
   async dispose(): Promise<void> {
     if (this.statusValue === "disposed") return;
+    this.statusValue = "disposed";
     this.cancelAll();
+    this.cancelInitialization?.(
+      new Error("Maia initialization cancelled because the client was disposed"),
+    );
     const requestId = `dispose-${this.generation++}`;
     await new Promise<void>((resolve) => {
       const timer = this.setTimer(() => resolve(), 1_000);

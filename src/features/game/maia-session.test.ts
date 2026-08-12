@@ -160,6 +160,34 @@ describe("maia session", () => {
     await session.dispose();
   });
 
+  it("ignores a superseded init failure after Strict Mode cleanup", async () => {
+    let rejectStale!: (error: Error) => void;
+    const staleInit = new Promise<void>((_resolve, reject) => {
+      rejectStale = reject;
+    });
+    const staleClient = createFakeClient();
+    staleClient.initialize = () => staleInit;
+    let createCount = 0;
+    const session = createMaiaSession({
+      createClient: () => {
+        createCount += 1;
+        return createCount === 1 ? staleClient : createFakeClient();
+      },
+    });
+
+    const staleStart = session.start();
+    await session.dispose();
+    await expect(session.start()).resolves.toBe(true);
+
+    rejectStale(new Error("Maia init timed out"));
+    await expect(staleStart).resolves.toBe(false);
+    expect(session.getState()).toMatchObject({
+      phase: "ready",
+      message: "Maia ready",
+    });
+    await session.dispose();
+  });
+
   it("start succeeds after dispose (Strict Mode cleanup)", async () => {
     const session = createMaiaSession({
       createClient: () => createFakeClient({ initDelayMs: 5 }),

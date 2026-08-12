@@ -1,16 +1,35 @@
 import { expect, type Page } from "@playwright/test";
 
-/** Choose a legal move via the accessible move select. */
-export async function chooseLegalMove(page: Page, san: string): Promise<void> {
-  await page.getByTestId("accessible-move-select").click();
-  await page.getByRole("option", { name: new RegExp(`^${san}\\b`) }).click();
+/** Open settings sheet so keyboard move select is available. */
+export async function openSettings(page: Page): Promise<void> {
+  const sheet = page.getByTestId("settings-sheet");
+  if (await sheet.count()) {
+    const visible = await sheet.isVisible().catch(() => false);
+    if (visible) return;
+  }
+  await page.getByTestId("settings-button").click();
+  await expect(page.getByTestId("settings-sheet")).toBeVisible();
 }
 
-/** Start a stubbed playable game (`?e2eStub=1`) and wait for player turn. */
+/** Choose a legal move via the accessible move select in settings. */
+export async function chooseLegalMove(page: Page, san: string): Promise<void> {
+  await openSettings(page);
+  await page.getByTestId("accessible-move-select").click();
+  await page.getByRole("option", { name: new RegExp(`^${san}\\b`) }).click();
+  // Close settings so board/tutor UI stays unobscured for assertions.
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("settings-sheet")).toBeHidden();
+}
+
+/** Wait for an auto-started stubbed playable game (`?e2eStub=1`). */
 export async function startStubGame(page: Page): Promise<void> {
   await page.goto("/?e2eStub=1");
   await expect(page.getByTestId("game-shell")).toBeVisible();
-  await page.getByTestId("start-button").click();
+  await expect(page.getByTestId("game-shell")).toHaveAttribute(
+    "data-hydrated",
+    "true",
+    { timeout: 15_000 },
+  );
   await expect(page.getByTestId("status-badge")).toHaveAttribute(
     "data-mode",
     "playerTurn",
@@ -18,11 +37,15 @@ export async function startStubGame(page: Page): Promise<void> {
   );
 }
 
-/** Start a stubbed coached game (`?e2eStub=coach`) and wait for player turn. */
+/** Wait for an auto-started stubbed coached game (`?e2eStub=coach`). */
 export async function startCoachGame(page: Page): Promise<void> {
   await page.goto("/?e2eStub=coach");
   await expect(page.getByTestId("game-shell")).toBeVisible();
-  await page.getByTestId("start-button").click();
+  await expect(page.getByTestId("game-shell")).toHaveAttribute(
+    "data-hydrated",
+    "true",
+    { timeout: 15_000 },
+  );
   await expect(page.getByTestId("status-badge")).toHaveAttribute(
     "data-mode",
     "playerTurn",

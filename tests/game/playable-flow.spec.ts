@@ -1,14 +1,20 @@
 import { expect, test } from "@playwright/test";
-import { chooseLegalMove, startStubGame } from "../shared/playwright-helpers";
+import {
+  chooseLegalMove,
+  openSettings,
+  startStubGame,
+} from "../shared/playwright-helpers";
 
 test.describe("playable slice (stub Maia)", () => {
-  test("complete flow: start, move, opponent reply, resign, restart", async ({
+  test("complete flow: auto-start, move, opponent reply, resign, restart", async ({
     page,
   }) => {
     await startStubGame(page);
 
     await expect(page.getByTestId("chessboard")).toBeVisible();
+    await expect(page.getByTestId("move-timeline")).toBeVisible();
 
+    await openSettings(page);
     await page.getByTestId("maia-elo-select").click();
     await page.getByRole("option", { name: "1600" }).click();
 
@@ -20,17 +26,20 @@ test.describe("playable slice (stub Maia)", () => {
       "playerTurn",
       { timeout: 10_000 },
     );
-    await expect(page.getByTestId("move-list")).toHaveText(/.+/);
-    const moveText = await page.getByTestId("move-list").innerText();
-    expect(moveText.trim().split("\n").length).toBeGreaterThanOrEqual(2);
+    const nodeCount = await page
+      .locator('[data-testid="move-list"] [data-timeline-node="true"]')
+      .count();
+    expect(nodeCount).toBeGreaterThanOrEqual(2);
 
+    await openSettings(page);
     await page.getByTestId("resign-button").click();
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
       "gameOver",
     );
-    await expect(page.getByTestId("status-panel")).toContainText(/resign/i);
+    await expect(page.getByTestId("live-region")).toContainText(/resign/i);
 
+    await openSettings(page);
     await page.getByTestId("restart-button").click();
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",

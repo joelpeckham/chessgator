@@ -13,11 +13,12 @@ model on a cheap static host.
 
 ## Shipped baseline (v1)
 
-A user can open the static site, start a game, play a complete legal game against
-Maia at a chosen Elo, get a useful explanation and line after mistakes, explore
-a better line as ghost futures, take back and retry, close the tab, and resume
-later. Production build, unit tests, and browser smoke tests pass. No runtime
-request depends on an application server.
+A user can open the static site, and a game is already ready while engines warm
+in the background. They can play a complete legal game against Maia at a chosen
+Elo, get a useful explanation and line after mistakes, explore better lines on
+the branching timeline under the board, take back and retry, close the tab, and
+resume later. Production build, unit tests, and browser smoke tests pass. No
+runtime request depends on an application server.
 
 ### Architecture
 
@@ -47,8 +48,11 @@ request depends on an application server.
   Time travel moves `currentNodeId`; alternate moves create branches.
 - **Session mode** — plain enum (`loading` | `playerTurn` | `opponentThinking` |
   `analyzing` | `reviewing` | `gameOver` | `error`) owned by the store.
-- **Teaching pipeline** — Stockfish evidence → `TeachingInsight` → coach UI.
-  Components never turn raw UCI/ONNX output into prose.
+- **Teaching pipeline** — Stockfish evidence → `TeachingInsight` → dismissible
+  tutor cards above the timeline. Components never turn raw UCI/ONNX output into
+  prose.
+- **Board-first shell** — chessboard + branching timeline card; settings live in
+  a right-side sheet; no sidebar status stack.
 - **Workers** — Stockfish and Maia in separate workers with typed protocols,
   request IDs, cancellation, and game-node IDs so stale results cannot apply.
 

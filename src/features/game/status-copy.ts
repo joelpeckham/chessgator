@@ -16,6 +16,7 @@ export type StatusPresentationInput = {
   coachMessage?: string | null;
   lastMove?: GameMove | null;
   navigationMessage?: string | null;
+  enginesWarming?: boolean;
 };
 
 export type StatusPresentation = {
@@ -27,8 +28,7 @@ export type StatusPresentation = {
 };
 
 /**
- * Single source for StatusPanel copy and LiveRegion announcements.
- * Announcement may prefer last-move SAN when more useful than the headline.
+ * Single source for status badge copy and live-region announcements.
  */
 export function getStatusPresentation(
   args: StatusPresentationInput,
@@ -38,7 +38,7 @@ export function getStatusPresentation(
   const coachUnavailable = args.coachUnavailable ?? null;
 
   const badgeVariant = badgeVariantFor(mode, maia);
-  const badgeLabel = badgeLabelFor(mode, maia);
+  const badgeLabel = badgeLabelFor(mode, maia, args.enginesWarming);
   const headline = headlineFor({
     mode,
     status,
@@ -53,6 +53,7 @@ export function getStatusPresentation(
     maia,
     lastError,
     coachUnavailable,
+    enginesWarming: args.enginesWarming,
   });
 
   let announcement: string;
@@ -60,7 +61,7 @@ export function getStatusPresentation(
     announcement = args.navigationMessage;
   } else if (mode === "gameOver") {
     announcement = detail ? `${headline}. ${detail}` : headline;
-  } else if (maia.message && mode === "loading") {
+  } else if (maia.message && (mode === "loading" || args.enginesWarming)) {
     announcement = maia.message;
   } else if (mode === "analyzing" && args.coachMessage) {
     announcement = args.coachMessage;
@@ -83,15 +84,21 @@ function badgeVariantFor(
   return "default";
 }
 
-function badgeLabelFor(mode: SessionMode, maia: MaiaSessionState): string {
-  if (maia.phase === "starting") return "Loading engines";
+function badgeLabelFor(
+  mode: SessionMode,
+  maia: MaiaSessionState,
+  enginesWarming?: boolean,
+): string {
   if (maia.phase === "failed" || mode === "error") return "Error";
   if (mode === "gameOver") return "Game over";
   if (mode === "opponentThinking" || maia.phase === "thinking") {
     return "Opponent thinking";
   }
+  if (mode === "analyzing") return "Analyzing";
+  if (mode === "reviewing") return "Reviewing";
+  if (enginesWarming || maia.phase === "starting") return "Your turn";
   if (mode === "playerTurn") return "Your turn";
-  if (mode === "loading") return "Ready to start";
+  if (mode === "loading") return "Starting";
   return mode;
 }
 
@@ -113,14 +120,12 @@ function headlineFor(args: {
     if (status.result === "draw") return "Draw";
     return "Game over";
   }
-  if (maia.phase === "starting") {
-    return maia.message ?? "Starting engines…";
-  }
   if (mode === "opponentThinking" || maia.phase === "thinking") {
     return "Maia is thinking…";
   }
-  if (mode === "playerTurn") return "Your move";
-  if (mode === "loading") return "Start a game when you are ready";
+  if (mode === "playerTurn" || mode === "loading") return "Your move";
+  if (mode === "reviewing") return "Reviewing";
+  if (mode === "analyzing") return "Analyzing…";
   return "chessgator";
 }
 
@@ -131,19 +136,24 @@ function detailFor(args: {
   maia: MaiaSessionState;
   lastError: string | null;
   coachUnavailable: string | null;
+  enginesWarming?: boolean;
 }): string | null {
-  const { mode, status, terminalReason, maia, lastError, coachUnavailable } =
-    args;
+  const {
+    mode,
+    status,
+    terminalReason,
+    maia,
+    lastError,
+    coachUnavailable,
+    enginesWarming,
+  } = args;
   if (coachUnavailable) return coachUnavailable;
   if (lastError) return lastError;
   if (mode === "gameOver") {
     return reasonCopy({ ...status, reason: terminalReason });
   }
-  if (maia.phase === "starting") {
-    return "The board is ready. Engines load only after you press Start.";
-  }
-  if (mode === "loading") {
-    return "Play as White against Maia. Stockfish powers coaching analysis.";
+  if (enginesWarming || maia.phase === "starting") {
+    return maia.message ?? "Downloading engines in the background…";
   }
   return maia.message;
 }

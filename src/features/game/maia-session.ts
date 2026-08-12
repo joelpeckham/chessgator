@@ -38,6 +38,8 @@ export type MaiaSession = {
   getState: () => MaiaSessionState;
   subscribe: (listener: () => void) => () => void;
   start: () => Promise<boolean>;
+  /** Resolves when phase is ready, or false if failed/disposed. */
+  whenReady: () => Promise<boolean>;
   chooseMove: (input: ChooseMaiaMoveInput) => Promise<MaiaMoveResult | null>;
   cancelPending: () => void;
   dispose: () => Promise<void>;
@@ -119,6 +121,8 @@ function createMaiaSessionFromClient(
   let pendingRequestId: string | null = null;
   let disposed = false;
   let state: MaiaSessionState = { ...IDLE_STATE };
+  let startPromise: Promise<boolean> | null = null;
+  let generation = 0;
 
   function emit(): void {
     for (const listener of listeners) listener();
@@ -140,54 +144,115 @@ function createMaiaSessionFromClient(
     },
 
     async start() {
-      // Always allow restart: React Strict Mode dispose() must not permanently
-      // block the same useState-held session instance.
-      await session.dispose();
-      disposed = false;
-      client = createClient();
-      markStart("engine-opponent-startup");
-
-      setState({
-        phase: "starting",
-        message: "Downloading Maia model…",
-      });
-
-      const poll = windowSetInterval(() => {
-        if (!client) return;
-        const status = client.status();
-        if (status === "downloading") {
-          setState({ message: "Downloading Maia model…" });
-        } else if (status === "initializing") {
-          setState({ message: "Initializing Maia…" });
-        }
-      }, 100);
-
-      try {
-        await client.initialize();
-        if (disposed) return false;
-        setState({
-          phase: "ready",
-          message: "Maia ready",
-        });
-        markEnd("engine-opponent-startup");
+      if (state.phase === "ready" && client && !disposed) {
         return true;
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "Maia failed to start";
-        setState({
-          phase: "failed",
-          message,
-        });
-        markEnd("engine-opponent-startup");
-        return false;
-      } finally {
-        windowClearInterval(poll);
       }
+      if (startPromise) {
+        return startPromise;
+      }
+
+      disposed = false;
+      generation += 1;
+      const startGen = generation;
+      startPromise = (async () => {
+        const previousClient = client;
+        if (previousClient) {
+          try {
+            await previousClient.dispose();
+          } catch {
+            // ignore previous client dispose errors
+          }
+          if (client === previousClient) {
+            client = null;
+          }
+        }
+
+        if (disposed || startGen !== generation) return false;
+
+        const currentClient = createClient();
+        client = currentClient;
+        markStart("engine-opponent-startup");
+
+        setState({
+          phase: "starting",
+          message: "Downloading Maia model…",
+        });
+
+        const poll = windowSetInterval(() => {
+          if (
+            disposed ||
+            startGen !== generation ||
+            client !== currentClient
+          ) {
+            return;
+          }
+          const status = currentClient.status();
+          if (status === "downloading") {
+            setState({ message: "Downloading Maia model…" });
+          } else if (status === "initializing") {
+            setState({ message: "Initializing Maia…" });
+          }
+        }, 100);
+
+        try {
+          await currentClient.initialize();
+          if (
+            disposed ||
+            startGen !== generation ||
+            client !== currentClient
+          ) {
+            return false;
+          }
+          setState({
+            phase: "ready",
+            message: "Maia ready",
+          });
+          markEnd("engine-opponent-startup");
+          return true;
+        } catch (err) {
+          if (
+            disposed ||
+            startGen !== generation ||
+            client !== currentClient
+          ) {
+            return false;
+          }
+          const message =
+            err instanceof Error ? err.message : "Maia failed to start";
+          setState({
+            phase: "failed",
+            message,
+          });
+          markEnd("engine-opponent-startup");
+          return false;
+        } finally {
+          windowClearInterval(poll);
+          if (startGen === generation) {
+            startPromise = null;
+          }
+        }
+      })();
+
+      return startPromise;
+    },
+
+    async whenReady() {
+      if (state.phase === "ready" || state.phase === "thinking") return true;
+      if (state.phase === "failed") return false;
+      return session.start();
     },
 
     async chooseMove(input) {
-      if (!client || state.phase === "failed" || state.phase === "idle") {
-        return null;
+      if (
+        !client ||
+        state.phase === "idle" ||
+        state.phase === "starting" ||
+        state.phase === "failed"
+      ) {
+        const ready = await session.whenReady();
+        if (!ready || !client || state.phase === "failed") {
+          return null;
+        }
       }
 
       pendingRequestId = input.requestId;
@@ -259,14 +324,19 @@ function createMaiaSessionFromClient(
 
     async dispose() {
       disposed = true;
+      generation += 1;
+      const disposeGen = generation;
+      startPromise = null;
       session.cancelPending();
       const current = client;
       client = null;
       if (current) {
         await Promise.allSettled([current.dispose()]);
       }
-      state = { ...IDLE_STATE };
-      emit();
+      if (disposed && disposeGen === generation) {
+        state = { ...IDLE_STATE };
+        emit();
+      }
     },
   };
 

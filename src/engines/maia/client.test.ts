@@ -7,7 +7,7 @@ import type {
 } from "@/engines/maia/protocol";
 import type { MaiaTransport } from "@/engines/maia/transport";
 
-function createFakeTransport(): {
+function createFakeTransport(options?: { autoReady?: boolean }): {
   transport: MaiaTransport;
   emit: (msg: MaiaWorkerResponse) => void;
   sent: MaiaWorkerRequest[];
@@ -18,7 +18,7 @@ function createFakeTransport(): {
   const transport: MaiaTransport = {
     postMessage(message) {
       sent.push(message);
-      if (message.type === "init") {
+      if (message.type === "init" && options?.autoReady !== false) {
         queueMicrotask(() => {
           for (const l of listeners) {
             l({
@@ -77,6 +77,31 @@ describe("MaiaClient", () => {
     await init;
     expect(client.status()).toBe("ready");
     expect(client.getExecutionProvider()).toBe("wasm");
+  });
+
+  it("cancels an in-flight initialization when disposed", async () => {
+    const timers = new Map<number, () => void>();
+    let timerId = 0;
+    const { transport } = createFakeTransport({ autoReady: false });
+    const client = new MaiaClient({
+      transport,
+      setTimer: (fn) => {
+        const id = ++timerId;
+        timers.set(id, fn);
+        return id;
+      },
+      clearTimer: (handle) => {
+        timers.delete(handle as number);
+      },
+    });
+
+    const init = client.initialize();
+    const rejected = expect(init).rejects.toThrow(/cancelled.*disposed/i);
+    await client.dispose();
+
+    await rejected;
+    expect(client.status()).toBe("disposed");
+    expect(timers.size).toBe(0);
   });
 
   it("ignores stale results for a non-current game node", async () => {

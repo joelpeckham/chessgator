@@ -1,15 +1,17 @@
 import { expect, test } from "@playwright/test";
 import {
   chooseLegalMove,
+  openSettings,
   startStubGame,
 } from "../shared/playwright-helpers";
 
 const STORAGE_KEY = "chessgator:game:v2";
 
 test.describe("local resume + corruption", () => {
-  test("reloads resume tree, elo, and reviewing mode", async ({ page }) => {
+  test("reloads resume tree, elo, and auto-continues play", async ({ page }) => {
     await startStubGame(page);
 
+    await openSettings(page);
     await page.getByTestId("maia-elo-select").click();
     await page.getByRole("option", { name: "1600" }).click();
 
@@ -41,23 +43,20 @@ test.describe("local resume + corruption", () => {
       "data-resumed",
       "true",
     );
-    await expect(page.getByTestId("status-badge")).toHaveAttribute(
-      "data-mode",
-      "reviewing",
-    );
-    await expect(page.getByTestId("move-list")).toContainText("e4");
-    await expect(page.getByTestId("start-button")).toContainText("Continue");
-    await expect(page.getByTestId("maia-elo-select")).toContainText("1600");
-
-    await page.getByTestId("start-button").click();
+    // Auto-resume continues play without a Continue button.
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
       "playerTurn",
       { timeout: 15_000 },
     );
+    await expect(page.getByTestId("move-list")).toContainText("e4");
+    await expect(page.getByTestId("start-button")).toHaveCount(0);
+
+    await openSettings(page);
+    await expect(page.getByTestId("maia-elo-select")).toContainText("1600");
   });
 
-  test("corrupt localStorage fails closed to a fresh shell", async ({
+  test("corrupt localStorage fails closed to a fresh auto-started shell", async ({
     page,
   }) => {
     await page.addInitScript((key) => {
@@ -76,7 +75,8 @@ test.describe("local resume + corruption", () => {
     );
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
-      "loading",
+      "playerTurn",
+      { timeout: 15_000 },
     );
     await expect(page.getByTestId("move-list")).toContainText("No moves yet");
   });

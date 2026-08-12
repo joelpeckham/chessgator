@@ -1,6 +1,7 @@
 "use client";
 
 import type { HintStep } from "@/domain/teaching";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 
 export type HintLadderProps = {
@@ -27,14 +28,14 @@ export function HintLadder({
             : "Hints maxed";
 
   return (
-    <section
+    <Alert
+      className="shadow-none"
       aria-label="Progressive hints"
-      className="flex flex-col gap-2"
       data-testid="hint-ladder"
       data-hint-level={hint?.level ?? "none"}
     >
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="text-xs font-medium text-muted-foreground">Hints</h2>
+      <div className="col-span-full flex items-center justify-between gap-2">
+        <AlertTitle className="mb-0">Hints</AlertTitle>
         <Button
           type="button"
           size="sm"
@@ -47,16 +48,10 @@ export function HintLadder({
         </Button>
       </div>
       {hint ? (
-        <div
-          className="rounded-2xl bg-muted/50 p-3 text-sm"
-          data-testid="hint-content"
-        >
+        <AlertDescription className="col-span-full" data-testid="hint-content">
           <p data-testid="hint-question">{hint.question}</p>
           {hint.level >= 1 && hint.highlightSquares.length > 0 ? (
-            <p
-              className="mt-2 text-xs text-muted-foreground"
-              data-testid="hint-squares"
-            >
+            <p className="mt-1.5 text-xs" data-testid="hint-squares">
               Focus squares: {hint.highlightSquares.join(", ")}
               <span className="sr-only">
                 {" "}
@@ -65,24 +60,21 @@ export function HintLadder({
             </p>
           ) : null}
           {hint.level >= 2 && hint.candidateMoveSan ? (
-            <p className="mt-2 font-medium" data-testid="hint-candidate">
+            <p className="mt-1.5 font-medium text-foreground" data-testid="hint-candidate">
               Candidate: {hint.candidateMoveSan}
             </p>
           ) : null}
           {hint.level >= 3 && hint.lineUci.length > 0 ? (
-            <p
-              className="mt-2 font-mono text-xs"
-              data-testid="hint-line"
-            >
+            <p className="mt-1.5 font-mono text-xs" data-testid="hint-line">
               Line: {hint.lineUci.join(" ")}
             </p>
           ) : null}
-        </div>
+        </AlertDescription>
       ) : (
-        <p className="text-xs text-muted-foreground">
+        <AlertDescription className="col-span-full">
           Progressive hints: question, squares, candidate, then a short line.
-        </p>
+        </AlertDescription>
       )}
-    </section>
+    </Alert>
   );
 }

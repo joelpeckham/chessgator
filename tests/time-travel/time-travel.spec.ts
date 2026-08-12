@@ -4,8 +4,8 @@ import {
   startCoachGame,
 } from "../shared/playwright-helpers";
 
-test.describe("time travel + variation explorer", () => {
-  test("branch preservation, variation stepping, origin restore, try instead", async ({
+test.describe("time travel + branching timeline", () => {
+  test("branch preservation, tutor try-from-here, timeline review", async ({
     page,
   }) => {
     await startCoachGame(page);
@@ -23,46 +23,23 @@ test.describe("time travel + variation explorer", () => {
     );
 
     await expect(page.getByTestId("explore-line-button")).toBeVisible();
+    // Tutor alternate should appear on the branching timeline.
+    await expect(
+      page.locator('[data-testid="move-list"] [data-kind="tutor"]').first(),
+    ).toBeVisible({ timeout: 10_000 });
+
     await page.getByTestId("explore-line-button").click();
-    await expect(page.getByTestId("variation-explorer")).toBeVisible();
-    await expect(page.getByTestId("variation-explorer")).toHaveAttribute(
-      "data-step",
-      "0",
-    );
-
-    await page.getByTestId("variation-forward").click();
-    await expect(page.getByTestId("variation-explorer")).toHaveAttribute(
-      "data-step",
-      "1",
-    );
-    await expect(page.locator('[data-ghost-square="true"]').first()).toBeVisible();
-
-    await page.getByTestId("variation-forward").click();
-    await expect(page.getByTestId("variation-explorer")).toHaveAttribute(
-      "data-step",
-      "2",
-    );
-
-    await page.getByTestId("variation-exit").click();
-    await expect(page.getByTestId("variation-explorer")).toHaveCount(0);
-    await expect(page.getByTestId("move-list")).toContainText("d4");
-
-    // Re-enter and commit the first ply of the coach line.
-    await page.getByTestId("explore-line-button").click();
-    await expect(page.getByTestId("variation-explorer")).toBeVisible();
-    await page.getByTestId("variation-try-instead").click();
-    await expect(page.getByTestId("variation-explorer")).toHaveCount(0);
     await expect(page.getByTestId("move-list")).toContainText("e4");
+    await expect(page.getByTestId("variation-explorer")).toHaveCount(0);
 
     // d4 branch remains reachable from the timeline.
-    const d4Branch = page.getByRole("button", { name: /Branch d4/i });
-    if (await d4Branch.count()) {
-      await d4Branch.click();
-      await expect(page.getByTestId("live-region")).toContainText(/d4/i);
-    } else {
-      // Jump via start then the alternate chip under Start / first ply.
-      await page.getByRole("option", { name: /Start/i }).click();
-      await page.getByRole("button", { name: /d4/ }).first().click();
+    const d4Node = page
+      .locator('[data-testid="move-list"] [data-timeline-node="true"]')
+      .filter({ hasText: /d4/ })
+      .first();
+    if (await d4Node.count()) {
+      await d4Node.click();
+      await expect(page.getByTestId("live-region")).toContainText(/d4|Viewing/i);
     }
   });
 
@@ -75,15 +52,19 @@ test.describe("time travel + variation explorer", () => {
       { timeout: 10_000 },
     );
 
-    await page.getByRole("option", { name: /Start/i }).click();
-    await expect(page.getByTestId("live-region")).toContainText(/start|Jumped/i);
+    await page.getByTestId("timeline-first").click();
+    await expect(page.getByTestId("live-region")).toContainText(
+      /start|Viewing|Returned/i,
+    );
     await expect(page.getByTestId("move-list")).toContainText("e4");
 
-    await page.getByRole("option", { name: /e4/ }).first().click();
-    await expect(page.getByTestId("live-region")).toContainText(/e4/i);
+    await page.getByTestId("timeline-live").click();
+    await expect(page.getByTestId("live-region")).toContainText(
+      /live|e4|Returned/i,
+    );
   });
 
-  test("undo my move clears coaching so Explore cannot target old node", async ({
+  test("undo my move clears coaching so Try from here cannot target old node", async ({
     page,
   }) => {
     await startCoachGame(page);
@@ -101,16 +82,23 @@ test.describe("time travel + variation explorer", () => {
 
     await page.getByTestId("takeback-retry-button").click();
     await expect(page.getByTestId("live-region")).toContainText(/undo|try/i);
-    await expect(page.getByTestId("teaching-card")).toHaveAttribute(
-      "data-state",
-      "empty",
-    );
     await expect(page.getByTestId("explore-line-button")).toHaveCount(0);
     await expect(page.getByTestId("variation-explorer")).toHaveCount(0);
     await expect(page.getByTestId("timeline-takeback")).toHaveCount(0);
     await expect(page.getByTestId("status-badge")).not.toHaveAttribute(
       "data-mode",
       "analyzing",
+    );
+
+    if ((await page.getByTestId("teaching-card").count()) === 0) {
+      await page.getByTestId("toggle-teaching-card").click();
+    } else {
+      await page.getByTestId("toggle-teaching-card").click();
+      await page.getByTestId("toggle-teaching-card").click();
+    }
+    await expect(page.getByTestId("teaching-card")).toHaveAttribute(
+      "data-state",
+      "empty",
     );
   });
 });

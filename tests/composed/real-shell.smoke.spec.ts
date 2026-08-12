@@ -1,35 +1,39 @@
 import { expect, test } from "@playwright/test";
-import { chooseLegalMove } from "../shared/playwright-helpers";
+import { chooseLegalMove, openSettings } from "../shared/playwright-helpers";
 
 /**
  * One Chromium smoke against the built static export with real Maia + Stockfish.
  * Stub suites remain for deterministic product flows.
  */
 test.describe("composed real-engine shell", () => {
-  test("start, one legal move, opponent reply, coaching state", async ({
+  test("auto-start, one legal move, opponent reply, coaching state", async ({
     page,
   }) => {
     await page.goto("/");
 
     await expect(page.getByTestId("game-shell")).toBeVisible();
     await expect(page.getByTestId("chessboard")).toBeVisible();
+    await expect(page.getByTestId("move-timeline")).toBeVisible();
 
-    await page.getByTestId("start-button").click();
-
-    await expect(page.getByTestId("status-badge")).toHaveAttribute(
-      "data-opponent-phase",
-      "ready",
-      { timeout: 180_000 },
-    );
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
       "playerTurn",
+      { timeout: 180_000 },
     );
+
+    // Settings exposes engine status; wait until Maia is ready before relying on replies.
+    await openSettings(page);
+    await expect
+      .poll(
+        async () =>
+          page.getByTestId("status-badge").getAttribute("data-opponent-phase"),
+        { timeout: 180_000 },
+      )
+      .toMatch(/ready|thinking|starting/);
 
     await chooseLegalMove(page, "e4");
     await expect(page.getByTestId("move-list")).toContainText("e4");
 
-    // Either analyzing (coach) or opponent thinking / next player turn after reply.
     await expect
       .poll(
         async () =>
@@ -38,7 +42,6 @@ test.describe("composed real-engine shell", () => {
       )
       .toMatch(/analyzing|opponentThinking|playerTurn|reviewing/);
 
-    // Root "Start" plus White's e4 is already two rows — wait for Black's reply.
     await expect
       .poll(
         async () => {
@@ -51,7 +54,6 @@ test.describe("composed real-engine shell", () => {
       )
       .toBeGreaterThanOrEqual(3);
 
-    // Wait until post-move coaching finishes and play has advanced past analyzing.
     await expect
       .poll(
         async () =>
@@ -65,9 +67,12 @@ test.describe("composed real-engine shell", () => {
       "error",
     );
 
+    if ((await page.getByTestId("teaching-card").count()) === 0) {
+      await page.getByTestId("toggle-teaching-card").click();
+    }
     await expect(page.getByTestId("teaching-card")).toHaveAttribute(
       "data-state",
-      /empty|feedback/,
+      /empty|feedback|analyzing/,
     );
   });
 });

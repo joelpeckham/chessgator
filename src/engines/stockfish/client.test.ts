@@ -31,6 +31,7 @@ function makeEvidence(
 }
 
 function createFakeTransport(options?: {
+  autoReady?: boolean;
   onAnalyze?: (req: Extract<StockfishWorkerRequest, { type: "analyze" }>) => void;
 }): {
   transport: StockfishTransport;
@@ -43,7 +44,7 @@ function createFakeTransport(options?: {
   const transport: StockfishTransport = {
     postMessage(message) {
       sent.push(message);
-      if (message.type === "init") {
+      if (message.type === "init" && options?.autoReady !== false) {
         queueMicrotask(() => {
           for (const l of listeners) {
             l({ type: "ready", requestId: message.requestId });
@@ -80,6 +81,31 @@ function createFakeTransport(options?: {
 }
 
 describe("StockfishClient", () => {
+  it("cancels an in-flight initialization when disposed", async () => {
+    const timers = new Map<number, () => void>();
+    let timerId = 0;
+    const { transport } = createFakeTransport({ autoReady: false });
+    const client = new StockfishClient({
+      transport,
+      setTimer: (fn) => {
+        const id = ++timerId;
+        timers.set(id, fn);
+        return id;
+      },
+      clearTimer: (handle) => {
+        timers.delete(handle as number);
+      },
+    });
+
+    const init = client.initialize();
+    const rejected = expect(init).rejects.toThrow(/cancelled.*disposed/i);
+    await client.dispose();
+
+    await rejected;
+    expect(client.status()).toBe("disposed");
+    expect(timers.size).toBe(0);
+  });
+
   it("queues user work ahead of background while busy", async () => {
     const { transport, emit, sent } = createFakeTransport();
     const client = new StockfishClient({ transport, timeoutBufferMs: 5_000 });

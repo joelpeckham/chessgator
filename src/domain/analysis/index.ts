@@ -44,3 +44,14 @@ export {
   SHORT_PV_MAX_PLIES,
   buildMoveAnalysisEvidence,
 } from "@/domain/analysis/move-analysis";
+
+export type {
+  ProjectedLine,
+  ProjectedPly,
+} from "@/domain/analysis/projected-lines";
+export {
+  FUTURE_PROJECTION_PLIES,
+  projectBestFuture,
+  projectUciLine,
+  sanOrUci,
+} from "@/domain/analysis/projected-lines";

@@ -1,6 +1,8 @@
 import {
   buildMoveAnalysisEvidence,
+  projectBestFuture,
   type MoveAnalysisEvidence,
+  type ProjectedLine,
 } from "@/domain/analysis";
 import type { GameMove } from "@/domain/game";
 import {
@@ -41,6 +43,11 @@ export type CoachingControllerState = {
   hintLevel: HintLevel;
   hint: HintStep | null;
   annotations: BoardAnnotation;
+  /** Soft-dismissed tutor card; insight remains cached for reopen. */
+  insightDismissed: boolean;
+  /** Latest projected future for the active projection node. */
+  futureLine: ProjectedLine | null;
+  futureNodeId: string | null;
 };
 
 export type AnalyzePlayerMoveInput = {
@@ -56,9 +63,18 @@ export type CoachingController = {
   getState: () => CoachingControllerState;
   subscribe: (listener: () => void) => () => void;
   start: () => Promise<boolean>;
+  whenReady: () => Promise<boolean>;
   analyzePlayerMove: (
     input: AnalyzePlayerMoveInput,
   ) => Promise<MoveAnalysisEvidence | null>;
+  projectFuture: (input: {
+    fen: string;
+    gameNodeId: string;
+    movetimeMs?: number;
+  }) => Promise<ProjectedLine | null>;
+  getCachedInsight: (gameNodeId: string) => TeachingInsight | null;
+  dismissInsight: () => void;
+  showInsight: (gameNodeId?: string | null) => void;
   escalateHint: (input: {
     fen: string;
     gameNodeId: string;
@@ -96,7 +112,12 @@ const IDLE: CoachingControllerState = {
   hintLevel: 0,
   hint: null,
   annotations: EMPTY_ANNOTATIONS,
+  insightDismissed: false,
+  futureLine: null,
+  futureNodeId: null,
 };
+
+const FUTURE_CACHE_LIMIT = 24;
 
 /**
  * Owns Stockfish-backed move analysis + hint ladder for the coaching slice.
@@ -113,7 +134,10 @@ export function createCoachingController(
   let disposed = false;
   let activeRequestId: string | null = null;
   let generation = 0;
+  let startPromise: Promise<boolean> | null = null;
   let state: CoachingControllerState = { ...IDLE };
+  const insightByNodeId = new Map<string, TeachingInsight>();
+  const futureByNodeId = new Map<string, ProjectedLine>();
 
   function emit(): void {
     for (const listener of listeners) listener();
@@ -122,6 +146,18 @@ export function createCoachingController(
   function setState(partial: Partial<CoachingControllerState>): void {
     state = { ...state, ...partial };
     emit();
+  }
+
+  function rememberFuture(nodeId: string, line: ProjectedLine | null): void {
+    if (!line) {
+      futureByNodeId.delete(nodeId);
+      return;
+    }
+    futureByNodeId.set(nodeId, line);
+    if (futureByNodeId.size > FUTURE_CACHE_LIMIT) {
+      const first = futureByNodeId.keys().next().value;
+      if (first) futureByNodeId.delete(first);
+    }
   }
 
   function annotationsFromInsight(
@@ -187,7 +223,7 @@ export function createCoachingController(
     setState({ ...partial, annotations });
   }
 
-  return {
+  const controller: CoachingController = {
     getState: () => state,
 
     subscribe(listener) {
@@ -198,40 +234,100 @@ export function createCoachingController(
     },
 
     async start() {
-      // Always allow restart: React Strict Mode dispose() must not permanently
-      // block the same useState-held controller instance.
-      await this.dispose();
+      if (
+        (state.phase === "ready" || state.phase === "analyzing") &&
+        engine &&
+        !disposed
+      ) {
+        return true;
+      }
+      if (startPromise) {
+        return startPromise;
+      }
+
       disposed = false;
       generation += 1;
       const startGen = generation;
-      engine = createEngine();
-      markStart("engine-coach-startup");
-      setState({
-        ...IDLE,
-        phase: "starting",
-        message: "Starting coach analysis…",
-      });
-      try {
-        await engine.initialize();
+      startPromise = (async () => {
+        const previousEngine = engine;
+        if (previousEngine) {
+          try {
+            await previousEngine.dispose();
+          } catch {
+            // ignore
+          }
+          if (engine === previousEngine) {
+            engine = null;
+          }
+        }
+
         if (disposed || startGen !== generation) return false;
+
+        const currentEngine = createEngine();
+        engine = currentEngine;
+        markStart("engine-coach-startup");
         setState({
-          phase: "ready",
-          message: "Coach ready",
+          ...IDLE,
+          phase: "starting",
+          message: "Starting coach analysis…",
         });
-        markEnd("engine-coach-startup");
-        return true;
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "Coach analysis failed";
-        setState({ phase: "failed", message });
-        markEnd("engine-coach-startup");
-        return false;
-      }
+        try {
+          await currentEngine.initialize();
+          if (
+            disposed ||
+            startGen !== generation ||
+            engine !== currentEngine
+          ) {
+            return false;
+          }
+          setState({
+            phase: "ready",
+            message: "Coach ready",
+          });
+          markEnd("engine-coach-startup");
+          return true;
+        } catch (err) {
+          if (
+            disposed ||
+            startGen !== generation ||
+            engine !== currentEngine
+          ) {
+            return false;
+          }
+          const message =
+            err instanceof Error ? err.message : "Coach analysis failed";
+          setState({ phase: "failed", message });
+          markEnd("engine-coach-startup");
+          return false;
+        } finally {
+          if (startGen === generation) {
+            startPromise = null;
+          }
+        }
+      })();
+
+      return startPromise;
+    },
+
+    async whenReady() {
+      // Analyzing means the engine is already up — never restart mid-request.
+      if (state.phase === "ready" || state.phase === "analyzing") return true;
+      if (state.phase === "failed") return false;
+      if (startPromise) return startPromise;
+      return controller.start();
     },
 
     async analyzePlayerMove(input) {
-      if (!engine || state.phase === "failed" || state.phase === "idle") {
-        return null;
+      if (
+        !engine ||
+        state.phase === "idle" ||
+        state.phase === "starting" ||
+        state.phase === "failed"
+      ) {
+        const ready = await controller.whenReady();
+        if (!ready || !engine || state.phase === "failed") {
+          return null;
+        }
       }
 
       this.cancelPending();
@@ -239,12 +335,14 @@ export function createCoachingController(
       const gen = generation;
       engine.setCurrentGameNodeId(input.gameNodeId);
       markStart("analysis-player-move");
-      // Clear prior teaching evidence so Explore / card never act on a stale move.
+      // Set analyzing synchronously before the first engine await so UI / tests
+      // observe the in-flight phase immediately.
       setState({
         phase: "analyzing",
         message: "Analyzing your move…",
         evidence: null,
         insight: null,
+        insightDismissed: false,
         hint: null,
         hintLevel: 0,
         annotations: EMPTY_ANNOTATIONS,
@@ -259,7 +357,6 @@ export function createCoachingController(
         gen !== generation ||
         activeRequestId !== input.requestId;
 
-      /** Leave analyzing when this request dies without a successor owning the phase. */
       const leaveAnalyzingIfOrphaned = () => {
         if (
           !disposed &&
@@ -310,12 +407,14 @@ export function createCoachingController(
           after,
         });
         const insight = selectTeachingInsight(evidence);
+        insightByNodeId.set(input.gameNodeId, insight);
 
         refreshAnnotations({
           phase: "ready",
           message: null,
           evidence,
           insight,
+          insightDismissed: false,
           hint: null,
           hintLevel: 0,
         });
@@ -330,7 +429,6 @@ export function createCoachingController(
         }
         const message =
           err instanceof Error ? err.message : "Analysis failed";
-        // Soft-fail: keep playing; coaching is optional for continuity.
         setState({
           phase: "ready",
           message: message.includes("cancelled") || message.includes("Stale")
@@ -343,9 +441,77 @@ export function createCoachingController(
       }
     },
 
-    async escalateHint(input) {
-      if (!engine || state.phase === "failed" || state.phase === "idle") {
+    async projectFuture(input) {
+      const cached = futureByNodeId.get(input.gameNodeId);
+      if (cached) {
+        setState({
+          futureLine: cached,
+          futureNodeId: input.gameNodeId,
+        });
+        return cached;
+      }
+
+      const ready = await controller.whenReady();
+      if (!ready || !engine || state.phase === "failed") {
         return null;
+      }
+
+      const requestId = `future-${generation}-${input.gameNodeId}`;
+      try {
+        const evidence = await engine.analyze({
+          requestId,
+          gameNodeId: input.gameNodeId,
+          fen: input.fen,
+          priority: "background",
+          multipv: 1,
+          movetimeMs: input.movetimeMs ?? Math.max(80, defaultMovetimeMs),
+        });
+        if (disposed) return null;
+        const line = projectBestFuture(evidence);
+        rememberFuture(input.gameNodeId, line);
+        setState({
+          futureLine: line,
+          futureNodeId: input.gameNodeId,
+        });
+        return line;
+      } catch {
+        return null;
+      }
+    },
+
+    getCachedInsight(gameNodeId) {
+      return insightByNodeId.get(gameNodeId) ?? null;
+    },
+
+    dismissInsight() {
+      setState({ insightDismissed: true });
+    },
+
+    showInsight(gameNodeId) {
+      if (gameNodeId) {
+        const cached = insightByNodeId.get(gameNodeId);
+        if (cached) {
+          refreshAnnotations({
+            insight: cached,
+            insightDismissed: false,
+          });
+          return;
+        }
+      }
+      setState({ insightDismissed: false });
+    },
+
+    async escalateHint(input) {
+      if (
+        !engine ||
+        state.phase === "idle" ||
+        state.phase === "starting" ||
+        state.phase === "failed"
+      ) {
+        const ready = await controller.whenReady();
+        if (!ready || !engine || state.phase === "failed") {
+          return null;
+        }
       }
       const nextLevel = state.hint ? nextHintLevel(state.hintLevel) : 0;
       const requestId = `hint-${generation}-${nextLevel}`;
@@ -377,6 +543,7 @@ export function createCoachingController(
         hint,
         hintLevel: nextLevel,
         phase: "ready",
+        insightDismissed: false,
       });
       activeRequestId = null;
       return hint;
@@ -396,6 +563,7 @@ export function createCoachingController(
         phase,
         evidence: null,
         insight: null,
+        insightDismissed: false,
         hint: null,
         hintLevel: 0,
         annotations: EMPTY_ANNOTATIONS,
@@ -413,7 +581,6 @@ export function createCoachingController(
         engine.cancelAll();
       }
       activeRequestId = null;
-      // Never leave the coach stuck analyzing after cancel (timeline jump, etc.).
       if (state.phase === "analyzing") {
         setState({
           phase: engine ? "ready" : "idle",
@@ -425,16 +592,24 @@ export function createCoachingController(
     async dispose() {
       disposed = true;
       generation += 1;
+      const disposeGen = generation;
+      startPromise = null;
       this.cancelPending();
       const current = engine;
       engine = null;
       if (current) {
-        await current.dispose();
+        await Promise.allSettled([current.dispose()]);
       }
-      state = { ...IDLE };
-      emit();
+      if (disposed && disposeGen === generation) {
+        insightByNodeId.clear();
+        futureByNodeId.clear();
+        state = { ...IDLE };
+        emit();
+      }
     },
   };
+
+  return controller;
 }
 
 function resolveDefaultEngine(): StockfishClientLike {

@@ -32,6 +32,7 @@ export function createStubMaiaSession(
   let pendingRequestId: string | null = null;
   const cancelled = new Set<string>();
   let state: MaiaSessionState = { phase: "idle", message: null };
+  let startPromise: Promise<boolean> | null = null;
 
   function emit(): void {
     for (const listener of listeners) listener();
@@ -53,32 +54,53 @@ export function createStubMaiaSession(
     },
 
     async start() {
-      await session.dispose();
-      setState({
-        phase: "starting",
-        message: "Downloading Maia model…",
-      });
-      if (initDelayMs > 0) {
-        await delay(initDelayMs / 2);
-      }
-      setState({ message: "Initializing Maia…" });
-      if (initDelayMs > 0) {
-        await delay(initDelayMs / 2);
-      }
-      if (failInit) {
+      if (state.phase === "ready") return true;
+      if (startPromise) return startPromise;
+
+      startPromise = (async () => {
         setState({
-          phase: "failed",
-          message: "Stub Maia failed to initialize",
+          phase: "starting",
+          message: "Downloading Maia model…",
         });
-        return false;
-      }
-      setState({ phase: "ready", message: "Maia ready" });
-      return true;
+        if (initDelayMs > 0) {
+          await delay(initDelayMs / 2);
+        }
+        setState({ message: "Initializing Maia…" });
+        if (initDelayMs > 0) {
+          await delay(initDelayMs / 2);
+        }
+        if (failInit) {
+          setState({
+            phase: "failed",
+            message: "Stub Maia failed to initialize",
+          });
+          return false;
+        }
+        setState({ phase: "ready", message: "Maia ready" });
+        return true;
+      })().finally(() => {
+        startPromise = null;
+      });
+
+      return startPromise;
+    },
+
+    async whenReady() {
+      if (state.phase === "ready") return true;
+      if (state.phase === "failed") return false;
+      return session.start();
     },
 
     async chooseMove(input: ChooseMaiaMoveInput): Promise<MaiaMoveResult | null> {
-      if (state.phase === "failed" || state.phase === "idle") {
-        return null;
+      if (
+        state.phase === "idle" ||
+        state.phase === "starting" ||
+        state.phase === "failed"
+      ) {
+        const ready = await session.whenReady();
+        if (!ready || state.phase === "failed") {
+          return null;
+        }
       }
 
       pendingRequestId = input.requestId;
@@ -136,6 +158,7 @@ export function createStubMaiaSession(
     },
 
     async dispose() {
+      startPromise = null;
       session.cancelPending();
       cancelled.clear();
       state = { phase: "idle", message: null };

@@ -120,14 +120,14 @@ export function ChessboardAdapter({
 
     if (lastMove) {
       styles[lastMove.from] = {
-        boxShadow:
-          "inset 0 0 0 3px color-mix(in oklch, var(--primary) 55%, transparent)",
         background: "color-mix(in oklch, var(--primary) 18%, transparent)",
+        outline: "2px solid color-mix(in oklch, var(--primary) 55%, transparent)",
+        outlineOffset: "-2px",
       };
       styles[lastMove.to] = {
-        boxShadow:
-          "inset 0 0 0 3px color-mix(in oklch, var(--primary) 70%, transparent)",
         background: "color-mix(in oklch, var(--primary) 28%, transparent)",
+        outline: "2px solid color-mix(in oklch, var(--primary) 70%, transparent)",
+        outlineOffset: "-2px",
       };
     }
 
@@ -136,8 +136,6 @@ export function ChessboardAdapter({
         ...styles[square],
         outline: "2px dashed var(--foreground)",
         outlineOffset: "-3px",
-        boxShadow:
-          "inset 0 0 0 2px color-mix(in oklch, var(--accent) 55%, transparent)",
         background:
           styles[square]?.background ??
           "color-mix(in oklch, var(--accent) 22%, transparent)",
@@ -149,15 +147,15 @@ export function ChessboardAdapter({
         ...styles[square],
         outline: "2px dotted var(--foreground)",
         outlineOffset: "-4px",
-        backgroundImage:
-          "repeating-linear-gradient(45deg, color-mix(in oklch, var(--foreground) 18%, transparent) 0 4px, transparent 4px 8px)",
+        background:
+          styles[square]?.background ??
+          "color-mix(in oklch, var(--muted) 70%, transparent)",
       };
     }
 
     if (selectedSquare) {
       styles[selectedSquare] = {
         ...styles[selectedSquare],
-        boxShadow: "inset 0 0 0 3px var(--foreground)",
         outline: "2px dashed var(--foreground)",
         outlineOffset: "-4px",
       };
@@ -166,20 +164,19 @@ export function ChessboardAdapter({
     for (const square of destinations) {
       styles[square] = {
         ...styles[square],
-        backgroundImage:
-          "radial-gradient(circle at center, color-mix(in oklch, var(--foreground) 55%, transparent) 0 12%, transparent 13%)",
-        boxShadow:
-          styles[square]?.boxShadow ??
-          "inset 0 0 0 2px color-mix(in oklch, var(--foreground) 35%, transparent)",
+        outline:
+          styles[square]?.outline ??
+          "2px solid color-mix(in oklch, var(--foreground) 35%, transparent)",
+        outlineOffset: "-2px",
       };
     }
 
     if (isCheck && checkSquare) {
       styles[checkSquare] = {
         ...styles[checkSquare],
-        background:
-          "repeating-linear-gradient(135deg, color-mix(in oklch, var(--destructive) 45%, transparent) 0 6px, color-mix(in oklch, var(--destructive) 15%, transparent) 6px 12px)",
-        boxShadow: "inset 0 0 0 3px var(--destructive)",
+        background: "color-mix(in oklch, var(--destructive) 35%, transparent)",
+        outline: "2px solid var(--destructive)",
+        outlineOffset: "-2px",
       };
     }
 
@@ -251,9 +248,7 @@ export function ChessboardAdapter({
       arrows: boardArrows,
       showNotation: true,
       boardStyle: {
-        borderRadius: "0.75rem",
-        boxShadow:
-          "0 18px 50px color-mix(in oklch, var(--foreground) 18%, transparent)",
+        borderRadius: "var(--radius)",
         width: "100%",
       },
       darkSquareStyle: { backgroundColor: "var(--board-dark)" },
@@ -373,10 +368,7 @@ export function ChessboardAdapter({
 
   return (
     <div
-      className={cn(
-        "chessboard-adapter aspect-square w-full max-w-[min(72vh,640px)]",
-        className,
-      )}
+      className={cn("chessboard-adapter aspect-square", className)}
       data-testid="chessboard"
     >
       <Chessboard options={options} />

@@ -8,6 +8,7 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
   test("hints, full feedback, explore line, undo my move", async ({ page }) => {
     await startCoachGame(page);
 
+    await page.getByTestId("toggle-teaching-card").click();
     await expect(page.getByTestId("coach-panel")).toBeVisible();
 
     // Progressive hint ladder before moving.
@@ -41,7 +42,6 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
     await expect(page.getByTestId("teaching-explanation")).toBeVisible();
     await expect(page.getByTestId("concept-badge")).toHaveCount(0);
     await expect(page.getByTestId("show-line-button")).toHaveCount(0);
-    await expect(page.getByTestId("toggle-teaching-card")).toHaveCount(0);
 
     // Opponent replies, then undo White's move and retry.
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
@@ -55,11 +55,21 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
       "data-mode",
       "playerTurn",
     );
+    await expect(page.getByTestId("explore-line-button")).toHaveCount(0);
+    await expect(page.getByTestId("move-list")).toContainText("No moves yet");
+    await expect(page.getByTestId("live-region")).toContainText(/undo|try/i);
+
+    // Tutor can be reopened from timeline controls after feedback clears.
+    if ((await page.getByTestId("teaching-card").count()) === 0) {
+      await page.getByTestId("toggle-teaching-card").click();
+    } else {
+      // Already open (pinned) — dismiss and reopen to assert the empty state.
+      await page.getByTestId("toggle-teaching-card").click();
+      await page.getByTestId("toggle-teaching-card").click();
+    }
     await expect(page.getByTestId("teaching-card")).toHaveAttribute(
       "data-state",
       "empty",
     );
-    await expect(page.getByTestId("move-list")).toContainText("No moves yet");
-    await expect(page.getByTestId("live-region")).toContainText(/undo|try/i);
   });
 });

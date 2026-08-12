@@ -324,6 +324,36 @@ describe("coaching controller", () => {
     await coach.dispose();
   });
 
+  it("ignores a superseded init failure after Strict Mode cleanup", async () => {
+    let rejectStale!: (error: Error) => void;
+    const staleInit = new Promise<void>((_resolve, reject) => {
+      rejectStale = reject;
+    });
+    const staleEngine = createStubAnalysisEngine({ delayMs: 0 });
+    staleEngine.initialize = () => staleInit;
+    let createCount = 0;
+    const coach = createCoachingController({
+      createEngine: () => {
+        createCount += 1;
+        return createCount === 1
+          ? staleEngine
+          : createStubAnalysisEngine({ delayMs: 0 });
+      },
+    });
+
+    const staleStart = coach.start();
+    await coach.dispose();
+    await expect(coach.start()).resolves.toBe(true);
+
+    rejectStale(new Error("Stockfish init timed out"));
+    await expect(staleStart).resolves.toBe(false);
+    expect(coach.getState()).toMatchObject({
+      phase: "ready",
+      message: "Coach ready",
+    });
+    await coach.dispose();
+  });
+
   it("start succeeds after dispose (Strict Mode cleanup)", async () => {
     const coach = stubCoach();
 

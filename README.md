@@ -30,9 +30,11 @@ src/
   components/         # board, coach, timeline, UI primitives
 ```
 
-Play as White against Maia. After each move, Stockfish coaches. The move timeline
-preserves branches; “Explore better line” steps ghost futures before you commit.
-Closing the tab resumes the local game from `localStorage`.
+Play as White against Maia. Engines warm as soon as the page loads and a game
+starts automatically. After each move, Stockfish coaches through dismissible
+tutor cards. The branching timeline under the board is the main way to review
+the past, preview engine futures, and try tutor alternatives. Closing the tab
+resumes the local game from `localStorage`.
 
 ## Prerequisites
 
@@ -67,7 +69,7 @@ Generated files land in `public/engine/`, `public/ort/<version>/`, and
 | `bun run test:maia` | Real Maia worker/ONNX browser smoke |
 | `bun run test:game` | Playable-slice e2e (stub Maia) |
 | `bun run test:coaching` | Coaching-slice e2e (stub engines) |
-| `bun run test:time-travel` | Timeline + variation explorer e2e |
+| `bun run test:time-travel` | Branching timeline + tutor alternate e2e |
 | `bun run test:persistence` | Local resume / corruption e2e |
 | `bun run test:accessibility` | Keyboard / live region / layout smoke |
 | `bun run test:composed` | Composed shell smoke with real Maia/Stockfish |
