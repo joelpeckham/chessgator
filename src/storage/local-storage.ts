@@ -1,9 +1,9 @@
 import {
   GAME_SCHEMA_VERSION,
   GAME_STORAGE_KEY,
+  type GameRepository,
   LEGACY_GAME_STORAGE_KEY,
   parseSavedGame,
-  type GameRepository,
   type SavedGameV2,
 } from "@/storage/schema";
 
@@ -25,9 +25,8 @@ export function createLocalStorageGameRepository(options?: {
   storage?: StorageLike | null;
   key?: string;
 }): GameRepository {
-  const storage = options?.storage === undefined
-    ? getDefaultStorage()
-    : options.storage;
+  const storage =
+    options?.storage === undefined ? getDefaultStorage() : options.storage;
   const key = options?.key ?? GAME_STORAGE_KEY;
 
   return {
@@ -60,9 +59,9 @@ export function createLocalStorageGameRepository(options?: {
 
     async save(game: SavedGameV2): Promise<void> {
       if (!storage) return;
-      if (game.version !== GAME_SCHEMA_VERSION) {
+      if ((game.version as number) !== GAME_SCHEMA_VERSION) {
         throw new Error(
-          `Refusing to save unsupported schema version ${game.version}`,
+          `Refusing to save unsupported schema version ${String(game.version)}`,
         );
       }
       const validated = parseSavedGame(game);

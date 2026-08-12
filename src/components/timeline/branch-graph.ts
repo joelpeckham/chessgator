@@ -1,10 +1,10 @@
 import type { ProjectedLine } from "@/domain/analysis/projected-lines";
 import {
+  type GameNode,
+  type GameTree,
   getAncestors,
   getNode,
   listMainlineChild,
-  type GameNode,
-  type GameTree,
 } from "@/domain/game";
 
 export type TimelineNodeKind =
@@ -312,7 +312,7 @@ export function buildBranchGraph(input: BuildBranchGraphInput): TimelineGraph {
         if (mainPathIds.has(child.id)) return false;
         return true;
       })
-      .sort((a, b) => {
+      .toSorted((a, b) => {
         const uciA = a.move?.uci ?? a.id;
         const uciB = b.move?.uci ?? b.id;
         return uciA.localeCompare(uciB) || a.id.localeCompare(b.id);
@@ -323,7 +323,10 @@ export function buildBranchGraph(input: BuildBranchGraphInput): TimelineGraph {
     const pinned: GameNode[] = [];
     const unpinned: GameNode[] = [];
     for (const sibling of siblings) {
-      const key = variationBranchKey(parent.id, sibling.move?.uci ?? sibling.id);
+      const key = variationBranchKey(
+        parent.id,
+        sibling.move?.uci ?? sibling.id,
+      );
       if (expanded.has(key)) pinned.push(sibling);
       else unpinned.push(sibling);
     }
@@ -446,9 +449,9 @@ export function buildBranchGraph(input: BuildBranchGraphInput): TimelineGraph {
     // Reserve the full interval first (up to cap) so lane stays sticky.
     const segmentNodes: GameNode[] = [];
     {
-      let walk: GameNode | null = current;
+      let walk = current;
       const seen = new Set<string>();
-      for (let depth = 0; walk && depth < BRANCH_FORWARD_PLIES; depth += 1) {
+      for (let depth = 0; depth < BRANCH_FORWARD_PLIES; depth += 1) {
         if (seen.has(walk.id) || nodesById.has(walk.id)) break;
         seen.add(walk.id);
         segmentNodes.push(walk);
@@ -456,7 +459,10 @@ export function buildBranchGraph(input: BuildBranchGraphInput): TimelineGraph {
         if (!nextId) break;
         const next = getNode(tree, nextId);
         if (!next || mainPathIds.has(next.id)) break;
-        if (next.childIds.length === 0 && depth + 1 >= BRANCH_FORWARD_PLIES - 1) {
+        if (
+          next.childIds.length === 0 &&
+          depth + 1 >= BRANCH_FORWARD_PLIES - 1
+        ) {
           // Will truncate after this next if deeper exists — checked below.
         }
         walk = next;
@@ -514,10 +520,7 @@ export function buildBranchGraph(input: BuildBranchGraphInput): TimelineGraph {
   }
 
   // --- Phase 3: projected lines with gating ---
-  function isAncestorOf(
-    ancestorId: string,
-    descendantId: string,
-  ): boolean {
+  function isAncestorOf(ancestorId: string, descendantId: string): boolean {
     if (ancestorId === descendantId) return true;
     const ancestors = getAncestors(tree, descendantId);
     return ancestors.some((n) => n.id === ancestorId);
@@ -636,7 +639,7 @@ export function buildBranchGraph(input: BuildBranchGraphInput): TimelineGraph {
     node.isOnReviewPath = reviewPath.includes(node.id);
   }
 
-  const nodes = [...nodesById.values()].sort((a, b) => {
+  const nodes = [...nodesById.values()].toSorted((a, b) => {
     if (a.column !== b.column) return a.column - b.column;
     return b.lane - a.lane;
   });
@@ -678,11 +681,11 @@ export function buildReviewPath(
     path.push(cur);
     cur = map.get(cur)?.parentId ?? null;
   }
-  path.reverse();
-  if (path.length === 0 || path[0] !== rootId) {
-    if (!path.includes(rootId)) path.unshift(rootId);
+  const ordered = path.toReversed();
+  if (ordered.length === 0 || ordered[0] !== rootId) {
+    if (!ordered.includes(rootId)) ordered.unshift(rootId);
   }
-  return path;
+  return ordered;
 }
 
 /**
@@ -706,7 +709,7 @@ export function transportStep(
       (n) =>
         n.parentId === selectedId && !n.isOverflow && n.kind !== "projected",
     )
-    .sort((a, b) => {
+    .toSorted((a, b) => {
       // Prefer same branch, then played lane, then lower |lane|.
       const sameA = a.branchKey === current.branchKey ? 0 : 1;
       const sameB = b.branchKey === current.branchKey ? 0 : 1;
@@ -721,7 +724,7 @@ export function transportStep(
   if (children.length === 0 && current.isLive) {
     const projected = graph.nodes
       .filter((n) => n.parentId === selectedId && n.kind === "projected")
-      .sort((a, b) => a.column - b.column);
+      .toSorted((a, b) => a.column - b.column);
     return projected[0]?.id ?? null;
   }
 

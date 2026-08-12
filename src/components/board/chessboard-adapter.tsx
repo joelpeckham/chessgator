@@ -1,25 +1,25 @@
 "use client";
 
 import {
-  useMemo,
-  useState,
-  useSyncExternalStore,
   type CSSProperties,
   type KeyboardEvent,
   type ReactNode,
+  useMemo,
+  useState,
+  useSyncExternalStore,
 } from "react";
 import { Chessboard, type SquareHandlerArgs } from "react-chessboard";
-import type { PieceSymbol } from "@/domain/game";
 import {
+  type BoardArrow,
+  dedupeBoardArrows,
+} from "@/components/board/arrow-utils";
+import {
+  type BoardMove,
   findMove,
   legalDestinations,
   moveRequiresPromotion,
-  type BoardMove,
 } from "@/components/board/move-utils";
-import {
-  dedupeBoardArrows,
-  type BoardArrow,
-} from "@/components/board/arrow-utils";
+import type { PieceSymbol } from "@/domain/game";
 import { cn } from "@/lib/utils";
 
 export type { BoardArrow } from "@/components/board/arrow-utils";
@@ -58,7 +58,11 @@ function getReducedMotion(): boolean {
 }
 
 function usePrefersReducedMotion(): boolean {
-  return useSyncExternalStore(subscribeReducedMotion, getReducedMotion, () => false);
+  return useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotion,
+    () => false,
+  );
 }
 
 /**
@@ -121,12 +125,14 @@ export function ChessboardAdapter({
     if (lastMove) {
       styles[lastMove.from] = {
         background: "color-mix(in oklch, var(--primary) 18%, transparent)",
-        outline: "2px solid color-mix(in oklch, var(--primary) 55%, transparent)",
+        outline:
+          "2px solid color-mix(in oklch, var(--primary) 55%, transparent)",
         outlineOffset: "-2px",
       };
       styles[lastMove.to] = {
         background: "color-mix(in oklch, var(--primary) 28%, transparent)",
-        outline: "2px solid color-mix(in oklch, var(--primary) 70%, transparent)",
+        outline:
+          "2px solid color-mix(in oklch, var(--primary) 70%, transparent)",
         outlineOffset: "-2px",
       };
     }
@@ -283,7 +289,7 @@ export function ChessboardAdapter({
         const isLast =
           lastMove != null &&
           (lastMove.from === square || lastMove.to === square);
-        const inCheck = Boolean(isCheck && checkSquare === square);
+        const inCheck = isCheck && checkSquare === square;
         const isHint = highlightSet.has(square);
         const isGhost = ghostSet.has(square);
         const annotation = labelBySquare.get(square) ?? null;
@@ -394,7 +400,5 @@ function describeSquare(args: {
   if (args.isHint) flags.push("hint focus");
   if (args.isGhost) flags.push("variation ghost");
   if (args.annotation) flags.push(args.annotation);
-  return flags.length > 0
-    ? `${args.square}, ${flags.join(", ")}`
-    : args.square;
+  return flags.length > 0 ? `${args.square}, ${flags.join(", ")}` : args.square;
 }

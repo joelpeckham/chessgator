@@ -37,8 +37,7 @@ describe("tactical facts", () => {
   });
 
   it("flags development off the back rank", () => {
-    const start =
-      "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    const start = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     const applied = tryApplyMove(start, "g1f3");
     expect(applied).not.toBeNull();
     const facts = collectTacticalFacts({

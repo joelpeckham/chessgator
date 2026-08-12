@@ -179,11 +179,7 @@ function createMaiaSessionFromClient(
         });
 
         const poll = windowSetInterval(() => {
-          if (
-            disposed ||
-            startGen !== generation ||
-            client !== currentClient
-          ) {
+          if (disposed || startGen !== generation || client !== currentClient) {
             return;
           }
           const status = currentClient.status();
@@ -196,11 +192,7 @@ function createMaiaSessionFromClient(
 
         try {
           await currentClient.initialize();
-          if (
-            disposed ||
-            startGen !== generation ||
-            client !== currentClient
-          ) {
+          if (disposed || startGen !== generation || client !== currentClient) {
             return false;
           }
           setState({
@@ -210,11 +202,7 @@ function createMaiaSessionFromClient(
           markEnd("engine-opponent-startup");
           return true;
         } catch (err) {
-          if (
-            disposed ||
-            startGen !== generation ||
-            client !== currentClient
-          ) {
+          if (disposed || startGen !== generation || client !== currentClient) {
             return false;
           }
           const message =
@@ -268,9 +256,7 @@ function createMaiaSessionFromClient(
           oppoElo: input.oppoElo,
           temperature: 0.8,
           topP: 0.9,
-          timeoutMs: input.movetimeMs
-            ? input.movetimeMs + 5_000
-            : undefined,
+          timeoutMs: input.movetimeMs ? input.movetimeMs + 5_000 : undefined,
         });
 
         if (pendingRequestId !== input.requestId) return null;

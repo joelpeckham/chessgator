@@ -75,7 +75,7 @@ export function createStubAnalysisEngine(options?: {
       const script = scripts.find(
         (s) => opts.fen === s.fen || opts.fen.startsWith(s.fen),
       );
-      const side = (opts.fen.split(" ")[1] === "b" ? "b" : "w") as "w" | "b";
+      const side: "w" | "b" = opts.fen.split(" ")[1] === "b" ? "b" : "w";
       const base = script?.evidence ?? {
         score: { cp: side === "w" ? 20 : -20 },
         bestMoveUci: side === "w" ? "e2e4" : "e7e5",
@@ -107,14 +107,11 @@ export function createStubAnalysisEngine(options?: {
 
 function defaultStubScripts(): StubAnalysisScript[] {
   // Starting position — e4 is best.
-  const start =
-    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+  const start = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
   // After 1.e4 — Black to move.
-  const afterE4 =
-    "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1";
+  const afterE4 = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1";
   // After 1.d4 — make d4 a teachable inaccuracy vs e4 (eval drop > 100cp).
-  const afterD4 =
-    "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1";
+  const afterD4 = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1";
   // Queen sortie position (White to move after …g6): saving the queen is best.
   const queenAttacked =
     "rnbqkbnr/pppp1p1p/6p1/4p2Q/4P3/8/PPPP1PPP/RNB1KBNR w KQkq - 0 3";
@@ -146,9 +143,7 @@ function defaultStubScripts(): StubAnalysisScript[] {
       evidence: {
         score: { cp: -120 },
         bestMoveUci: "d7d5",
-        lines: [
-          { multipv: 1, score: { cp: -120 }, pvUci: ["d7d5", "c2c4"] },
-        ],
+        lines: [{ multipv: 1, score: { cp: -120 }, pvUci: ["d7d5", "c2c4"] }],
       },
     },
     {

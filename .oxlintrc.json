@@ -1,0 +1,52 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "typescript",
+    "react",
+    "nextjs",
+    "jsx-a11y",
+    "import",
+    "unicorn",
+    "vitest",
+    "oxc"
+  ],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error"
+  },
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "eslint/no-underscore-dangle": "off",
+    "import/no-unassigned-import": "off",
+    "unicorn/require-post-message-target-origin": "off",
+    "unicorn/prefer-add-event-listener": "off",
+    "jsx-a11y/prefer-tag-over-role": "off",
+    "eslint/no-unmodified-loop-condition": "off",
+    "vitest/no-conditional-expect": "off",
+    "react/no-unstable-nested-components": [
+      "error",
+      {
+        "allowAsProps": true
+      }
+    ],
+    "unicorn/no-array-sort": "error",
+    "unicorn/no-array-reverse": "error",
+    "unicorn/no-useless-spread": "error",
+    "unicorn/prefer-array-find": "error",
+    "unicorn/prefer-includes": "error",
+    "unicorn/prefer-node-protocol": "error",
+    "unicorn/no-await-in-promise-methods": "error"
+  },
+  "ignorePatterns": [
+    "node_modules/**",
+    ".next/**",
+    "out/**",
+    "build/**",
+    "coverage/**",
+    "public/engine/**",
+    "public/models/**",
+    "public/ort/**",
+    "tests/stockfish/.generated/**",
+    "tests/maia/.generated/**"
+  ]
+}

@@ -4,9 +4,10 @@
  * Maia3 5M fp16 browser export, and speaks `src/engines/maia/protocol.ts`.
  */
 import * as ort from "onnxruntime-web";
+import { validateLegalUci } from "@/domain/game/rules";
 import {
-  encodeTokensForBrowserExport,
   eloTensors,
+  encodeTokensForBrowserExport,
   fromVocabUci,
 } from "@/engines/maia/encode";
 import { applyLegalMask, legalMovesMask } from "@/engines/maia/mask";
@@ -21,7 +22,6 @@ import {
   stableSoftmax,
   topKFromLogits,
 } from "@/engines/maia/sample";
-import { validateLegalUci } from "@/domain/game/rules";
 import { indexToMove } from "@/engines/maia/vocabulary";
 
 type WorkerScope = {

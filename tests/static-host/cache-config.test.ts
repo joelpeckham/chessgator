@@ -66,9 +66,9 @@ describe("static host cache configuration", () => {
     expect(
       existsSync(path.join(outEngine, "stockfish-18-lite-single.wasm")),
     ).toBe(true);
-    expect(
-      existsSync(path.join(outOrt, "ort-wasm-simd-threaded.wasm")),
-    ).toBe(true);
+    expect(existsSync(path.join(outOrt, "ort-wasm-simd-threaded.wasm"))).toBe(
+      true,
+    );
     expect(
       existsSync(path.join(outModels, "maia3-5m.fp16.ca22fc303197.onnx")),
     ).toBe(true);

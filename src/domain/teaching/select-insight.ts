@@ -1,15 +1,12 @@
 import {
-  shouldAutoExpand,
   type MoveClassification,
+  shouldAutoExpand,
 } from "@/domain/analysis/classification";
 import type { MoveAnalysisEvidence } from "@/domain/analysis/move-analysis";
 import type { TacticalFacts } from "@/domain/analysis/tactics";
 import { uciToSan } from "@/domain/game/rules";
 import { renderExplanation } from "@/domain/teaching/templates";
-import type {
-  TeachingConcept,
-  TeachingInsight,
-} from "@/domain/teaching/types";
+import type { TeachingConcept, TeachingInsight } from "@/domain/teaching/types";
 
 /**
  * Priority order for concept selection. First matching heuristic wins.
@@ -39,12 +36,12 @@ export function selectTeachingInsight(
           evidence.bestMoveUci.toLowerCase() !==
             evidence.playedMove.uci.toLowerCase()
         ? evidence.bestMoveUci
-        : evidence.alternatives.find(
+        : (evidence.alternatives.find(
             (line) =>
               line.pvUci[0] &&
               line.pvUci[0].toLowerCase() !==
                 evidence.playedMove.uci.toLowerCase(),
-          )?.pvUci[0] ?? null;
+          )?.pvUci[0] ?? null);
 
   const suggestedMoveSan = suggestedMoveUci
     ? uciToSan(evidence.fenBefore, suggestedMoveUci)

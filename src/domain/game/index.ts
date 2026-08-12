@@ -1,29 +1,11 @@
-export type {
-  Color,
-  GameMove,
-  GameNode,
-  GameSession,
-  GameStatus,
-  GameStatusReason,
-  GameTree,
-  MoveInput,
-  PieceSymbol,
-  SessionMode,
-  SessionState,
-  Square,
-} from "@/domain/game/types";
-
-export { createSessionState } from "@/domain/game/types";
-
 export {
   BOOTSTRAP_ROOT_ID,
   createNodeId,
   resetNodeIdSequenceForTests,
 } from "@/domain/game/id";
-
 export {
-  DEFAULT_POSITION,
   createChess,
+  DEFAULT_POSITION,
   getLegalMoves,
   getStatus,
   getStatusAlongPath,
@@ -41,7 +23,7 @@ export {
   validateFen,
   validateLegalUci,
 } from "@/domain/game/rules";
-
+export type { PlayMoveOnTreeOptions } from "@/domain/game/tree";
 export {
   createBootstrapTree,
   createInitialTree,
@@ -60,8 +42,22 @@ export {
   pruneVariationChildren,
   takebackOne,
 } from "@/domain/game/tree";
-export type { PlayMoveOnTreeOptions } from "@/domain/game/tree";
-
+export type {
+  Color,
+  GameMove,
+  GameNode,
+  GameSession,
+  GameStatus,
+  GameStatusReason,
+  GameTree,
+  MoveInput,
+  PieceSymbol,
+  SessionMode,
+  SessionState,
+  Square,
+} from "@/domain/game/types";
+export { createSessionState } from "@/domain/game/types";
+export type { VariationExplorerState } from "@/domain/game/variation";
 export {
   createVariationExplorer,
   exitVariationExplorer,
@@ -70,4 +66,3 @@ export {
   tryInsteadFromExplorer,
   validateVariationLine,
 } from "@/domain/game/variation";
-export type { VariationExplorerState } from "@/domain/game/variation";

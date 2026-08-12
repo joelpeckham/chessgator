@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildTimelineEntries } from "@/components/timeline/move-timeline";
-import {
-  createInitialTree,
-  jumpToNode,
-  playMoveOnTree,
-} from "@/domain/game";
+import { createInitialTree, jumpToNode, playMoveOnTree } from "@/domain/game";
 
 describe("move timeline entries", () => {
   it("keeps prior branches visible as alternates when a new mainline is preferred", () => {

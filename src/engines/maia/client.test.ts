@@ -1,5 +1,5 @@
-import { DEFAULT_POSITION } from "@/domain/game/rules";
 import { describe, expect, it, vi } from "vitest";
+import { DEFAULT_POSITION } from "@/domain/game/rules";
 import { MaiaClient } from "@/engines/maia/client";
 import type {
   MaiaWorkerRequest,
@@ -72,7 +72,9 @@ describe("MaiaClient", () => {
     expect(client.status()).toBe("idle");
     const init = client.initialize();
     await vi.waitFor(() => {
-      expect(["downloading", "initializing", "ready"]).toContain(client.status());
+      expect(["downloading", "initializing", "ready"]).toContain(
+        client.status(),
+      );
     });
     await init;
     expect(client.status()).toBe("ready");
@@ -96,10 +98,9 @@ describe("MaiaClient", () => {
     });
 
     const init = client.initialize();
-    const rejected = expect(init).rejects.toThrow(/cancelled.*disposed/i);
-    await client.dispose();
-
-    await rejected;
+    const disposed = client.dispose();
+    await expect(init).rejects.toThrow(/cancelled.*disposed/i);
+    await disposed;
     expect(client.status()).toBe("disposed");
     expect(timers.size).toBe(0);
   });
@@ -160,7 +161,7 @@ describe("MaiaClient", () => {
     });
 
     now = 50;
-    for (const t of [...timers]) {
+    for (const t of Array.from(timers)) {
       if (t.at <= now) t.fn();
     }
 

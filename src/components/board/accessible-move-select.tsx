@@ -1,6 +1,5 @@
 "use client";
 
-import { getLegalMoves, type GameMove } from "@/domain/game";
 import {
   Select,
   SelectContent,
@@ -8,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { type GameMove, getLegalMoves } from "@/domain/game";
 
 export type AccessibleMoveSelectProps = {
   fen: string;

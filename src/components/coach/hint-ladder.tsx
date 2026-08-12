@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
-import type { HintStep } from "@/domain/teaching";
-import { tryApplyMove } from "@/domain/game/rules";
 import { Button } from "@/components/ui/button";
+import { tryApplyMove } from "@/domain/game/rules";
+import type { HintStep } from "@/domain/teaching";
 
 export type HintLadderProps = {
   hint: HintStep | null;

@@ -1,23 +1,27 @@
 "use client";
 
 import {
+  RiArrowLeftLine,
+  RiArrowRightLine,
+  RiSkipBackLine,
+  RiSkipForwardLine,
+} from "@remixicon/react";
+import {
+  type KeyboardEvent,
   useEffect,
   useMemo,
   useRef,
   useState,
-  type KeyboardEvent,
 } from "react";
 import { BoardPreview } from "@/components/board/board-preview";
 import {
   buildBranchGraph,
   laneRoleLabel,
-  transportStep,
   type TimelineGraphNode,
   type TimelineLaneRole,
+  transportStep,
 } from "@/components/timeline/branch-graph";
 import { BranchPicker } from "@/components/timeline/branch-picker";
-import type { ProjectedLine } from "@/domain/analysis";
-import type { GameTree } from "@/domain/game";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -30,13 +34,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import type { ProjectedLine } from "@/domain/analysis";
+import type { GameTree } from "@/domain/game";
 import { cn } from "@/lib/utils";
-import {
-  RiArrowLeftLine,
-  RiArrowRightLine,
-  RiSkipBackLine,
-  RiSkipForwardLine,
-} from "@remixicon/react";
 
 export type MoveTimelineProps = {
   tree: GameTree;
@@ -201,9 +201,7 @@ export function MoveTimeline({
   });
 
   const overflowById = useMemo(() => {
-    const map = new Map(
-      graph.overflowGroups.map((g) => [g.id, g] as const),
-    );
+    const map = new Map(graph.overflowGroups.map((g) => [g.id, g] as const));
     return map;
   }, [graph.overflowGroups]);
 
@@ -236,12 +234,15 @@ export function MoveTimeline({
           !n.isOverflow &&
           (n.parentId === current.parentId || n.lane === 0),
       )
-      .sort((a, b) => b.lane - a.lane);
+      .toSorted((a, b) => b.lane - a.lane);
     if (siblings.length === 0) return;
     const idx = siblings.findIndex((n) => n.id === selectedId);
     const next =
       siblings[
-        Math.min(siblings.length - 1, Math.max(0, idx + (deltaLane > 0 ? -1 : 1)))
+        Math.min(
+          siblings.length - 1,
+          Math.max(0, idx + (deltaLane > 0 ? -1 : 1)),
+        )
       ];
     if (next) {
       onSelectNode(next.id);
@@ -304,7 +305,9 @@ export function MoveTimeline({
   ).filter((row) => {
     if (row.role === "played") return true;
     if (compact && (row.role === "variationA" || row.role === "variationB")) {
-      return activeLaneRoles.has("variationA") || activeLaneRoles.has("overflow");
+      return (
+        activeLaneRoles.has("variationA") || activeLaneRoles.has("overflow")
+      );
     }
     return activeLaneRoles.has(row.role);
   });
@@ -400,8 +403,7 @@ export function MoveTimeline({
                 const midX = (x1 + x2) / 2;
                 const dashed =
                   edge.kind === "projected" || edge.kind === "tutor";
-                const onReview =
-                  from.isOnReviewPath && to.isOnReviewPath;
+                const onReview = from.isOnReviewPath && to.isOnReviewPath;
                 const dimmed = isReviewing && !onReview;
                 return (
                   <path
@@ -433,8 +435,7 @@ export function MoveTimeline({
             {sorted.map((node) => {
               const cx = node.column * COL_W + COL_W / 2;
               const cy = midY - node.lane * LANE_H;
-              const selected =
-                node.isReview || (!reviewNodeId && node.isLive);
+              const selected = node.isReview || (!reviewNodeId && node.isLive);
               const dimmed =
                 isReviewing && !node.isOnReviewPath && !node.isOverflow;
 
@@ -540,7 +541,9 @@ export function MoveTimeline({
                       width: COL_W - 8,
                     }}
                   >
-                    {node.kind === "projected" ? `~${node.san}` : node.moveLabel}
+                    {node.kind === "projected"
+                      ? `~${node.san ?? ""}`
+                      : node.moveLabel}
                     {node.isTruncated ? "…" : ""}
                   </span>
                 </div>

@@ -1,4 +1,7 @@
-import type { AnalysisEvidence, AnalysisPriority } from "@/domain/analysis/types";
+import type {
+  AnalysisEvidence,
+  AnalysisPriority,
+} from "@/domain/analysis/types";
 import { stockfishAssetWorkerUrl } from "@/engines/stockfish/assets";
 import type {
   StockfishWorkerRequest,
@@ -29,8 +32,6 @@ export type StockfishClientOptions = {
   defaultMovetimeMs?: number;
   /** Extra ms added to movetime for the client-side timeout. */
   timeoutBufferMs?: number;
-  /** Clock used for timeouts (injectable for tests). */
-  now?: () => number;
   setTimer?: (fn: () => void, ms: number) => unknown;
   clearTimer?: (handle: unknown) => void;
 };
@@ -63,7 +64,6 @@ export class StockfishClient {
   private readonly engineUrl: string;
   private readonly defaultMovetimeMs: number;
   private readonly timeoutBufferMs: number;
-  private readonly now: () => number;
   private readonly setTimer: (fn: () => void, ms: number) => unknown;
   private readonly clearTimer: (handle: unknown) => void;
 
@@ -84,15 +84,14 @@ export class StockfishClient {
     this.engineUrl = options.engineUrl ?? stockfishAssetWorkerUrl();
     this.defaultMovetimeMs = options.defaultMovetimeMs ?? 250;
     this.timeoutBufferMs = options.timeoutBufferMs ?? 1_500;
-    this.now = options.now ?? (() => Date.now());
-    this.setTimer =
-      options.setTimer ??
-      ((fn, ms) => setTimeout(fn, ms));
+    this.setTimer = options.setTimer ?? ((fn, ms) => setTimeout(fn, ms));
     this.clearTimer =
       options.clearTimer ??
       ((handle) => clearTimeout(handle as ReturnType<typeof setTimeout>));
 
-    this.unsubscribe = this.transport.subscribe((msg) => this.onWorkerMessage(msg));
+    this.unsubscribe = this.transport.subscribe((msg) =>
+      this.onWorkerMessage(msg),
+    );
   }
 
   status(): StockfishClientStatus {
@@ -176,8 +175,7 @@ export class StockfishClient {
     }
 
     const movetimeMs = options.movetimeMs ?? this.defaultMovetimeMs;
-    const timeoutMs =
-      options.timeoutMs ?? movetimeMs + this.timeoutBufferMs;
+    const timeoutMs = options.timeoutMs ?? movetimeMs + this.timeoutBufferMs;
 
     return new Promise<AnalysisEvidence>((resolve, reject) => {
       if (this.pending.has(options.requestId)) {
@@ -198,17 +196,16 @@ export class StockfishClient {
       };
 
       this.pending.set(job.requestId, job);
-      this.queue.enqueue(
-        job.requestId,
-        options.priority ?? "background",
-        job,
-      );
+      this.queue.enqueue(job.requestId, options.priority ?? "background", job);
 
       this.armTimeout(job);
       void this.initialize()
         .then(() => this.pump())
         .catch((err: unknown) => {
-          this.failJob(job, err instanceof Error ? err : new Error(String(err)));
+          this.failJob(
+            job,
+            err instanceof Error ? err : new Error(String(err)),
+          );
         });
     });
   }
@@ -238,7 +235,7 @@ export class StockfishClient {
 
   /** Cancel every pending/active job (e.g. on navigation). */
   cancelAll(): void {
-    for (const id of [...this.pending.keys()]) {
+    for (const id of Array.from(this.pending.keys())) {
       this.cancel(id);
     }
   }

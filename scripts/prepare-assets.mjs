@@ -7,13 +7,7 @@
  *   node scripts/prepare-assets.mjs [--force] [--verify-only]
  */
 import { createHash } from "node:crypto";
-import {
-  mkdir,
-  readFile,
-  rename,
-  rm,
-  writeFile,
-} from "node:fs/promises";
+import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -98,7 +92,9 @@ async function downloadTo(url, destAbs) {
     },
   });
   if (!res.ok) {
-    throw new Error(`Download failed (${res.status} ${res.statusText}): ${url}`);
+    throw new Error(
+      `Download failed (${res.status} ${res.statusText}): ${url}`,
+    );
   }
   const buf = Buffer.from(await res.arrayBuffer());
   const tmp = `${destAbs}.tmp`;

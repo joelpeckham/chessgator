@@ -1,10 +1,10 @@
 #!/usr/bin/env node
+import { readFile } from "node:fs/promises";
 /**
  * Narrow static server for Maia browser smoke tests.
  * Serves prepared model asset + generated typed-worker bundle + ORT wasm.
  */
 import { createServer } from "node:http";
-import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -33,7 +33,11 @@ function resolvePath(urlPath) {
     return path.join(__dirname, ".generated", clean.slice(1));
   }
   if (clean.startsWith("/generated/")) {
-    return path.join(__dirname, ".generated", clean.slice("/generated/".length));
+    return path.join(
+      __dirname,
+      ".generated",
+      clean.slice("/generated/".length),
+    );
   }
   return null;
 }

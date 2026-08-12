@@ -1,10 +1,10 @@
 #!/usr/bin/env node
+import { readFile } from "node:fs/promises";
 /**
  * Narrow static server for Stockfish browser smoke tests.
  * Serves prepared engine assets + generated typed-worker bundle.
  */
 import { createServer } from "node:http";
-import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -29,7 +29,11 @@ function resolvePath(urlPath) {
     return path.join(ROOT, "public", clean.slice(1));
   }
   if (clean.startsWith("/generated/")) {
-    return path.join(__dirname, ".generated", clean.slice("/generated/".length));
+    return path.join(
+      __dirname,
+      ".generated",
+      clean.slice("/generated/".length),
+    );
   }
   return null;
 }

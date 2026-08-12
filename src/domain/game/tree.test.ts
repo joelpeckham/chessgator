@@ -29,9 +29,9 @@ describe("game tree", () => {
     expect(played!.created).toBe(true);
     expect(played!.tree.nodes[rootId]!.childIds).toHaveLength(1);
     expect(tree.nodes[rootId]!.childIds).toHaveLength(0); // original unchanged
-    expect(getMoveHistory(played!.tree, played!.node.id).map((m) => m.uci)).toEqual([
-      "e2e4",
-    ]);
+    expect(
+      getMoveHistory(played!.tree, played!.node.id).map((m) => m.uci),
+    ).toEqual(["e2e4"]);
   });
 
   it("reuses an existing branch when the same move is replayed", () => {

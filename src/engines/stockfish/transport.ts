@@ -1,13 +1,13 @@
-import type {
-  StockfishWorkerRequest,
-  StockfishWorkerResponse,
-} from "@/engines/stockfish/protocol";
-import { isStockfishWorkerResponse } from "@/engines/stockfish/protocol";
 import {
   createBrowserWorkerTransport as createSharedBrowserWorkerTransport,
   type WorkerLike,
   type WorkerTransport,
 } from "@/engines/shared/worker-transport";
+import type {
+  StockfishWorkerRequest,
+  StockfishWorkerResponse,
+} from "@/engines/stockfish/protocol";
+import { isStockfishWorkerResponse } from "@/engines/stockfish/protocol";
 
 export type { WorkerLike };
 
@@ -20,7 +20,9 @@ export type StockfishTransport = WorkerTransport<
   StockfishWorkerResponse
 >;
 
-export function createBrowserWorkerTransport(worker: WorkerLike): StockfishTransport {
+export function createBrowserWorkerTransport(
+  worker: WorkerLike,
+): StockfishTransport {
   return createSharedBrowserWorkerTransport(worker, isStockfishWorkerResponse);
 }
 
@@ -29,9 +31,12 @@ export function createStockfishWorker(): Worker {
   if (typeof Worker === "undefined") {
     throw new Error("Stockfish requires a browser Worker environment");
   }
-  return new Worker(new URL("../../workers/stockfish-worker.ts", import.meta.url), {
-    type: "module",
-  });
+  return new Worker(
+    new URL("../../workers/stockfish-worker.ts", import.meta.url),
+    {
+      type: "module",
+    },
+  );
 }
 
 export function createDefaultStockfishTransport(): StockfishTransport {

@@ -1,7 +1,13 @@
 export type WorkerLike = {
   postMessage(message: unknown): void;
-  addEventListener(type: "message", listener: (event: MessageEvent<unknown>) => void): void;
-  removeEventListener(type: "message", listener: (event: MessageEvent<unknown>) => void): void;
+  addEventListener(
+    type: "message",
+    listener: (event: MessageEvent<unknown>) => void,
+  ): void;
+  removeEventListener(
+    type: "message",
+    listener: (event: MessageEvent<unknown>) => void,
+  ): void;
   terminate(): void;
 };
 
@@ -22,10 +28,14 @@ export function createBrowserWorkerTransport<TReq, TRes>(
   };
   worker.addEventListener("message", onMessage);
   return {
-    postMessage(message) { worker.postMessage(message); },
+    postMessage(message) {
+      worker.postMessage(message);
+    },
     subscribe(listener) {
       listeners.add(listener);
-      return () => { listeners.delete(listener); };
+      return () => {
+        listeners.delete(listener);
+      };
     },
     terminate() {
       worker.removeEventListener("message", onMessage);

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "src/app/**/{page,layout,loading,error,not-found,default,template,route}.{ts,tsx}",
+    "src/workers/**/*.{ts,tsx}",
+    "tests/**/playwright.config.ts",
+    "tests/**/*.{spec,test}.{ts,tsx,mjs}",
+    "tests/**/build-smoke.mjs",
+    "tests/**/static-server.mjs",
+    "tests/shared/**/*.{ts,mjs}"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "tests/**/*.{ts,tsx,mjs}",
+    "scripts/**/*.{js,mjs}"
+  ],
+  "ignoreDependencies": ["tailwindcss", "tw-animate-css", "stockfish"],
+  "exclude": [
+    "exports",
+    "types",
+    "nsExports",
+    "nsTypes",
+    "enumMembers",
+    "namespaceMembers",
+    "duplicates"
+  ]
+}

@@ -1,5 +1,5 @@
-import type { AnalysisEvidence } from "@/domain/analysis/types";
 import { hangingSquaresFor } from "@/domain/analysis/tactics";
+import type { AnalysisEvidence } from "@/domain/analysis/types";
 import { createChess, uciToSan } from "@/domain/game/rules";
 import { hintQuestionForPosition } from "@/domain/teaching/templates";
 import type { HintLevel, HintStep } from "@/domain/teaching/types";

@@ -1,5 +1,6 @@
 "use client";
 
+import { RiCloseLine } from "@remixicon/react";
 import {
   Alert,
   AlertAction,
@@ -9,7 +10,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
-import { RiCloseLine } from "@remixicon/react";
 
 export type FeedbackNotice = {
   id: string;
@@ -56,7 +56,9 @@ export function FeedbackStack({
           {notice.busy ? <Spinner /> : null}
           <AlertTitle className="text-sm">{notice.title}</AlertTitle>
           {notice.body ? (
-            <AlertDescription className="text-xs">{notice.body}</AlertDescription>
+            <AlertDescription className="text-xs">
+              {notice.body}
+            </AlertDescription>
           ) : null}
           {notice.dismissible !== false ? (
             <AlertAction>

@@ -5,21 +5,16 @@ export {
 } from "@/engines/stockfish/assets";
 
 export {
-  StockfishClient,
   type AnalyzeOptions,
+  StockfishClient,
   type StockfishClientOptions,
   type StockfishClientStatus,
 } from "@/engines/stockfish/client";
-
 export {
-  applyInfoLine,
-  parseBestMove,
-  parseInfoLine,
-  sideToMoveFromFen,
-  sortedLines,
-  type ParsedBestMove,
-  type ParsedInfoLine,
-} from "@/engines/stockfish/uci-parse";
+  isStockfishWorkerResponse,
+  type StockfishWorkerRequest,
+  type StockfishWorkerResponse,
+} from "@/engines/stockfish/protocol";
 
 export { PriorityQueue, type QueuedJob } from "@/engines/stockfish/queue";
 
@@ -30,9 +25,12 @@ export {
   type StockfishTransport,
   type WorkerLike,
 } from "@/engines/stockfish/transport";
-
 export {
-  isStockfishWorkerResponse,
-  type StockfishWorkerRequest,
-  type StockfishWorkerResponse,
-} from "@/engines/stockfish/protocol";
+  applyInfoLine,
+  type ParsedBestMove,
+  type ParsedInfoLine,
+  parseBestMove,
+  parseInfoLine,
+  sideToMoveFromFen,
+  sortedLines,
+} from "@/engines/stockfish/uci-parse";

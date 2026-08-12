@@ -1,9 +1,8 @@
 "use client";
 
 import { AccessibleMoveSelect } from "@/components/board/accessible-move-select";
-import type { GameMove } from "@/domain/game";
+import { MAIA_ELO_OPTIONS } from "@/components/controls/game-controls";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -11,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
   SheetContent,
@@ -19,7 +19,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Spinner } from "@/components/ui/spinner";
-import { MAIA_ELO_OPTIONS } from "@/components/controls/game-controls";
+import type { GameMove } from "@/domain/game";
 
 export type SettingsSheetProps = {
   open: boolean;

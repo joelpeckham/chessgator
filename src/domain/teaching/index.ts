@@ -1,9 +1,9 @@
-export type {
-  HintLevel,
-  HintStep,
-  TeachingConcept,
-  TeachingInsight,
-} from "@/domain/teaching/types";
+export {
+  type BuildHintInput,
+  buildHintStep,
+  MAX_HINT_LEVEL,
+  nextHintLevel,
+} from "@/domain/teaching/hints";
 
 export {
   CONCEPT_PRIORITY,
@@ -17,10 +17,9 @@ export {
   renderExplanation,
   type TemplateContext,
 } from "@/domain/teaching/templates";
-
-export {
-  MAX_HINT_LEVEL,
-  buildHintStep,
-  nextHintLevel,
-  type BuildHintInput,
-} from "@/domain/teaching/hints";
+export type {
+  HintLevel,
+  HintStep,
+  TeachingConcept,
+  TeachingInsight,
+} from "@/domain/teaching/types";

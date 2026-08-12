@@ -40,8 +40,7 @@ test.describe("composed real-engine shell", () => {
 
     await expect
       .poll(
-        async () =>
-          page.getByTestId("status-badge").getAttribute("data-mode"),
+        async () => page.getByTestId("status-badge").getAttribute("data-mode"),
         { timeout: 180_000 },
       )
       .toMatch(/analyzing|opponentThinking|playerTurn|reviewing/);
@@ -60,8 +59,7 @@ test.describe("composed real-engine shell", () => {
 
     await expect
       .poll(
-        async () =>
-          page.getByTestId("status-badge").getAttribute("data-mode"),
+        async () => page.getByTestId("status-badge").getAttribute("data-mode"),
         { timeout: 180_000 },
       )
       .toMatch(/opponentThinking|playerTurn|reviewing|gameOver/);

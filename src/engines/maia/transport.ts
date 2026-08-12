@@ -15,9 +15,14 @@ export type { WorkerLike };
  * Narrow transport so Node unit tests never touch `Worker` / browser globals.
  * Production uses `createBrowserWorkerTransport`.
  */
-export type MaiaTransport = WorkerTransport<MaiaWorkerRequest, MaiaWorkerResponse>;
+export type MaiaTransport = WorkerTransport<
+  MaiaWorkerRequest,
+  MaiaWorkerResponse
+>;
 
-export function createBrowserWorkerTransport(worker: WorkerLike): MaiaTransport {
+export function createBrowserWorkerTransport(
+  worker: WorkerLike,
+): MaiaTransport {
   return createSharedBrowserWorkerTransport(worker, isMaiaWorkerResponse);
 }
 

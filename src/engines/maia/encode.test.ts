@@ -1,16 +1,18 @@
-import { DEFAULT_POSITION } from "@/domain/game/rules";
 import { describe, expect, it } from "vitest";
+import { DEFAULT_POSITION } from "@/domain/game/rules";
 import {
   encodeTokensForBrowserExport,
+  fromVocabUci,
   mirrorMove,
   mirrorSquare,
   squareToIndex,
   tokenizeFen,
   toVocabUci,
-  fromVocabUci,
 } from "@/engines/maia/encode";
 
-function occupiedChannels(tokens: Float32Array): Array<{ sq: number; ch: number }> {
+function occupiedChannels(
+  tokens: Float32Array,
+): Array<{ sq: number; ch: number }> {
   const out: Array<{ sq: number; ch: number }> = [];
   for (let sq = 0; sq < 64; sq++) {
     for (let ch = 0; ch < 12; ch++) {
@@ -47,8 +49,7 @@ describe("Maia encoding / mirroring", () => {
   it("mirrors and color-swaps when Black to move (structural parity)", () => {
     // After 1.e4, Black to move. Upstream board.mirror():
     // white P on e4 → black p on e5; black pieces become white on flipped ranks.
-    const fen =
-      "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
+    const fen = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
     const tokens = tokenizeFen(fen);
 
     // Side-to-move (Black) pieces become White after mirror+color-swap, on rank 2.
@@ -61,8 +62,7 @@ describe("Maia encoding / mirroring", () => {
   });
 
   it("maps moves into vocab space when Black to move", () => {
-    const fen =
-      "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
+    const fen = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
     expect(toVocabUci(fen, "e7e5")).toBe("e2e4");
     expect(fromVocabUci(fen, "e2e4")).toBe("e7e5");
   });

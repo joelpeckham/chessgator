@@ -80,7 +80,7 @@ export function hintQuestionForPosition(input: {
     return "You are in check — which replies get you out safely?";
   }
   if (input.hangingSquares.length > 0) {
-    const sq = input.hangingSquares[0];
+    const sq = input.hangingSquares[0] ?? "";
     return `Something on ${sq} may be unsafe. What is the threat, and how do you answer it?`;
   }
   if (input.bestMoveSan) {

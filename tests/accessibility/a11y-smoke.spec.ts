@@ -40,9 +40,7 @@ test.describe("accessibility + responsive smoke", () => {
     // Single listbox tab stop — option nodes are not separately tabbable.
     const optionTabIndexes = await page
       .locator('[data-testid="move-list"] [role="option"]')
-      .evaluateAll((els) =>
-        els.map((el) => (el as HTMLElement).tabIndex),
-      );
+      .evaluateAll((els) => els.map((el) => (el as HTMLElement).tabIndex));
     expect(optionTabIndexes.every((t) => t === -1)).toBe(true);
 
     // Board squares expose non-color semantics via aria-label (last move / flags).
@@ -59,7 +57,9 @@ test.describe("accessibility + responsive smoke", () => {
     expect(timelineBox).toBeTruthy();
     expect(boardBox!.width).toBeGreaterThan(200);
     expect(boardBox!.width).toBeLessThanOrEqual((shellBox!.width ?? 900) + 1);
-    expect(timelineBox!.width).toBeLessThanOrEqual((shellBox!.width ?? 900) + 1);
+    expect(timelineBox!.width).toBeLessThanOrEqual(
+      (shellBox!.width ?? 900) + 1,
+    );
 
     await page.screenshot({
       path: "test-results/board-first-ui.png",
@@ -110,7 +110,9 @@ test.describe("accessibility + responsive smoke", () => {
     const boardBox = await page.getByTestId("chessboard").boundingBox();
     const timelineBox = await page.getByTestId("move-timeline").boundingBox();
     expect(boardBox!.width).toBeLessThanOrEqual((shellBox!.width ?? 390) + 1);
-    expect(timelineBox!.width).toBeLessThanOrEqual((shellBox!.width ?? 390) + 1);
+    expect(timelineBox!.width).toBeLessThanOrEqual(
+      (shellBox!.width ?? 390) + 1,
+    );
 
     await page.screenshot({
       path: "test-results/board-first-ui-mobile.png",

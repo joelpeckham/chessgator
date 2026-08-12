@@ -63,7 +63,7 @@ export function getAncestors(tree: GameTree, nodeId: string): GameNode[] {
     if (!current.parentId) break;
     current = tree.nodes[current.parentId];
   }
-  return path.reverse();
+  return path.toReversed();
 }
 
 /** Moves from root to the given node (excludes root). */
@@ -194,10 +194,7 @@ export function playMoveOnTree(
   };
 }
 
-export function jumpToNode(
-  tree: GameTree,
-  nodeId: string,
-): GameTree | null {
+export function jumpToNode(tree: GameTree, nodeId: string): GameTree | null {
   if (!tree.nodes[nodeId]) {
     return null;
   }
@@ -280,10 +277,7 @@ export function promoteVariation(
  * Remove a node and all of its descendants. Parent childIds are updated.
  * Refuses to delete the root. If `currentNodeId` is removed, jumps to parent.
  */
-export function pruneSubtree(
-  tree: GameTree,
-  nodeId: string,
-): GameTree | null {
+export function pruneSubtree(tree: GameTree, nodeId: string): GameTree | null {
   if (nodeId === tree.rootId) return null;
   const start = tree.nodes[nodeId];
   if (!start) return null;
@@ -335,7 +329,7 @@ export function pruneVariationChildren(
   if (!origin) return tree;
 
   let next = tree;
-  for (const childId of [...origin.childIds]) {
+  for (const childId of Array.from(origin.childIds)) {
     const child = next.nodes[childId];
     if (child?.isVariation) {
       const pruned = pruneSubtree(next, childId);

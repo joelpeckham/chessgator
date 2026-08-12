@@ -57,8 +57,12 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
     const boardAfterBest = await page.getByTestId("board-frame").boundingBox();
     expect(boardBefore).toBeTruthy();
     expect(boardAfterBest).toBeTruthy();
-    expect(Math.abs((boardAfterBest!.width ?? 0) - (boardBefore!.width ?? 0))).toBeLessThanOrEqual(1);
-    expect(Math.abs((boardAfterBest!.x ?? 0) - (boardBefore!.x ?? 0))).toBeLessThanOrEqual(1);
+    expect(
+      Math.abs((boardAfterBest!.width ?? 0) - (boardBefore!.width ?? 0)),
+    ).toBeLessThanOrEqual(1);
+    expect(
+      Math.abs((boardAfterBest!.x ?? 0) - (boardBefore!.x ?? 0)),
+    ).toBeLessThanOrEqual(1);
 
     await expandCoach(page);
     await expect(page.getByTestId("teaching-card")).toHaveAttribute(
@@ -69,13 +73,17 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
       "data-state",
       "feedback",
     );
-    await expect(page.getByTestId("classification-badge")).toContainText("Best");
+    await expect(page.getByTestId("classification-badge")).toContainText(
+      "Best",
+    );
     await expect(page.getByTestId("teaching-explanation")).toBeVisible();
     await expect(page.getByTestId("concept-badge")).toHaveCount(0);
     await expect(page.getByTestId("show-line-button")).toHaveCount(0);
 
     // Expanding must not shift the board.
-    const boardAfterExpand = await page.getByTestId("board-frame").boundingBox();
+    const boardAfterExpand = await page
+      .getByTestId("board-frame")
+      .boundingBox();
     expect(
       Math.abs((boardAfterExpand!.width ?? 0) - (boardAfterBest!.width ?? 0)),
     ).toBeLessThanOrEqual(1);

@@ -1,7 +1,4 @@
-import {
-  MAIA3_5M_FP16_ONNX,
-  MAIA_ORT_WASM_PATHS,
-} from "@/engines/maia/assets";
+import { MAIA_ORT_WASM_PATHS, MAIA3_5M_FP16_ONNX } from "@/engines/maia/assets";
 import type {
   MaiaCandidateMove,
   MaiaWorkerRequest,
@@ -108,13 +105,14 @@ export class MaiaClient {
     this.defaultTemperature = options.defaultTemperature ?? 0;
     this.defaultTopP = options.defaultTopP ?? 1;
     this.timeoutBufferMs = options.timeoutBufferMs ?? 30_000;
-    this.setTimer =
-      options.setTimer ?? ((fn, ms) => setTimeout(fn, ms));
+    this.setTimer = options.setTimer ?? ((fn, ms) => setTimeout(fn, ms));
     this.clearTimer =
       options.clearTimer ??
       ((handle) => clearTimeout(handle as ReturnType<typeof setTimeout>));
 
-    this.unsubscribe = this.transport.subscribe((msg) => this.onWorkerMessage(msg));
+    this.unsubscribe = this.transport.subscribe((msg) =>
+      this.onWorkerMessage(msg),
+    );
   }
 
   status(): MaiaClientStatus {
@@ -241,7 +239,10 @@ export class MaiaClient {
       void this.initialize()
         .then(() => this.pump())
         .catch((err: unknown) => {
-          this.failJob(job, err instanceof Error ? err : new Error(String(err)));
+          this.failJob(
+            job,
+            err instanceof Error ? err : new Error(String(err)),
+          );
         });
     });
   }
@@ -263,7 +264,7 @@ export class MaiaClient {
   }
 
   cancelAll(): void {
-    for (const id of [...this.pending.keys()]) {
+    for (const id of Array.from(this.pending.keys())) {
       this.cancel(id);
     }
   }
@@ -273,7 +274,9 @@ export class MaiaClient {
     this.statusValue = "disposed";
     this.cancelAll();
     this.cancelInitialization?.(
-      new Error("Maia initialization cancelled because the client was disposed"),
+      new Error(
+        "Maia initialization cancelled because the client was disposed",
+      ),
     );
     const requestId = `dispose-${this.generation++}`;
     await new Promise<void>((resolve) => {
@@ -346,7 +349,10 @@ export class MaiaClient {
       const job = this.pending.get(msg.requestId);
       if (job) {
         this.failJob(job, new Error(msg.message));
-      } else if (this.statusValue !== "ready" && this.statusValue !== "disposed") {
+      } else if (
+        this.statusValue !== "ready" &&
+        this.statusValue !== "disposed"
+      ) {
         this.statusValue = "failed";
       } else {
         this.releaseActive(msg.requestId);

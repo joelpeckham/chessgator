@@ -14,21 +14,18 @@
  * mode (repeated current board) and temperature=0 requires the Python stack
  * and the PyTorch checkpoint. Run that offline when changing the encoder.
  */
-import { DEFAULT_POSITION, getLegalMoves } from "@/domain/game/rules";
+
 import { describe, expect, it } from "vitest";
-import {
-  fromVocabUci,
-  tokenizeFen,
-  toVocabUci,
-} from "@/engines/maia/encode";
+import { DEFAULT_POSITION, getLegalMoves } from "@/domain/game/rules";
+import { fromVocabUci, tokenizeFen, toVocabUci } from "@/engines/maia/encode";
+import structuralFixture from "@/engines/maia/fixtures/structural-parity.json";
 import { applyLegalMask, legalMovesMask } from "@/engines/maia/mask";
 import { sampleFromLogits } from "@/engines/maia/sample";
 import {
-  MOVE_VOCAB_SIZE,
   getAllPossibleMoves,
+  MOVE_VOCAB_SIZE,
   moveToIndex,
 } from "@/engines/maia/vocabulary";
-import structuralFixture from "@/engines/maia/fixtures/structural-parity.json";
 
 describe("Maia structural parity fixtures", () => {
   it("matches documented vocabulary landmarks", () => {
@@ -43,8 +40,7 @@ describe("Maia structural parity fixtures", () => {
     for (const entry of structuralFixture.startposOccupied) {
       const square = entry[0] as string;
       const channel = entry[1] as number;
-      const sq =
-        "abcdefgh".indexOf(square[0]!) + (Number(square[1]) - 1) * 8;
+      const sq = "abcdefgh".indexOf(square[0]!) + (Number(square[1]) - 1) * 8;
       expect(tokens[sq * 12 + channel]).toBe(1);
     }
   });

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { projectUciLine } from "@/domain/analysis/projected-lines";
 import {
   buildBranchGraph,
   isVirtualTimelineId,
@@ -7,15 +6,10 @@ import {
   parseVirtualTimelineId,
   transportStep,
 } from "@/components/timeline/branch-graph";
-import {
-  createInitialTree,
-  jumpToNode,
-  playMoveOnTree,
-} from "@/domain/game";
+import { projectUciLine } from "@/domain/analysis/projected-lines";
+import { createInitialTree, jumpToNode, playMoveOnTree } from "@/domain/game";
 
-function assertNoCollisions(
-  graph: ReturnType<typeof buildBranchGraph>,
-): void {
+function assertNoCollisions(graph: ReturnType<typeof buildBranchGraph>): void {
   const seen = new Set<string>();
   for (const node of graph.nodes) {
     const key = `${node.column}:${node.lane}`;
@@ -24,9 +18,7 @@ function assertNoCollisions(
   }
 }
 
-function assertNoZigZag(
-  graph: ReturnType<typeof buildBranchGraph>,
-): void {
+function assertNoZigZag(graph: ReturnType<typeof buildBranchGraph>): void {
   const byBranch = new Map<string, number>();
   for (const node of graph.nodes) {
     if (node.isOverflow) continue;
@@ -271,11 +263,11 @@ describe("buildBranchGraph", () => {
     const lanesA = a.nodes
       .filter((n) => !n.isOverflow)
       .map((n) => `${n.id}:${n.lane}`)
-      .sort();
+      .toSorted();
     const lanesB = b.nodes
       .filter((n) => !n.isOverflow)
       .map((n) => `${n.id}:${n.lane}`)
-      .sort();
+      .toSorted();
     expect(lanesA).toEqual(lanesB);
   });
 });

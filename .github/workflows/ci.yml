@@ -33,11 +33,17 @@ jobs:
       - name: Verify asset checksums
         run: node scripts/prepare-assets.mjs --verify-only
 
+      - name: Format check
+        run: bun run format:check
+
       - name: Lint
         run: bun run lint
 
       - name: Typecheck
         run: bun run typecheck
+
+      - name: Knip
+        run: bun run knip
 
       - name: Unit tests
         run: bun run test

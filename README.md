@@ -8,7 +8,7 @@ no accounts, APIs, or runtime backend. Production is intended at
 
 ## Stack
 
-- Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS 4 + shadcn/ui
+- Next.js 16 (App Router) + React 19 + React Compiler + TypeScript + Tailwind CSS 4 + shadcn/ui
 - Package manager: [Bun](https://bun.sh)
 - Rules: `chess.js`
 - Opponent: Maia3 5M (ONNX Runtime Web)
@@ -61,8 +61,13 @@ Generated files land in `public/engine/`, `public/ort/<version>/`, and
 | --- | --- |
 | `bun run dev` | Next.js development server |
 | `bun run prepare:assets` | Fetch/copy + verify engine/ORT/model assets |
-| `bun run lint` | ESLint |
+| `bun run format` | Biome format + organize imports (write) |
+| `bun run format:check` | Biome CI format gate |
+| `bun run lint` | Oxlint, then ESLint (React Compiler / typed / boundaries) |
 | `bun run typecheck` | `tsc --noEmit` |
+| `bun run knip` | Unused files and dependency gate |
+| `bun run check` | format:check + lint + typecheck + knip + unit tests |
+| `bun run analyze` | Next.js Turbopack bundle analyzer (`next experimental-analyze`) |
 | `bun run test` | Vitest unit tests |
 | `bun run test:static-host` | Cache-header / asset-path gate (needs `out/`) |
 | `bun run test:stockfish` | Real Stockfish worker/WASM browser smoke |
@@ -74,6 +79,11 @@ Generated files land in `public/engine/`, `public/ort/<version>/`, and
 | `bun run test:accessibility` | Keyboard / live region / layout smoke |
 | `bun run test:composed` | Composed shell smoke with real Maia/Stockfish |
 | `bun run build` | Prepare assets, then static `next build` → `out/` |
+
+Quality tooling: Biome (format), Oxlint (fast lint), ESLint (React Compiler
+rules, type-aware TypeScript, architecture boundaries), stricter `tsc`, Knip,
+and Next.js React Compiler (`reactCompiler: true`). Lefthook runs Biome + Oxlint
+on staged files; VS Code settings recommend Biome + ESLint + Oxc.
 
 Serve the `out/` directory with any static host after a production build.
 `next start` is not used — there is no Node server in production.

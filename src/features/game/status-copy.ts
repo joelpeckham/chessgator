@@ -106,8 +106,8 @@ function badgeLabelFor(
   if (mode === "reviewing") return "Reviewing";
   if (enginesWarming || maia.phase === "starting") return "Your turn";
   if (mode === "playerTurn") return "Your turn";
-  if (mode === "loading") return "Starting";
-  return mode;
+  // Remaining SessionMode after the guards above is "loading".
+  return "Starting";
 }
 
 function headlineFor(args: {
@@ -133,8 +133,8 @@ function headlineFor(args: {
   }
   if (mode === "playerTurn" || mode === "loading") return "Your move";
   if (mode === "reviewing") return "Reviewing";
-  if (mode === "analyzing") return "Analyzing…";
-  return "chessgator";
+  // Remaining SessionMode after the guards above is "analyzing".
+  return "Analyzing…";
 }
 
 function detailFor(args: {

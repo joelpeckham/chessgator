@@ -1,5 +1,5 @@
-import type { EvaluationScore } from "@/domain/analysis/types";
 import { pickPrimaryScore } from "@/domain/analysis/score";
+import type { EvaluationScore } from "@/domain/analysis/types";
 
 /**
  * Move quality labels derived from centipawn loss for the side that moved.

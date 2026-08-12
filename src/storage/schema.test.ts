@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   createInitialTree,
+  type GameTree,
   jumpToNode,
   playMoveOnTree,
-  type GameTree,
 } from "@/domain/game";
 import { createLocalStorageGameRepository } from "@/storage/local-storage";
 import {
@@ -53,11 +53,11 @@ describe("persistence schema v2", () => {
     expect(restored).not.toBeNull();
     expect(restored!.maiaElo).toBe(1200);
     expect(
-      Object.values(restored!.tree.nodes).every((n) => n.isVariation === false),
+      Object.values(restored!.tree.nodes).every((n) => !n.isVariation),
     ).toBe(true);
-    expect(
-      restored!.tree.nodes[restored!.tree.currentNodeId]?.move?.uci,
-    ).toBe("d2d4");
+    expect(restored!.tree.nodes[restored!.tree.currentNodeId]?.move?.uci).toBe(
+      "d2d4",
+    );
     const root = restored!.tree.nodes[restored!.tree.rootId]!;
     expect(root.childIds).toHaveLength(2);
   });
@@ -94,8 +94,7 @@ describe("persistence schema v2", () => {
   });
 
   it("fails closed on illegal child UCI during reconstruct", () => {
-    const startFen =
-      "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    const startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     const parsed = parseSavedGame({
       version: 2,
       rootFen: startFen,

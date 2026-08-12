@@ -1,15 +1,15 @@
 "use client";
 
+import { RiArrowUpSLine, RiCloseLine } from "@remixicon/react";
 import { useEffect, useRef } from "react";
-import type { HintStep, TeachingInsight } from "@/domain/teaching";
-import { classificationLabel } from "@/domain/teaching";
-import { TeachingCard } from "@/components/coach/teaching-card";
 import { HintLadder } from "@/components/coach/hint-ladder";
+import { TeachingCard } from "@/components/coach/teaching-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import type { HintStep, TeachingInsight } from "@/domain/teaching";
+import { classificationLabel } from "@/domain/teaching";
 import { cn } from "@/lib/utils";
-import { RiArrowUpSLine, RiCloseLine } from "@remixicon/react";
 
 /** Fixed coach rail height — always reserved so the board never shifts. */
 export const COACH_RAIL_PX = 40;
@@ -174,17 +174,16 @@ export function CoachRail({
               size="icon-xs"
               variant="ghost"
               className="size-8"
-              aria-label={expanded ? "Hide coach feedback" : "Show coach feedback"}
+              aria-label={
+                expanded ? "Hide coach feedback" : "Show coach feedback"
+              }
               aria-expanded={expanded}
               aria-controls="coach-expanded-panel"
               data-testid="coach-expand"
               onClick={() => onExpandedChange(!expanded)}
             >
               <RiArrowUpSLine
-                className={cn(
-                  "transition-transform",
-                  expanded && "rotate-180",
-                )}
+                className={cn("transition-transform", expanded && "rotate-180")}
               />
             </Button>
           ) : null}
@@ -237,14 +236,10 @@ export function CoachRail({
               hintDisabled={hintDisabled}
               hintFen={hintFen}
               showTutorLaneHint={showTutorLaneHint}
-              onRequestHint={
-                onRequestHint
-                  ? () => {
-                      onRequestHint();
-                      onExpandedChange(true);
-                    }
-                  : undefined
-              }
+              onRequestHint={() => {
+                onRequestHint();
+                onExpandedChange(true);
+              }}
             />
           </div>
         </div>

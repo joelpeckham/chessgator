@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
+import { type CSSProperties, useState } from "react";
 import { BoardPreview } from "@/components/board/board-preview";
 import type { TimelineOverflowGroup } from "@/components/timeline/branch-graph";
 import { Button } from "@/components/ui/button";

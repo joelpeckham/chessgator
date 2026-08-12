@@ -1,4 +1,4 @@
-import { getLegalMoves, type GameMove, type PieceSymbol } from "@/domain/game";
+import { type GameMove, getLegalMoves, type PieceSymbol } from "@/domain/game";
 
 export type BoardMove = {
   from: string;

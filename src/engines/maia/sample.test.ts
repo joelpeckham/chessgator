@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  argmax,
-  sampleFromLogits,
-  stableSoftmax,
-} from "@/engines/maia/sample";
+import { argmax, sampleFromLogits, stableSoftmax } from "@/engines/maia/sample";
 
 describe("Maia sampling", () => {
   it("uses stable softmax", () => {
@@ -19,12 +15,8 @@ describe("Maia sampling", () => {
 
   it("temperature <= 0 selects argmax (parity / test mode)", () => {
     const logits = [0, 5, 1, Number.NEGATIVE_INFINITY];
-    expect(
-      sampleFromLogits(logits, { temperature: 0, topP: 1 }),
-    ).toBe(1);
-    expect(
-      sampleFromLogits(logits, { temperature: -1, topP: 0.5 }),
-    ).toBe(1);
+    expect(sampleFromLogits(logits, { temperature: 0, topP: 1 })).toBe(1);
+    expect(sampleFromLogits(logits, { temperature: -1, topP: 0.5 })).toBe(1);
   });
 
   it("temperature sampling follows injected RNG", () => {

@@ -67,7 +67,9 @@ if (
   throw new Error(`Maia ORT version constant missing ${ortVersion}`);
 }
 if (!assetsTs.includes("maia3-5m.fp16.ca22fc303197.onnx")) {
-  throw new Error("Maia model path constant missing content-addressed filename");
+  throw new Error(
+    "Maia model path constant missing content-addressed filename",
+  );
 }
 
 console.log("bundled tests/maia/.generated/maia-worker.js");

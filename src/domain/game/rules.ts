@@ -1,7 +1,7 @@
 import {
   Chess,
-  DEFAULT_POSITION,
   type Color,
+  DEFAULT_POSITION,
   type Move,
   type PieceSymbol,
   type Square,
@@ -9,8 +9,8 @@ import {
 } from "chess.js";
 import type { GameMove, GameStatus, MoveInput } from "@/domain/game/types";
 
-export { DEFAULT_POSITION, validateFen };
 export type { Color, PieceSymbol, Square };
+export { DEFAULT_POSITION, validateFen };
 
 /** Create a fresh Chess instance for a FEN. Never persist this object. */
 export function createChess(fen: string = DEFAULT_POSITION): Chess {
@@ -40,7 +40,9 @@ export function toGameMove(move: Move): GameMove {
   };
 }
 
-export function moveToUci(move: Pick<Move, "from" | "to" | "promotion">): string {
+export function moveToUci(
+  move: Pick<Move, "from" | "to" | "promotion">,
+): string {
   return `${move.from}${move.to}${move.promotion ?? ""}`;
 }
 
@@ -65,7 +67,7 @@ export function parseUci(uci: string): {
   }
   const from = trimmed.slice(0, 2).toLowerCase();
   const to = trimmed.slice(2, 4).toLowerCase();
-  const promotion = trimmed.slice(4, 5).toLowerCase() as PieceSymbol | "";
+  const promotion = trimmed.slice(4, 5).toLowerCase();
   return promotion
     ? { from, to, promotion: promotion as PieceSymbol }
     : { from, to };
@@ -82,14 +84,17 @@ function normalizeMoveInput(
     return input;
   }
   return {
-    from: String(input.from).toLowerCase(),
-    to: String(input.to).toLowerCase(),
-    ...(input.promotion ? { promotion: String(input.promotion).toLowerCase() } : {}),
+    from: input.from.toLowerCase(),
+    to: input.to.toLowerCase(),
+    ...(input.promotion ? { promotion: input.promotion.toLowerCase() } : {}),
   };
 }
 
 /** Legal moves from a FEN, as normalized GameMove values. */
-export function getLegalMoves(fen: string, square?: Square | string): GameMove[] {
+export function getLegalMoves(
+  fen: string,
+  square?: Square | string,
+): GameMove[] {
   const chess = createChess(fen);
   const moves = square
     ? chess.moves({ verbose: true, square: square as Square })
@@ -102,7 +107,10 @@ export function isLegalMove(fen: string, input: MoveInput): boolean {
 }
 
 /** Return the UCI move only when it is legal in `fen`; otherwise null. */
-export function validateLegalUci(fen: string, uci: string | null | undefined): string | null {
+export function validateLegalUci(
+  fen: string,
+  uci: string | null | undefined,
+): string | null {
   if (!uci) return null;
   const normalized = uci.trim().toLowerCase();
   if (!isLegalMove(fen, normalized)) return null;
@@ -110,7 +118,10 @@ export function validateLegalUci(fen: string, uci: string | null | undefined): s
 }
 
 /** Walk a UCI line from fen, keeping only the legal prefix. */
-export function legalUciPrefix(fen: string, pvUci: readonly string[]): string[] {
+export function legalUciPrefix(
+  fen: string,
+  pvUci: readonly string[],
+): string[] {
   const legal: string[] = [];
   let currentFen = fen;
   for (const raw of pvUci) {
@@ -133,7 +144,10 @@ export type AppliedMove = {
  * Apply a move without mutating caller state. Returns null if illegal.
  * chess.js is the sole rules authority.
  */
-export function tryApplyMove(fen: string, input: MoveInput): AppliedMove | null {
+export function tryApplyMove(
+  fen: string,
+  input: MoveInput,
+): AppliedMove | null {
   let chess: Chess;
   try {
     chess = createChess(fen);
@@ -142,13 +156,10 @@ export function tryApplyMove(fen: string, input: MoveInput): AppliedMove | null 
   }
 
   const fenBefore = chess.fen();
-  let result: Move | null = null;
+  let result: Move;
   try {
     result = chess.move(normalizeMoveInput(input));
   } catch {
-    return null;
-  }
-  if (!result) {
     return null;
   }
 
@@ -218,15 +229,19 @@ function getStatusFromChess(chess: Chess): GameStatus {
  * Reconstruct a Chess instance along a move path so repetition / fifty-move
  * state matches playing those moves from the root FEN.
  */
-export function replayMoves(rootFen: string, moves: readonly GameMove[]): Chess {
+export function replayMoves(
+  rootFen: string,
+  moves: readonly GameMove[],
+): Chess {
   const chess = createChess(rootFen);
   for (const move of moves) {
-    const result = chess.move({
-      from: move.from,
-      to: move.to,
-      promotion: move.promotion,
-    });
-    if (!result) {
+    try {
+      chess.move({
+        from: move.from,
+        to: move.to,
+        promotion: move.promotion,
+      });
+    } catch {
       throw new Error(`Illegal move while replaying: ${move.uci}`);
     }
   }

@@ -99,7 +99,9 @@ export type MaiaWorkerResponse =
   | MaiaErrorResponse
   | MaiaDisposedResponse;
 
-export function isMaiaWorkerResponse(value: unknown): value is MaiaWorkerResponse {
+export function isMaiaWorkerResponse(
+  value: unknown,
+): value is MaiaWorkerResponse {
   if (!value || typeof value !== "object") return false;
   const type = (value as { type?: unknown }).type;
   return (

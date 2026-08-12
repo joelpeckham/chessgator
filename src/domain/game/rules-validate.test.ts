@@ -1,5 +1,9 @@
-import { DEFAULT_POSITION, legalUciPrefix, validateLegalUci } from "@/domain/game/rules";
 import { describe, expect, it } from "vitest";
+import {
+  DEFAULT_POSITION,
+  legalUciPrefix,
+  validateLegalUci,
+} from "@/domain/game/rules";
 
 describe("validateLegalUci", () => {
   it("accepts legal UCI and rejects illegal", () => {
@@ -12,11 +16,9 @@ describe("validateLegalUci", () => {
 
 describe("legalUciPrefix", () => {
   it("keeps only the legal prefix of a PV", () => {
-    expect(legalUciPrefix(DEFAULT_POSITION, ["e2e4", "e7e5", "g1f3", "zzzz"])).toEqual([
-      "e2e4",
-      "e7e5",
-      "g1f3",
-    ]);
+    expect(
+      legalUciPrefix(DEFAULT_POSITION, ["e2e4", "e7e5", "g1f3", "zzzz"]),
+    ).toEqual(["e2e4", "e7e5", "g1f3"]);
   });
 
   it("returns empty when the first move is illegal", () => {

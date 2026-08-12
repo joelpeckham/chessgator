@@ -1,4 +1,7 @@
-import type { AnalysisEvidence, EvaluationScore } from "@/domain/analysis/types";
+import type {
+  AnalysisEvidence,
+  EvaluationScore,
+} from "@/domain/analysis/types";
 import { legalUciPrefix, tryApplyMove, uciToSan } from "@/domain/game/rules";
 
 /** Default plies shown as the "future" continuation on the timeline. */
@@ -35,7 +38,10 @@ export function projectUciLine(args: {
   score?: EvaluationScore | null;
 }): ProjectedLine {
   const maxPlies = args.maxPlies ?? FUTURE_PROJECTION_PLIES;
-  const validated = legalUciPrefix(args.rootFen, args.lineUci).slice(0, maxPlies);
+  const validated = legalUciPrefix(args.rootFen, args.lineUci).slice(
+    0,
+    maxPlies,
+  );
   const plies: ProjectedPly[] = [];
   let fen = args.rootFen;
   const path: string[] = [];
@@ -74,7 +80,8 @@ export function projectBestFuture(
 ): ProjectedLine | null {
   const best =
     evidence.lines.find((line) => line.multipv === 1) ?? evidence.lines[0];
-  const pv = best?.pvUci ?? (evidence.bestMoveUci ? [evidence.bestMoveUci] : []);
+  const pv =
+    best?.pvUci ?? (evidence.bestMoveUci ? [evidence.bestMoveUci] : []);
   if (pv.length === 0) return null;
 
   const line = projectUciLine({

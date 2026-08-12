@@ -1,5 +1,6 @@
 "use client";
 
+import { RiSettings3Line } from "@remixicon/react";
 import {
   useEffect,
   useMemo,
@@ -7,53 +8,49 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import {
-  getCurrentNode,
-  getMoveHistory,
-  getNode,
-  getStatusAtNode,
-  getTurn,
-  playMoveOnTree,
-  type GameMove,
-  type PieceSymbol,
-} from "@/domain/game";
-import { projectUciLine } from "@/domain/analysis";
 import { ChessboardAdapter } from "@/components/board/chessboard-adapter";
 import type { BoardMove } from "@/components/board/move-utils";
+import { COACH_RAIL_PX, CoachRail } from "@/components/coach/coach-rail";
 import {
-  FeedbackStack,
   type FeedbackNotice,
+  FeedbackStack,
 } from "@/components/coach/feedback-stack";
-import {
-  CoachRail,
-  COACH_RAIL_PX,
-} from "@/components/coach/coach-rail";
 import { PromotionDialog } from "@/components/game/promotion-dialog";
 import { SettingsSheet } from "@/components/game/settings-sheet";
-import {
-  MoveTimeline,
-  TIMELINE_GRAPH_HEIGHT_PX,
-} from "@/components/timeline/move-timeline";
 import {
   buildBranchGraph,
   isVirtualTimelineId,
   resolveReviewFen,
 } from "@/components/timeline/branch-graph";
+import {
+  MoveTimeline,
+  TIMELINE_GRAPH_HEIGHT_PX,
+} from "@/components/timeline/move-timeline";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { projectUciLine } from "@/domain/analysis";
 import {
-  createCoachingController,
+  type GameMove,
+  getCurrentNode,
+  getMoveHistory,
+  getNode,
+  getStatusAtNode,
+  getTurn,
+  type PieceSymbol,
+  playMoveOnTree,
+} from "@/domain/game";
+import { classificationLabel } from "@/domain/teaching";
+import {
   type CoachingController,
+  createCoachingController,
 } from "@/features/game/coaching-controller";
+import { useGameStore } from "@/features/game/game-store";
 import {
   createMaiaSession,
   type MaiaSession,
 } from "@/features/game/maia-session";
-import { useGameStore } from "@/features/game/game-store";
 import { getStatusPresentation } from "@/features/game/status-copy";
-import { classificationLabel } from "@/domain/teaching";
-import { RiSettings3Line } from "@remixicon/react";
 
 /** Reserved chrome so board size ignores floating coach/toasts. */
 const HEADER_RESERVE_PX = 48;
@@ -70,10 +67,7 @@ function computeBoardSize(): number {
   if (typeof window === "undefined") return 640;
   const availW = window.innerWidth - VIEWPORT_PAD_PX;
   const availH =
-    window.innerHeight -
-    HEADER_RESERVE_PX -
-    FOOTER_CHROME_PX -
-    VIEWPORT_PAD_PX;
+    window.innerHeight - HEADER_RESERVE_PX - FOOTER_CHROME_PX - VIEWPORT_PAD_PX;
   return Math.max(
     BOARD_MIN_PX,
     Math.min(BOARD_MAX_PX, Math.floor(Math.min(availW, availH))),
@@ -101,7 +95,7 @@ function kingSquareFromFen(fen: string, color: "w" | "b"): string | null {
       continue;
     }
     if (ch === target) {
-      return `${"abcdefgh"[file]}${rank}`;
+      return `${"abcdefgh".charAt(file)}${String(rank)}`;
     }
     file += 1;
   }
@@ -146,9 +140,10 @@ export function GameShell() {
     coach.getState,
   );
 
-  const [promotion, setPromotion] = useState<{ from: string; to: string } | null>(
-    null,
-  );
+  const [promotion, setPromotion] = useState<{
+    from: string;
+    to: string;
+  } | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [reviewNodeId, setReviewNodeId] = useState<string | null>(null);
   const [coachExpanded, setCoachExpanded] = useState(false);
@@ -262,8 +257,7 @@ export function GameShell() {
       ? kingSquareFromFen(boardFen, boardStatus.turn)
       : null;
 
-  const analyzing =
-    coaching.phase === "analyzing" || mode === "analyzing";
+  const analyzing = coaching.phase === "analyzing" || mode === "analyzing";
   const visibleInsight = coaching.insightDismissed ? null : coaching.insight;
   const shouldAutoExpand =
     Boolean(visibleInsight?.autoExpand) && !coachUserCollapsedAuto;
@@ -381,7 +375,8 @@ export function GameShell() {
     if (state.session.mode === "loading" || !state.resumed) {
       startGame();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- bootstrap once after hydrate
+    // Bootstrap once after hydrate; startGame/resumePlay are stable enough for mount.
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated]);
 
   useEffect(() => {
@@ -544,7 +539,10 @@ export function GameShell() {
       coach.start(),
     ]);
     if (!maiaOk) {
-      setMode("error", maiaSession.getState().message ?? "Maia failed to start");
+      setMode(
+        "error",
+        maiaSession.getState().message ?? "Maia failed to start",
+      );
       return;
     }
     setCoachUnavailable(

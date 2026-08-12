@@ -1,23 +1,23 @@
 import {
   buildMoveAnalysisEvidence,
-  projectBestFuture,
   type MoveAnalysisEvidence,
   type ProjectedLine,
+  projectBestFuture,
 } from "@/domain/analysis";
 import type { GameMove } from "@/domain/game";
 import {
   buildHintStep,
-  nextHintLevel,
-  selectTeachingInsight,
   type HintLevel,
   type HintStep,
+  nextHintLevel,
+  selectTeachingInsight,
   type TeachingInsight,
 } from "@/domain/teaching";
 import { StockfishClient } from "@/engines/stockfish";
 import { markEnd, markStart } from "@/features/game/perf-marks";
 import {
-  createStubAnalysisEngine,
   type CreateAnalysisEngineFn,
+  createStubAnalysisEngine,
   type StockfishClientLike,
 } from "@/features/game/stub-analysis";
 
@@ -215,7 +215,9 @@ export function createCoachingController(
     };
   }
 
-  function refreshAnnotations(partial: Partial<CoachingControllerState> = {}): void {
+  function refreshAnnotations(
+    partial: Partial<CoachingControllerState> = {},
+  ): void {
     const next = { ...state, ...partial };
     const annotations = annotationsFromInsight(
       next.insight,
@@ -275,11 +277,7 @@ export function createCoachingController(
         });
         try {
           await currentEngine.initialize();
-          if (
-            disposed ||
-            startGen !== generation ||
-            engine !== currentEngine
-          ) {
+          if (disposed || startGen !== generation || engine !== currentEngine) {
             return false;
           }
           setState({
@@ -289,11 +287,7 @@ export function createCoachingController(
           markEnd("engine-coach-startup");
           return true;
         } catch (err) {
-          if (
-            disposed ||
-            startGen !== generation ||
-            engine !== currentEngine
-          ) {
+          if (disposed || startGen !== generation || engine !== currentEngine) {
             return false;
           }
           const message =
@@ -355,9 +349,7 @@ export function createCoachingController(
       const afterId = `${input.requestId}-after`;
 
       const isStale = () =>
-        disposed ||
-        gen !== generation ||
-        activeRequestId !== input.requestId;
+        disposed || gen !== generation || activeRequestId !== input.requestId;
 
       const leaveAnalyzingIfOrphaned = () => {
         if (
@@ -429,13 +421,13 @@ export function createCoachingController(
           markEnd("analysis-player-move");
           return null;
         }
-        const message =
-          err instanceof Error ? err.message : "Analysis failed";
+        const message = err instanceof Error ? err.message : "Analysis failed";
         setState({
           phase: "ready",
-          message: message.includes("cancelled") || message.includes("Stale")
-            ? null
-            : message,
+          message:
+            message.includes("cancelled") || message.includes("Stale")
+              ? null
+              : message,
         });
         activeRequestId = null;
         markEnd("analysis-player-move");

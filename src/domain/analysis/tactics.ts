@@ -71,7 +71,7 @@ export function collectTacticalFacts(input: TacticalFactsInput): TacticalFacts {
     (sq) => sq !== move.from && hangingAfter.includes(sq),
   );
 
-  const developedPiece = isDevelopingMove(before, move);
+  const developedPiece = isDevelopingMove(move);
   const castlingRightsLost = lostCastlingRights(before, after, mover);
   const kingMoreExposed =
     kingExposure(after, mover) > kingExposure(before, mover);
@@ -127,7 +127,7 @@ export function isHangingOn(
   return !chess.isAttacked(square, owner);
 }
 
-function isDevelopingMove(before: Chess, move: GameMove): boolean {
+function isDevelopingMove(move: GameMove): boolean {
   if (move.piece === "p" || move.piece === "k") return false;
   const backRank = move.color === "w" ? "1" : "8";
   if (!move.from.endsWith(backRank)) return false;

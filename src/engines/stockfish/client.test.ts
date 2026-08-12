@@ -1,6 +1,6 @@
-import { DEFAULT_POSITION } from "@/domain/game/rules";
-import type { AnalysisEvidence } from "@/domain/analysis/types";
 import { describe, expect, it, vi } from "vitest";
+import type { AnalysisEvidence } from "@/domain/analysis/types";
+import { DEFAULT_POSITION } from "@/domain/game/rules";
 import { StockfishClient } from "@/engines/stockfish/client";
 import type {
   StockfishWorkerRequest,
@@ -32,7 +32,9 @@ function makeEvidence(
 
 function createFakeTransport(options?: {
   autoReady?: boolean;
-  onAnalyze?: (req: Extract<StockfishWorkerRequest, { type: "analyze" }>) => void;
+  onAnalyze?: (
+    req: Extract<StockfishWorkerRequest, { type: "analyze" }>,
+  ) => void;
 }): {
   transport: StockfishTransport;
   emit: (msg: StockfishWorkerResponse) => void;
@@ -98,10 +100,9 @@ describe("StockfishClient", () => {
     });
 
     const init = client.initialize();
-    const rejected = expect(init).rejects.toThrow(/cancelled.*disposed/i);
-    await client.dispose();
-
-    await rejected;
+    const disposed = client.dispose();
+    await expect(init).rejects.toThrow(/cancelled.*disposed/i);
+    await disposed;
     expect(client.status()).toBe("disposed");
     expect(timers.size).toBe(0);
   });
@@ -120,9 +121,9 @@ describe("StockfishClient", () => {
     });
 
     await vi.waitFor(() => {
-      expect(sent.some((m) => m.type === "analyze" && m.requestId === "r1")).toBe(
-        true,
-      );
+      expect(
+        sent.some((m) => m.type === "analyze" && m.requestId === "r1"),
+      ).toBe(true);
     });
 
     const second = client.analyze({
@@ -150,9 +151,9 @@ describe("StockfishClient", () => {
     });
 
     await vi.waitFor(() => {
-      expect(sent.some((m) => m.type === "analyze" && m.requestId === "r2")).toBe(
-        true,
-      );
+      expect(
+        sent.some((m) => m.type === "analyze" && m.requestId === "r2"),
+      ).toBe(true);
     });
     expect(client.queuedRequestIds()).toEqual(["r3"]);
 
@@ -163,9 +164,9 @@ describe("StockfishClient", () => {
       evidence: makeEvidence("r2", "n1", "d2d4"),
     });
     await vi.waitFor(() => {
-      expect(sent.some((m) => m.type === "analyze" && m.requestId === "r3")).toBe(
-        true,
-      );
+      expect(
+        sent.some((m) => m.type === "analyze" && m.requestId === "r3"),
+      ).toBe(true);
     });
     emit({
       type: "result",
@@ -175,7 +176,10 @@ describe("StockfishClient", () => {
     });
 
     await expect(first).resolves.toMatchObject({ requestId: "r1" });
-    await expect(second).resolves.toMatchObject({ requestId: "r2", bestMoveUci: "d2d4" });
+    await expect(second).resolves.toMatchObject({
+      requestId: "r2",
+      bestMoveUci: "d2d4",
+    });
     await expect(third).resolves.toMatchObject({ requestId: "r3" });
     await client.dispose();
   });
@@ -200,9 +204,9 @@ describe("StockfishClient", () => {
     });
 
     await vi.waitFor(() =>
-      expect(sent.some((m) => m.type === "analyze" && m.requestId === "run")).toBe(
-        true,
-      ),
+      expect(
+        sent.some((m) => m.type === "analyze" && m.requestId === "run"),
+      ).toBe(true),
     );
 
     client.cancel("queued");
@@ -215,9 +219,9 @@ describe("StockfishClient", () => {
       evidence: makeEvidence("run", "n1"),
     });
     await expect(running).resolves.toBeTruthy();
-    expect(sent.some((m) => m.type === "analyze" && m.requestId === "queued")).toBe(
-      false,
-    );
+    expect(
+      sent.some((m) => m.type === "analyze" && m.requestId === "queued"),
+    ).toBe(false);
     await client.dispose();
   });
 
@@ -257,7 +261,6 @@ describe("StockfishClient", () => {
     const { transport, sent } = createFakeTransport();
     const client = new StockfishClient({
       transport,
-      now: () => now,
       setTimer: (fn, ms) => {
         const id = timerId++;
         timers.set(id, { fn, due: now + ms });
@@ -278,13 +281,13 @@ describe("StockfishClient", () => {
     });
 
     await vi.waitFor(() =>
-      expect(sent.some((m) => m.type === "analyze" && m.requestId === "slow")).toBe(
-        true,
-      ),
+      expect(
+        sent.some((m) => m.type === "analyze" && m.requestId === "slow"),
+      ).toBe(true),
     );
 
     now = 30;
-    for (const [id, timer] of [...timers.entries()]) {
+    for (const [id, timer] of Array.from(timers.entries())) {
       if (timer.due <= now) {
         timers.delete(id);
         timer.fn();
@@ -292,9 +295,9 @@ describe("StockfishClient", () => {
     }
 
     await expect(promise).rejects.toThrow(/timed out/);
-    expect(sent.some((m) => m.type === "cancel" && m.requestId === "slow")).toBe(
-      true,
-    );
+    expect(
+      sent.some((m) => m.type === "cancel" && m.requestId === "slow"),
+    ).toBe(true);
     await client.dispose();
   });
 
@@ -314,7 +317,9 @@ describe("StockfishClient", () => {
     );
 
     client.cancel("c1");
-    expect(sent.some((m) => m.type === "cancel" && m.requestId === "c1")).toBe(true);
+    expect(sent.some((m) => m.type === "cancel" && m.requestId === "c1")).toBe(
+      true,
+    );
 
     // Worker eventually answers — client must not resolve successfully.
     emit({

@@ -85,24 +85,31 @@ export function buildMoveAnalysisEvidence(
     bestMoveUci,
   });
 
-  const alternatives = input.before.lines.slice().sort((a, b) => a.multipv - b.multipv);
+  const alternatives = input.before.lines.toSorted(
+    (a, b) => a.multipv - b.multipv,
+  );
   const maxPlies = input.shortPvMaxPlies ?? SHORT_PV_MAX_PLIES;
 
   const bestLine = alternatives[0]?.pvUci ?? [];
   // Improvement line always starts from fenBefore (best / MultiPV #1).
-  const shortPvUci = legalUciPrefix(input.fenBefore, bestLine).slice(0, maxPlies);
+  const shortPvUci = legalUciPrefix(input.fenBefore, bestLine).slice(
+    0,
+    maxPlies,
+  );
 
   // Refutation is separate: from the played position, never prefixed with the
   // mistake itself (Explore / Try instead must not replay the blunder).
   let refutationUci: string[] = [];
+  const afterBest = input.after.lines[0];
   if (
     (classification === "mistake" || classification === "blunder") &&
-    input.after.lines[0]?.pvUci?.length
+    afterBest &&
+    afterBest.pvUci.length > 0
   ) {
-    refutationUci = legalUciPrefix(
-      input.fenAfter,
-      input.after.lines[0].pvUci,
-    ).slice(0, maxPlies);
+    refutationUci = legalUciPrefix(input.fenAfter, afterBest.pvUci).slice(
+      0,
+      maxPlies,
+    );
   }
 
   const tacticalFacts = collectTacticalFacts({

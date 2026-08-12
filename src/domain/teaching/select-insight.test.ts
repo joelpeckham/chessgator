@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { AnalysisEvidence } from "@/domain/analysis/types";
 import { buildMoveAnalysisEvidence } from "@/domain/analysis/move-analysis";
+import type { AnalysisEvidence } from "@/domain/analysis/types";
 import { tryApplyMove } from "@/domain/game/rules";
 import {
   chooseConcept,
@@ -27,8 +27,7 @@ function evidence(
 
 describe("teaching selection", () => {
   it("labels engine-best as best_move", () => {
-    const fen =
-      "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    const fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     const applied = tryApplyMove(fen, "e2e4")!;
     const moveEvidence = buildMoveAnalysisEvidence({
       requestId: "r1",
@@ -81,6 +80,8 @@ describe("teaching selection", () => {
       evalLossCp: 15,
     });
     expect(text).toMatch(/Nf3/);
-    expect(text).not.toMatch(/model-predicted likelihood|population frequency/i);
+    expect(text).not.toMatch(
+      /model-predicted likelihood|population frequency/i,
+    );
   });
 });

@@ -1,11 +1,11 @@
 "use client";
 
-import type { HintStep, TeachingInsight } from "@/domain/teaching";
-import { classificationLabel } from "@/domain/teaching";
 import { HintLadder } from "@/components/coach/hint-ladder";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import type { HintStep, TeachingInsight } from "@/domain/teaching";
+import { classificationLabel } from "@/domain/teaching";
 
 export type TeachingCardProps = {
   insight: TeachingInsight | null;
@@ -115,10 +115,7 @@ export function TeachingCard({
           {classificationLabel(insight.classification)}
         </Badge>
       </div>
-      <p
-        className="text-sm text-pretty"
-        data-testid="teaching-explanation"
-      >
+      <p className="text-sm text-pretty" data-testid="teaching-explanation">
         {insight.explanation}
       </p>
       {insight.suggestedMoveSan ? (
@@ -128,7 +125,10 @@ export function TeachingCard({
         </p>
       ) : null}
       {showTutorLaneHint ? (
-        <p className="text-xs text-muted-foreground" data-testid="tutor-lane-hint">
+        <p
+          className="text-xs text-muted-foreground"
+          data-testid="tutor-lane-hint"
+        >
           Alternate line shown on the timeline (dashed diamond).
         </p>
       ) : null}

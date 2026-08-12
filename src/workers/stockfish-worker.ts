@@ -3,8 +3,13 @@
  * Loads the versioned lite-single asset from /public/engine (never the package default)
  * and speaks the protocol in `src/engines/stockfish/protocol.ts`.
  */
-import type { AnalysisEvidence, PrincipalVariation } from "@/domain/analysis/types";
+
 import { pickPrimaryScore } from "@/domain/analysis/score";
+import type {
+  AnalysisEvidence,
+  PrincipalVariation,
+} from "@/domain/analysis/types";
+import { tryApplyMove, validateLegalUci } from "@/domain/game/rules";
 import { stockfishAssetWorkerUrl } from "@/engines/stockfish/assets";
 import type {
   StockfishAnalyzeRequest,
@@ -18,7 +23,6 @@ import {
   sideToMoveFromFen,
   sortedLines,
 } from "@/engines/stockfish/uci-parse";
-import { tryApplyMove, validateLegalUci } from "@/domain/game/rules";
 
 type EngineWorker = Worker;
 
@@ -108,7 +112,11 @@ function handleEngineLine(line: string): void {
   }
 
   // Ignore readyok / option noise during a search.
-  if (line === "readyok" || line.startsWith("option ") || line.startsWith("id ")) {
+  if (
+    line === "readyok" ||
+    line.startsWith("option ") ||
+    line.startsWith("id ")
+  ) {
     return;
   }
 
@@ -186,7 +194,11 @@ async function handleInit(requestId: string, engineUrl: string): Promise<void> {
       post({ type: "ready", requestId });
       return;
     }
-    post({ type: "error", requestId, message: "Stockfish init already in progress" });
+    post({
+      type: "error",
+      requestId,
+      message: "Stockfish init already in progress",
+    });
     return;
   }
 

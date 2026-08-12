@@ -1,8 +1,12 @@
-import { DEFAULT_POSITION, getLegalMoves } from "@/domain/game/rules";
 import { describe, expect, it } from "vitest";
+import { DEFAULT_POSITION, getLegalMoves } from "@/domain/game/rules";
 import { fromVocabUci } from "@/engines/maia/encode";
-import { applyLegalMask, countLegal, legalMovesMask } from "@/engines/maia/mask";
-import { MOVE_VOCAB_SIZE, indexToMove } from "@/engines/maia/vocabulary";
+import {
+  applyLegalMask,
+  countLegal,
+  legalMovesMask,
+} from "@/engines/maia/mask";
+import { indexToMove, MOVE_VOCAB_SIZE } from "@/engines/maia/vocabulary";
 
 describe("Maia legal masking", () => {
   it("masks exactly the chess.js legal move count at startpos", () => {
@@ -13,8 +17,7 @@ describe("Maia legal masking", () => {
   });
 
   it("never marks illegal vocabulary entries", () => {
-    const fen =
-      "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
+    const fen = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
     const mask = legalMovesMask(fen);
     const legalSet = new Set(getLegalMoves(fen).map((m) => m.uci));
     for (let i = 0; i < mask.length; i++) {

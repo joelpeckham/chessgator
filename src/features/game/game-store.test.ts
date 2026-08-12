@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { createInitialTree, createSessionState, playMoveOnTree } from "@/domain/game";
+import {
+  createInitialTree,
+  createSessionState,
+  playMoveOnTree,
+} from "@/domain/game";
 import {
   normalizeSessionForResume,
   useGameStore,
@@ -34,15 +38,20 @@ describe("game store adapter", () => {
     expect(useGameStore.getState().playMove("e7e5")).toBe(true);
 
     const leaf = useGameStore.getState().tree.currentNodeId;
-    expect(useGameStore.getState().jumpToNode(useGameStore.getState().tree.rootId)).toBe(
-      true,
-    );
+    expect(
+      useGameStore.getState().jumpToNode(useGameStore.getState().tree.rootId),
+    ).toBe(true);
     expect(useGameStore.getState().session.mode).toBe("reviewing");
     expect(useGameStore.getState().retryMove()).toBe(false); // at root
 
     useGameStore.getState().jumpToNode(leaf);
     expect(useGameStore.getState().takeback()).toBe(true);
-    expect(useGameStore.getState().history().map((m) => m.uci)).toEqual(["e2e4"]);
+    expect(
+      useGameStore
+        .getState()
+        .history()
+        .map((m) => m.uci),
+    ).toEqual(["e2e4"]);
   });
 
   it("rejects illegal moves and keeps lastError", () => {
@@ -84,7 +93,12 @@ describe("game store adapter", () => {
     expect(hydrated).toBe(true);
     expect(useGameStore.getState().resumed).toBe(true);
     expect(useGameStore.getState().session.mode).toBe("reviewing");
-    expect(useGameStore.getState().history().map((m) => m.uci)).toEqual(["e2e4"]);
+    expect(
+      useGameStore
+        .getState()
+        .history()
+        .map((m) => m.uci),
+    ).toEqual(["e2e4"]);
   });
 
   it("hydrates resigned games as gameOver", async () => {

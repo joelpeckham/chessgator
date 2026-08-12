@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils"
-import { RiLoaderLine } from "@remixicon/react"
+import { RiLoaderLine } from "@remixicon/react";
+import { cn } from "@/lib/utils";
 
 function Spinner({ className, ...props }: { className?: string }) {
   return (
@@ -10,7 +10,7 @@ function Spinner({ className, ...props }: { className?: string }) {
       className={cn("size-4 animate-spin", className)}
       {...props}
     />
-  )
+  );
 }
 
-export { Spinner }
+export { Spinner };

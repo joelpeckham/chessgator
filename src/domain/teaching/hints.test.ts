@@ -1,12 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { AnalysisEvidence } from "@/domain/analysis/types";
-import {
-  buildHintStep,
-  nextHintLevel,
-} from "@/domain/teaching/hints";
+import { buildHintStep, nextHintLevel } from "@/domain/teaching/hints";
 
-const fen =
-  "rnbqkbnr/pppp1ppp/8/4p2Q/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 1 2";
+const fen = "rnbqkbnr/pppp1ppp/8/4p2Q/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 1 2";
 
 const analysis: AnalysisEvidence = {
   requestId: "h",

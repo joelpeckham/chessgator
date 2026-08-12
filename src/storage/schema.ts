@@ -49,10 +49,7 @@ function isFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
 }
 
-function committedChildren(
-  tree: GameTree,
-  nodeId: string,
-): GameNode[] {
+function committedChildren(tree: GameTree, nodeId: string): GameNode[] {
   const node = tree.nodes[nodeId];
   if (!node) return [];
   const out: GameNode[] = [];
@@ -96,10 +93,7 @@ function persistCommittedSubtree(tree: GameTree, nodeId: string): SavedNode {
   return saved;
 }
 
-function pathToNode(
-  tree: GameTree,
-  targetId: string,
-): number[] | null {
+function pathToNode(tree: GameTree, targetId: string): number[] | null {
   const path: number[] = [];
   const ancestors: string[] = [];
   let cursor: string | null = targetId;
@@ -189,7 +183,11 @@ export function parseSavedGame(raw: unknown): SavedGameV2 | null {
   if (raw.version !== 2) return null;
   if (!isString(raw.rootFen) || !isValidFen(raw.rootFen)) return null;
   if (!Array.isArray(raw.currentPath)) return null;
-  if (!raw.currentPath.every((n) => typeof n === "number" && Number.isInteger(n) && n >= 0)) {
+  if (
+    !raw.currentPath.every(
+      (n) => typeof n === "number" && Number.isInteger(n) && n >= 0,
+    )
+  ) {
     return null;
   }
   if (!isFiniteNumber(raw.maiaElo)) return null;
@@ -197,14 +195,19 @@ export function parseSavedGame(raw: unknown): SavedGameV2 | null {
   const tree = parseSavedNode(raw.tree, true);
   if (!tree) return null;
 
-  if ("resigned" in raw && raw.resigned !== undefined && raw.resigned !== true) {
+  if (
+    "resigned" in raw &&
+    raw.resigned !== undefined &&
+    raw.resigned !== true
+  ) {
     return null;
   }
 
+  const currentPath = raw.currentPath as number[];
   const saved: SavedGameV2 = {
     version: 2,
     rootFen: raw.rootFen,
-    currentPath: [...raw.currentPath],
+    currentPath: [...currentPath],
     tree,
     maiaElo: raw.maiaElo,
   };
@@ -213,9 +216,6 @@ export function parseSavedGame(raw: unknown): SavedGameV2 | null {
   }
   return saved;
 }
-
-/** @deprecated Use parseSavedGame. */
-export const parsePersistedGame = parseSavedGame;
 
 /**
  * Rebuild a GameTree with fresh IDs. Fails closed on illegal UCI / bad path.
@@ -236,7 +236,10 @@ export function reconstructGame(saved: SavedGameV2): ReconstructedGame | null {
 
   const nodes: Record<string, GameNode> = { [rootId]: root };
 
-  function addChildren(parentId: string, savedChildren: SavedNode[] | undefined): boolean {
+  function addChildren(
+    parentId: string,
+    savedChildren: SavedNode[] | undefined,
+  ): boolean {
     if (!savedChildren || savedChildren.length === 0) return true;
     const parent = nodes[parentId]!;
     const childIds: string[] = [];
@@ -292,13 +295,4 @@ export function reconstructGame(saved: SavedGameV2): ReconstructedGame | null {
     maiaElo: saved.maiaElo,
     resigned: saved.resigned === true,
   };
-}
-
-/** @deprecated Use reconstructGame. */
-export function toGameSession(persisted: SavedGameV2): {
-  tree: GameTree;
-  maiaElo: number;
-  resigned: boolean;
-} | null {
-  return reconstructGame(persisted);
 }

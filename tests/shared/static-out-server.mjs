@@ -1,9 +1,9 @@
 #!/usr/bin/env node
+import { readFile, stat } from "node:fs/promises";
 /**
  * Serves the Next static export (`out/`) for playable-slice Playwright tests.
  */
 import { createServer } from "node:http";
-import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 

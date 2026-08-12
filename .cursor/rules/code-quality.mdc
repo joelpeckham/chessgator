@@ -1,0 +1,18 @@
+---
+description: High-bar code quality, architecture boundaries, and React Compiler conventions
+alwaysApply: true
+---
+
+# Code quality
+
+- Respect layer boundaries enforced by ESLint `boundaries/dependencies`:
+  - `domain` → `domain`, `lib`
+  - `engines` → `domain`, `engines`, `lib`
+  - `storage` → `domain`, `storage`, `lib`
+  - `workers` → `domain`, `engines`, `workers`
+  - `features` → `domain`, `engines`, `storage`, `features`, `components`, `lib`
+  - `components` → `domain`, `components`, `lib` (only `game-shell-client` may import `features`)
+  - `app` → `components`, `lib`
+- Do not add `useMemo` / `useCallback` / `React.memo` unless needed as an effect-dependency escape hatch. React Compiler (`reactCompiler: true`) handles memoization.
+- Do not hand-edit `src/components/ui/**` except via the shadcn CLI / registry updates.
+- Keep `bun run check` green: Biome format, Oxlint, ESLint, `tsc`, Knip, Vitest.

@@ -8,7 +8,9 @@ import {
 const STORAGE_KEY = "chessgator:game:v2";
 
 test.describe("local resume + corruption", () => {
-  test("reloads resume tree, elo, and auto-continues play", async ({ page }) => {
+  test("reloads resume tree, elo, and auto-continues play", async ({
+    page,
+  }) => {
     await startStubGame(page);
 
     await openSettings(page);
@@ -25,7 +27,10 @@ test.describe("local resume + corruption", () => {
 
     // Wait for debounced persist.
     await page.waitForTimeout(500);
-    const raw = await page.evaluate((key) => localStorage.getItem(key), STORAGE_KEY);
+    const raw = await page.evaluate(
+      (key) => localStorage.getItem(key),
+      STORAGE_KEY,
+    );
     expect(raw).toBeTruthy();
     const parsed = JSON.parse(raw!);
     expect(parsed.version).toBe(2);

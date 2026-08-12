@@ -6,13 +6,15 @@ import {
   type MaiaClientLike,
 } from "@/features/game/maia-session";
 
-function createFakeClient(options: {
-  failInit?: boolean;
-  initDelayMs?: number;
-  moveDelayMs?: number;
-  failInfer?: boolean;
-  scriptedMoves?: string[];
-} = {}): MaiaClientLike {
+function createFakeClient(
+  options: {
+    failInit?: boolean;
+    initDelayMs?: number;
+    moveDelayMs?: number;
+    failInfer?: boolean;
+    scriptedMoves?: string[];
+  } = {},
+): MaiaClientLike {
   let statusValue: MaiaClientStatus = "idle";
   let scriptIndex = 0;
   const cancelled = new Set<string>();

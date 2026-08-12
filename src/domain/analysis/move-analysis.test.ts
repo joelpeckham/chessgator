@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { AnalysisEvidence } from "@/domain/analysis/types";
 import { buildMoveAnalysisEvidence } from "@/domain/analysis/move-analysis";
+import type { AnalysisEvidence } from "@/domain/analysis/types";
 import { tryApplyMove } from "@/domain/game/rules";
 
 function ev(
@@ -22,8 +22,7 @@ function ev(
 
 describe("move analysis evidence", () => {
   it("builds classification + short PV for a best move", () => {
-    const fen =
-      "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    const fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     const applied = tryApplyMove(fen, "e2e4")!;
     const evidence = buildMoveAnalysisEvidence({
       requestId: "r",

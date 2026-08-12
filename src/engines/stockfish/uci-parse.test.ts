@@ -1,5 +1,6 @@
-import { DEFAULT_POSITION } from "@/domain/game/rules";
 import { describe, expect, it } from "vitest";
+import type { PrincipalVariation } from "@/domain/analysis/types";
+import { DEFAULT_POSITION } from "@/domain/game/rules";
 import {
   applyInfoLine,
   parseBestMove,
@@ -7,7 +8,6 @@ import {
   sideToMoveFromFen,
   sortedLines,
 } from "@/engines/stockfish/uci-parse";
-import type { PrincipalVariation } from "@/domain/analysis/types";
 
 describe("parseInfoLine", () => {
   it("parses MultiPV centipawn lines", () => {

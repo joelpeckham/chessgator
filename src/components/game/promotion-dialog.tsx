@@ -1,6 +1,5 @@
 "use client";
 
-import type { PieceSymbol } from "@/domain/game";
 import { PROMOTION_PIECES } from "@/components/board/move-utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import type { PieceSymbol } from "@/domain/game";
 
 const LABELS: Record<PieceSymbol, string> = {
   q: "Queen",

@@ -21,7 +21,7 @@ let cachedMoves: string[] | null = null;
 let cachedIndex: Map<string, number> | null = null;
 
 function squareName(file: number, rank: number): string {
-  return `${FILES[file]}${rank + 1}`;
+  return `${FILES.charAt(file)}${String(rank + 1)}`;
 }
 
 /** Build the full 4352-entry vocabulary (cached). */

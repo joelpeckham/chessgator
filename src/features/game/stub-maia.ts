@@ -91,7 +91,9 @@ export function createStubMaiaSession(
       return session.start();
     },
 
-    async chooseMove(input: ChooseMaiaMoveInput): Promise<MaiaMoveResult | null> {
+    async chooseMove(
+      input: ChooseMaiaMoveInput,
+    ): Promise<MaiaMoveResult | null> {
       if (
         state.phase === "idle" ||
         state.phase === "starting" ||

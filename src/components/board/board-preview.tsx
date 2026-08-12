@@ -11,7 +11,11 @@ export type BoardPreviewProps = {
 };
 
 /** Small non-interactive board for timeline hover/focus previews. */
-export function BoardPreview({ fen, san = null, className }: BoardPreviewProps) {
+export function BoardPreview({
+  fen,
+  san = null,
+  className,
+}: BoardPreviewProps) {
   const options = useMemo(
     () => ({
       id: `preview-${fen.slice(0, 24)}`,

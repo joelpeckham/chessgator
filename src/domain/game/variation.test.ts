@@ -40,10 +40,7 @@ describe("variation explorer", () => {
     const originId = tree.currentNodeId;
     const mainChildBefore = listMainlineChild(tree, tree.rootId);
 
-    const started = createVariationExplorer(tree, originId, [
-      "g1f3",
-      "b8c6",
-    ]);
+    const started = createVariationExplorer(tree, originId, ["g1f3", "b8c6"]);
     expect(started).not.toBeNull();
     tree = started!.tree;
     let explorer = started!.explorer;
@@ -74,9 +71,7 @@ describe("variation explorer", () => {
 
     const exited = exitVariationExplorer(back!.tree, back!.explorer);
     expect(exited.currentNodeId).toBe(originId);
-    expect(
-      Object.values(exited.nodes).some((n) => n.isVariation),
-    ).toBe(false);
+    expect(Object.values(exited.nodes).some((n) => n.isVariation)).toBe(false);
   });
 
   it("Try instead promotes the first ply and restores a clean origin sibling set", () => {
@@ -106,9 +101,9 @@ describe("variation explorer", () => {
     const root = tried!.tree.nodes[tried!.tree.rootId]!;
     expect(root.childIds).toContain(afterE4);
     expect(listMainlineChild(tried!.tree, root.id)?.id).toBe(tried!.node.id);
-    expect(
-      Object.values(tried!.tree.nodes).some((n) => n.isVariation),
-    ).toBe(false);
+    expect(Object.values(tried!.tree.nodes).some((n) => n.isVariation)).toBe(
+      false,
+    );
   });
 
   it("exit removes nested ghosts when first ply reused a committed child", () => {
@@ -156,9 +151,7 @@ describe("variation explorer", () => {
     for (const id of ghostIds) {
       expect(exited.nodes[id]).toBeUndefined();
     }
-    expect(
-      Object.values(exited.nodes).some((n) => n.isVariation),
-    ).toBe(false);
+    expect(Object.values(exited.nodes).some((n) => n.isVariation)).toBe(false);
   });
 
   it("preserves branches when jumping after exploration", () => {

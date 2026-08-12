@@ -1,21 +1,23 @@
 import { describe, expect, it } from "vitest";
+import { squareToIndex } from "@/engines/maia/encode";
 import {
   BASE_MOVE_COUNT,
-  MOVE_VOCAB_SIZE,
   getAllPossibleMoves,
   indexToMove,
+  MOVE_VOCAB_SIZE,
   moveToIndex,
   promotionMoveIndex,
   quietMoveIndex,
 } from "@/engines/maia/vocabulary";
-import { squareToIndex } from "@/engines/maia/encode";
 
 describe("Maia move vocabulary", () => {
   it("has exactly 4352 entries with 256 promotions", () => {
     const moves = getAllPossibleMoves();
     expect(moves).toHaveLength(MOVE_VOCAB_SIZE);
     expect(BASE_MOVE_COUNT).toBe(4096);
-    expect(moves.slice(BASE_MOVE_COUNT).every((m) => m.length === 5)).toBe(true);
+    expect(moves.slice(BASE_MOVE_COUNT).every((m) => m.length === 5)).toBe(
+      true,
+    );
     expect(moves[BASE_MOVE_COUNT]).toBe("a7a8q");
     expect(moves[MOVE_VOCAB_SIZE - 1]).toBe("h7h8n");
   });

@@ -3,10 +3,7 @@
  */
 import { getLegalMoves } from "@/domain/game/rules";
 import { toVocabUci } from "@/engines/maia/encode";
-import {
-  MOVE_VOCAB_SIZE,
-  getMoveIndexMap,
-} from "@/engines/maia/vocabulary";
+import { getMoveIndexMap, MOVE_VOCAB_SIZE } from "@/engines/maia/vocabulary";
 
 /** Boolean mask of length 4352; true = legal in `fen`. */
 export function legalMovesMask(fen: string): Uint8Array {

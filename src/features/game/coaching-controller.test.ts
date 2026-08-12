@@ -7,8 +7,7 @@ import {
   type StockfishClientLike,
 } from "@/features/game/stub-analysis";
 
-const START =
-  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+const START = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 function createSlowEngine(gate: Promise<void>): StockfishClientLike {
   return {
@@ -172,13 +171,11 @@ describe("coaching controller", () => {
     expect(after.phase).toBe("ready");
     expect(after.evidence).toBeNull();
     expect(after.insight).toBeNull();
-    expect(after.insight?.lineUci?.length ?? 0).toBe(0);
     await coach.dispose();
   });
 
   it("autoExpand insights annotate the suggested move on the board", async () => {
-    const afterA3 =
-      "rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1";
+    const afterA3 = "rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1";
     const coach = createCoachingController({
       createEngine: () =>
         createStubAnalysisEngine({
@@ -314,7 +311,7 @@ describe("coaching controller", () => {
       playedMove: applied.move,
     });
     expect(coach.getState().insight).not.toBeNull();
-    const spy = vi.fn();
+    const spy = vi.fn<() => void>();
     coach.subscribe(spy);
     coach.clearFeedback();
     expect(coach.getState().insight).toBeNull();

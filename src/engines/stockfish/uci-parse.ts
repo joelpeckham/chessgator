@@ -1,7 +1,7 @@
 import {
   pickPrimaryScore,
-  scoreFromSideToMove,
   type SideToMove,
+  scoreFromSideToMove,
 } from "@/domain/analysis/score";
 import type {
   EvaluationScore,
@@ -89,7 +89,9 @@ export function parseInfoLine(line: string): ParsedInfoLine | null {
         break;
       }
       case "pv":
-        pvUci = tokens.slice(i + 1).filter((t) => /^[a-h][1-8][a-h][1-8][qrbn]?$/i.test(t));
+        pvUci = tokens
+          .slice(i + 1)
+          .filter((t) => /^[a-h][1-8][a-h][1-8][qrbn]?$/i.test(t));
         i = tokens.length;
         break;
       default:
@@ -140,13 +142,20 @@ export function applyInfoLine(
   sideToMove: SideToMove,
 ): void {
   const scoreStm = info.score ?? {};
-  const scoreWhite = pickPrimaryScore(scoreFromSideToMove(scoreStm, sideToMove));
+  const scoreWhite = pickPrimaryScore(
+    scoreFromSideToMove(scoreStm, sideToMove),
+  );
   const existing = linesByMultipv.get(info.multipv);
-  const pvUci = legalUciPrefix(fen, info.pvUci.length ? info.pvUci : existing?.pvUci ?? []);
+  const pvUci = legalUciPrefix(
+    fen,
+    info.pvUci.length ? info.pvUci : (existing?.pvUci ?? []),
+  );
 
   linesByMultipv.set(info.multipv, {
     multipv: info.multipv,
-    score: Object.keys(scoreWhite).length ? scoreWhite : existing?.score ?? {},
+    score: Object.keys(scoreWhite).length
+      ? scoreWhite
+      : (existing?.score ?? {}),
     pvUci,
     depth: info.depth ?? existing?.depth,
     seldepth: info.seldepth ?? existing?.seldepth,
@@ -158,7 +167,7 @@ export function applyInfoLine(
 export function sortedLines(
   linesByMultipv: Map<number, PrincipalVariation>,
 ): PrincipalVariation[] {
-  return [...linesByMultipv.values()].sort((a, b) => a.multipv - b.multipv);
+  return [...linesByMultipv.values()].toSorted((a, b) => a.multipv - b.multipv);
 }
 
 export function sideToMoveFromFen(fen: string): SideToMove {

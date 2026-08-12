@@ -6,8 +6,7 @@ import {
 } from "@/domain/analysis/projected-lines";
 import type { AnalysisEvidence } from "@/domain/analysis/types";
 
-const START =
-  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+const START = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 describe("projectUciLine", () => {
   it("validates and caps plies", () => {

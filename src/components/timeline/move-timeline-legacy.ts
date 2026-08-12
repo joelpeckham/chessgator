@@ -1,9 +1,9 @@
 import {
+  type GameNode,
+  type GameTree,
   getAncestors,
   getNode,
   listMainlineChild,
-  type GameNode,
-  type GameTree,
 } from "@/domain/game";
 
 export type TimelineEntry = {

@@ -35,10 +35,11 @@ export function squareToIndex(square: string): number {
 }
 
 export function indexToSquare(index: number): string {
-  if (index < 0 || index > 63) throw new Error(`Invalid square index: ${index}`);
+  if (index < 0 || index > 63)
+    throw new Error(`Invalid square index: ${index}`);
   const file = index % 8;
   const rank = Math.floor(index / 8);
-  return `${FILES[file]}${rank + 1}`;
+  return `${FILES.charAt(file)}${String(rank + 1)}`;
 }
 
 /** Mirror a square vertically (rank ↔ 9-rank), matching upstream `mirror_square`. */
@@ -64,7 +65,10 @@ type ColoredPiece = { type: string; color: "w" | "b" };
  * vertical flip + color swap. Castling/ep are unused by piece-only tokens.
  */
 function mirroredPieces(chess: Chess): Array<ColoredPiece | null> {
-  const out: Array<ColoredPiece | null> = Array.from({ length: 64 }, () => null);
+  const out: Array<ColoredPiece | null> = Array.from(
+    { length: 64 },
+    () => null,
+  );
   const board = chess.board(); // [rank8..rank1][file a..h]
 
   for (let rankFromTop = 0; rankFromTop < 8; rankFromTop++) {
@@ -84,7 +88,10 @@ function mirroredPieces(chess: Chess): Array<ColoredPiece | null> {
 }
 
 function piecesAsIs(chess: Chess): Array<ColoredPiece | null> {
-  const out: Array<ColoredPiece | null> = Array.from({ length: 64 }, () => null);
+  const out: Array<ColoredPiece | null> = Array.from(
+    { length: 64 },
+    () => null,
+  );
   const board = chess.board();
   for (let rankFromTop = 0; rankFromTop < 8; rankFromTop++) {
     const rank = 7 - rankFromTop;
