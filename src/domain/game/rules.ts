@@ -21,6 +21,26 @@ export function getTurn(fen: string): Color {
   return createChess(fen).turn();
 }
 
+/** Square of the given side's king, or null if the FEN is invalid / king missing. */
+export function findKingSquare(fen: string, color: Color): Square | null {
+  let chess: Chess;
+  try {
+    chess = createChess(fen);
+  } catch {
+    return null;
+  }
+  const board = chess.board();
+  for (let rank = 0; rank < 8; rank += 1) {
+    for (let file = 0; file < 8; file += 1) {
+      const piece = board[rank]?.[file];
+      if (piece?.type === "k" && piece.color === color) {
+        return `${String.fromCharCode(97 + file)}${8 - rank}` as Square;
+      }
+    }
+  }
+  return null;
+}
+
 export function isValidFen(fen: string): boolean {
   return validateFen(fen).ok;
 }
@@ -54,6 +74,26 @@ export function sanToUci(fen: string, san: string): string | null {
 export function uciToSan(fen: string, uci: string): string | null {
   const applied = tryApplyMove(fen, uci);
   return applied?.move.san ?? null;
+}
+
+/** Convert a UCI line to SAN, stopping at the first illegal ply. */
+export function lineUciToSan(
+  fen: string | null | undefined,
+  lineUci: readonly string[],
+): string {
+  if (!fen || lineUci.length === 0) return lineUci.join(" ");
+  const sans: string[] = [];
+  let cursor = fen;
+  for (const uci of lineUci) {
+    const applied = tryApplyMove(cursor, uci);
+    if (!applied) {
+      sans.push(uci);
+      break;
+    }
+    sans.push(applied.move.san);
+    cursor = applied.fenAfter;
+  }
+  return sans.join(" ");
 }
 
 export function parseUci(uci: string): {

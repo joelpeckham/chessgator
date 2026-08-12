@@ -6,6 +6,7 @@ export {
 export {
   createChess,
   DEFAULT_POSITION,
+  findKingSquare,
   getLegalMoves,
   getStatus,
   getStatusAlongPath,
@@ -13,6 +14,7 @@ export {
   isLegalMove,
   isValidFen,
   legalUciPrefix,
+  lineUciToSan,
   moveToUci,
   parseUci,
   replayMoves,
@@ -23,6 +25,10 @@ export {
   validateFen,
   validateLegalUci,
 } from "@/domain/game/rules";
+export {
+  normalizeSessionForResume,
+  sessionModeForTurn,
+} from "@/domain/game/session";
 export type { PlayMoveOnTreeOptions } from "@/domain/game/tree";
 export {
   createBootstrapTree,
@@ -56,7 +62,12 @@ export type {
   SessionState,
   Square,
 } from "@/domain/game/types";
-export { createSessionState } from "@/domain/game/types";
+export {
+  createSessionState,
+  HUMAN_COLOR,
+  isHumanTurn,
+  OPPONENT_COLOR,
+} from "@/domain/game/types";
 export type { VariationExplorerState } from "@/domain/game/variation";
 export {
   createVariationExplorer,

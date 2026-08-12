@@ -2,6 +2,14 @@ import type { Color, PieceSymbol, Square } from "chess.js";
 
 export type { Color, PieceSymbol, Square };
 
+/** v1: the human always plays White. Playing as Black is out of scope. */
+export const HUMAN_COLOR: Color = "w";
+export const OPPONENT_COLOR: Color = "b";
+
+export function isHumanTurn(turn: Color): boolean {
+  return turn === HUMAN_COLOR;
+}
+
 /** Input accepted by move-application helpers (object or UCI/SAN string). */
 export type MoveInput =
   | string
@@ -84,7 +92,6 @@ export type SessionMode =
 
 export type SessionState = {
   mode: SessionMode;
-  errorMessage: string | null;
   /** Optional override when the game ended by resignation rather than rules. */
   terminalReason: GameStatusReason | null;
 };
@@ -99,7 +106,6 @@ export function createSessionState(
 ): SessionState {
   return {
     mode,
-    errorMessage: null,
     terminalReason: null,
   };
 }

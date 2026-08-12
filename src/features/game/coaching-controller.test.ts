@@ -359,4 +359,31 @@ describe("coaching controller", () => {
     expect(coach.getState().phase).toBe("ready");
     await coach.dispose();
   });
+
+  it("drops a stale future projection after the node changes", async () => {
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const coach = createCoachingController({
+      createEngine: () => createSlowEngine(gate),
+    });
+    await coach.start();
+
+    const stale = coach.projectFuture({
+      fen: START,
+      gameNodeId: "node-old",
+    });
+    coach.clearFuture();
+    const next = coach.projectFuture({
+      fen: START,
+      gameNodeId: "node-new",
+    });
+    release();
+    await expect(stale).resolves.toBeNull();
+    await next;
+    expect(coach.getState().futureNodeId).toBe("node-new");
+    expect(coach.getState().futureLine).not.toBeNull();
+    await coach.dispose();
+  });
 });

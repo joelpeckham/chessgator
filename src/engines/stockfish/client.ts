@@ -1,8 +1,11 @@
-import type {
-  AnalysisEvidence,
-  AnalysisPriority,
-} from "@/domain/analysis/types";
+import type { AnalysisEvidence } from "@/domain/analysis/types";
+import {
+  type EngineJob,
+  EngineJobBook,
+  handshakeDispose,
+} from "@/engines/shared/engine-job-book";
 import { stockfishAssetWorkerUrl } from "@/engines/stockfish/assets";
+import { type AnalyzeOptions } from "@/engines/stockfish/ports";
 import type {
   StockfishWorkerRequest,
   StockfishWorkerResponse,
@@ -13,16 +16,7 @@ import {
   type StockfishTransport,
 } from "@/engines/stockfish/transport";
 
-export type AnalyzeOptions = {
-  requestId: string;
-  gameNodeId: string;
-  fen: string;
-  priority?: AnalysisPriority;
-  multipv?: number;
-  movetimeMs?: number;
-  /** Wall-clock timeout including queue wait; defaults to movetime + buffer. */
-  timeoutMs?: number;
-};
+export type { AnalyzeOptions } from "@/engines/stockfish/ports";
 
 export type StockfishClientOptions = {
   transport?: StockfishTransport;
@@ -36,16 +30,10 @@ export type StockfishClientOptions = {
   clearTimer?: (handle: unknown) => void;
 };
 
-type PendingJob = {
-  requestId: string;
-  gameNodeId: string;
+type PendingJob = EngineJob<AnalysisEvidence> & {
   fen: string;
   multipv: number;
   movetimeMs: number;
-  timeoutMs: number;
-  resolve: (evidence: AnalysisEvidence) => void;
-  reject: (error: Error) => void;
-  cancelled: boolean;
 };
 
 export type StockfishClientStatus =
@@ -68,15 +56,11 @@ export class StockfishClient {
   private readonly clearTimer: (handle: unknown) => void;
 
   private readonly queue = new PriorityQueue<PendingJob>();
-  private readonly pending = new Map<string, PendingJob>();
-  private readonly timeoutHandles = new Map<string, unknown>();
+  private readonly jobs: EngineJobBook<AnalysisEvidence, PendingJob>;
 
   private statusValue: StockfishClientStatus = "idle";
   private initPromise: Promise<void> | null = null;
   private unsubscribe: (() => void) | null = null;
-  private active: PendingJob | null = null;
-  private currentGameNodeId: string | null = null;
-  private generation = 0;
   private cancelInitialization: ((error: Error) => void) | null = null;
 
   constructor(options: StockfishClientOptions = {}) {
@@ -92,6 +76,23 @@ export class StockfishClient {
     this.unsubscribe = this.transport.subscribe((msg) =>
       this.onWorkerMessage(msg),
     );
+    this.jobs = new EngineJobBook({
+      setTimer: this.setTimer,
+      clearTimer: this.clearTimer,
+      removeFromQueue: (requestId) => {
+        this.queue.remove(requestId);
+      },
+      postCancel: (requestId) => {
+        this.post({ type: "cancel", requestId });
+      },
+      afterReleaseActive: () => {
+        this.pump();
+      },
+      cancelMessage: (requestId) => `Analysis cancelled: ${requestId}`,
+      timeoutMessage: (job) => `Analysis timed out after ${job.timeoutMs}ms`,
+      staleMessage: (gameNodeId, current) =>
+        `Stale analysis ignored for node ${gameNodeId} (current ${current})`,
+    });
   }
 
   status(): StockfishClientStatus {
@@ -100,7 +101,7 @@ export class StockfishClient {
 
   /** Mark which game node is "current" so stale results are ignored. */
   setCurrentGameNodeId(gameNodeId: string | null): void {
-    this.currentGameNodeId = gameNodeId;
+    this.jobs.setCurrentGameNodeId(gameNodeId);
   }
 
   async initialize(): Promise<void> {
@@ -112,7 +113,7 @@ export class StockfishClient {
 
     this.statusValue = "initializing";
     this.initPromise = new Promise<void>((resolve, reject) => {
-      const requestId = `init-${this.generation++}`;
+      const requestId = `init-${this.jobs.nextGeneration()}`;
       const resources: {
         timer?: unknown;
         unsubscribe: (() => void) | null;
@@ -178,7 +179,7 @@ export class StockfishClient {
     const timeoutMs = options.timeoutMs ?? movetimeMs + this.timeoutBufferMs;
 
     return new Promise<AnalysisEvidence>((resolve, reject) => {
-      if (this.pending.has(options.requestId)) {
+      if (this.jobs.pending.has(options.requestId)) {
         reject(new Error(`Duplicate requestId: ${options.requestId}`));
         return;
       }
@@ -195,14 +196,12 @@ export class StockfishClient {
         cancelled: false,
       };
 
-      this.pending.set(job.requestId, job);
+      this.jobs.track(job);
       this.queue.enqueue(job.requestId, options.priority ?? "background", job);
-
-      this.armTimeout(job);
       void this.initialize()
         .then(() => this.pump())
         .catch((err: unknown) => {
-          this.failJob(
+          this.jobs.fail(
             job,
             err instanceof Error ? err : new Error(String(err)),
           );
@@ -217,27 +216,12 @@ export class StockfishClient {
    * never overlap on the single-thread engine.
    */
   cancel(requestId: string): void {
-    const job = this.pending.get(requestId);
-    if (!job || job.cancelled) return;
-    job.cancelled = true;
-    this.queue.remove(requestId);
-
-    const isActive = this.active?.requestId === requestId;
-    if (isActive) {
-      this.post({ type: "cancel", requestId });
-    }
-
-    this.failJob(job, new Error(`Analysis cancelled: ${requestId}`), {
-      // Keep the active slot until the nested engine reports bestmove/cancelled.
-      releaseActive: !isActive,
-    });
+    this.jobs.cancel(requestId);
   }
 
   /** Cancel every pending/active job (e.g. on navigation). */
   cancelAll(): void {
-    for (const id of Array.from(this.pending.keys())) {
-      this.cancel(id);
-    }
+    this.jobs.cancelAll();
   }
 
   async dispose(): Promise<void> {
@@ -249,17 +233,18 @@ export class StockfishClient {
         "Stockfish initialization cancelled because the client was disposed",
       ),
     );
-    const requestId = `dispose-${this.generation++}`;
-    await new Promise<void>((resolve) => {
-      const timer = this.setTimer(() => resolve(), 1_000);
-      const off = this.transport.subscribe((msg) => {
-        if (msg.type === "disposed" && msg.requestId === requestId) {
-          this.clearTimer(timer);
-          off();
-          resolve();
-        }
-      });
-      this.post({ type: "dispose", requestId });
+    const requestId = `dispose-${this.jobs.nextGeneration()}`;
+    await handshakeDispose({
+      requestId,
+      postDispose: () => {
+        this.post({ type: "dispose", requestId });
+      },
+      subscribe: (listener) =>
+        this.transport.subscribe((msg) => {
+          listener(msg.type === "disposed" && msg.requestId === requestId);
+        }),
+      setTimer: this.setTimer,
+      clearTimer: this.clearTimer,
     });
     this.unsubscribe?.();
     this.unsubscribe = null;
@@ -277,7 +262,7 @@ export class StockfishClient {
   }
 
   private pump(): void {
-    if (this.statusValue !== "ready" || this.active) return;
+    if (this.statusValue !== "ready" || this.jobs.active) return;
     const next = this.queue.dequeue();
     if (!next) return;
     const job = next.payload;
@@ -285,7 +270,7 @@ export class StockfishClient {
       this.pump();
       return;
     }
-    this.active = job;
+    this.jobs.active = job;
     this.post({
       type: "analyze",
       requestId: job.requestId,
@@ -298,113 +283,16 @@ export class StockfishClient {
 
   private onWorkerMessage(msg: StockfishWorkerResponse): void {
     if (msg.type === "result") {
-      this.onResult(msg.requestId, msg.gameNodeId, msg.evidence);
+      const job = this.jobs.takeResult(msg.requestId, msg.gameNodeId);
+      job?.resolve(msg.evidence);
       return;
     }
     if (msg.type === "cancelled") {
-      const job = this.pending.get(msg.requestId);
-      if (job) {
-        this.failJob(job, new Error(`Analysis cancelled: ${msg.requestId}`));
-      } else {
-        this.releaseActive(msg.requestId);
-      }
+      this.jobs.handleCancelled(msg.requestId);
       return;
     }
     if (msg.type === "error") {
-      const job = this.pending.get(msg.requestId);
-      if (job) {
-        this.failJob(job, new Error(msg.message));
-      } else {
-        this.releaseActive(msg.requestId);
-      }
-    }
-  }
-
-  private onResult(
-    requestId: string,
-    gameNodeId: string,
-    evidence: AnalysisEvidence,
-  ): void {
-    const job = this.pending.get(requestId);
-
-    if (!job) {
-      // Already cancelled/timed out — free the engine slot and continue.
-      this.releaseActive(requestId);
-      return;
-    }
-
-    if (job.cancelled) {
-      this.failJob(job, new Error(`Analysis cancelled: ${requestId}`));
-      return;
-    }
-
-    if (
-      this.currentGameNodeId !== null &&
-      gameNodeId !== this.currentGameNodeId
-    ) {
-      this.failJob(
-        job,
-        new Error(
-          `Stale analysis ignored for node ${gameNodeId} (current ${this.currentGameNodeId})`,
-        ),
-      );
-      return;
-    }
-
-    this.clearTimeout(requestId);
-    this.pending.delete(requestId);
-    this.releaseActive(requestId);
-    job.resolve(evidence);
-  }
-
-  private armTimeout(job: PendingJob): void {
-    const handle = this.setTimer(() => {
-      if (!this.pending.has(job.requestId) || job.cancelled) return;
-      job.cancelled = true;
-      this.queue.remove(job.requestId);
-      const isActive = this.active?.requestId === job.requestId;
-      if (isActive) {
-        this.post({ type: "cancel", requestId: job.requestId });
-      }
-      this.failJob(
-        job,
-        new Error(`Analysis timed out after ${job.timeoutMs}ms`),
-        { releaseActive: !isActive },
-      );
-    }, job.timeoutMs);
-    this.timeoutHandles.set(job.requestId, handle);
-  }
-
-  private clearTimeout(requestId: string): void {
-    const handle = this.timeoutHandles.get(requestId);
-    if (handle !== undefined) {
-      this.clearTimer(handle);
-      this.timeoutHandles.delete(requestId);
-    }
-  }
-
-  private releaseActive(requestId: string): void {
-    if (this.active?.requestId === requestId) {
-      this.active = null;
-      this.pump();
-    }
-  }
-
-  private failJob(
-    job: PendingJob,
-    error: Error,
-    options: { releaseActive?: boolean } = {},
-  ): void {
-    const releaseActive = options.releaseActive ?? true;
-    if (!this.pending.has(job.requestId)) {
-      if (releaseActive) this.releaseActive(job.requestId);
-      return;
-    }
-    this.clearTimeout(job.requestId);
-    this.pending.delete(job.requestId);
-    job.reject(error);
-    if (releaseActive) {
-      this.releaseActive(job.requestId);
+      this.jobs.handleError(msg.requestId, msg.message);
     }
   }
 }

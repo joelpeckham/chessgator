@@ -10,6 +10,10 @@ export {
   type StockfishClientOptions,
   type StockfishClientStatus,
 } from "@/engines/stockfish/client";
+export type {
+  CreateAnalysisEngineFn,
+  StockfishClientLike,
+} from "@/engines/stockfish/ports";
 export {
   isStockfishWorkerResponse,
   type StockfishWorkerRequest,

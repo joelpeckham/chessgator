@@ -1,7 +1,7 @@
 "use client";
 
 import { AccessibleMoveSelect } from "@/components/board/accessible-move-select";
-import { MAIA_ELO_OPTIONS } from "@/components/controls/game-controls";
+import { MAIA_ELO_OPTIONS } from "@/components/game/maia-elo-options";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -21,6 +21,14 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import type { GameMove } from "@/domain/game";
 
+export type SettingsEngineStatus = {
+  message: string | null;
+  starting: boolean;
+  failed: boolean;
+  coachMessage: string | null;
+  onRetry: () => void;
+};
+
 export type SettingsSheetProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -29,11 +37,7 @@ export type SettingsSheetProps = {
   fen: string;
   canPlayMove: boolean;
   onSelectMove: (move: GameMove) => void;
-  engineMessage: string | null;
-  engineStarting: boolean;
-  engineFailed: boolean;
-  coachMessage: string | null;
-  onRetryEngines: () => void;
+  engine: SettingsEngineStatus;
   canResign: boolean;
   canRestart: boolean;
   onResign: () => void;
@@ -48,11 +52,7 @@ export function SettingsSheet({
   fen,
   canPlayMove,
   onSelectMove,
-  engineMessage,
-  engineStarting,
-  engineFailed,
-  coachMessage,
-  onRetryEngines,
+  engine,
   canResign,
   canRestart,
   onResign,
@@ -85,7 +85,7 @@ export function SettingsSheet({
               onValueChange={(value) => {
                 if (value != null) onMaiaEloChange(Number(value));
               }}
-              disabled={engineStarting}
+              disabled={engine.starting}
             >
               <SelectTrigger id="maia-elo" data-testid="maia-elo-select">
                 <SelectValue />
@@ -106,25 +106,27 @@ export function SettingsSheet({
             </h3>
             <div className="rounded-xl bg-muted/50 p-3 text-sm">
               <div className="flex items-start gap-2">
-                {engineStarting ? <Spinner className="mt-0.5" /> : null}
+                {engine.starting ? <Spinner className="mt-0.5" /> : null}
                 <div className="flex min-w-0 flex-col gap-1">
                   <p data-testid="engine-status-message">
-                    {engineMessage ??
-                      (engineFailed
+                    {engine.message ??
+                      (engine.failed
                         ? "Opponent engine failed"
                         : "Engines ready")}
                   </p>
-                  {coachMessage ? (
-                    <p className="text-xs text-destructive">{coachMessage}</p>
+                  {engine.coachMessage ? (
+                    <p className="text-xs text-destructive">
+                      {engine.coachMessage}
+                    </p>
                   ) : null}
                 </div>
               </div>
-              {engineFailed ? (
+              {engine.failed ? (
                 <Button
                   type="button"
                   size="sm"
                   className="mt-3"
-                  onClick={onRetryEngines}
+                  onClick={engine.onRetry}
                   data-testid="retry-engines-button"
                 >
                   Retry engines
@@ -148,7 +150,7 @@ export function SettingsSheet({
               type="button"
               variant="outline"
               onClick={onRestart}
-              disabled={!canRestart || engineStarting}
+              disabled={!canRestart || engine.starting}
               data-testid="restart-button"
             >
               New game
@@ -157,7 +159,7 @@ export function SettingsSheet({
               type="button"
               variant="destructive"
               onClick={onResign}
-              disabled={!canResign || engineStarting}
+              disabled={!canResign || engine.starting}
               data-testid="resign-button"
             >
               Resign

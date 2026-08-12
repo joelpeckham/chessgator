@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { PROMOTION_PIECES } from "@/components/board/move-utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +36,8 @@ export function PromotionDialog({
   onChoose,
   onCancel,
 }: PromotionDialogProps) {
+  const queenButton = useRef<HTMLButtonElement>(null);
+
   return (
     <Dialog
       open={open}
@@ -46,6 +49,7 @@ export function PromotionDialog({
         showCloseButton={false}
         className="sm:max-w-sm"
         data-testid="promotion-dialog"
+        initialFocus={queenButton}
       >
         <DialogHeader>
           <DialogTitle>Choose promotion</DialogTitle>
@@ -57,6 +61,7 @@ export function PromotionDialog({
           {PROMOTION_PIECES.map((piece) => (
             <Button
               key={piece}
+              ref={piece === "q" ? queenButton : undefined}
               type="button"
               variant={piece === "q" ? "default" : "outline"}
               onClick={() => onChoose(piece)}

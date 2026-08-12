@@ -1,13 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import {
-  createInitialTree,
-  createSessionState,
-  playMoveOnTree,
-} from "@/domain/game";
-import {
-  normalizeSessionForResume,
-  useGameStore,
-} from "@/features/game/game-store";
+import { useGameStore } from "@/features/game/game-store";
 import { createLocalStorageGameRepository } from "@/storage";
 
 function memoryStorage() {
@@ -67,8 +59,21 @@ describe("game store adapter", () => {
     ).toBe(true);
     const state = useGameStore.getState();
     expect(state.session.mode).toBe("error");
-    expect(state.session.errorMessage).toBeNull();
     expect(state.lastError).toBe("Engines failed to start");
+  });
+
+  it("resumePlay after error restores the side to move", () => {
+    useGameStore.getState().startGame();
+    useGameStore.getState().playMove("e2e4");
+    useGameStore.getState().setMode("error", "Maia failed to move");
+    useGameStore.getState().resumePlay();
+    expect(useGameStore.getState().session.mode).toBe("opponentThinking");
+    expect(useGameStore.getState().lastError).toBeNull();
+
+    useGameStore.getState().playMove("e7e5");
+    useGameStore.getState().setMode("error", "Maia failed to start");
+    useGameStore.getState().resumePlay();
+    expect(useGameStore.getState().session.mode).toBe("playerTurn");
   });
 
   it("clamps Maia Elo preferences to the supported ladder", () => {
@@ -114,15 +119,5 @@ describe("game store adapter", () => {
     expect(await useGameStore.getState().hydrate(repo)).toBe(true);
     expect(useGameStore.getState().session.mode).toBe("gameOver");
     expect(useGameStore.getState().session.terminalReason).toBe("resignation");
-  });
-
-  it("normalizes transient modes on resume", () => {
-    let tree = createInitialTree();
-    tree = playMoveOnTree(tree, tree.rootId, "e2e4")!.tree;
-    const normalized = normalizeSessionForResume({
-      tree,
-      session: createSessionState("analyzing"),
-    });
-    expect(normalized.session.mode).toBe("reviewing");
   });
 });

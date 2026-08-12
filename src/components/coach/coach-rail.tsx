@@ -2,13 +2,12 @@
 
 import { RiArrowUpSLine, RiCloseLine } from "@remixicon/react";
 import { useEffect, useRef } from "react";
+import { ClassificationBadge } from "@/components/coach/classification-badge";
 import { HintLadder } from "@/components/coach/hint-ladder";
 import { TeachingCard } from "@/components/coach/teaching-card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import type { HintStep, TeachingInsight } from "@/domain/teaching";
-import { classificationLabel } from "@/domain/teaching";
 import { cn } from "@/lib/utils";
 
 /** Fixed coach rail height — always reserved so the board never shifts. */
@@ -19,7 +18,6 @@ export type CoachRailProps = {
   onExpandedChange: (expanded: boolean) => void;
   insight: TeachingInsight | null;
   analyzing: boolean;
-  dismissed: boolean;
   canTakebackRetry: boolean;
   onTakebackRetry: () => void;
   onTrySuggested?: () => void;
@@ -60,7 +58,6 @@ export function CoachRail({
   onExpandedChange,
   insight,
   analyzing,
-  dismissed,
   canTakebackRetry,
   onTakebackRetry,
   onTrySuggested,
@@ -75,12 +72,16 @@ export function CoachRail({
 }: CoachRailProps) {
   const expandButtonRef = useRef<HTMLButtonElement>(null);
 
-  const visibleInsight = dismissed ? null : insight;
   const stripMode = deriveStripMode({
     analyzing,
-    insight: visibleInsight,
+    insight,
     hint,
   });
+
+  function requestHintAndExpand(): void {
+    onRequestHint();
+    onExpandedChange(true);
+  }
 
   function collapse(): void {
     onExpandedChange(false);
@@ -103,8 +104,8 @@ export function CoachRail({
   const summary =
     stripMode === "analyzing"
       ? "Analyzing your move…"
-      : stripMode === "feedback" && visibleInsight
-        ? visibleInsight.explanation
+      : stripMode === "feedback" && insight
+        ? insight.explanation
         : stripMode === "hints" && hint
           ? hint.question
           : "Feedback after your move";
@@ -129,20 +130,12 @@ export function CoachRail({
       >
         {stripMode === "analyzing" ? (
           <Spinner className="size-3.5 shrink-0" />
-        ) : stripMode === "feedback" && visibleInsight ? (
-          <Badge
-            variant={
-              visibleInsight.autoExpand
-                ? "destructive"
-                : visibleInsight.classification === "best"
-                  ? "default"
-                  : "secondary"
-            }
+        ) : stripMode === "feedback" && insight ? (
+          <ClassificationBadge
+            insight={insight}
             className="shrink-0"
-            data-testid="classification-badge-strip"
-          >
-            {classificationLabel(visibleInsight.classification)}
-          </Badge>
+            testId="classification-badge-strip"
+          />
         ) : (
           <span className="shrink-0 text-xs font-medium text-muted-foreground">
             Coach
@@ -159,10 +152,7 @@ export function CoachRail({
               hint={hint}
               fen={hintFen}
               disabled={hintDisabled}
-              onRequestHint={() => {
-                onRequestHint();
-                onExpandedChange(true);
-              }}
+              onRequestHint={requestHintAndExpand}
               compact
             />
           ) : null}
@@ -233,7 +223,7 @@ export function CoachRail({
               <RiCloseLine />
             </Button>
             <TeachingCard
-              insight={visibleInsight}
+              insight={insight}
               analyzing={analyzing}
               canTakebackRetry={canTakebackRetry}
               onTakebackRetry={onTakebackRetry}
@@ -242,10 +232,7 @@ export function CoachRail({
               hintDisabled={hintDisabled}
               hintFen={hintFen}
               showTutorLaneHint={showTutorLaneHint}
-              onRequestHint={() => {
-                onRequestHint();
-                onExpandedChange(true);
-              }}
+              onRequestHint={requestHintAndExpand}
             />
           </div>
         </div>

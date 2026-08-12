@@ -1,8 +1,4 @@
-import type {
-  AnalysisEvidence,
-  EvaluationScore,
-  PrincipalVariation,
-} from "@/domain/analysis/types";
+import type { AnalysisEvidence } from "@/domain/analysis/types";
 
 /** Typed messages between the main-thread client and `stockfish-worker`. */
 
@@ -43,14 +39,6 @@ export type StockfishReadyResponse = {
   requestId: string;
 };
 
-export type StockfishProgressResponse = {
-  type: "progress";
-  requestId: string;
-  gameNodeId: string;
-  lines: PrincipalVariation[];
-  score: EvaluationScore;
-};
-
 export type StockfishResultResponse = {
   type: "result";
   requestId: string;
@@ -76,7 +64,6 @@ export type StockfishDisposedResponse = {
 
 export type StockfishWorkerResponse =
   | StockfishReadyResponse
-  | StockfishProgressResponse
   | StockfishResultResponse
   | StockfishCancelledResponse
   | StockfishErrorResponse
@@ -89,7 +76,6 @@ export function isStockfishWorkerResponse(
   const type = (value as { type?: unknown }).type;
   return (
     type === "ready" ||
-    type === "progress" ||
     type === "result" ||
     type === "cancelled" ||
     type === "error" ||

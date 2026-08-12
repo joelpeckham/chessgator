@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { Chessboard } from "react-chessboard";
 import { cn } from "@/lib/utils";
 
@@ -16,24 +15,21 @@ export function BoardPreview({
   san = null,
   className,
 }: BoardPreviewProps) {
-  const options = useMemo(
-    () => ({
-      id: `preview-${fen.slice(0, 24)}`,
-      position: fen,
-      boardOrientation: "white" as const,
-      allowDragging: false,
-      showAnimations: false,
-      allowDrawingArrows: false,
-      showNotation: false,
-      boardStyle: {
-        borderRadius: "var(--radius)",
-        width: "100%",
-      },
-      darkSquareStyle: { backgroundColor: "var(--board-dark)" },
-      lightSquareStyle: { backgroundColor: "var(--board-light)" },
-    }),
-    [fen],
-  );
+  const options = {
+    id: `preview-${fen.slice(0, 24)}`,
+    position: fen,
+    boardOrientation: "white" as const,
+    allowDragging: false,
+    showAnimations: false,
+    allowDrawingArrows: false,
+    showNotation: false,
+    boardStyle: {
+      borderRadius: "var(--radius)",
+      width: "100%",
+    },
+    darkSquareStyle: { backgroundColor: "var(--board-dark)" },
+    lightSquareStyle: { backgroundColor: "var(--board-light)" },
+  };
 
   return (
     <div

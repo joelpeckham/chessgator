@@ -1,18 +1,10 @@
 import type { AnalysisEvidence } from "@/domain/analysis/types";
-import type { AnalyzeOptions } from "@/engines/stockfish";
+import type { StockfishClientLike } from "@/engines/stockfish/ports";
 
-/** Minimal StockfishClient surface used by coaching (and e2e stubs). */
-export type StockfishClientLike = {
-  status: () => string;
-  initialize: () => Promise<void>;
-  analyze: (options: AnalyzeOptions) => Promise<AnalysisEvidence>;
-  cancel: (requestId: string) => void;
-  cancelAll: () => void;
-  setCurrentGameNodeId: (gameNodeId: string | null) => void;
-  dispose: () => Promise<void>;
-};
-
-export type CreateAnalysisEngineFn = () => StockfishClientLike;
+export type {
+  CreateAnalysisEngineFn,
+  StockfishClientLike,
+} from "@/engines/stockfish/ports";
 
 export type StubAnalysisScript = {
   /** Match by fen prefix or exact fen. */

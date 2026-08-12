@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   DEFAULT_POSITION,
+  findKingSquare,
   getLegalMoves,
   getStatus,
   getStatusAlongPath,
   isLegalMove,
+  lineUciToSan,
   moveToUci,
   parseUci,
   sanToUci,
@@ -25,6 +27,9 @@ describe("rules wrapper", () => {
   it("converts between SAN and UCI", () => {
     expect(sanToUci(DEFAULT_POSITION, "e4")).toBe("e2e4");
     expect(uciToSan(DEFAULT_POSITION, "e2e4")).toBe("e4");
+    expect(lineUciToSan(DEFAULT_POSITION, ["e2e4", "e7e5", "g1f3"])).toBe(
+      "e4 e5 Nf3",
+    );
     expect(parseUci("e7e8q")).toEqual({
       from: "e7",
       to: "e8",
@@ -92,5 +97,11 @@ describe("rules wrapper", () => {
 
   it("builds UCI from move fields", () => {
     expect(moveToUci({ from: "e7", to: "e8", promotion: "n" })).toBe("e7e8n");
+  });
+
+  it("finds the king square from a FEN", () => {
+    expect(findKingSquare(DEFAULT_POSITION, "w")).toBe("e1");
+    expect(findKingSquare(DEFAULT_POSITION, "b")).toBe("e8");
+    expect(findKingSquare("not-a-fen", "w")).toBeNull();
   });
 });

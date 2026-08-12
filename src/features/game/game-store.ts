@@ -14,9 +14,11 @@ import {
   getStatusAtNode,
   jumpToNode,
   type MoveInput,
+  normalizeSessionForResume,
   playMoveOnTree,
   type SessionMode,
   type SessionState,
+  sessionModeForTurn,
   takebackOne,
 } from "@/domain/game";
 import {
@@ -65,45 +67,6 @@ export type GameStoreState = {
   clearPersisted: (repository?: GameRepository) => Promise<void>;
 };
 
-/**
- * Drop transient engine/UI modes on reload. Workers and pending jobs are never
- * serialized — resume into reviewing / gameOver / playerTurn only.
- */
-export function normalizeSessionForResume(game: GameSession): GameSession {
-  const status = getStatusAtNode(game.tree, game.tree.currentNodeId);
-  if (status.isGameOver || game.session.mode === "gameOver") {
-    return {
-      tree: game.tree,
-      session: {
-        mode: "gameOver",
-        errorMessage: null,
-        terminalReason: game.session.terminalReason ?? status.reason,
-      },
-    };
-  }
-
-  const hasMoves = Object.keys(game.tree.nodes).length > 1;
-  if (!hasMoves) {
-    return {
-      tree: game.tree,
-      session: {
-        mode: "loading",
-        errorMessage: null,
-        terminalReason: null,
-      },
-    };
-  }
-
-  return {
-    tree: game.tree,
-    session: {
-      mode: "reviewing",
-      errorMessage: null,
-      terminalReason: null,
-    },
-  };
-}
-
 const defaultPreferences: GameStorePreferences = {
   maiaElo: 1500,
 };
@@ -129,7 +92,6 @@ function sessionState(
 ): SessionState {
   return {
     mode,
-    errorMessage: null,
     terminalReason,
   };
 }
@@ -177,10 +139,8 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       });
       return;
     }
-    const mode: SessionMode =
-      status.turn === "w" ? "playerTurn" : "opponentThinking";
     set({
-      session: sessionState(mode),
+      session: sessionState(sessionModeForTurn(status.turn)),
       lastError: null,
     });
   },
@@ -285,14 +245,11 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       return false;
     }
 
-    // v1: human plays White.
     const status = getStatusAtNode(nextTree, nextTree.currentNodeId);
-    const mode: SessionMode =
-      status.turn === "w" ? "playerTurn" : "opponentThinking";
 
     set({
       tree: nextTree,
-      session: sessionState(mode),
+      session: sessionState(sessionModeForTurn(status.turn)),
       lastError: null,
     });
     return true;
@@ -326,7 +283,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       session: sessionState(mode, terminalReason),
       lastError:
         mode === "error"
-          ? (errorMessage ?? prev.errorMessage ?? "Unknown error")
+          ? (errorMessage ?? get().lastError ?? "Unknown error")
           : null,
     });
     return true;
@@ -365,7 +322,6 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
           : createSessionState("reviewing"),
       };
       const game = normalizeSessionForResume(baseSession);
-      getStatusAtNode(game.tree, game.tree.currentNodeId);
       set({
         tree: game.tree,
         session: game.session,

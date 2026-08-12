@@ -67,12 +67,9 @@ describe("Maia encoding / mirroring", () => {
     expect(fromVocabUci(fen, "e2e4")).toBe("e7e5");
   });
 
-  it("accepts optional history without changing browser-export tokens", () => {
+  it("encodes browser-export tokens as a 64x12 plane", () => {
     const a = encodeTokensForBrowserExport(DEFAULT_POSITION);
-    const b = encodeTokensForBrowserExport(DEFAULT_POSITION, [
-      DEFAULT_POSITION,
-    ]);
     expect(a.dims).toEqual([1, 64, 12]);
-    expect(Array.from(a.tokens)).toEqual(Array.from(b.tokens));
+    expect(a.tokens).toHaveLength(64 * 12);
   });
 });

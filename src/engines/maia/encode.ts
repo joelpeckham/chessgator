@@ -129,14 +129,14 @@ export function tokenizeFen(fen: string): Float32Array {
 
 /**
  * Encode tokens for the browser ONNX export: shape [1, 64, 12].
- * Optional `historyFens` is accepted for API forward-compat but ignored —
- * the published export repeats the current board internally.
+ * The published export repeats the current board internally (no history planes).
+ * If a later ONNX layout adds history, keep encoding here rather than on the
+ * public infer request — callers should not assume Maia consumes prior FENs.
  */
-export function encodeTokensForBrowserExport(
-  fen: string,
-  _historyFens?: readonly string[],
-): { tokens: Float32Array; dims: [number, number, number] } {
-  void _historyFens;
+export function encodeTokensForBrowserExport(fen: string): {
+  tokens: Float32Array;
+  dims: [number, number, number];
+} {
   const tokens = tokenizeFen(fen);
   return { tokens, dims: [1, 64, 12] };
 }

@@ -1,11 +1,10 @@
 "use client";
 
+import { ClassificationBadge } from "@/components/coach/classification-badge";
 import { HintLadder } from "@/components/coach/hint-ladder";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import type { HintStep, TeachingInsight } from "@/domain/teaching";
-import { classificationLabel } from "@/domain/teaching";
 
 export type TeachingCardProps = {
   insight: TeachingInsight | null;
@@ -37,6 +36,16 @@ export function TeachingCard({
   hintFen = null,
   showTutorLaneHint = false,
 }: TeachingCardProps) {
+  const showHints = Boolean(onRequestHint) || Boolean(hint);
+  const hintLadder = showHints ? (
+    <HintLadder
+      hint={hint}
+      fen={hintFen}
+      disabled={hintDisabled || !onRequestHint}
+      onRequestHint={onRequestHint ?? (() => undefined)}
+    />
+  ) : null;
+
   if (analyzing) {
     return (
       <div
@@ -76,14 +85,7 @@ export function TeachingCard({
             </p>
           </div>
         </div>
-        {onRequestHint ? (
-          <HintLadder
-            hint={hint}
-            fen={hintFen}
-            disabled={hintDisabled}
-            onRequestHint={onRequestHint}
-          />
-        ) : null}
+        {hintLadder}
       </div>
     );
   }
@@ -102,18 +104,7 @@ export function TeachingCard({
         <h3 id="coach-expanded-title" className="text-sm font-medium">
           Coach
         </h3>
-        <Badge
-          variant={
-            insight.autoExpand
-              ? "destructive"
-              : insight.classification === "best"
-                ? "default"
-                : "secondary"
-          }
-          data-testid="classification-badge"
-        >
-          {classificationLabel(insight.classification)}
-        </Badge>
+        <ClassificationBadge insight={insight} testId="classification-badge" />
       </div>
       <p className="text-sm text-pretty" data-testid="teaching-explanation">
         {insight.explanation}
@@ -132,21 +123,7 @@ export function TeachingCard({
           Alternate line shown on the timeline (dashed diamond).
         </p>
       ) : null}
-      {onRequestHint ? (
-        <HintLadder
-          hint={hint}
-          fen={hintFen}
-          disabled={hintDisabled}
-          onRequestHint={onRequestHint}
-        />
-      ) : hint ? (
-        <HintLadder
-          hint={hint}
-          fen={hintFen}
-          disabled
-          onRequestHint={() => undefined}
-        />
-      ) : null}
+      {hintLadder}
       <div className="flex flex-wrap gap-1.5 pt-0.5">
         {onTrySuggested && insight.suggestedMoveUci ? (
           <Button

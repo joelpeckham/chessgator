@@ -14,8 +14,6 @@ export type MaiaInferRequest = {
   requestId: string;
   gameNodeId: string;
   fen: string;
-  /** Optional history FENs (oldest first); ignored by the browser export. */
-  historyFens?: string[];
   selfElo: number;
   oppoElo: number;
   temperature: number;

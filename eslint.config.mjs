@@ -199,6 +199,8 @@ const eslintConfig = defineConfig([
     // Flags mutated by async worker/event handlers; TS control-flow is wrong.
     files: [
       "src/workers/**/*.{ts,tsx}",
+      "src/engines/stockfish/worker-runtime.ts",
+      "src/engines/maia/worker-runtime.ts",
       "src/features/game/coaching-controller.ts",
       "src/features/game/maia-session.ts",
     ],

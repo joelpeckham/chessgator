@@ -1,8 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { tryApplyMove } from "@/domain/game/rules";
+import { lineUciToSan } from "@/domain/game";
 import type { HintStep } from "@/domain/teaching";
 
 export type HintLadderProps = {
@@ -22,22 +21,6 @@ function nextHintLabel(level: number): string {
   return "Hints maxed";
 }
 
-function lineToSan(fen: string | null | undefined, lineUci: string[]): string {
-  if (!fen || lineUci.length === 0) return lineUci.join(" ");
-  const sans: string[] = [];
-  let cursor = fen;
-  for (const uci of lineUci) {
-    const applied = tryApplyMove(cursor, uci);
-    if (!applied) {
-      sans.push(uci);
-      break;
-    }
-    sans.push(applied.move.san);
-    cursor = applied.fenAfter;
-  }
-  return sans.join(" ");
-}
-
 /**
  * Progressive hint ladder: question → squares → candidate → short line.
  */
@@ -50,10 +33,8 @@ export function HintLadder({
 }: HintLadderProps) {
   const level = hint?.level ?? -1;
   const nextLabel = nextHintLabel(level);
-  const lineSan = useMemo(
-    () => (hint && hint.level >= 3 ? lineToSan(fen, hint.lineUci) : ""),
-    [fen, hint],
-  );
+  const lineSan =
+    hint && hint.level >= 3 ? lineUciToSan(fen, hint.lineUci) : "";
 
   if (compact) {
     return (

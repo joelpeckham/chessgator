@@ -8,12 +8,16 @@ import {
   createDefaultMaiaTransport,
   type MaiaTransport,
 } from "@/engines/maia/transport";
+import {
+  type EngineJob,
+  EngineJobBook,
+  handshakeDispose,
+} from "@/engines/shared/engine-job-book";
 
 export type MaiaInferOptions = {
   requestId: string;
   gameNodeId: string;
   fen: string;
-  historyFens?: string[];
   selfElo?: number;
   oppoElo?: number;
   temperature?: number;
@@ -52,19 +56,12 @@ export type MaiaClientStatus =
   | "failed"
   | "disposed";
 
-type PendingJob = {
-  requestId: string;
-  gameNodeId: string;
+type PendingJob = EngineJob<MaiaInferResult> & {
   fen: string;
-  historyFens?: string[];
   selfElo: number;
   oppoElo: number;
   temperature: number;
   topP: number;
-  timeoutMs: number;
-  resolve: (result: MaiaInferResult) => void;
-  reject: (error: Error) => void;
-  cancelled: boolean;
 };
 
 /**
@@ -83,16 +80,12 @@ export class MaiaClient {
   private readonly setTimer: (fn: () => void, ms: number) => unknown;
   private readonly clearTimer: (handle: unknown) => void;
 
-  private readonly pending = new Map<string, PendingJob>();
   private readonly queue: PendingJob[] = [];
-  private readonly timeoutHandles = new Map<string, unknown>();
+  private readonly jobs: EngineJobBook<MaiaInferResult, PendingJob>;
 
   private statusValue: MaiaClientStatus = "idle";
   private initPromise: Promise<void> | null = null;
   private unsubscribe: (() => void) | null = null;
-  private active: PendingJob | null = null;
-  private currentGameNodeId: string | null = null;
-  private generation = 0;
   private executionProvider: "webgpu" | "wasm" | null = null;
   private cancelInitialization: ((error: Error) => void) | null = null;
 
@@ -113,6 +106,24 @@ export class MaiaClient {
     this.unsubscribe = this.transport.subscribe((msg) =>
       this.onWorkerMessage(msg),
     );
+    this.jobs = new EngineJobBook({
+      setTimer: this.setTimer,
+      clearTimer: this.clearTimer,
+      removeFromQueue: (requestId) => {
+        const idx = this.queue.findIndex((j) => j.requestId === requestId);
+        if (idx >= 0) this.queue.splice(idx, 1);
+      },
+      postCancel: (requestId) => {
+        this.post({ type: "cancel", requestId });
+      },
+      afterReleaseActive: () => {
+        this.pump();
+      },
+      cancelMessage: (requestId) => `Inference cancelled: ${requestId}`,
+      timeoutMessage: (job) => `Inference timed out after ${job.timeoutMs}ms`,
+      staleMessage: (gameNodeId, current) =>
+        `Stale inference ignored for node ${gameNodeId} (current ${current})`,
+    });
   }
 
   status(): MaiaClientStatus {
@@ -125,7 +136,7 @@ export class MaiaClient {
 
   /** Mark which game node is "current" so stale results are ignored. */
   setCurrentGameNodeId(gameNodeId: string | null): void {
-    this.currentGameNodeId = gameNodeId;
+    this.jobs.setCurrentGameNodeId(gameNodeId);
   }
 
   async initialize(): Promise<void> {
@@ -137,7 +148,7 @@ export class MaiaClient {
 
     this.statusValue = "downloading";
     this.initPromise = new Promise<void>((resolve, reject) => {
-      const requestId = `init-${this.generation++}`;
+      const requestId = `init-${this.jobs.nextGeneration()}`;
       const resources: {
         timer?: unknown;
         unsubscribe: (() => void) | null;
@@ -213,7 +224,7 @@ export class MaiaClient {
     const timeoutMs = options.timeoutMs ?? this.timeoutBufferMs;
 
     return new Promise<MaiaInferResult>((resolve, reject) => {
-      if (this.pending.has(options.requestId)) {
+      if (this.jobs.pending.has(options.requestId)) {
         reject(new Error(`Duplicate requestId: ${options.requestId}`));
         return;
       }
@@ -222,7 +233,6 @@ export class MaiaClient {
         requestId: options.requestId,
         gameNodeId: options.gameNodeId,
         fen: options.fen,
-        historyFens: options.historyFens,
         selfElo: options.selfElo ?? this.defaultSelfElo,
         oppoElo: options.oppoElo ?? this.defaultOppoElo,
         temperature: options.temperature ?? this.defaultTemperature,
@@ -233,13 +243,12 @@ export class MaiaClient {
         cancelled: false,
       };
 
-      this.pending.set(job.requestId, job);
+      this.jobs.track(job);
       this.queue.push(job);
-      this.armTimeout(job);
       void this.initialize()
         .then(() => this.pump())
         .catch((err: unknown) => {
-          this.failJob(
+          this.jobs.fail(
             job,
             err instanceof Error ? err : new Error(String(err)),
           );
@@ -248,25 +257,11 @@ export class MaiaClient {
   }
 
   cancel(requestId: string): void {
-    const job = this.pending.get(requestId);
-    if (!job || job.cancelled) return;
-    job.cancelled = true;
-    this.removeFromQueue(requestId);
-
-    const isActive = this.active?.requestId === requestId;
-    if (isActive) {
-      this.post({ type: "cancel", requestId });
-    }
-
-    this.failJob(job, new Error(`Inference cancelled: ${requestId}`), {
-      releaseActive: !isActive,
-    });
+    this.jobs.cancel(requestId);
   }
 
   cancelAll(): void {
-    for (const id of Array.from(this.pending.keys())) {
-      this.cancel(id);
-    }
+    this.jobs.cancelAll();
   }
 
   async dispose(): Promise<void> {
@@ -278,17 +273,18 @@ export class MaiaClient {
         "Maia initialization cancelled because the client was disposed",
       ),
     );
-    const requestId = `dispose-${this.generation++}`;
-    await new Promise<void>((resolve) => {
-      const timer = this.setTimer(() => resolve(), 1_000);
-      const off = this.transport.subscribe((msg) => {
-        if (msg.type === "disposed" && msg.requestId === requestId) {
-          this.clearTimer(timer);
-          off();
-          resolve();
-        }
-      });
-      this.post({ type: "dispose", requestId });
+    const requestId = `dispose-${this.jobs.nextGeneration()}`;
+    await handshakeDispose({
+      requestId,
+      postDispose: () => {
+        this.post({ type: "dispose", requestId });
+      },
+      subscribe: (listener) =>
+        this.transport.subscribe((msg) => {
+          listener(msg.type === "disposed" && msg.requestId === requestId);
+        }),
+      setTimer: this.setTimer,
+      clearTimer: this.clearTimer,
     });
     this.unsubscribe?.();
     this.unsubscribe = null;
@@ -304,26 +300,20 @@ export class MaiaClient {
     this.transport.postMessage(message);
   }
 
-  private removeFromQueue(requestId: string): void {
-    const idx = this.queue.findIndex((j) => j.requestId === requestId);
-    if (idx >= 0) this.queue.splice(idx, 1);
-  }
-
   private pump(): void {
-    if (this.statusValue !== "ready" || this.active) return;
+    if (this.statusValue !== "ready" || this.jobs.active) return;
     const next = this.queue.shift();
     if (!next) return;
     if (next.cancelled) {
       this.pump();
       return;
     }
-    this.active = next;
+    this.jobs.active = next;
     this.post({
       type: "infer",
       requestId: next.requestId,
       gameNodeId: next.gameNodeId,
       fen: next.fen,
-      historyFens: next.historyFens,
       selfElo: next.selfElo,
       oppoElo: next.oppoElo,
       temperature: next.temperature,
@@ -333,119 +323,29 @@ export class MaiaClient {
 
   private onWorkerMessage(msg: MaiaWorkerResponse): void {
     if (msg.type === "result") {
-      this.onResult(msg);
+      const job = this.jobs.takeResult(msg.requestId, msg.gameNodeId);
+      job?.resolve({
+        requestId: msg.requestId,
+        gameNodeId: msg.gameNodeId,
+        moveUci: msg.moveUci,
+        candidates: msg.candidates,
+        value: msg.value,
+      });
       return;
     }
     if (msg.type === "cancelled") {
-      const job = this.pending.get(msg.requestId);
-      if (job) {
-        this.failJob(job, new Error(`Inference cancelled: ${msg.requestId}`));
-      } else {
-        this.releaseActive(msg.requestId);
-      }
+      this.jobs.handleCancelled(msg.requestId);
       return;
     }
     if (msg.type === "error") {
-      const job = this.pending.get(msg.requestId);
-      if (job) {
-        this.failJob(job, new Error(msg.message));
-      } else if (
+      const handled = this.jobs.handleError(msg.requestId, msg.message);
+      if (
+        !handled &&
         this.statusValue !== "ready" &&
         this.statusValue !== "disposed"
       ) {
         this.statusValue = "failed";
-      } else {
-        this.releaseActive(msg.requestId);
       }
-    }
-  }
-
-  private onResult(msg: Extract<MaiaWorkerResponse, { type: "result" }>): void {
-    const job = this.pending.get(msg.requestId);
-
-    if (!job) {
-      this.releaseActive(msg.requestId);
-      return;
-    }
-
-    if (job.cancelled) {
-      this.failJob(job, new Error(`Inference cancelled: ${msg.requestId}`));
-      return;
-    }
-
-    if (
-      this.currentGameNodeId !== null &&
-      msg.gameNodeId !== this.currentGameNodeId
-    ) {
-      this.failJob(
-        job,
-        new Error(
-          `Stale inference ignored for node ${msg.gameNodeId} (current ${this.currentGameNodeId})`,
-        ),
-      );
-      return;
-    }
-
-    this.clearTimeout(msg.requestId);
-    this.pending.delete(msg.requestId);
-    this.releaseActive(msg.requestId);
-    job.resolve({
-      requestId: msg.requestId,
-      gameNodeId: msg.gameNodeId,
-      moveUci: msg.moveUci,
-      candidates: msg.candidates,
-      value: msg.value,
-    });
-  }
-
-  private armTimeout(job: PendingJob): void {
-    const handle = this.setTimer(() => {
-      if (!this.pending.has(job.requestId) || job.cancelled) return;
-      job.cancelled = true;
-      this.removeFromQueue(job.requestId);
-      const isActive = this.active?.requestId === job.requestId;
-      if (isActive) {
-        this.post({ type: "cancel", requestId: job.requestId });
-      }
-      this.failJob(
-        job,
-        new Error(`Inference timed out after ${job.timeoutMs}ms`),
-        { releaseActive: !isActive },
-      );
-    }, job.timeoutMs);
-    this.timeoutHandles.set(job.requestId, handle);
-  }
-
-  private clearTimeout(requestId: string): void {
-    const handle = this.timeoutHandles.get(requestId);
-    if (handle !== undefined) {
-      this.clearTimer(handle);
-      this.timeoutHandles.delete(requestId);
-    }
-  }
-
-  private releaseActive(requestId: string): void {
-    if (this.active?.requestId === requestId) {
-      this.active = null;
-      this.pump();
-    }
-  }
-
-  private failJob(
-    job: PendingJob,
-    error: Error,
-    options: { releaseActive?: boolean } = {},
-  ): void {
-    const releaseActive = options.releaseActive ?? true;
-    if (!this.pending.has(job.requestId)) {
-      if (releaseActive) this.releaseActive(job.requestId);
-      return;
-    }
-    this.clearTimeout(job.requestId);
-    this.pending.delete(job.requestId);
-    job.reject(error);
-    if (releaseActive) {
-      this.releaseActive(job.requestId);
     }
   }
 }
