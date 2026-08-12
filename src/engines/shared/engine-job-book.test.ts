@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   type EngineJob,
   EngineJobBook,
+  handshakeDispose,
 } from "@/engines/shared/engine-job-book";
 
 type Job = EngineJob<string>;
@@ -102,5 +103,38 @@ describe("EngineJobBook", () => {
     for (const fn of timers.values()) fn();
     await expect(result).rejects.toThrow(/timed out slow/);
     expect(cancelled).toEqual(["slow"]);
+  });
+});
+
+describe("handshakeDispose", () => {
+  it("resolves when the worker reports disposed", async () => {
+    let listener: ((isDisposed: boolean) => void) | null = null;
+    const posted: string[] = [];
+    const timers = new Map<string, () => void>();
+    const done = handshakeDispose({
+      requestId: "d1",
+      postDispose: () => {
+        posted.push("dispose");
+      },
+      subscribe: (fn) => {
+        listener = fn;
+        return () => {
+          listener = null;
+        };
+      },
+      setTimer: (fn) => {
+        timers.set("t", fn);
+        return "t";
+      },
+      clearTimer: (handle) => {
+        timers.delete(handle as string);
+      },
+      timeoutMs: 5_000,
+    });
+    expect(posted).toEqual(["dispose"]);
+    expect(listener).toBeTypeOf("function");
+    listener!(true);
+    await done;
+    expect(timers.size).toBe(0);
   });
 });

@@ -1,16 +1,6 @@
-import { Chess, type Color, type PieceSymbol, type Square } from "chess.js";
-import { createChess } from "@/domain/game/rules";
+import { Chess, type Color, type Square } from "chess.js";
+import { createChess, findKingOnChess } from "@/domain/game";
 import type { GameMove } from "@/domain/game/types";
-
-/** Piece values in centipawns for hanging / capture heuristics. */
-export const PIECE_VALUE_CP: Record<PieceSymbol, number> = {
-  p: 100,
-  n: 320,
-  b: 330,
-  r: 500,
-  q: 900,
-  k: 20_000,
-};
 
 /**
  * Basic tactical facts from chess.js — explicit, testable, no engine needed.
@@ -149,7 +139,7 @@ function lostCastlingRights(
 
 /** Count enemy attacks on squares adjacent to the king (including the king sq). */
 export function kingExposure(chess: Chess, color: Color): number {
-  const kingSq = findKing(chess, color);
+  const kingSq = findKingOnChess(chess, color);
   if (!kingSq) return 0;
   const opponent: Color = color === "w" ? "b" : "w";
   let count = 0;
@@ -158,19 +148,6 @@ export function kingExposure(chess: Chess, color: Color): number {
   }
   if (chess.isAttacked(kingSq, opponent)) count += 2;
   return count;
-}
-
-function findKing(chess: Chess, color: Color): Square | null {
-  const board = chess.board();
-  for (let rank = 0; rank < 8; rank += 1) {
-    for (let file = 0; file < 8; file += 1) {
-      const piece = board[rank]?.[file];
-      if (piece?.type === "k" && piece.color === color) {
-        return (String.fromCharCode(97 + file) + String(8 - rank)) as Square;
-      }
-    }
-  }
-  return null;
 }
 
 function adjacentSquares(square: Square): Square[] {
@@ -187,24 +164,4 @@ function adjacentSquares(square: Square): Square[] {
     }
   }
   return out;
-}
-
-/** Own pieces currently attacked by the opponent (from `fen` as-is). */
-export function opponentCaptureTargets(fen: string, defender: Color): string[] {
-  const chess = createChess(fen);
-  const board = chess.board();
-  const targets = new Set<string>();
-  const attacker: Color = defender === "w" ? "b" : "w";
-  for (let rank = 0; rank < 8; rank += 1) {
-    for (let file = 0; file < 8; file += 1) {
-      const piece = board[rank]?.[file];
-      if (!piece || piece.color !== defender || piece.type === "k") continue;
-      const square = (String.fromCharCode(97 + file) +
-        String(8 - rank)) as Square;
-      if (chess.isAttacked(square, attacker)) {
-        targets.add(square);
-      }
-    }
-  }
-  return [...targets];
 }

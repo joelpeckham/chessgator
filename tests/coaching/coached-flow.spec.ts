@@ -95,7 +95,7 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
       { timeout: 10_000 },
     );
 
-    await page.getByTestId("takeback-retry-button").click();
+    await page.getByTestId("undo-human-move-button").click();
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
       "playerTurn",

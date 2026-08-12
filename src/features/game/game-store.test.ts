@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import { getMoveHistory } from "@/domain/game";
 import { useGameStore } from "@/features/game/game-store";
 import { createLocalStorageGameRepository } from "@/storage";
 
@@ -22,27 +23,19 @@ describe("game store adapter", () => {
     });
   });
 
-  it("exposes tree ops without requiring raw tree mutation", () => {
+  it("plays moves and retries without mutating the tree from outside the store", () => {
     const store = useGameStore.getState();
     store.startGame();
     expect(store.playMove("e2e4")).toBe(true);
     expect(useGameStore.getState().session.mode).toBe("opponentThinking");
     expect(useGameStore.getState().playMove("e7e5")).toBe(true);
 
-    const leaf = useGameStore.getState().tree.currentNodeId;
+    expect(useGameStore.getState().retryMove()).toBe(true);
     expect(
-      useGameStore.getState().jumpToNode(useGameStore.getState().tree.rootId),
-    ).toBe(true);
-    expect(useGameStore.getState().session.mode).toBe("reviewing");
-    expect(useGameStore.getState().retryMove()).toBe(false); // at root
-
-    useGameStore.getState().jumpToNode(leaf);
-    expect(useGameStore.getState().takeback()).toBe(true);
-    expect(
-      useGameStore
-        .getState()
-        .history()
-        .map((m) => m.uci),
+      getMoveHistory(
+        useGameStore.getState().tree,
+        useGameStore.getState().tree.currentNodeId,
+      ).map((m) => m.uci),
     ).toEqual(["e2e4"]);
   });
 
@@ -99,10 +92,10 @@ describe("game store adapter", () => {
     expect(useGameStore.getState().resumed).toBe(true);
     expect(useGameStore.getState().session.mode).toBe("reviewing");
     expect(
-      useGameStore
-        .getState()
-        .history()
-        .map((m) => m.uci),
+      getMoveHistory(
+        useGameStore.getState().tree,
+        useGameStore.getState().tree.currentNodeId,
+      ).map((m) => m.uci),
     ).toEqual(["e2e4"]);
   });
 

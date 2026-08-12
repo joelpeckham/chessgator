@@ -20,7 +20,7 @@ export type GameRuntimeOptions = {
   createCoachingController?: () => CoachingController;
 };
 
-export function useGameRuntime(options: GameRuntimeOptions = {}): {
+export type GameRuntime = {
   maiaSession: MaiaSession;
   coach: CoachingController;
   maia: ReturnType<MaiaSession["getState"]>;
@@ -29,7 +29,15 @@ export function useGameRuntime(options: GameRuntimeOptions = {}): {
   enginesWarming: boolean;
   engineNoticeArmed: boolean;
   retryEngines: () => Promise<void>;
-} {
+};
+
+/**
+ * Owns engine sessions, hydrate/persist, and future projection.
+ * Effects: hydrate once; start engines; debounce persist on tree/session/elo;
+ * dispose on unmount; arm the engine-loading notice; project Stockfish futures
+ * on the live tip while it is the human's turn.
+ */
+export function useGameRuntime(options: GameRuntimeOptions = {}): GameRuntime {
   const hydrated = useGameStore((s) => s.hydrated);
   const tree = useGameStore((s) => s.tree);
   const mode = useGameStore((s) => s.session.mode);

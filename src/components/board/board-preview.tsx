@@ -1,6 +1,7 @@
 "use client";
 
 import { Chessboard } from "react-chessboard";
+import { boardSurfaceOptions } from "@/components/board/board-surface";
 import { cn } from "@/lib/utils";
 
 export type BoardPreviewProps = {
@@ -9,7 +10,7 @@ export type BoardPreviewProps = {
   className?: string;
 };
 
-/** Small non-interactive board for timeline hover/focus previews. */
+/** Small non-interactive board for timeline overflow popovers. */
 export function BoardPreview({
   fen,
   san = null,
@@ -23,12 +24,7 @@ export function BoardPreview({
     showAnimations: false,
     allowDrawingArrows: false,
     showNotation: false,
-    boardStyle: {
-      borderRadius: "var(--radius)",
-      width: "100%",
-    },
-    darkSquareStyle: { backgroundColor: "var(--board-dark)" },
-    lightSquareStyle: { backgroundColor: "var(--board-light)" },
+    ...boardSurfaceOptions(),
   };
 
   return (

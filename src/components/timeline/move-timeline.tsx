@@ -3,6 +3,7 @@
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import {
   laneRoleLabel,
+  pinOverflowBranch,
   type TimelineGraph,
   type TimelineGraphNode,
   type TimelineLaneRole,
@@ -18,7 +19,6 @@ import {
 } from "@/components/timeline/timeline-layout";
 import { nodeCenter, TimelineNode } from "@/components/timeline/timeline-node";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import type { GameTree } from "@/domain/game";
 import { cn } from "@/lib/utils";
 
@@ -221,12 +221,8 @@ export function MoveTimeline({
   });
 
   return (
-    <Card
-      size="sm"
-      className={cn(
-        "w-full gap-0 rounded-none border-0 py-0 shadow-none ring-0",
-        className,
-      )}
+    <section
+      className={cn("w-full", className)}
       data-testid="move-timeline"
       aria-label="Move timeline"
     >
@@ -269,7 +265,7 @@ export function MoveTimeline({
           </div>
         </div>
       </div>
-      <CardContent className="flex items-stretch gap-2 px-2 py-2 sm:px-3">
+      <div className="flex items-stretch gap-2 px-2 py-2 sm:px-3">
         <div
           className="relative hidden w-[4.5rem] shrink-0 sm:block"
           style={{ height }}
@@ -376,23 +372,14 @@ export function MoveTimeline({
                     style={{ left: cx, top: cy }}
                     className={cn(dimmed && "opacity-40")}
                     onSelectBranch={(branchKey, headNodeId) => {
-                      const next = [
-                        ...expandedOverflowKeys.filter((k) => {
-                          const parentPrefix = `var:${group.parentId}:`;
-                          return !k.startsWith(parentPrefix);
+                      setExpandedKeys(
+                        pinOverflowBranch({
+                          expandedOverflowKeys,
+                          parentId: group.parentId,
+                          branchKey,
+                          maxLaneSide,
                         }),
-                        branchKey,
-                      ];
-                      const parentPins = next.filter((k) =>
-                        k.startsWith(`var:${group.parentId}:`),
                       );
-                      const others = next.filter(
-                        (k) => !k.startsWith(`var:${group.parentId}:`),
-                      );
-                      setExpandedKeys([
-                        ...others,
-                        ...parentPins.slice(-maxLaneSide),
-                      ]);
                       onSelectNode(headNodeId);
                     }}
                     onPreviewNode={onPreviewNode}
@@ -419,7 +406,7 @@ export function MoveTimeline({
             })}
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }

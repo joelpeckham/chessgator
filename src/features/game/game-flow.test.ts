@@ -3,6 +3,7 @@ import type { MoveAnalysisEvidence } from "@/domain/analysis";
 import {
   createInitialTree,
   createVariationExplorer,
+  getMoveHistory,
   getNode,
   playMoveOnTree,
   stepVariationForward,
@@ -156,10 +157,10 @@ describe("requestOpponentMove", () => {
 
     expect(useGameStore.getState().session.mode).not.toBe("error");
     expect(
-      useGameStore
-        .getState()
-        .history()
-        .map((m) => m.uci),
+      getMoveHistory(
+        useGameStore.getState().tree,
+        useGameStore.getState().tree.currentNodeId,
+      ).map((m) => m.uci),
     ).toEqual(["e2e4", "e7e5"]);
     await maia.dispose();
   });

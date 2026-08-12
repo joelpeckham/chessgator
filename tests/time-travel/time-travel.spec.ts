@@ -129,7 +129,7 @@ test.describe("time travel + branching timeline", () => {
 
     await expect(page.getByTestId("explore-line-button")).toBeVisible();
 
-    await page.getByTestId("takeback-retry-button").click();
+    await page.getByTestId("undo-human-move-button").click();
     await expect(page.getByTestId("live-region")).toContainText(/undo|try/i);
     await expect(page.getByTestId("explore-line-button")).toHaveCount(0);
     await expect(page.getByTestId("variation-explorer")).toHaveCount(0);

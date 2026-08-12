@@ -9,16 +9,10 @@ import {
 } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import type { FeedbackNotice } from "@/domain/teaching";
 import { cn } from "@/lib/utils";
 
-export type FeedbackNotice = {
-  id: string;
-  title: string;
-  body?: string | null;
-  variant?: "default" | "destructive";
-  dismissible?: boolean;
-  busy?: boolean;
-};
+export type { FeedbackNotice };
 
 export type FeedbackStackProps = {
   notices: FeedbackNotice[];

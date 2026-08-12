@@ -6,6 +6,7 @@ import {
   type GameNode,
   type GameTree,
   getCurrentNode,
+  getMoveHistory,
   getNode,
   getStatusAtNode,
   isHumanTurn,
@@ -94,7 +95,7 @@ export async function requestOpponentMove(args: {
   if (state.session.mode !== "opponentThinking") return;
 
   const nodeId = state.tree.currentNodeId;
-  const nodeFen = state.fen();
+  const nodeFen = getCurrentNode(state.tree).fen;
 
   const ready = await args.maia.whenReady();
   if (!ready) {
@@ -175,7 +176,7 @@ export function playHumanMove(args: {
   promotion?: PieceSymbol;
 }): { ok: false } | { ok: true; fenBefore: string; node: GameNode } {
   const store = useGameStore.getState();
-  const fenBefore = store.fen();
+  const fenBefore = getCurrentNode(store.tree).fen;
   if (store.session.mode === "loading") {
     store.setMode("playerTurn");
   }
@@ -241,7 +242,7 @@ export function trySuggestedMove(args: {
 
 export function undoHumanMove(): void {
   const store = useGameStore.getState();
-  const history = store.history();
+  const history = getMoveHistory(store.tree, store.tree.currentNodeId);
   const last = history[history.length - 1];
   if (last?.color === OPPONENT_COLOR) {
     store.retryMove();

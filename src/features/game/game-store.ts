@@ -5,14 +5,9 @@ import {
   createBootstrapTree,
   createInitialTree,
   createSessionState,
-  type GameMove,
   type GameSession,
-  type GameStatus,
   type GameTree,
-  getCurrentNode,
-  getMoveHistory,
   getStatusAtNode,
-  jumpToNode,
   type MoveInput,
   normalizeSessionForResume,
   playMoveOnTree,
@@ -42,11 +37,6 @@ export type GameStoreState = {
   resumed: boolean;
   lastError: string | null;
 
-  /** Derived helpers — components should not mutate tree/session directly. */
-  fen: () => string;
-  status: () => GameStatus;
-  history: () => GameMove[];
-
   startGame: (fen?: string) => void;
   /** Continue a hydrated game without wiping the tree. */
   resumePlay: () => void;
@@ -55,10 +45,8 @@ export type GameStoreState = {
     input: MoveInput,
     options?: { afterMode?: SessionMode; asVariation?: boolean },
   ) => boolean;
-  jumpToNode: (nodeId: string) => boolean;
-  takeback: () => boolean;
   retryMove: () => boolean;
-  resign: (winner?: "white" | "black") => boolean;
+  resign: () => boolean;
   setMode: (mode: SessionMode, errorMessage?: string | null) => boolean;
   setMaiaElo: (elo: number) => void;
 
@@ -113,10 +101,6 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   resumed: false,
   lastError: null,
 
-  fen: () => getCurrentNode(get().tree).fen,
-  status: () => getStatusAtNode(get().tree, get().tree.currentNodeId),
-  history: () => getMoveHistory(get().tree, get().tree.currentNodeId),
-
   startGame: (fen?: string) => {
     set({
       tree: createInitialTree(fen),
@@ -128,12 +112,13 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   },
 
   resumePlay: () => {
-    const status = get().status();
+    const { tree, session } = get();
+    const status = getStatusAtNode(tree, tree.currentNodeId);
     if (status.isGameOver) {
       set({
         session: sessionState(
           "gameOver",
-          get().session.terminalReason ?? status.reason,
+          session.terminalReason ?? status.reason,
         ),
         lastError: null,
       });
@@ -183,55 +168,6 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     return true;
   },
 
-  jumpToNode: (nodeId) => {
-    const nextTree = jumpToNode(get().tree, nodeId);
-    if (!nextTree) {
-      set({ lastError: `Unknown node: ${nodeId}` });
-      return false;
-    }
-
-    const status = getStatusAtNode(nextTree, nodeId);
-    if (status.isGameOver) {
-      set({
-        tree: nextTree,
-        session: sessionState("gameOver", status.reason),
-        lastError: null,
-      });
-      return true;
-    }
-
-    set({
-      tree: nextTree,
-      session: sessionState("reviewing"),
-      lastError: null,
-    });
-    return true;
-  },
-
-  takeback: () => {
-    const nextTree = takebackOne(get().tree);
-    if (!nextTree) {
-      set({ lastError: "Nothing to take back" });
-      return false;
-    }
-
-    const { mode } = get().session;
-    const nextMode: SessionMode =
-      mode === "gameOver" ||
-      mode === "analyzing" ||
-      mode === "playerTurn" ||
-      mode === "opponentThinking"
-        ? "reviewing"
-        : mode;
-
-    set({
-      tree: nextTree,
-      session: sessionState(nextMode),
-      lastError: null,
-    });
-    return true;
-  },
-
   retryMove: () => {
     const { session } = get();
     if (!RETRYABLE_MODES.has(session.mode)) {
@@ -255,8 +191,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     return true;
   },
 
-  resign: (_winner = "black") => {
-    void _winner;
+  resign: () => {
     const { session } = get();
     if (session.mode === "loading" || session.mode === "error") {
       set({ lastError: `Cannot resign while in mode ${session.mode}` });

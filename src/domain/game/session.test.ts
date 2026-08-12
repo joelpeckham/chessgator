@@ -26,6 +26,15 @@ describe("session policy", () => {
     expect(normalized.session.mode).toBe("reviewing");
   });
 
+  it("resumes an empty tree as loading", () => {
+    const tree = createInitialTree();
+    const normalized = normalizeSessionForResume({
+      tree,
+      session: createSessionState("playerTurn"),
+    });
+    expect(normalized.session.mode).toBe("loading");
+  });
+
   it("resumes finished games as gameOver", () => {
     const tree = createInitialTree();
     const normalized = normalizeSessionForResume({

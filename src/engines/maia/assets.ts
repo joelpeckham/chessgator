@@ -6,5 +6,5 @@ export const MAIA3_5M_FP16_ONNX = "/models/maia3-5m.fp16.ca22fc303197.onnx";
  * Copied from `node_modules/onnxruntime-web/dist/` by prepare:assets into
  * `public/ort/<version>/` (see assets.lock.json). Overridable via Maia init for tests.
  */
-export const MAIA_ORT_VERSION = "1.27.0";
+const MAIA_ORT_VERSION = "1.27.0";
 export const MAIA_ORT_WASM_PATHS = `/ort/${MAIA_ORT_VERSION}/`;

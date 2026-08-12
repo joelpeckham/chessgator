@@ -1,3 +1,19 @@
+import {
+  type BuildBranchGraphInput,
+  LANE,
+  type TimelineGraph,
+  type TimelineGraphEdge,
+  type TimelineGraphNode,
+  type TimelineLaneRole,
+  type TimelineNodeKind,
+  type TimelineOverflowGroup,
+} from "@/components/timeline/branch-graph-types";
+import {
+  buildReviewPath,
+  isVirtualTimelineId,
+  parseVirtualTimelineId,
+  virtualId,
+} from "@/components/timeline/branch-graph-virtual";
 import type { ProjectedLine } from "@/domain/analysis/projected-lines";
 import {
   type GameNode,
@@ -7,127 +23,27 @@ import {
   listMainlineChild,
 } from "@/domain/game";
 
-export type TimelineNodeKind =
-  | "committed"
-  | "variation"
-  | "projected"
-  | "tutor";
-
-export type TimelineLaneRole =
-  | "played"
-  | "coach"
-  | "engine"
-  | "variationA"
-  | "variationB"
-  | "overflow";
-
-export type TimelineGraphNode = {
-  id: string;
-  parentId: string | null;
-  fen: string;
-  san: string | null;
-  /** Numbered SAN label, e.g. "1.e4", "8…d5", or "start". */
-  moveLabel: string;
-  ply: number;
-  kind: TimelineNodeKind;
-  laneRole: TimelineLaneRole;
-  /** Stable branch identity: `played:…`, `var:parent:uci`, `tutor:…`, `projected:…`. */
-  branchKey: string;
-  /** 0 = current game; +1 coach; −1 engine; ±2 variations. */
-  lane: number;
-  column: number;
-  /** Matches the live game playhead (`tree.currentNodeId`). */
-  isLive: boolean;
-  /** Matches the ephemeral review cursor. */
-  isReview: boolean;
-  isOnPlayedPath: boolean;
-  isOnReviewPath: boolean;
-  /**
-   * For projected/tutor nodes: the committed tree node the line branches from.
-   * For committed/variation: the tree node id (same as `id`).
-   */
-  sourceNodeId: string;
-  uciFromParent: string | null;
-  /** True when this node is a collapsed "+N" overflow sentinel. */
-  isOverflow?: boolean;
-  overflowCount?: number;
-  overflowGroupId?: string;
-  /** True when a side branch hit the forward ply cap. */
-  isTruncated?: boolean;
-};
-
-export type TimelineGraphEdge = {
-  fromId: string;
-  toId: string;
-  kind: TimelineNodeKind;
-};
-
-export type TimelineOverflowBranch = {
-  branchKey: string;
-  headNodeId: string;
-  san: string;
-  uci: string;
-  moveLabel: string;
-  fen: string;
-  ply: number;
-  length: number;
-};
-
-export type TimelineOverflowGroup = {
-  id: string;
-  parentId: string;
-  column: number;
-  hiddenBranches: TimelineOverflowBranch[];
-};
-
-export type TimelineGraph = {
-  nodes: TimelineGraphNode[];
-  edges: TimelineGraphEdge[];
-  /** Max absolute lane used (for vertical sizing). */
-  maxLaneAbs: number;
-  columns: number;
-  currentGamePath: readonly string[];
-  reviewPath: readonly string[];
-  liveTipColumn: number;
-  overflowGroups: TimelineOverflowGroup[];
-};
-
-export type BuildBranchGraphInput = {
-  tree: GameTree;
-  /** Ephemeral review cursor; null follows the live playhead. */
-  reviewNodeId?: string | null;
-  /** Best-play future from the live tip. */
-  futureLine?: ProjectedLine | null;
-  /** Coach alternate line (e.g. improvement from before the last move). */
-  tutorLine?: ProjectedLine | null;
-  /**
-   * Branch keys the user has pinned from overflow menus.
-   * Format: `var:${parentId}:${uci}`.
-   */
-  expandedOverflowKeys?: readonly string[];
-  /**
-   * Max absolute side lane for variations.
-   * Desktop: 2 (±2 variation slots). Mobile: 1 (no variation slots; overflow sooner).
-   */
-  maxLaneSide?: number;
-  /**
-   * When false, suppress the engine future line (e.g. during review or when
-   * coach context should take the secondary slot on mobile).
-   */
-  showEngineLine?: boolean;
-  /**
-   * When false, suppress the coach projected line.
-   */
-  showCoachLine?: boolean;
-};
-
-export const LANE = {
-  played: 0,
-  coach: 1,
-  engine: -1,
-  variationA: 2,
-  variationB: -2,
-} as const;
+export { pinOverflowBranch } from "@/components/timeline/branch-graph-overflow";
+export type {
+  BuildBranchGraphInput,
+  TimelineGraph,
+  TimelineGraphEdge,
+  TimelineGraphNode,
+  TimelineLaneRole,
+  TimelineNodeKind,
+  TimelineOverflowBranch,
+  TimelineOverflowGroup,
+} from "@/components/timeline/branch-graph-types";
+export { LANE } from "@/components/timeline/branch-graph-types";
+export {
+  buildReviewPath,
+  getGraphNode,
+  isVirtualTimelineId,
+  laneRoleLabel,
+  parseVirtualTimelineId,
+  resolveReviewFen,
+  transportStep,
+} from "@/components/timeline/branch-graph-virtual";
 
 const MAX_LANE_SIDE_DEFAULT = 2;
 const BRANCH_FORWARD_PLIES = 8;
@@ -141,14 +57,6 @@ function formatMoveLabel(ply: number, san: string | null): string {
 
 function plyLabelSan(node: GameNode): string | null {
   return node.move?.san ?? null;
-}
-
-function virtualId(
-  kind: "projected" | "tutor",
-  rootId: string,
-  pathKey: string,
-): string {
-  return `${kind}:${rootId}:${pathKey}`;
 }
 
 function variationBranchKey(parentId: string, uci: string): string {
@@ -661,134 +569,4 @@ export function buildBranchGraph(input: BuildBranchGraphInput): TimelineGraph {
     liveTipColumn,
     overflowGroups,
   };
-}
-
-/** Walk parent links from selected node to root. */
-export function buildReviewPath(
-  nodesById: Map<string, TimelineGraphNode> | TimelineGraphNode[],
-  selectedId: string,
-  rootId: string,
-): string[] {
-  const map =
-    nodesById instanceof Map
-      ? nodesById
-      : new Map(nodesById.map((n) => [n.id, n]));
-  const path: string[] = [];
-  const seen = new Set<string>();
-  let cur: string | null = selectedId;
-  while (cur && !seen.has(cur)) {
-    seen.add(cur);
-    path.push(cur);
-    cur = map.get(cur)?.parentId ?? null;
-  }
-  const ordered = path.toReversed();
-  if (ordered.length === 0 || ordered[0] !== rootId) {
-    if (!ordered.includes(rootId)) ordered.unshift(rootId);
-  }
-  return ordered;
-}
-
-/**
- * Step along the focused branch: parent for −1, preferred child for +1.
- * Preferred child shares `branchKey` with the current node when possible.
- */
-export function transportStep(
-  graph: TimelineGraph,
-  selectedId: string,
-  delta: -1 | 1,
-): string | null {
-  const current = graph.nodes.find((n) => n.id === selectedId);
-  if (!current || current.isOverflow) return null;
-
-  if (delta < 0) {
-    return current.parentId;
-  }
-
-  const children = graph.nodes
-    .filter(
-      (n) =>
-        n.parentId === selectedId && !n.isOverflow && n.kind !== "projected",
-    )
-    .toSorted((a, b) => {
-      // Prefer same branch, then played lane, then lower |lane|.
-      const sameA = a.branchKey === current.branchKey ? 0 : 1;
-      const sameB = b.branchKey === current.branchKey ? 0 : 1;
-      if (sameA !== sameB) return sameA - sameB;
-      if (a.lane === 0 && b.lane !== 0) return -1;
-      if (b.lane === 0 && a.lane !== 0) return 1;
-      return Math.abs(a.lane) - Math.abs(b.lane);
-    });
-
-  // Allow stepping into engine projection only from the live tip on the
-  // played path when no committed child exists.
-  if (children.length === 0 && current.isLive) {
-    const projected = graph.nodes
-      .filter((n) => n.parentId === selectedId && n.kind === "projected")
-      .toSorted((a, b) => a.column - b.column);
-    return projected[0]?.id ?? null;
-  }
-
-  return children[0]?.id ?? null;
-}
-
-/** Look up a graph node by id. */
-export function getGraphNode(
-  graph: TimelineGraph,
-  nodeId: string,
-): TimelineGraphNode | null {
-  return graph.nodes.find((n) => n.id === nodeId) ?? null;
-}
-
-/** Resolve the fen for a review cursor against the graph / tree. */
-export function resolveReviewFen(
-  tree: GameTree,
-  graph: TimelineGraph,
-  reviewNodeId: string | null,
-): string {
-  const id = reviewNodeId ?? tree.currentNodeId;
-  const graphNode = getGraphNode(graph, id);
-  if (graphNode) return graphNode.fen;
-  const treeNode = getNode(tree, id);
-  return treeNode?.fen ?? getNode(tree, tree.rootId)?.fen ?? "";
-}
-
-export function isVirtualTimelineId(id: string): boolean {
-  return id.startsWith("projected:") || id.startsWith("tutor:");
-}
-
-/**
- * Extract the UCI path from a virtual timeline id relative to its root.
- * `tutor:rootId:e2e4/e7e5` → `{ rootNodeId, uciPath: ['e2e4','e7e5'], kind }`
- */
-export function parseVirtualTimelineId(id: string): {
-  kind: "projected" | "tutor";
-  rootNodeId: string;
-  uciPath: string[];
-} | null {
-  const match = /^(projected|tutor):([^:]+):(.+)$/.exec(id);
-  if (!match) return null;
-  const kind = match[1] as "projected" | "tutor";
-  const rootNodeId = match[2]!;
-  const pathKey = match[3]!;
-  return {
-    kind,
-    rootNodeId,
-    uciPath: pathKey.split("/").filter(Boolean),
-  };
-}
-
-export function laneRoleLabel(role: TimelineLaneRole): string {
-  switch (role) {
-    case "played":
-      return "Current game";
-    case "coach":
-      return "Coach";
-    case "engine":
-      return "Engine";
-    case "variationA":
-    case "variationB":
-      return "Variation";
-    case "overflow":
-      return "More branches";
-  }
 }

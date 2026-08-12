@@ -24,7 +24,6 @@ export {
   FUTURE_PROJECTION_PLIES,
   projectBestFuture,
   projectUciLine,
-  sanOrUci,
 } from "@/domain/analysis/projected-lines";
 export type { SideToMove } from "@/domain/analysis/score";
 export {
@@ -42,8 +41,6 @@ export {
   hangingSquaresFor,
   isHangingOn,
   kingExposure,
-  opponentCaptureTargets,
-  PIECE_VALUE_CP,
 } from "@/domain/analysis/tactics";
 export type {
   AnalysisEvidence,

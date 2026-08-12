@@ -34,14 +34,6 @@ export function squareToIndex(square: string): number {
   return file + rank * 8;
 }
 
-export function indexToSquare(index: number): string {
-  if (index < 0 || index > 63)
-    throw new Error(`Invalid square index: ${index}`);
-  const file = index % 8;
-  const rank = Math.floor(index / 8);
-  return `${FILES.charAt(file)}${String(rank + 1)}`;
-}
-
 /** Mirror a square vertically (rank ↔ 9-rank), matching upstream `mirror_square`. */
 export function mirrorSquare(square: string): string {
   const file = square[0]!;

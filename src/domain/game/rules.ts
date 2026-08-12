@@ -21,14 +21,8 @@ export function getTurn(fen: string): Color {
   return createChess(fen).turn();
 }
 
-/** Square of the given side's king, or null if the FEN is invalid / king missing. */
-export function findKingSquare(fen: string, color: Color): Square | null {
-  let chess: Chess;
-  try {
-    chess = createChess(fen);
-  } catch {
-    return null;
-  }
+/** Square of the given side's king on an existing board. */
+export function findKingOnChess(chess: Chess, color: Color): Square | null {
   const board = chess.board();
   for (let rank = 0; rank < 8; rank += 1) {
     for (let file = 0; file < 8; file += 1) {
@@ -39,6 +33,17 @@ export function findKingSquare(fen: string, color: Color): Square | null {
     }
   }
   return null;
+}
+
+/** Square of the given side's king, or null if the FEN is invalid / king missing. */
+export function findKingSquare(fen: string, color: Color): Square | null {
+  let chess: Chess;
+  try {
+    chess = createChess(fen);
+  } catch {
+    return null;
+  }
+  return findKingOnChess(chess, color);
 }
 
 export function isValidFen(fen: string): boolean {
@@ -269,10 +274,7 @@ function getStatusFromChess(chess: Chess): GameStatus {
  * Reconstruct a Chess instance along a move path so repetition / fifty-move
  * state matches playing those moves from the root FEN.
  */
-export function replayMoves(
-  rootFen: string,
-  moves: readonly GameMove[],
-): Chess {
+function replayMoves(rootFen: string, moves: readonly GameMove[]): Chess {
   const chess = createChess(rootFen);
   for (const move of moves) {
     try {

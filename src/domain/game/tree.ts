@@ -73,10 +73,6 @@ export function getMoveHistory(tree: GameTree, nodeId: string): GameMove[] {
     .filter((move): move is GameMove => move !== null);
 }
 
-export function getPathFenHistory(tree: GameTree, nodeId: string): string[] {
-  return getAncestors(tree, nodeId).map((node) => node.fen);
-}
-
 export function getStatusAtNode(tree: GameTree, nodeId: string): GameStatus {
   const root = tree.nodes[tree.rootId];
   if (!root) {

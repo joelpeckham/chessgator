@@ -2,7 +2,7 @@ import type {
   AnalysisEvidence,
   EvaluationScore,
 } from "@/domain/analysis/types";
-import { legalUciPrefix, tryApplyMove, uciToSan } from "@/domain/game/rules";
+import { legalUciPrefix, tryApplyMove } from "@/domain/game/rules";
 
 /** Default plies shown as the "future" continuation on the timeline. */
 export const FUTURE_PROJECTION_PLIES = 5;
@@ -93,9 +93,4 @@ export function projectBestFuture(
     score: best?.score ?? evidence.score,
   });
   return line.plies.length > 0 ? line : null;
-}
-
-/** Resolve SAN for a UCI move when available; falls back to UCI. */
-export function sanOrUci(fen: string, uci: string): string {
-  return uciToSan(fen, uci) ?? uci;
 }

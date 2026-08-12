@@ -10,8 +10,7 @@
 
 export const MOVE_VOCAB_SIZE = 4352;
 export const BASE_MOVE_COUNT = 64 * 64; // 4096
-export const PROMOTION_COUNT = 8 * 8 * 4; // 256
-export const PROMOTION_PIECES = ["q", "r", "b", "n"] as const;
+const PROMOTION_PIECES = ["q", "r", "b", "n"] as const;
 
 export type PromotionPiece = (typeof PROMOTION_PIECES)[number];
 

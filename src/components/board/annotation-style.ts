@@ -1,12 +1,10 @@
 import type { BoardArrow } from "@/components/board/arrow-utils";
+import type {
+  SemanticArrowKind,
+  SemanticBoardAnnotation,
+} from "@/domain/teaching";
 
-export type SemanticArrowKind = "hint" | "hint-line" | "better";
-
-export type SemanticBoardAnnotation = {
-  highlightSquares: string[];
-  arrows: Array<{ from: string; to: string; kind: SemanticArrowKind }>;
-  labels: Array<{ square: string; text: string }>;
-};
+export type { SemanticArrowKind, SemanticBoardAnnotation };
 
 const ARROW_COLOR: Record<SemanticArrowKind, string> = {
   hint: "var(--primary)",

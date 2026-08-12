@@ -10,8 +10,8 @@ export type TeachingCardProps = {
   insight: TeachingInsight | null;
   analyzing?: boolean;
   onTrySuggested?: () => void;
-  onTakebackRetry: () => void;
-  canTakebackRetry: boolean;
+  onUndoHumanMove: () => void;
+  canUndoHumanMove: boolean;
   hint?: HintStep | null;
   hintDisabled?: boolean;
   onRequestHint?: () => void;
@@ -28,8 +28,8 @@ export function TeachingCard({
   insight,
   analyzing = false,
   onTrySuggested,
-  onTakebackRetry,
-  canTakebackRetry,
+  onUndoHumanMove,
+  canUndoHumanMove,
   hint = null,
   hintDisabled = false,
   onRequestHint,
@@ -140,9 +140,9 @@ export function TeachingCard({
           type="button"
           size="sm"
           variant="secondary"
-          disabled={!canTakebackRetry}
-          onClick={onTakebackRetry}
-          data-testid="takeback-retry-button"
+          disabled={!canUndoHumanMove}
+          onClick={onUndoHumanMove}
+          data-testid="undo-human-move-button"
         >
           Undo my move
         </Button>

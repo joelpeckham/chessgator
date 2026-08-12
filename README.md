@@ -33,7 +33,8 @@ src/
 Play as White against Maia. Engines warm as soon as the page loads and a game
 starts automatically. After each move, Stockfish coaches through dismissible
 tutor cards. The branching timeline under the board is the main way to review
-the past, preview engine futures, and try tutor alternatives. Closing the tab
+the past, preview engine futures, and try tutor alternatives. Timeline review
+is ephemeral: scrubbing does not move the live game pointer. Closing the tab
 resumes the local game from `localStorage`.
 
 ## Prerequisites

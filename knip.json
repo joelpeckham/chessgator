@@ -2,6 +2,8 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "entry": [
     "src/app/**/{page,layout,loading,error,not-found,default,template,route}.{ts,tsx}",
+    "src/domain/**/index.ts",
+    "src/engines/stockfish/index.ts",
     "src/workers/**/*.{ts,tsx}",
     "tests/**/playwright.config.ts",
     "tests/**/*.{spec,test}.{ts,tsx,mjs}",
@@ -10,19 +12,27 @@
     "tests/shared/**/*.{ts,mjs}"
   ],
   "project": [
-    "src/**/*.{ts,tsx}",
+    "src/**/*.{ts,tsx,css}",
     "tests/**/*.{ts,tsx,mjs}",
     "scripts/**/*.{js,mjs}"
   ],
-  "ignoreDependencies": ["tailwindcss", "tw-animate-css", "stockfish"],
-  "ignore": ["src/components/ui/hover-card.tsx"],
+  "ignoreDependencies": ["stockfish"],
   "exclude": [
-    "exports",
     "types",
     "nsExports",
     "nsTypes",
     "enumMembers",
     "namespaceMembers",
     "duplicates"
-  ]
+  ],
+  "ignoreIssues": {
+    "src/app/**": ["exports"],
+    "src/components/**": ["exports"],
+    "src/features/**": ["exports"],
+    "src/storage/**": ["exports"],
+    "src/lib/**": ["exports"],
+    "src/workers/**": ["exports"],
+    "tests/**": ["exports"],
+    "scripts/**": ["exports"]
+  }
 }

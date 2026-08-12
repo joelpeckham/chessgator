@@ -4,6 +4,7 @@ import {
   isVirtualTimelineId,
   LANE,
   parseVirtualTimelineId,
+  pinOverflowBranch,
   transportStep,
 } from "@/components/timeline/branch-graph";
 import { projectUciLine } from "@/domain/analysis/projected-lines";
@@ -269,5 +270,17 @@ describe("buildBranchGraph", () => {
       .map((n) => `${n.id}:${n.lane}`)
       .toSorted();
     expect(lanesA).toEqual(lanesB);
+  });
+});
+
+describe("pinOverflowBranch", () => {
+  it("keeps at most maxLaneSide pins under the same parent", () => {
+    const keys = pinOverflowBranch({
+      expandedOverflowKeys: ["var:p1:e2e4", "var:p2:a2a4"],
+      parentId: "p1",
+      branchKey: "var:p1:d2d4",
+      maxLaneSide: 1,
+    });
+    expect(keys).toEqual(["var:p2:a2a4", "var:p1:d2d4"]);
   });
 });

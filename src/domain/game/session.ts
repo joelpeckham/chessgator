@@ -8,7 +8,9 @@ import {
 
 /**
  * Drop transient engine/UI modes on reload. Workers and pending jobs are never
- * serialized — resume into reviewing / gameOver / playerTurn only.
+ * serialized. In-progress games resume as `"reviewing"` (hydrate transient)
+ * until `resumePlay` maps them to playerTurn / opponentThinking. Finished
+ * games resume as gameOver. Empty trees resume as loading.
  */
 export function normalizeSessionForResume(game: GameSession): GameSession {
   const status = getStatusAtNode(game.tree, game.tree.currentNodeId);

@@ -20,14 +20,12 @@ export type MaiaTransport = WorkerTransport<
   MaiaWorkerResponse
 >;
 
-export function createBrowserWorkerTransport(
-  worker: WorkerLike,
-): MaiaTransport {
+function createBrowserWorkerTransport(worker: WorkerLike): MaiaTransport {
   return createSharedBrowserWorkerTransport(worker, isMaiaWorkerResponse);
 }
 
 /** Create the default Next/bundler worker pointing at our typed entry. */
-export function createMaiaWorker(): Worker {
+function createMaiaWorker(): Worker {
   if (typeof Worker === "undefined") {
     throw new Error("Maia requires a browser Worker environment");
   }

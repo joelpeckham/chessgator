@@ -18,8 +18,8 @@ export type CoachRailProps = {
   onExpandedChange: (expanded: boolean) => void;
   insight: TeachingInsight | null;
   analyzing: boolean;
-  canTakebackRetry: boolean;
-  onTakebackRetry: () => void;
+  canUndoHumanMove: boolean;
+  onUndoHumanMove: () => void;
   onTrySuggested?: () => void;
   onDismiss: () => void;
   hint: HintStep | null;
@@ -58,8 +58,8 @@ export function CoachRail({
   onExpandedChange,
   insight,
   analyzing,
-  canTakebackRetry,
-  onTakebackRetry,
+  canUndoHumanMove,
+  onUndoHumanMove,
   onTrySuggested,
   onDismiss,
   hint,
@@ -225,8 +225,8 @@ export function CoachRail({
             <TeachingCard
               insight={insight}
               analyzing={analyzing}
-              canTakebackRetry={canTakebackRetry}
-              onTakebackRetry={onTakebackRetry}
+              canUndoHumanMove={canUndoHumanMove}
+              onUndoHumanMove={onUndoHumanMove}
               onTrySuggested={onTrySuggested}
               hint={hint}
               hintDisabled={hintDisabled}

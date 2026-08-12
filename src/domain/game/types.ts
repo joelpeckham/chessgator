@@ -79,7 +79,12 @@ export type GameTree = {
 
 /**
  * Session mode is orthogonal to the tree pointer (`currentNodeId`).
- * The pointer answers where on the board we are; the mode answers what the UI may do.
+ * The pointer answers where on the live tree we are; the mode answers what
+ * play/engine work may do. Timeline scrub is an ephemeral UI cursor and does
+ * not change `currentNodeId` or this mode.
+ *
+ * `"reviewing"` is only the hydrate transient: a restored in-progress game
+ * sits here until `resumePlay` maps it to playerTurn / opponentThinking.
  */
 export type SessionMode =
   | "loading"

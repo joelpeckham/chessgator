@@ -12,7 +12,7 @@ export type QueuedJob<T> = {
 };
 
 /**
- * Single priority queue: opponent > user feedback > background.
+ * Single priority queue: user analysis before background work.
  * Stable FIFO among equal priorities via `enqueuedAt`.
  */
 export class PriorityQueue<T> {

@@ -6,6 +6,7 @@ export {
 export {
   createChess,
   DEFAULT_POSITION,
+  findKingOnChess,
   findKingSquare,
   getLegalMoves,
   getStatus,
@@ -17,7 +18,6 @@ export {
   lineUciToSan,
   moveToUci,
   parseUci,
-  replayMoves,
   sanToUci,
   toGameMove,
   tryApplyMove,
@@ -38,7 +38,6 @@ export {
   getMainlinePath,
   getMoveHistory,
   getNode,
-  getPathFenHistory,
   getStatusAtNode,
   jumpToNode,
   listMainlineChild,

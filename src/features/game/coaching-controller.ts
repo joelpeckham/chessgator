@@ -1,4 +1,3 @@
-import type { SemanticBoardAnnotation } from "@/components/board/annotation-style";
 import {
   buildMoveAnalysisEvidence,
   type MoveAnalysisEvidence,
@@ -7,10 +6,13 @@ import {
 } from "@/domain/analysis";
 import type { GameMove } from "@/domain/game";
 import {
+  annotationsFromInsight,
   buildHintStep,
+  EMPTY_BOARD_ANNOTATIONS,
   type HintLevel,
   type HintStep,
   nextHintLevel,
+  type SemanticBoardAnnotation,
   selectTeachingInsight,
   type TeachingInsight,
 } from "@/domain/teaching";
@@ -93,11 +95,7 @@ export type CreateCoachingControllerOptions = {
   defaultMovetimeMs?: number;
 };
 
-const EMPTY_ANNOTATIONS: BoardAnnotation = {
-  highlightSquares: [],
-  arrows: [],
-  labels: [],
-};
+const EMPTY_ANNOTATIONS: BoardAnnotation = EMPTY_BOARD_ANNOTATIONS;
 
 const IDLE: CoachingControllerState = {
   phase: "idle",
@@ -148,59 +146,6 @@ export function createCoachingController(
       const first = futureByNodeId.keys().next().value;
       if (first) futureByNodeId.delete(first);
     }
-  }
-
-  function annotationsFromInsight(
-    insight: TeachingInsight | null,
-    evidence: MoveAnalysisEvidence | null,
-    hint: HintStep | null,
-  ): BoardAnnotation {
-    const highlightSquares = new Set<string>();
-    const arrows: BoardAnnotation["arrows"] = [];
-    const labels: BoardAnnotation["labels"] = [];
-
-    if (hint) {
-      for (const sq of hint.highlightSquares) highlightSquares.add(sq);
-      if (hint.candidateMoveUci && hint.candidateMoveUci.length >= 4) {
-        arrows.push({
-          from: hint.candidateMoveUci.slice(0, 2),
-          to: hint.candidateMoveUci.slice(2, 4),
-          kind: "hint",
-        });
-        labels.push({
-          square: hint.candidateMoveUci.slice(2, 4),
-          text: "hint",
-        });
-      }
-      if (hint.level >= 3) {
-        for (const uci of hint.lineUci) {
-          if (uci.length < 4) continue;
-          arrows.push({
-            from: uci.slice(0, 2),
-            to: uci.slice(2, 4),
-            kind: "hint-line",
-          });
-        }
-      }
-    }
-
-    if (insight?.suggestedMoveUci && insight.autoExpand && evidence) {
-      const uci = insight.suggestedMoveUci;
-      if (uci.length >= 4) {
-        arrows.push({
-          from: uci.slice(0, 2),
-          to: uci.slice(2, 4),
-          kind: "better",
-        });
-        labels.push({ square: uci.slice(2, 4), text: "better" });
-      }
-    }
-
-    return {
-      highlightSquares: [...highlightSquares],
-      arrows,
-      labels,
-    };
   }
 
   function refreshAnnotations(

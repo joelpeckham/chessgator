@@ -1,5 +1,5 @@
-import type { FeedbackNotice } from "@/components/coach/feedback-stack";
 import type { SessionMode } from "@/domain/game";
+import type { FeedbackNotice } from "@/domain/teaching";
 import type { MaiaSessionPhase } from "@/features/game/maia-session";
 
 const HIGH_SIGNAL_NAV =
