@@ -65,7 +65,7 @@ describe("veilCoverage", () => {
     const midCenter = veilCoverage(0.5, 0);
     const midEdge = veilCoverage(0.5, 1);
     expect(midEdge).toBeLessThan(midCenter);
-    expect(midCenter).toBeGreaterThan(VEIL_COVERAGE_CENTER);
+    expect(midCenter).toBe(VEIL_COVERAGE_CENTER);
     expect(midEdge).toBeGreaterThan(VEIL_COVERAGE_EDGE);
   });
 });
@@ -73,9 +73,9 @@ describe("veilCoverage", () => {
 describe("veilGridSize", () => {
   it("snaps to a multiple of eight between the min and max", () => {
     expect(veilGridSize(433) % 8).toBe(0);
-    expect(veilGridSize(433)).toBe(144);
-    expect(veilGridSize(200)).toBe(VEIL_GRID_MIN);
-    expect(veilGridSize(960)).toBe(VEIL_GRID_MAX);
+    expect(veilGridSize(433)).toBe(216);
+    expect(veilGridSize(100)).toBe(VEIL_GRID_MIN);
+    expect(veilGridSize(1200)).toBe(VEIL_GRID_MAX);
     expect(veilGridSize(0)).toBe(VEIL_GRID_MIN);
     expect(veilGridSize(Number.NaN)).toBe(VEIL_GRID_MIN);
   });

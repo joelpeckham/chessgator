@@ -4,6 +4,11 @@ test.describe("Maia3 5M fp16 worker / ONNX", () => {
   test("typed worker initializes and returns a legal move at temperature 0", async ({
     page,
   }) => {
+    const consoleMessages: string[] = [];
+    page.on("console", (msg) => {
+      consoleMessages.push(msg.text());
+    });
+
     await page.goto("/");
 
     const result = await page.evaluate(async () => {
@@ -21,7 +26,7 @@ test.describe("Maia3 5M fp16 worker / ONNX", () => {
       return runner();
     });
 
-    expect(result.executionProvider).toMatch(/^(webgpu|wasm)$/);
+    expect(result.executionProvider).toBe("wasm");
     expect(result.moveUci).toMatch(/^[a-h][1-8][a-h][1-8][qrbn]?$/);
     expect(result.candidates.length).toBeGreaterThan(0);
     expect(
@@ -29,5 +34,14 @@ test.describe("Maia3 5M fp16 worker / ONNX", () => {
         /^[a-h][1-8][a-h][1-8][qrbn]?$/.test(c.moveUci),
       ),
     ).toBe(true);
+    expect(
+      consoleMessages.filter(
+        (text) =>
+          text.includes("VerifyEachNodeIsAssignedToAnEp") ||
+          text.includes("Concat") ||
+          text.includes("WGSL") ||
+          text.includes("WebGPU validation"),
+      ),
+    ).toEqual([]);
   });
 });

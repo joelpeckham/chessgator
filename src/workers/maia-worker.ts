@@ -17,19 +17,10 @@ type WorkerScope = {
 
 const workerScope = self as unknown as WorkerScope;
 
-function supportsWebGpu(): boolean {
-  try {
-    const nav = navigator as Navigator & { gpu?: unknown };
-    return typeof navigator !== "undefined" && !!nav.gpu;
-  } catch {
-    return false;
-  }
-}
-
 async function createSession(
   modelBytes: Uint8Array,
   wasmPaths: string,
-): Promise<{ session: ort.InferenceSession; provider: "webgpu" | "wasm" }> {
+): Promise<ort.InferenceSession> {
   ort.env.wasm.numThreads = 1;
   ort.env.wasm.simd = true;
   if (wasmPaths) {
@@ -38,27 +29,11 @@ async function createSession(
       : `${wasmPaths}/`;
   }
 
-  const sessionOptions: ort.InferenceSession.SessionOptions = {
+  return ort.InferenceSession.create(modelBytes, {
     graphOptimizationLevel: "basic",
-  };
-
-  if (supportsWebGpu()) {
-    try {
-      const webgpuSession = await ort.InferenceSession.create(modelBytes, {
-        ...sessionOptions,
-        executionProviders: ["webgpu"],
-      });
-      return { session: webgpuSession, provider: "webgpu" };
-    } catch {
-      // Fall through to WASM.
-    }
-  }
-
-  const wasmSession = await ort.InferenceSession.create(modelBytes, {
-    ...sessionOptions,
+    logSeverityLevel: 3,
     executionProviders: ["wasm"],
   });
-  return { session: wasmSession, provider: "wasm" };
 }
 
 const runtime = createMaiaWorkerRuntime({
@@ -73,11 +48,11 @@ const runtime = createMaiaWorkerRuntime({
     }
     const modelBytes = new Uint8Array(await response.arrayBuffer());
     report("initializing");
-    const created = await createSession(modelBytes, wasmPaths);
+    const session = await createSession(modelBytes, wasmPaths);
     return {
-      provider: created.provider,
+      provider: "wasm",
       async run(feeds) {
-        const output = await created.session.run({
+        const output = await session.run({
           tokens: new ort.Tensor("float32", feeds.tokens, feeds.tokenDims),
           elo_self: new ort.Tensor("float32", feeds.eloSelf, [1]),
           elo_oppo: new ort.Tensor("float32", feeds.eloOppo, [1]),
@@ -95,7 +70,7 @@ const runtime = createMaiaWorkerRuntime({
         };
       },
       async release() {
-        await created.session.release();
+        await session.release();
       },
     };
   },
