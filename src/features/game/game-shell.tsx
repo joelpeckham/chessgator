@@ -3,7 +3,9 @@
 import { RiSettings3Line } from "@remixicon/react";
 import { useState } from "react";
 import { styleBoardAnnotations } from "@/components/board/annotation-style";
+import { BoardPreviewVeil } from "@/components/board/board-preview-veil";
 import { ChessboardAdapter } from "@/components/board/chessboard-adapter";
+import { lastMoveSquares } from "@/components/board/move-utils";
 import { CoachRail } from "@/components/coach/coach-rail";
 import { FeedbackStack } from "@/components/coach/feedback-stack";
 import { PromotionDialog } from "@/components/game/promotion-dialog";
@@ -21,6 +23,7 @@ import {
   findKingSquare,
   getCurrentNode,
   getMoveHistory,
+  getNode,
   getStatusAtNode,
   getTurn,
   HUMAN_COLOR,
@@ -61,6 +64,7 @@ export function GameShell(props: GameRuntimeOptions = {}) {
   } | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [reviewNodeId, setReviewNodeId] = useState<string | null>(null);
+  const [previewNodeId, setPreviewNodeId] = useState<string | null>(null);
   const [coachExpanded, setCoachExpanded] = useState(false);
   const [coachUserCollapsedAuto, setCoachUserCollapsedAuto] = useState(false);
   const [expandedOverflowKeys, setExpandedOverflowKeys] = useState<string[]>(
@@ -78,6 +82,9 @@ export function GameShell(props: GameRuntimeOptions = {}) {
   const mode = session.mode;
   const isReviewing =
     reviewNodeId != null && reviewNodeId !== tree.currentNodeId;
+  const viewedNodeId = previewNodeId ?? reviewNodeId;
+  const isViewingNonLive =
+    viewedNodeId != null && viewedNodeId !== tree.currentNodeId;
 
   const tutorLine = buildTutorLine(
     tree,
@@ -103,16 +110,16 @@ export function GameShell(props: GameRuntimeOptions = {}) {
     showCoachLine: Boolean(tutorLine),
   });
 
-  const boardFen = resolveReviewFen(tree, graph, reviewNodeId);
+  const boardFen = resolveReviewFen(tree, graph, viewedNodeId);
   const boardStatus =
-    reviewNodeId && !isVirtualTimelineId(reviewNodeId)
-      ? getStatusAtNode(tree, reviewNodeId)
+    viewedNodeId && !isVirtualTimelineId(viewedNodeId)
+      ? getStatusAtNode(tree, viewedNodeId)
       : getStatusAtNode(tree, tree.currentNodeId);
 
   const interactive =
     mode === "playerTurn" &&
     isHumanTurn(getTurn(liveFen)) &&
-    !isReviewing &&
+    !isViewingNonLive &&
     runtime.maia.phase !== "failed";
 
   const checkSquare =
@@ -131,7 +138,7 @@ export function GameShell(props: GameRuntimeOptions = {}) {
     coachExpanded || (shouldAutoExpand && Boolean(visibleInsight));
 
   const showCoachAnnotations =
-    !isReviewing &&
+    !isViewingNonLive &&
     !runtime.coachUnavailable &&
     (coachExpandedEffective ||
       Boolean(visibleInsight?.autoExpand) ||
@@ -154,6 +161,7 @@ export function GameShell(props: GameRuntimeOptions = {}) {
     graph,
     setNavMessage,
     setReviewNodeId,
+    setPreviewNodeId,
     setCoachExpanded,
     setCoachUserCollapsedAuto,
     setPromotion,
@@ -190,13 +198,21 @@ export function GameShell(props: GameRuntimeOptions = {}) {
       mode === "gameOver");
 
   const boardMarks =
-    isReviewing || !showCoachAnnotations
+    isViewingNonLive || !showCoachAnnotations
       ? styleBoardAnnotations({
           highlightSquares: [],
           arrows: [],
           labels: [],
         })
       : styleBoardAnnotations(runtime.coaching.annotations);
+
+  const viewedGraphNode = graph.nodes.find(
+    (n) => n.id === (viewedNodeId ?? tree.currentNodeId),
+  );
+  const viewedTreeNode = getNode(tree, viewedNodeId ?? tree.currentNodeId);
+  const boardLastMove = lastMoveSquares(
+    viewedGraphNode?.uciFromParent ?? viewedTreeNode?.move?.uci ?? null,
+  );
 
   const notices = buildFeedbackNotices({
     engineNoticeArmed: runtime.engineNoticeArmed,
@@ -267,11 +283,7 @@ export function GameShell(props: GameRuntimeOptions = {}) {
             <ChessboardAdapter
               fen={boardFen}
               interactive={interactive}
-              lastMove={
-                !isReviewing && lastMove
-                  ? { from: lastMove.from, to: lastMove.to }
-                  : null
-              }
+              lastMove={boardLastMove}
               isCheck={boardStatus.isCheck && !boardStatus.isGameOver}
               checkSquare={checkSquare}
               highlightSquares={boardMarks.highlightSquares}
@@ -282,6 +294,7 @@ export function GameShell(props: GameRuntimeOptions = {}) {
               onPromotionNeeded={(from, to) => setPromotion({ from, to })}
               className="h-full w-full"
             />
+            <BoardPreviewVeil active={isViewingNonLive} />
           </div>
 
           <FeedbackStack
@@ -347,6 +360,7 @@ export function GameShell(props: GameRuntimeOptions = {}) {
             tree={tree}
             graph={graph}
             reviewNodeId={reviewNodeId}
+            previewNodeId={previewNodeId}
             disabled={mode === "error"}
             compact={compact}
             expandedOverflowKeys={expandedOverflowKeys}
@@ -354,6 +368,7 @@ export function GameShell(props: GameRuntimeOptions = {}) {
               setExpandedOverflowKeys([...keys])
             }
             onSelectNode={flow.handleSelectTimelineNode}
+            onPreviewNode={setPreviewNodeId}
             onReturnLive={flow.handleReturnLive}
             onOpenCoach={() => {
               runtime.coach.showInsight(tree.currentNodeId);

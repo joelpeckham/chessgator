@@ -53,17 +53,24 @@ test.describe("time travel + branching timeline", () => {
     ).toBeLessThanOrEqual(1);
 
     // d4 branch remains reachable from the timeline.
-    const d4Node = page
-      .locator('[data-testid="move-list"] [data-timeline-node="true"]')
-      .filter({ hasText: /d4/ })
-      .first();
+    const d4Node = page.getByRole("option", { name: /d4/ });
     await expect(d4Node).toBeVisible();
     await d4Node.click();
     await expect(page.getByTestId("timeline-status")).toContainText(
       /Reviewing|d4/i,
     );
-    // Prev/Next follow the selected branch.
-    await page.getByTestId("timeline-prev").click();
+    await expect(page.getByTestId("board-preview-veil")).toHaveAttribute(
+      "data-active",
+      "true",
+    );
+    await expect(page.getByTestId("board-preview-veil")).toHaveAttribute(
+      "data-ready",
+      "true",
+    );
+    await page.mouse.move(0, 0);
+    const timeline = page.getByTestId("move-list");
+    await timeline.focus();
+    await page.keyboard.press("ArrowLeft");
     await expect(page.getByTestId("timeline-status")).toContainText(
       /start|Reviewing/i,
     );
@@ -78,9 +85,19 @@ test.describe("time travel + branching timeline", () => {
       { timeout: 10_000 },
     );
 
-    await page.getByTestId("timeline-first").click();
+    const timeline = page.getByTestId("move-list");
+    await timeline.focus();
+    await page.keyboard.press("Home");
     await expect(page.getByTestId("timeline-status")).toContainText(
       /Reviewing|start/i,
+    );
+    await expect(page.getByTestId("board-preview-veil")).toHaveAttribute(
+      "data-active",
+      "true",
+    );
+    await expect(page.getByTestId("board-preview-veil")).toHaveAttribute(
+      "data-ready",
+      "true",
     );
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
@@ -90,6 +107,10 @@ test.describe("time travel + branching timeline", () => {
 
     await page.getByTestId("timeline-live").click();
     await expect(page.getByTestId("timeline-status")).toContainText(/Live/i);
+    await expect(page.getByTestId("board-preview-veil")).toHaveAttribute(
+      "data-active",
+      "false",
+    );
   });
 
   test("undo my move clears coaching so Try from here cannot target old node", async ({

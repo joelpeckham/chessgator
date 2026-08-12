@@ -15,6 +15,7 @@
     "scripts/**/*.{js,mjs}"
   ],
   "ignoreDependencies": ["tailwindcss", "tw-animate-css", "stockfish"],
+  "ignore": ["src/components/ui/hover-card.tsx"],
   "exclude": [
     "exports",
     "types",

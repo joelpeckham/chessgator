@@ -25,6 +25,7 @@ export function useGameFlow(args: {
   retryEngines: () => Promise<void>;
   setNavMessage: (message: string | null) => void;
   setReviewNodeId: (id: string | null) => void;
+  setPreviewNodeId: (id: string | null) => void;
   setCoachExpanded: (expanded: boolean) => void;
   setCoachUserCollapsedAuto: (collapsed: boolean) => void;
   setPromotion: (value: { from: string; to: string } | null) => void;
@@ -62,6 +63,7 @@ export function useGameFlow(args: {
       args.coach.clearFeedback();
     }
     args.setReviewNodeId(null);
+    args.setPreviewNodeId(null);
     args.setCoachExpanded(false);
     args.setCoachUserCollapsedAuto(false);
   }
@@ -121,6 +123,7 @@ export function useGameFlow(args: {
     if (!played.ok) return false;
     args.setPromotion(null);
     args.setReviewNodeId(null);
+    args.setPreviewNodeId(null);
     args.setCoachUserCollapsedAuto(false);
     args.setCoachExpanded(false);
     args.coach.resetHints();
@@ -157,6 +160,7 @@ export function useGameFlow(args: {
     args.coach.clearFeedback();
     replaceTree(result.tree);
     args.setReviewNodeId(null);
+    args.setPreviewNodeId(null);
     setMode(result.mode);
     if (result.needsOpponent) {
       requestOpponent();
@@ -205,6 +209,7 @@ export function useGameFlow(args: {
 
   function handleReturnLive(): void {
     args.setReviewNodeId(null);
+    args.setPreviewNodeId(null);
   }
 
   return {

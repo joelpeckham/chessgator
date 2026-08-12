@@ -6,7 +6,7 @@ import { TIMELINE_GRAPH_HEIGHT_PX } from "@/components/timeline/move-timeline";
 
 /** Reserved chrome so board size ignores floating coach/toasts. */
 const HEADER_RESERVE_PX = 48;
-/** Timeline status row + fixed graph + transport chrome. */
+/** Timeline status row + fixed graph. */
 const TIMELINE_CHROME_PX = TIMELINE_GRAPH_HEIGHT_PX + 36;
 /** Fixed footer footprint: coach rail + timeline (never grows with expansion). */
 const FOOTER_CHROME_PX = COACH_RAIL_PX + TIMELINE_CHROME_PX;

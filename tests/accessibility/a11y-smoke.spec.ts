@@ -34,6 +34,10 @@ test.describe("accessibility + responsive smoke", () => {
     await expect(page.getByTestId("timeline-status")).toContainText(
       /Reviewing|start/i,
     );
+    await expect(page.getByTestId("board-preview-veil")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
     await page.keyboard.press("End");
     await expect(page.getByTestId("timeline-status")).toContainText(/Live/i);
 
@@ -95,12 +99,14 @@ test.describe("accessibility + responsive smoke", () => {
       Math.abs((boardAfter!.y ?? 0) - (boardBefore!.y ?? 0)),
     ).toBeLessThanOrEqual(1);
 
-    // Transport controls meet touch target size on narrow viewports.
-    const prev = page.getByTestId("timeline-prev");
-    const prevBox = await prev.boundingBox();
-    expect(prevBox).toBeTruthy();
-    expect(prevBox!.width).toBeGreaterThanOrEqual(44);
-    expect(prevBox!.height).toBeGreaterThanOrEqual(44);
+    // Timeline nodes meet touch target size on narrow viewports.
+    const node = page
+      .locator('[data-testid="move-list"] [data-timeline-node="true"]')
+      .first();
+    const nodeBox = await node.boundingBox();
+    expect(nodeBox).toBeTruthy();
+    expect(nodeBox!.width).toBeGreaterThanOrEqual(44);
+    expect(nodeBox!.height).toBeGreaterThanOrEqual(44);
 
     await page.keyboard.press("Escape");
     await expect(page.getByTestId("coach-expanded-panel")).toHaveCount(0);

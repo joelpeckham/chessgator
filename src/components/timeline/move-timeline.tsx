@@ -17,7 +17,7 @@ import {
   TIMELINE_GRAPH_HEIGHT_PX,
 } from "@/components/timeline/timeline-layout";
 import { nodeCenter, TimelineNode } from "@/components/timeline/timeline-node";
-import { TimelineTransport } from "@/components/timeline/timeline-transport";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { GameTree } from "@/domain/game";
 import { cn } from "@/lib/utils";
@@ -26,12 +26,15 @@ export type MoveTimelineProps = {
   tree: GameTree;
   graph: TimelineGraph;
   reviewNodeId: string | null;
+  /** Ephemeral hover cursor; does not pin review or dim the graph. */
+  previewNodeId?: string | null;
   disabled?: boolean;
   expandedOverflowKeys?: readonly string[];
   onExpandedOverflowChange?: (keys: readonly string[]) => void;
   /** Narrow layout: fewer variation lanes, hide unused lane labels. */
   compact?: boolean;
   onSelectNode: (nodeId: string) => void;
+  onPreviewNode?: (nodeId: string | null) => void;
   onReturnLive: () => void;
   /** Selecting a coach-lane node can open the coach rail. */
   onOpenCoach?: () => void;
@@ -44,41 +47,45 @@ export {
 } from "@/components/timeline/timeline-layout";
 
 function statusLineText(args: {
-  isReviewing: boolean;
+  viewingLive: boolean;
+  isPreviewing: boolean;
   selected: TimelineGraphNode | undefined;
   livePly: number;
 }): string {
-  const { isReviewing, selected, livePly } = args;
-  if (!isReviewing) {
+  const { viewingLive, isPreviewing, selected, livePly } = args;
+  if (viewingLive) {
     const move = Math.max(0, Math.floor((livePly + 1) / 2));
     return move === 0 ? "Live · start" : `Live · move ${move}`;
   }
-  if (!selected) return "Reviewing";
+  const prefix = isPreviewing ? "Preview" : "Reviewing";
+  if (!selected) return prefix;
   if (selected.kind === "tutor") {
-    return `Reviewing coach idea · ${selected.moveLabel}`;
+    return `${prefix} coach idea · ${selected.moveLabel}`;
   }
   if (selected.kind === "projected") {
-    return `Reviewing engine line · ${selected.moveLabel}`;
+    return `${prefix} engine line · ${selected.moveLabel}`;
   }
   if (!selected.isOnPlayedPath) {
-    return `Reviewing variation · ${selected.moveLabel}`;
+    return `${prefix} variation · ${selected.moveLabel}`;
   }
-  return `Reviewing · ${selected.moveLabel}`;
+  return `${prefix} · ${selected.moveLabel}`;
 }
 
 /**
- * Horizontal branching timeline with semantic lanes and transport controls.
- * Review selection is ephemeral — clicking does not mutate the live game tree.
+ * Horizontal branching timeline. Hover scrubs the main board; click pins
+ * an ephemeral review cursor without mutating the live game tree.
  */
 export function MoveTimeline({
   tree,
   graph,
   reviewNodeId,
+  previewNodeId = null,
   disabled = false,
   expandedOverflowKeys: controlledKeys,
   onExpandedOverflowChange,
   compact = false,
   onSelectNode,
+  onPreviewNode,
   onReturnLive,
   onOpenCoach,
   className,
@@ -94,8 +101,12 @@ export function MoveTimeline({
   const maxLaneSide = compact ? 1 : 2;
   const scrollRef = useRef<HTMLDivElement>(null);
   const selectedId = reviewNodeId ?? tree.currentNodeId;
+  const viewedId = previewNodeId ?? reviewNodeId ?? tree.currentNodeId;
   const isReviewing =
     reviewNodeId != null && reviewNodeId !== tree.currentNodeId;
+  const isPreviewing =
+    previewNodeId != null && previewNodeId !== tree.currentNodeId;
+  const viewingLive = viewedId === tree.currentNodeId;
 
   const sorted = graph.nodes;
   const height = TIMELINE_GRAPH_HEIGHT_PX;
@@ -103,10 +114,12 @@ export function MoveTimeline({
   const midY = (height - LABEL_H) / 2;
 
   const selectedNode = graph.nodes.find((n) => n.id === selectedId);
+  const viewedNode = graph.nodes.find((n) => n.id === viewedId);
   const liveNode = graph.nodes.find((n) => n.isLive);
   const statusText = statusLineText({
-    isReviewing,
-    selected: selectedNode,
+    viewingLive,
+    isPreviewing,
+    selected: isPreviewing ? viewedNode : selectedNode,
     livePly: liveNode?.ply ?? 0,
   });
 
@@ -222,23 +235,38 @@ export function MoveTimeline({
         data-testid="timeline-status"
       >
         <p className="truncate text-xs text-muted-foreground">{statusText}</p>
-        <div
-          className="hidden items-center gap-2 text-[0.65rem] text-muted-foreground sm:flex"
-          data-testid="timeline-legend"
-          aria-hidden
-        >
-          <span className="inline-flex items-center gap-1">
-            <span className="size-2 rounded-full bg-foreground" />
-            Played
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <span className="size-1.5 rotate-45 border border-primary bg-background" />
-            Coach
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <span className="size-2 rounded-full border border-muted-foreground bg-background" />
-            Engine
-          </span>
+        <div className="flex shrink-0 items-center gap-2">
+          {isReviewing ? (
+            <Button
+              type="button"
+              size="xs"
+              variant="ghost"
+              disabled={disabled}
+              aria-label="Return to live position"
+              data-testid="timeline-live"
+              onClick={onReturnLive}
+            >
+              Live
+            </Button>
+          ) : null}
+          <div
+            className="hidden items-center gap-2 text-[0.65rem] text-muted-foreground sm:flex"
+            data-testid="timeline-legend"
+            aria-hidden
+          >
+            <span className="inline-flex items-center gap-1">
+              <span className="size-2 rounded-full bg-foreground" />
+              Played
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <span className="size-1.5 rotate-45 border border-primary bg-background" />
+              Coach
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <span className="size-2 rounded-full border border-muted-foreground bg-background" />
+              Engine
+            </span>
+          </div>
         </div>
       </div>
       <CardContent className="flex items-stretch gap-2 px-2 py-2 sm:px-3">
@@ -268,6 +296,13 @@ export function MoveTimeline({
           className="min-h-16 min-w-0 flex-1 overflow-x-auto overflow-y-hidden scroll-fade-x [scrollbar-width:thin] focus-visible:ring-2 focus-visible:ring-ring"
           data-testid="move-list"
           onKeyDown={onKeyDown}
+          onPointerLeave={(event) => {
+            const next = event.relatedTarget;
+            if (next instanceof Node && event.currentTarget.contains(next)) {
+              return;
+            }
+            onPreviewNode?.(null);
+          }}
         >
           <p className="sr-only">
             Scroll for more moves. Arrow keys move along the selected branch.
@@ -360,6 +395,7 @@ export function MoveTimeline({
                       ]);
                       onSelectNode(headNodeId);
                     }}
+                    onPreviewNode={onPreviewNode}
                   />
                 );
               }
@@ -377,20 +413,12 @@ export function MoveTimeline({
                     onSelectNode(picked.id);
                     if (picked.kind === "tutor") onOpenCoach?.();
                   }}
+                  onPreview={(picked) => onPreviewNode?.(picked.id)}
                 />
               );
             })}
           </div>
         </div>
-
-        <TimelineTransport
-          disabled={disabled}
-          isReviewing={isReviewing}
-          onFirst={() => onSelectNode(tree.rootId)}
-          onPrev={() => step(-1)}
-          onNext={() => step(1)}
-          onLive={onReturnLive}
-        />
       </CardContent>
     </Card>
   );

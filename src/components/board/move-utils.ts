@@ -1,4 +1,9 @@
-import { type GameMove, getLegalMoves, type PieceSymbol } from "@/domain/game";
+import {
+  type GameMove,
+  getLegalMoves,
+  type PieceSymbol,
+  parseUci,
+} from "@/domain/game";
 
 export type BoardMove = {
   from: string;
@@ -32,6 +37,15 @@ export function findMove(
     return matches.find((move) => move.promotion === promotion) ?? null;
   }
   return matches.find((move) => !move.promotion) ?? matches[0] ?? null;
+}
+
+/** From/to squares for a UCI move, or null when the string is not a move. */
+export function lastMoveSquares(
+  uci: string | null | undefined,
+): { from: string; to: string } | null {
+  if (!uci) return null;
+  const parsed = parseUci(uci);
+  return parsed ? { from: parsed.from, to: parsed.to } : null;
 }
 
 export const PROMOTION_PIECES: PieceSymbol[] = ["q", "r", "b", "n"];

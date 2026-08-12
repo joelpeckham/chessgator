@@ -1,13 +1,7 @@
 "use client";
 
-import { BoardPreview } from "@/components/board/board-preview";
 import type { TimelineGraphNode } from "@/components/timeline/branch-graph";
 import { COL_W, LANE_H, NODE_R } from "@/components/timeline/timeline-layout";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
 import { cn } from "@/lib/utils";
 
 function ariaLabelFor(node: TimelineGraphNode): string {
@@ -56,6 +50,7 @@ export function TimelineNode({
   dimmed,
   disabled,
   onSelect,
+  onPreview,
 }: {
   node: TimelineGraphNode;
   cx: number;
@@ -64,55 +59,50 @@ export function TimelineNode({
   dimmed: boolean;
   disabled: boolean;
   onSelect: (node: TimelineGraphNode) => void;
+  onPreview?: (node: TimelineGraphNode) => void;
 }) {
-  const button = (
-    <button
-      type="button"
-      id={`timeline-node-${node.id}`}
-      role="option"
-      tabIndex={-1}
-      aria-selected={selected}
-      aria-label={ariaLabelFor(node)}
-      data-timeline-node="true"
-      data-node-id={node.id}
-      data-kind={node.kind}
-      data-lane={node.lane}
-      data-branch-key={node.branchKey}
-      data-variation={
-        node.kind === "variation" || node.kind === "tutor" ? "true" : "false"
-      }
-      data-testid={`timeline-node-${node.id}`}
-      disabled={disabled}
-      className={cn(
-        "absolute flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full sm:size-7",
-        "outline-none focus-visible:ring-2 focus-visible:ring-ring",
-        "touch-manipulation",
-        selected && "ring-2 ring-primary ring-offset-2 ring-offset-background",
-        dimmed && "opacity-40",
-      )}
-      style={{ left: cx, top: cy }}
-      onClick={() => onSelect(node)}
-    >
-      <NodeGlyph node={node} />
-      {node.isLive ? (
-        <span
-          className="absolute top-[calc(50%+11px)] left-1/2 -translate-x-1/2 rounded-sm bg-primary px-1 font-mono text-[0.55rem] leading-tight text-primary-foreground"
-          aria-hidden
-        >
-          Live
-        </span>
-      ) : null}
-    </button>
-  );
-
   return (
-    <div>
-      <HoverCard>
-        <HoverCardTrigger render={button} />
-        <HoverCardContent className="w-auto p-2" side="top">
-          <BoardPreview fen={node.fen} san={node.san} />
-        </HoverCardContent>
-      </HoverCard>
+    <>
+      <button
+        type="button"
+        id={`timeline-node-${node.id}`}
+        role="option"
+        tabIndex={-1}
+        aria-selected={selected}
+        aria-label={ariaLabelFor(node)}
+        data-timeline-node="true"
+        data-node-id={node.id}
+        data-kind={node.kind}
+        data-lane={node.lane}
+        data-branch-key={node.branchKey}
+        data-variation={
+          node.kind === "variation" || node.kind === "tutor" ? "true" : "false"
+        }
+        data-testid={`timeline-node-${node.id}`}
+        disabled={disabled}
+        className={cn(
+          "absolute flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full sm:size-7",
+          "outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          "touch-manipulation",
+          selected &&
+            "ring-2 ring-primary ring-offset-2 ring-offset-background",
+          !selected && "hover:ring-1 hover:ring-foreground/30",
+          dimmed && "opacity-40",
+        )}
+        style={{ left: cx, top: cy }}
+        onClick={() => onSelect(node)}
+        onPointerEnter={() => onPreview?.(node)}
+      >
+        <NodeGlyph node={node} />
+        {node.isLive ? (
+          <span
+            className="absolute top-[calc(50%+11px)] left-1/2 -translate-x-1/2 rounded-sm bg-primary px-1 font-mono text-[0.55rem] leading-tight text-primary-foreground"
+            aria-hidden
+          >
+            Live
+          </span>
+        ) : null}
+      </button>
       <span
         className={cn(
           "pointer-events-none absolute text-center font-mono text-[0.7rem] leading-tight text-muted-foreground",
@@ -128,7 +118,7 @@ export function TimelineNode({
         {node.kind === "projected" ? `~${node.san ?? ""}` : node.moveLabel}
         {node.isTruncated ? "…" : ""}
       </span>
-    </div>
+    </>
   );
 }
 

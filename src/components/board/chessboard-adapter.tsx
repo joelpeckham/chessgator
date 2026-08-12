@@ -362,6 +362,7 @@ export function ChessboardAdapter({
     arrows: boardArrows,
     showNotation: true,
     boardStyle: {
+      backgroundColor: "transparent",
       borderRadius: "var(--radius)",
       width: "100%",
     },

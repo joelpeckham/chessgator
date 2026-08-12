@@ -18,6 +18,7 @@ export type BranchPickerProps = {
   group: TimelineOverflowGroup;
   disabled?: boolean;
   onSelectBranch: (branchKey: string, headNodeId: string) => void;
+  onPreviewNode?: (nodeId: string | null) => void;
   className?: string;
   style?: CSSProperties;
 };
@@ -30,6 +31,7 @@ export function BranchPicker({
   group,
   disabled = false,
   onSelectBranch,
+  onPreviewNode,
   className,
   style,
 }: BranchPickerProps) {
@@ -37,7 +39,13 @@ export function BranchPicker({
   const count = group.hiddenBranches.length;
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (!next) onPreviewNode?.(null);
+      }}
+    >
       <PopoverTrigger
         render={
           <button
@@ -86,6 +94,7 @@ export function BranchPicker({
                 variant="ghost"
                 className="h-auto w-full justify-start gap-3 px-2 py-2"
                 data-testid={`branch-picker-item-${branch.headNodeId}`}
+                onPointerEnter={() => onPreviewNode?.(branch.headNodeId)}
                 onClick={() => {
                   onSelectBranch(branch.branchKey, branch.headNodeId);
                   setOpen(false);
