@@ -55,7 +55,7 @@ export function FeedbackStack({
             </AlertDescription>
           ) : null}
           {notice.dismissible !== false ? (
-            <AlertAction>
+            <AlertAction className="top-1/2 -translate-y-1/2">
               <Button
                 type="button"
                 size="icon-xs"
