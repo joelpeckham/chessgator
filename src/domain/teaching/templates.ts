@@ -2,10 +2,12 @@ import type { MoveClassification } from "@/domain/analysis/classification";
 import type { TeachingConcept } from "@/domain/teaching/types";
 
 export type TemplateContext = {
-  playedSan: string;
-  suggestedSan: string | null;
+  playedPhrase: string;
+  suggestedPhrase: string | null;
+  playedProblem: string | null;
+  playedBecause: string;
+  suggestedBecause: string | null;
   classification: MoveClassification;
-  evalLossCp: number;
 };
 
 const CLASSIFICATION_LABEL: Record<MoveClassification, string> = {
@@ -40,48 +42,56 @@ export function renderExplanation(
   concept: TeachingConcept,
   ctx: TemplateContext,
 ): string {
-  const better = ctx.suggestedSan
-    ? ` ${ctx.suggestedSan} keeps more of your advantage.`
-    : "";
-  const loss =
-    ctx.evalLossCp > 0
-      ? ` About ${ctx.evalLossCp} centipawns slipped away.`
-      : "";
+  const played = capitalizePhrase(ctx.playedPhrase);
+  const better = betterMoveSentence(ctx);
 
   let base: string;
   switch (concept) {
     case "best_move":
-      base = `${ctx.playedSan} matches the engine’s top choice.`;
+      base = `${played} is the strongest move because ${ctx.playedBecause}.`;
       break;
     case "solid_move":
-      base = `${ctx.playedSan} is a solid ${CLASSIFICATION_LABEL[ctx.classification].toLowerCase()} move.`;
+      base = `${played} is a solid ${CLASSIFICATION_LABEL[ctx.classification].toLowerCase()} move because ${ctx.playedBecause}.`;
       break;
     case "piece_safety":
-      base = `${ctx.playedSan} leaves material unsafe.${better}${loss}`;
+    case "threat":
+      if (ctx.playedProblem && better) {
+        base = `${played} ${ctx.playedProblem}.${better}`;
+      } else if (ctx.playedProblem) {
+        base = `${played} ${ctx.playedProblem} because ${ctx.playedBecause}.`;
+      } else {
+        base = `${played} leaves material unsafe because ${ctx.playedBecause}.${better}`;
+      }
       break;
     case "check":
-      base = `${ctx.playedSan} gives check — keep asking whether the follow-up is forced or only a tempo.`;
+      base = `${played} gives check because ${ctx.playedBecause}.${better}`;
       break;
     case "capture":
-      base = `${ctx.playedSan} wins or trades material.${better}`;
-      break;
-    case "threat":
-      base = `${ctx.playedSan} does not answer a live threat to your pieces.${better}${loss}`;
+      base = `${played} wins or trades material because ${ctx.playedBecause}.${better}`;
       break;
     case "development":
-      base = `${ctx.playedSan} affects development — prefer bringing new pieces into the game when the position is quiet.`;
+      base = `${played} affects development because ${ctx.playedBecause}.${better}`;
       break;
     case "king_safety":
-      base = `${ctx.playedSan} makes your king easier to attack.${better}${loss}`;
+      if (ctx.playedProblem && better) {
+        base = `${played} ${ctx.playedProblem}.${better}`;
+      } else if (ctx.playedProblem) {
+        base = `${played} ${ctx.playedProblem} because ${ctx.playedBecause}.`;
+      } else {
+        base = `${played} makes your king easier to attack because ${ctx.playedBecause}.${better}`;
+      }
       break;
     case "missed_improvement":
-      base = `${ctx.playedSan} is playable, but there was a clearer improvement.${better}${loss}`;
+      base =
+        ctx.suggestedPhrase && ctx.suggestedBecause
+          ? `${played} is playable, but ${ctx.suggestedPhrase} would be better because ${ctx.suggestedBecause}.`
+          : `${played} is playable because ${ctx.playedBecause}, but there was a clearer improvement.`;
       break;
     default:
-      base = `${ctx.playedSan}: ${CLASSIFICATION_LABEL[ctx.classification]}.${better}`;
+      base = `${played} is a ${CLASSIFICATION_LABEL[ctx.classification].toLowerCase()} because ${ctx.playedBecause}.${better}`;
   }
 
-  return base.trim();
+  return collapseSpaces(base);
 }
 
 export function hintQuestionForPosition(input: {
@@ -100,4 +110,18 @@ export function hintQuestionForPosition(input: {
     return "What is the most useful idea here — a threat, a developing move, or a king-safety step?";
   }
   return "What is your plan on this move?";
+}
+
+function betterMoveSentence(ctx: TemplateContext): string {
+  if (!ctx.suggestedPhrase || !ctx.suggestedBecause) return "";
+  return ` A better move would have been ${ctx.suggestedPhrase} because ${ctx.suggestedBecause}.`;
+}
+
+function capitalizePhrase(text: string): string {
+  if (text.length === 0) return text;
+  return text[0]!.toUpperCase() + text.slice(1);
+}
+
+function collapseSpaces(text: string): string {
+  return text.replace(/\s+/g, " ").replace(/\s+\./g, ".").trim();
 }

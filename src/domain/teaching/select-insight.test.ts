@@ -25,6 +25,12 @@ function evidence(
   };
 }
 
+function expectQuality(text: string): void {
+  expect(text.toLowerCase()).toContain("because");
+  expect(text).not.toMatch(/keeps more of your advantage/i);
+  expect(text).not.toMatch(/centipawn/i);
+}
+
 describe("teaching selection", () => {
   it("labels engine-best as best_move", () => {
     const fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -44,6 +50,11 @@ describe("teaching selection", () => {
     expect(insight.nudge).toBe(false);
     expect(insight.quip).toBe("That's the one.");
     expect(insight.suggestedMoveUci).toBeNull();
+    expectQuality(insight.explanation);
+    expect(insight.explanation.toLowerCase()).toContain("pawn");
+    expect(insight.explanation).toBe(
+      "Moving your pawn to e4 is the strongest move because you control more central squares.",
+    );
   });
 
   it("selects piece_safety when a hanging piece is left", () => {
@@ -70,17 +81,43 @@ describe("teaching selection", () => {
     expect(insight.lineUci[0]).toBe("h5e5");
     expect(insight.lineUci).not.toContain("a2a3");
     expect(insight.refutationUci[0]).toBe("g6h5");
-    expect(insight.explanation.length).toBeGreaterThan(10);
+    expectQuality(insight.explanation);
+    expect(insight.explanation.toLowerCase()).toMatch(/queen|pawn/);
+    expect(insight.explanation.toLowerCase()).toContain("moving your pawn");
+  });
+
+  it("explains a hanging knight versus kingside castling", () => {
+    const fen =
+      "r1bqk2r/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4";
+    const played = tryApplyMove(fen, "f3h4")!;
+    expect(played).toBeTruthy();
+    const moveEvidence = buildMoveAnalysisEvidence({
+      requestId: "r3",
+      gameNodeId: "node-3",
+      playedMove: played.move,
+      fenBefore: fen,
+      fenAfter: played.fenAfter,
+      before: evidence(fen, { cp: 40 }, "e1g1", ["e1g1"]),
+      after: evidence(played.fenAfter, { cp: -180 }, "d8h4", ["d8h4"]),
+    });
+    const insight = selectTeachingInsight(moveEvidence);
+    expectQuality(insight.explanation);
+    expect(insight.explanation).toBe(
+      "Moving your knight to h4 puts it at risk of attack from the black queen. A better move would have been castling kingside because it gets your king out of danger and activates your rook.",
+    );
   });
 
   it("templates render classification without Maia likelihood", () => {
     const text = renderExplanation("solid_move", {
-      playedSan: "Nf3",
-      suggestedSan: null,
+      playedPhrase: "moving your knight to f3",
+      suggestedPhrase: null,
+      playedProblem: null,
+      playedBecause: "it develops your knight",
+      suggestedBecause: null,
       classification: "good",
-      evalLossCp: 15,
     });
-    expect(text).toMatch(/Nf3/);
+    expect(text).toMatch(/knight to f3/);
+    expect(text).toMatch(/because/);
     expect(text).not.toMatch(
       /model-predicted likelihood|population frequency/i,
     );

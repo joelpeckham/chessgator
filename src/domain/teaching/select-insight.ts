@@ -2,9 +2,23 @@ import {
   type MoveClassification,
   shouldNudge,
 } from "@/domain/analysis/classification";
+import {
+  type ExplanationReason,
+  pickBenefitReasons,
+  pickProblemReasons,
+} from "@/domain/analysis/explanation-reasons";
 import type { MoveAnalysisEvidence } from "@/domain/analysis/move-analysis";
+import {
+  collectMoveEffects,
+  walkLineEvents,
+} from "@/domain/analysis/move-effects";
 import type { TacticalFacts } from "@/domain/analysis/tactics";
-import { uciToSan } from "@/domain/game/rules";
+import { tryApplyMove, uciToSan } from "@/domain/game/rules";
+import {
+  describeBecause,
+  describeMove,
+  describePlayedProblem,
+} from "@/domain/teaching/move-copy";
 import { renderExplanation, renderQuip } from "@/domain/teaching/templates";
 import type { TeachingConcept, TeachingInsight } from "@/domain/teaching/types";
 
@@ -43,15 +57,75 @@ export function selectTeachingInsight(
                 evidence.playedMove.uci.toLowerCase(),
           )?.pvUci[0] ?? null);
 
-  const suggestedMoveSan = suggestedMoveUci
-    ? uciToSan(evidence.fenBefore, suggestedMoveUci)
+  const suggestedApplied = suggestedMoveUci
+    ? tryApplyMove(evidence.fenBefore, suggestedMoveUci)
+    : null;
+  const suggestedMoveSan =
+    suggestedApplied?.move.san ??
+    (suggestedMoveUci ? uciToSan(evidence.fenBefore, suggestedMoveUci) : null);
+
+  const playedEffects = collectMoveEffects({
+    fenBefore: evidence.fenBefore,
+    move: evidence.playedMove,
+    fenAfter: evidence.fenAfter,
+  });
+  const suggestedEffects = suggestedApplied
+    ? collectMoveEffects({
+        fenBefore: evidence.fenBefore,
+        move: suggestedApplied.move,
+        fenAfter: suggestedApplied.fenAfter,
+      })
     : null;
 
+  const improvementEvents = walkLineEvents(
+    evidence.fenBefore,
+    evidence.shortPvUci,
+  );
+  const refutationEvents = walkLineEvents(
+    evidence.fenAfter,
+    evidence.refutationUci,
+  );
+
+  const problemReasons = pickProblemReasons(playedEffects, refutationEvents);
+  const playedBenefits = pickBenefitReasons(playedEffects, []);
+  const suggestedBenefits = suggestedEffects
+    ? dropRedundantCapture(
+        pickBenefitReasons(suggestedEffects, improvementEvents, playedEffects),
+        Boolean(suggestedEffects.captured),
+      )
+    : [];
+
+  const playedPhrase = describeMove(evidence.playedMove);
+  const suggestedPhrase = suggestedApplied
+    ? describeMove(suggestedApplied.move)
+    : null;
+  const playedProblem = problemReasons[0]
+    ? describePlayedProblem(problemReasons[0], evidence.playedMove)
+    : null;
+  const explainPlayedAsBenefit =
+    concept === "best_move" ||
+    concept === "solid_move" ||
+    concept === "check" ||
+    concept === "capture" ||
+    concept === "development";
+  const playedBecause = describeBecause(
+    explainPlayedAsBenefit || problemReasons.length === 0
+      ? playedBenefits
+      : problemReasons,
+    evidence.playedMove.color,
+  );
+  const suggestedBecause =
+    suggestedPhrase && suggestedBenefits.length > 0
+      ? describeBecause(suggestedBenefits, evidence.playedMove.color)
+      : null;
+
   const explanation = renderExplanation(concept, {
-    playedSan: evidence.playedMove.san,
-    suggestedSan: suggestedMoveSan,
+    playedPhrase,
+    suggestedPhrase,
+    playedProblem,
+    playedBecause,
+    suggestedBecause,
     classification: evidence.classification,
-    evalLossCp: evidence.evalLossCp,
   });
 
   const confidence = computeConfidence(evidence, concept);
@@ -84,6 +158,17 @@ export function chooseConcept(evidence: MoveAnalysisEvidence): TeachingConcept {
   return classification === "excellent" || classification === "good"
     ? "solid_move"
     : "missed_improvement";
+}
+
+function dropRedundantCapture(
+  reasons: ExplanationReason[],
+  moveIsCapture: boolean,
+): ExplanationReason[] {
+  if (!moveIsCapture) return reasons;
+  const withoutImmediateCapture = reasons.filter(
+    (reason) => !(reason.kind === "capture" && !reason.likely),
+  );
+  return withoutImmediateCapture.length > 0 ? withoutImmediateCapture : reasons;
 }
 
 function matchesConcept(

@@ -75,6 +75,12 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
       "Best",
     );
     await expect(page.getByTestId("teaching-explanation")).toBeVisible();
+    await expect(page.getByTestId("teaching-explanation")).toContainText(
+      /because/i,
+    );
+    await expect(page.getByTestId("teaching-explanation")).toContainText(
+      /pawn/i,
+    );
     await expect(page.getByTestId("concept-badge")).toHaveCount(0);
     await expect(page.getByTestId("show-line-button")).toHaveCount(0);
 
@@ -132,6 +138,9 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
     await expect(page.getByTestId("teaching-card")).toHaveAttribute(
       "data-state",
       "feedback",
+    );
+    await expect(page.getByTestId("teaching-explanation")).toContainText(
+      /because/i,
     );
     await expect(page.getByTestId("explore-line-button")).toBeVisible();
 
