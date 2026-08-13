@@ -52,9 +52,11 @@ describe("teaching selection", () => {
     expect(insight.suggestedMoveUci).toBeNull();
     expectQuality(insight.explanation);
     expect(insight.explanation.toLowerCase()).toContain("pawn");
-    expect(insight.explanation).toBe(
-      "Moving your pawn to e4 is the strongest move because you control more central squares.",
+    expect(insight.explanation.toLowerCase()).toMatch(
+      /strongest move|one of several strong moves/,
     );
+    expect(insight.explanation.toLowerCase()).toMatch(/central squares|center/);
+    expect(insight.explanation).not.toMatch(/\bis a excellent\b/);
   });
 
   it("selects piece_safety when a hanging piece is left", () => {
@@ -102,19 +104,24 @@ describe("teaching selection", () => {
     });
     const insight = selectTeachingInsight(moveEvidence);
     expectQuality(insight.explanation);
-    expect(insight.explanation).toBe(
-      "Moving your knight to h4 puts it at risk of attack from the black queen. A better move would have been castling kingside because it gets your king out of danger and activates your rook.",
+    expect(insight.explanation.toLowerCase()).toMatch(/knight/);
+    expect(insight.explanation.toLowerCase()).toMatch(
+      /castle|king|rook|safer|danger/,
     );
   });
 
   it("templates render classification without Maia likelihood", () => {
-    const text = renderExplanation("solid_move", {
+    const text = renderExplanation({
       playedPhrase: "moving your knight to f3",
       suggestedPhrase: null,
-      playedProblem: null,
+      problem: null,
+      consequence: null,
       playedBecause: "it develops your knight",
       suggestedBecause: null,
       classification: "good",
+      concept: "solid_move",
+      evalFrame: null,
+      margin: null,
     });
     expect(text).toMatch(/knight to f3/);
     expect(text).toMatch(/because/);

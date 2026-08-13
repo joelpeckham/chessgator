@@ -1,0 +1,42 @@
+[
+  {
+    "id": "skewer-king-rook:best",
+    "severity": "wrong",
+    "quote": "Moving your rook to e1 puts it at risk of attack from the black king.",
+    "why": "A best-move skewer was framed as hanging the rook. Problem reasons were used on benefit moves.",
+    "suggestedFix": "reason",
+    "promoted": "golden-corpus: explains a winning skewer without calling the best move a hanging"
+  },
+  {
+    "id": "pin-relative:wrong",
+    "severity": "wrong",
+    "quote": "Moving your rook to a2 is the only move that holds",
+    "why": "Blunders inherited MultiPV-only margin copy.",
+    "suggestedFix": "copy",
+    "promoted": "templates.test: never calls a blunder the only move that holds"
+  },
+  {
+    "id": "001wr:wrong",
+    "severity": "wrong",
+    "quote": "Moving your a8-rook to b8 is playable",
+    "why": "missed_improvement used playable framing for blunders.",
+    "suggestedFix": "copy",
+    "promoted": "templates.test: does not call a blunder playable"
+  },
+  {
+    "id": "00JQS:best",
+    "severity": "tautology",
+    "quote": "it forces checkmate in 2 moves and it puts the opponent in check",
+    "why": "Check restates forced mate.",
+    "suggestedFix": "reason",
+    "promoted": "selectBecauseReasons drops check when mate is present"
+  },
+  {
+    "id": "00DEc:wrong",
+    "severity": "generic",
+    "quote": "it gives your king better protection",
+    "why": "King-safety filler attached after a concrete discovered attack.",
+    "suggestedFix": "reason",
+    "promoted": "describeBecause prefers tactical reasons over king_safer"
+  }
+]

@@ -57,4 +57,27 @@ describe("hint escalation", () => {
     expect(nextHintLevel(0)).toBe(1);
     expect(nextHintLevel(3)).toBe(3);
   });
+
+  it("asks a pin-specific question and highlights the pinner", () => {
+    const pinFen = "4k3/4n3/8/8/8/8/8/R6K w - - 0 1";
+    const step = buildHintStep({
+      fen: pinFen,
+      sideToMove: "w",
+      positionAnalysis: {
+        requestId: "h",
+        gameNodeId: "g",
+        fen: pinFen,
+        sideToMove: "w",
+        score: { cp: 300 },
+        bestMoveUci: "a1e1",
+        lines: [{ multipv: 1, score: { cp: 300 }, pvUci: ["a1e1"] }],
+      },
+      level: 1,
+    });
+    expect(step.question.toLowerCase()).toMatch(/pin/);
+    expect(step.question.toLowerCase()).not.toMatch(/hit two targets at once/);
+    expect(step.highlightSquares).toEqual(
+      expect.arrayContaining(["e1", "e7", "e8"]),
+    );
+  });
 });

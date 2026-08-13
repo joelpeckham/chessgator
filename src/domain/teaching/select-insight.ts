@@ -3,21 +3,29 @@ import {
   shouldNudge,
 } from "@/domain/analysis/classification";
 import {
-  type ExplanationReason,
+  classifyEvalFrame,
+  classifyMoveMargin,
+  contrastBenefits,
+  dropTautologyReasons,
   pickBenefitReasons,
+  pickMateBenefits,
   pickProblemReasons,
+  rankReasons,
+  verifyLikelyTactics,
 } from "@/domain/analysis/explanation-reasons";
 import type { MoveAnalysisEvidence } from "@/domain/analysis/move-analysis";
 import {
   collectMoveEffects,
-  walkLineEvents,
+  summarizeLine,
 } from "@/domain/analysis/move-effects";
 import type { TacticalFacts } from "@/domain/analysis/tactics";
 import { tryApplyMove, uciToSan } from "@/domain/game/rules";
 import {
   describeBecause,
+  describeConsequence,
   describeMove,
   describePlayedProblem,
+  describeRefutationPunchline,
 } from "@/domain/teaching/move-copy";
 import { renderExplanation, renderQuip } from "@/domain/teaching/templates";
 import type { TeachingConcept, TeachingInsight } from "@/domain/teaching/types";
@@ -42,7 +50,6 @@ export function selectTeachingInsight(
   evidence: MoveAnalysisEvidence,
 ): TeachingInsight {
   const concept = chooseConcept(evidence);
-  // Best moves have no "try instead" — don't pick MultiPV #2 as a fake alternate.
   const suggestedMoveUci =
     evidence.classification === "best"
       ? null
@@ -77,55 +84,136 @@ export function selectTeachingInsight(
       })
     : null;
 
-  const improvementEvents = walkLineEvents(
+  const improvement = summarizeLine(
     evidence.fenBefore,
     evidence.shortPvUci,
+    4,
+    { extendForcing: true },
   );
-  const refutationEvents = walkLineEvents(
+  const refutation = summarizeLine(
     evidence.fenAfter,
     evidence.refutationUci,
+    4,
+    { extendForcing: true },
   );
 
-  const problemReasons = pickProblemReasons(playedEffects, refutationEvents);
-  const playedBenefits = pickBenefitReasons(playedEffects, []);
-  const suggestedBenefits = suggestedEffects
-    ? dropRedundantCapture(
-        pickBenefitReasons(suggestedEffects, improvementEvents, playedEffects),
-        Boolean(suggestedEffects.captured),
-      )
-    : [];
+  const problemReasons = rankReasons(
+    pickProblemReasons(playedEffects, refutation.events, {
+      evalAfter: evidence.evalAfter,
+      refutationNetCp: refutation.netMaterialCp,
+    }),
+  );
+  const mateBenefits = pickMateBenefits({
+    evalBefore: evidence.evalBefore,
+    bestLineScore: evidence.alternatives[0]?.score,
+    mover: evidence.playedMove.color,
+  });
 
-  const playedPhrase = describeMove(evidence.playedMove);
-  const suggestedPhrase = suggestedApplied
-    ? describeMove(suggestedApplied.move)
-    : null;
-  const playedProblem = problemReasons[0]
-    ? describePlayedProblem(problemReasons[0], evidence.playedMove)
-    : null;
   const explainPlayedAsBenefit =
     concept === "best_move" ||
     concept === "solid_move" ||
     concept === "check" ||
     concept === "capture" ||
     concept === "development";
-  const playedBecause = describeBecause(
+
+  let playedBenefits = dropTautologyReasons(
+    pickBenefitReasons(playedEffects, []),
+    evidence.playedMove,
+  );
+  if (explainPlayedAsBenefit) {
+    playedBenefits = [
+      ...mateBenefits.filter((reason) => reason.kind === "forces_mate"),
+      ...playedBenefits,
+    ];
+  }
+
+  let suggestedBenefits = suggestedEffects
+    ? dropTautologyReasons(
+        pickBenefitReasons(suggestedEffects, improvement.events, playedEffects),
+        suggestedEffects.move,
+      )
+    : [];
+  suggestedBenefits = contrastBenefits(
+    verifyLikelyTactics(
+      [
+        ...mateBenefits.filter(
+          (reason) =>
+            reason.kind === "forces_mate" || reason.kind === "missed_mate",
+        ),
+        ...suggestedBenefits,
+      ],
+      evidence.evalLossCp,
+    ),
+    playedBenefits,
+  );
+  suggestedBenefits = rankReasons(suggestedBenefits);
+
+  const copyOpts = {
+    fen: evidence.fenBefore,
+    seed: evidence.gameNodeId,
+  };
+  const playedPhrase = describeMove(evidence.playedMove, copyOpts);
+  const suggestedPhrase = suggestedApplied
+    ? describeMove(suggestedApplied.move, copyOpts)
+    : null;
+  const problem =
+    explainPlayedAsBenefit || !problemReasons[0]
+      ? null
+      : describePlayedProblem(problemReasons[0], evidence.playedMove, copyOpts);
+  const consequence = explainPlayedAsBenefit
+    ? null
+    : (describeConsequence(
+        problemReasons,
+        evidence.playedMove.color,
+        copyOpts,
+      ) ??
+      (problemReasons[0]?.kind === "refutation_material"
+        ? describeRefutationPunchline(
+            refutation.events,
+            refutation.netMaterialCp,
+            evidence.playedMove.color,
+            copyOpts,
+          )
+        : null));
+  const becauseReasons =
     explainPlayedAsBenefit || problemReasons.length === 0
       ? playedBenefits
-      : problemReasons,
+      : problemReasons;
+  const playedBecause = describeBecause(
+    becauseReasons,
+    evidence.playedMove.color,
+    copyOpts,
+  );
+  const margin = classifyMoveMargin(
+    evidence.alternatives,
     evidence.playedMove.color,
   );
-  const suggestedBecause =
-    suggestedPhrase && suggestedBenefits.length > 0
-      ? describeBecause(suggestedBenefits, evidence.playedMove.color)
+  const skipSuggestionLecture =
+    suggestedBenefits.length === 0 &&
+    (margin === "near_equal" || evidence.evalLossCp <= 50);
+  let suggestedBecause =
+    !skipSuggestionLecture && suggestedPhrase && suggestedBenefits.length > 0
+      ? describeBecause(suggestedBenefits, evidence.playedMove.color, copyOpts)
       : null;
+  if (suggestedBecause && playedBecause && suggestedBecause === playedBecause) {
+    suggestedBecause = null;
+  }
 
-  const explanation = renderExplanation(concept, {
+  const explanation = renderExplanation({
     playedPhrase,
-    suggestedPhrase,
-    playedProblem,
+    suggestedPhrase: skipSuggestionLecture ? null : suggestedPhrase,
+    problem,
+    consequence,
     playedBecause,
     suggestedBecause,
     classification: evidence.classification,
+    concept,
+    evalFrame: classifyEvalFrame(
+      evidence.evalBefore,
+      evidence.evalAfter,
+      evidence.playedMove.color,
+    ),
+    margin,
   });
 
   const confidence = computeConfidence(evidence, concept);
@@ -145,9 +233,23 @@ export function selectTeachingInsight(
 }
 
 export function chooseConcept(evidence: MoveAnalysisEvidence): TeachingConcept {
-  const { classification, tacticalFacts: t, evalLossCp } = evidence;
+  const { classification, tacticalFacts: t, evalLossCp, evalAfter } = evidence;
+  const mover = evidence.playedMove.color;
+  const mateAgainst =
+    evalAfter.mate !== undefined &&
+    ((mover === "w" && evalAfter.mate < 0) ||
+      (mover === "b" && evalAfter.mate > 0));
 
   if (classification === "best") return "best_move";
+
+  if (
+    mateAgainst &&
+    (classification === "inaccuracy" ||
+      classification === "mistake" ||
+      classification === "blunder")
+  ) {
+    return "king_safety";
+  }
 
   for (const concept of CONCEPT_PRIORITY) {
     if (matchesConcept(concept, classification, t, evalLossCp)) {
@@ -158,17 +260,6 @@ export function chooseConcept(evidence: MoveAnalysisEvidence): TeachingConcept {
   return classification === "excellent" || classification === "good"
     ? "solid_move"
     : "missed_improvement";
-}
-
-function dropRedundantCapture(
-  reasons: ExplanationReason[],
-  moveIsCapture: boolean,
-): ExplanationReason[] {
-  if (!moveIsCapture) return reasons;
-  const withoutImmediateCapture = reasons.filter(
-    (reason) => !(reason.kind === "capture" && !reason.likely),
-  );
-  return withoutImmediateCapture.length > 0 ? withoutImmediateCapture : reasons;
 }
 
 function matchesConcept(
@@ -227,6 +318,7 @@ function computeConfidence(
   }
   if (concept === "threat" && t.ignoredThreat) score += 0.1;
   if (evidence.before.depth && evidence.before.depth >= 8) score += 0.05;
+  if (evidence.evalAfter.mate !== undefined) score += 0.08;
 
   return Math.max(0, Math.min(1, Number(score.toFixed(2))));
 }

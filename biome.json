@@ -18,7 +18,8 @@
       "!**/tests/maia/.generated",
       "!**/bun.lock",
       "!**/package-lock.json",
-      "!**/assets.lock.json"
+      "!**/assets.lock.json",
+      "!**/scripts/fixtures"
     ]
   },
   "formatter": {

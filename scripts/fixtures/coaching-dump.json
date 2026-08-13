@@ -1,0 +1,5276 @@
+[
+  {
+    "id": "stub-0:best",
+    "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+    "playedUci": "e2e4",
+    "explanation": "Moving your pawn to e4 is one of several strong moves because you claim more of the center.",
+    "reasons": [
+      "center_control"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "stub-0:alt",
+    "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+    "playedUci": "d2d4",
+    "explanation": "Moving your pawn to d4 is a mistake because you claim more of the center.",
+    "reasons": [
+      "center_control"
+    ],
+    "classification": "mistake",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "stub-1:best",
+    "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+    "playedUci": "e7e5",
+    "explanation": "Moving your pawn to e5 is the strongest move because you control more central squares.",
+    "reasons": [
+      "center_control"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "stub-2:best",
+    "fen": "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1",
+    "playedUci": "d7d5",
+    "explanation": "Moving your pawn to d5 is the strongest move because you control more central squares.",
+    "reasons": [
+      "center_control"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "stub-3:best",
+    "fen": "rnbqkbnr/pppp1p1p/6p1/4p2Q/4P3/8/PPPP1PPP/RNB1KBNR w KQkq - 0 3",
+    "playedUci": "h5e5",
+    "explanation": "Taking the pawn on e5 with your queen is the only move that holds because you fork the black king and the black h8-rook and the pawn was undefended.",
+    "reasons": [
+      "fork",
+      "wins_material",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "stub-3:alt",
+    "fen": "rnbqkbnr/pppp1p1p/6p1/4p2Q/4P3/8/PPPP1PPP/RNB1KBNR w KQkq - 0 3",
+    "playedUci": "a2a3",
+    "explanation": "Moving your pawn to a3 is the only move that holds.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "stub-4:best",
+    "fen": "rnbqkbnr/pppp1p1p/6p1/4p2Q/4P3/P7/1PPP1PPP/RNB1KBNR b KQkq - 0 3",
+    "playedUci": "g6h5",
+    "explanation": "Taking the queen on h5 with your g-pawn is the strongest move because the queen was undefended.",
+    "reasons": [
+      "doubled_pawns",
+      "isolated_pawn",
+      "wins_material",
+      "capture",
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "fork-knight:best",
+    "fen": "4k3/8/8/8/3Q4/n7/8/4K3 b - - 0 1",
+    "playedUci": "a3c2",
+    "explanation": "Moving your knight to c2 is the only move that holds because you fork the white queen and the white king.",
+    "reasons": [
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "fork-knight:wrong",
+    "fen": "4k3/8/8/8/3Q4/n7/8/4K3 b - - 0 1",
+    "playedUci": "e8f8",
+    "explanation": "Moving your king to f8 is a blunder, but moving your knight to c2 would be better because you fork the white queen and the white king.",
+    "reasons": [
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "pin-absolute:best",
+    "fen": "4k3/4n3/8/8/8/8/8/R6K w - - 0 1",
+    "playedUci": "a1e1",
+    "explanation": "Moving your rook to e1 is the only move that holds because you pin the knight to the king.",
+    "reasons": [
+      "pin"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "pin-absolute:wrong",
+    "fen": "4k3/4n3/8/8/8/8/8/R6K w - - 0 1",
+    "playedUci": "a1a2",
+    "explanation": "Moving your rook to a2 is a blunder, but moving your rook to e1 would be better because you pin the knight to the king.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "pin-relative:best",
+    "fen": "k3q3/8/4n3/8/8/8/8/R6K w - - 0 1",
+    "playedUci": "a1e1",
+    "explanation": "Moving your rook to e1 is the only move that holds because you pin the knight to the queen.",
+    "reasons": [
+      "pin"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "pin-relative:wrong",
+    "fen": "k3q3/8/4n3/8/8/8/8/R6K w - - 0 1",
+    "playedUci": "a1a2",
+    "explanation": "Moving your rook to a2 is a blunder because it attacks the king directly. A better move would have been moving your rook to e1 because you pin the knight to the queen.",
+    "reasons": [
+      "check"
+    ],
+    "classification": "blunder",
+    "concept": "check"
+  },
+  {
+    "id": "skewer-king-rook:best",
+    "fen": "4r3/8/8/8/8/8/4k3/R6K w - - 0 1",
+    "playedUci": "a1e1",
+    "explanation": "Moving your rook to e1 is the only move that holds because you skewer the black king, exposing the black rook.",
+    "reasons": [
+      "hanging",
+      "skewer",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "skewer-king-rook:wrong",
+    "fen": "4r3/8/8/8/8/8/4k3/R6K w - - 0 1",
+    "playedUci": "a1a2",
+    "explanation": "Moving your rook to a2 is a blunder because it puts the opponent in check. A better move would have been moving your rook to e1 because you skewer the black king, exposing the black rook.",
+    "reasons": [
+      "check"
+    ],
+    "classification": "blunder",
+    "concept": "check"
+  },
+  {
+    "id": "discovered-check:best",
+    "fen": "3k4/8/8/8/8/8/3N4/3RK3 w - - 0 1",
+    "playedUci": "d2e4",
+    "explanation": "Moving your knight to e4 is the only move that holds because it opens a line to the king.",
+    "reasons": [
+      "discovered_check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "discovered-check:wrong",
+    "fen": "3k4/8/8/8/8/8/3N4/3RK3 w - - 0 1",
+    "playedUci": "d2b3",
+    "explanation": "Moving your knight to b3 is a blunder because it opens a line to the king. A better move would have been moving your knight to e4.",
+    "reasons": [
+      "discovered_check"
+    ],
+    "classification": "blunder",
+    "concept": "check"
+  },
+  {
+    "id": "back-rank:best",
+    "fen": "6k1/5ppp/8/8/8/8/8/R6K w - - 0 1",
+    "playedUci": "a1a8",
+    "explanation": "Moving your rook to a8 is the only move that holds because it forces checkmate in 2 moves.",
+    "reasons": [
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "back-rank:wrong",
+    "fen": "6k1/5ppp/8/8/8/8/8/R6K w - - 0 1",
+    "playedUci": "a1a2",
+    "explanation": "Moving your rook to a2 is a blunder, but moving your rook to a8 would be better because it forces checkmate in 2 moves.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "trapped-knight-edge:best",
+    "fen": "7n/6P1/8/8/8/8/8/4K2k w - - 0 1",
+    "playedUci": "g7g8q",
+    "explanation": "Promoting your pawn to a queen on g8 is the only move that holds.",
+    "reasons": [
+      "promotion"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "trapped-knight-edge:wrong",
+    "fen": "7n/6P1/8/8/8/8/8/4K2k w - - 0 1",
+    "playedUci": "g7g8n",
+    "explanation": "Promoting your pawn to a knight on g8 is a blunder, but promoting your pawn to a queen on g8 would be better.",
+    "reasons": [
+      "promotion"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "000Pw:best",
+    "fen": "6k1/5p1p/4p3/4q3/3n4/2Q3P1/PP1N1P1P/6K1 b - - 3 37",
+    "playedUci": "d4e2",
+    "explanation": "Moving your knight to e2 is the only move that holds because you fork the white queen and the white king and it unveils an attack from your queen on the white queen.",
+    "reasons": [
+      "hanging",
+      "fork",
+      "discovered_attack"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "000Pw:wrong",
+    "fen": "6k1/5p1p/4p3/4q3/3n4/2Q3P1/PP1N1P1P/6K1 b - - 3 37",
+    "playedUci": "g8h8",
+    "explanation": "Moving your king to h8 leaves your king with less pawn cover. A better move would have been moving your knight to e2 because you fork the white queen and the white king and it unveils an attack from your queen on the white queen.",
+    "reasons": [
+      "pawn_shield"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "000rO:best",
+    "fen": "3R4/8/8/KB2b3/1p6/1P2k3/3p4/8 b - - 0 58",
+    "playedUci": "e5c7",
+    "explanation": "Moving your bishop to c7 is the only move that holds because you fork the white rook and the white king.",
+    "reasons": [
+      "ignored_threat",
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "000rO:wrong",
+    "fen": "3R4/8/8/KB2b3/1p6/1P2k3/3p4/8 b - - 0 58",
+    "playedUci": "e5d6",
+    "explanation": "Moving your bishop to d6 puts it where the white rook can take and you lose a knight. A better move would have been moving your bishop to c7 because you fork the white rook and the white king.",
+    "reasons": [
+      "hanging",
+      "saves_piece",
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "0017R:best",
+    "fen": "r2qk2r/pp2ppbp/1n1p2p1/3P4/2n5/2NBBP1P/PP3P2/R2QK2R w KQkq - 0 13",
+    "playedUci": "d3c4",
+    "explanation": "Taking the knight on c4 with your d3-bishop is the only move that holds because it saves your pawn from capture.",
+    "reasons": [
+      "hanging",
+      "capture",
+      "saves_piece",
+      "king_safer"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "0017R:wrong",
+    "fen": "r2qk2r/pp2ppbp/1n1p2p1/3P4/2n5/2NBBP1P/PP3P2/R2QK2R w KQkq - 0 13",
+    "playedUci": "c3a4",
+    "explanation": "Moving your knight to a4 leaves your pawn hanging to the black b6-knight. A better move would have been taking the knight on c4 with your d3-bishop because it saves your pawn from capture.",
+    "reasons": [
+      "ignored_threat",
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "001wr:best",
+    "fen": "r4rk1/p3ppbp/Pp1q1np1/3PpbB1/2B5/2N2P2/1PPQ2PP/3RR1K1 b - - 0 18",
+    "playedUci": "d6c5",
+    "explanation": "Moving your queen to c5 is the only move that holds because you fork the white c4-bishop and the white king.",
+    "reasons": [
+      "hanging",
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "001wr:wrong",
+    "fen": "r4rk1/p3ppbp/Pp1q1np1/3PpbB1/2B5/2N2P2/1PPQ2PP/3RR1K1 b - - 0 18",
+    "playedUci": "a8b8",
+    "explanation": "Moving your a8-rook to b8 is a blunder, but moving your queen to c5 would be better because you fork the white c4-bishop and the white king.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "002GQ:best",
+    "fen": "5rk1/5ppp/4p3/4N3/8/1Pn5/5PPP/2R3K1 b - - 1 28",
+    "playedUci": "c3e2",
+    "explanation": "Moving your knight to e2 is the only move that holds because you fork the white rook and the white king.",
+    "reasons": [
+      "back_rank",
+      "fork",
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "002GQ:wrong",
+    "fen": "5rk1/5ppp/4p3/4N3/8/1Pn5/5PPP/2R3K1 b - - 1 28",
+    "playedUci": "f8e8",
+    "explanation": "Moving your rook to e8 leaves your knight hanging to the white rook. A better move would have been moving your knight to e2 because you fork the white rook and the white king.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "002IE:best",
+    "fen": "r3brk1/5pp1/p2qpn1p/P2pn3/2pP4/2P1PN2/5PPP/RB1QK2R w KQ - 0 17",
+    "playedUci": "d4e5",
+    "explanation": "Taking the knight on e5 with your d-pawn is the only move that holds because you fork the black queen and the black f6-knight and the knight was undefended.",
+    "reasons": [
+      "doubled_pawns",
+      "isolated_pawn",
+      "fork",
+      "wins_material",
+      "discovered_attack"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "002IE:wrong",
+    "fen": "r3brk1/5pp1/p2qpn1p/P2pn3/2pP4/2P1PN2/5PPP/RB1QK2R w KQ - 0 17",
+    "playedUci": "e3e4",
+    "explanation": "Moving your pawn to e4 puts it at risk of attack from the black f6-knight and pawn. A better move would have been taking the knight on e5 with your d-pawn because you fork the black queen and the black f6-knight and the knight was undefended.",
+    "reasons": [
+      "hanging",
+      "pawn_shield"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "002Tf:best",
+    "fen": "r3kbnr/ppp1qppp/2n5/1B1pP3/5B2/4PQ2/PPP2PPP/RN2K2R b KQkq - 2 7",
+    "playedUci": "e7b4",
+    "explanation": "Moving your queen to b4 is the only move that holds because you fork the white b5-bishop and the white f4-bishop.",
+    "reasons": [
+      "ignored_threat",
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "002Tf:wrong",
+    "fen": "r3kbnr/ppp1qppp/2n5/1B1pP3/5B2/4PQ2/PPP2PPP/RN2K2R b KQkq - 2 7",
+    "playedUci": "a8b8",
+    "explanation": "Moving your a8-rook to b8 leaves your pawn hanging to the white queen. A better move would have been moving your queen to b4 because you fork the white b5-bishop and the white f4-bishop.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "003Jb:best",
+    "fen": "6k1/Q2bqr1p/2rpp1pR/p7/Pp2P3/1B3P2/1PP3P1/2KR4 b - - 7 22",
+    "playedUci": "e7g5",
+    "explanation": "Moving your queen to g5 is the only move that holds because you fork the white h6-rook and the white king.",
+    "reasons": [
+      "fork",
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "003Jb:wrong",
+    "fen": "6k1/Q2bqr1p/2rpp1pR/p7/Pp2P3/1B3P2/1PP3P1/2KR4 b - - 7 22",
+    "playedUci": "g8h8",
+    "explanation": "Moving your king to h8 leaves your pawn hanging to the white queen. A better move would have been moving your queen to g5 because you fork the white h6-rook and the white king.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "003Tx:best",
+    "fen": "2r5/pR5p/5p1k/4p3/4R3/B4nPP/PP3P2/1K6 b - - 0 27",
+    "playedUci": "f3d2",
+    "explanation": "Moving your knight to d2 is the only move that holds because you fork the white e4-rook and the white king.",
+    "reasons": [
+      "ignored_threat",
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "003Tx:wrong",
+    "fen": "2r5/pR5p/5p1k/4p3/4R3/B4nPP/PP3P2/1K6 b - - 0 27",
+    "playedUci": "c8d8",
+    "explanation": "Moving your rook to d8 leaves your pawn hanging to the white b7-rook. A better move would have been moving your knight to d2 because you fork the white e4-rook and the white king.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "003jH:best",
+    "fen": "rn3rk1/p5pp/3N4/4np1q/5Q2/1P6/PB1P1KP1/2R4R b - - 1 25",
+    "playedUci": "e5d3",
+    "explanation": "Moving your e5-knight to d3 is the only move that holds because you fork the white queen and the white bishop.",
+    "reasons": [
+      "ignored_threat",
+      "king_more_exposed",
+      "fork",
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "003jH:wrong",
+    "fen": "rn3rk1/p5pp/3N4/4np1q/5Q2/1P6/PB1P1KP1/2R4R b - - 1 25",
+    "playedUci": "b8d7",
+    "explanation": "Moving your b8-knight to d7 leaves your queen hanging to the white h1-rook. A better move would have been moving your e5-knight to d3 because you fork the white queen and the white bishop.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "003jb:best",
+    "fen": "r3kb1r/p4ppp/b3p3/2pq4/3Q4/4BN2/PPP2PPP/R3K2R w KQkq - 0 12",
+    "playedUci": "d4a4",
+    "explanation": "Moving your queen to a4 is the only move that holds because you fork the black king and the black a6-bishop and it unveils an attack from your bishop on the black pawn.",
+    "reasons": [
+      "king_more_exposed",
+      "fork",
+      "discovered_attack",
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "003jb:wrong",
+    "fen": "r3kb1r/p4ppp/b3p3/2pq4/3Q4/4BN2/PPP2PPP/R3K2R w KQkq - 0 12",
+    "playedUci": "d4c5",
+    "explanation": "Taking the pawn on c5 with your queen puts it at risk of attack from the black queen and f8-bishop. A better move would have been moving your queen to a4 because you fork the black king and the black a6-bishop and it unveils an attack from your bishop on the black pawn.",
+    "reasons": [
+      "hanging",
+      "king_more_exposed",
+      "fork",
+      "capture",
+      "passed_pawn"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "003jv:best",
+    "fen": "7R/1p2k2p/p2n2p1/4K3/8/6P1/P6P/8 b - - 11 37",
+    "playedUci": "d6f7",
+    "explanation": "Moving your knight to f7 is the only move that holds because you fork the white rook and the white king.",
+    "reasons": [
+      "ignored_threat",
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "003jv:wrong",
+    "fen": "7R/1p2k2p/p2n2p1/4K3/8/6P1/P6P/8 b - - 11 37",
+    "playedUci": "b7b6",
+    "explanation": "Moving your pawn to b6 leaves your pawn hanging to the white rook. A better move would have been moving your knight to f7 because you fork the white rook and the white king.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "003mh:best",
+    "fen": "4rk1r/1pp2p2/p2p3p/3N4/3P2q1/8/PPP5/1K2Q1NR w - - 2 24",
+    "playedUci": "e1e8",
+    "explanation": "Taking the rook on e8 with your queen is the only move that holds because you skewer the black king, exposing the black h8-rook.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "skewer",
+      "capture",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "003mh:wrong",
+    "fen": "4rk1r/1pp2p2/p2p3p/3N4/3P2q1/8/PPP5/1K2Q1NR w - - 2 24",
+    "playedUci": "d5b6",
+    "explanation": "Moving your d5-knight to b6 leaves your queen hanging to the black e8-rook. A better move would have been taking the rook on e8 with your queen because you skewer the black king, exposing the black h8-rook.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "003o0:best",
+    "fen": "r1bqk2r/pp1nbppp/3p4/1B1p4/3P1B2/5N2/PPP2PPP/R2QK2R b KQkq - 3 9",
+    "playedUci": "d8a5",
+    "explanation": "Moving your queen to a5 is the only move that holds because you fork the white b5-bishop and the white king and then pin the pawn to the rook.",
+    "reasons": [
+      "fork",
+      "pin"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "003o0:wrong",
+    "fen": "r1bqk2r/pp1nbppp/3p4/1B1p4/3P1B2/5N2/PPP2PPP/R2QK2R b KQkq - 3 9",
+    "playedUci": "a8b8",
+    "explanation": "Moving your a8-rook to b8 is a blunder, but moving your queen to a5 would be better because you fork the white b5-bishop and the white king and then pin the pawn to the rook.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "003r5:best",
+    "fen": "r2qr1k1/ppp2ppp/4P3/8/1nP2Q2/2N2N1P/PP3KP1/R4R2 b - - 0 15",
+    "playedUci": "b4d3",
+    "explanation": "Moving your knight to d3 is the only move that holds because you fork the white queen and the white king.",
+    "reasons": [
+      "ignored_threat",
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "003r5:wrong",
+    "fen": "r2qr1k1/ppp2ppp/4P3/8/1nP2Q2/2N2N1P/PP3KP1/R4R2 b - - 0 15",
+    "playedUci": "a8b8",
+    "explanation": "Moving your a8-rook to b8 leaves your pawn hanging to the white queen and pawn. A better move would have been moving your knight to d3 because you fork the white queen and the white king.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "0047P:best",
+    "fen": "8/1N3k2/6p1/8/2P3P1/pr6/R7/5K2 b - - 2 56",
+    "playedUci": "b3b1",
+    "explanation": "Moving your rook to b1 is the only move that holds because you fork the white knight and the white king.",
+    "reasons": [
+      "hanging",
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "0047P:wrong",
+    "fen": "8/1N3k2/6p1/8/2P3P1/pr6/R7/5K2 b - - 2 56",
+    "playedUci": "f7e8",
+    "explanation": "Moving your king to e8 gives the opponent more access to your king. A better move would have been moving your rook to b1 because you fork the white knight and the white king.",
+    "reasons": [
+      "king_more_exposed",
+      "pawn_shield"
+    ],
+    "classification": "blunder",
+    "concept": "king_safety"
+  },
+  {
+    "id": "004nd:best",
+    "fen": "3q2k1/3r4/pp3p1Q/2b1n3/P3N3/2P5/1P4PP/R6K w - - 1 25",
+    "playedUci": "e4f6",
+    "explanation": "Taking the pawn on f6 with your knight is the only move that holds because you fork the black king and the black rook and the pawn was undefended.",
+    "reasons": [
+      "fork",
+      "wins_material",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "004nd:wrong",
+    "fen": "3q2k1/3r4/pp3p1Q/2b1n3/P3N3/2P5/1P4PP/R6K w - - 1 25",
+    "playedUci": "h6g7",
+    "explanation": "Moving your queen to g7 puts it at risk of attack from the black king and rook. A better move would have been taking the pawn on f6 with your knight because the pawn was undefended.",
+    "reasons": [
+      "hanging",
+      "fork"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "0050w:best",
+    "fen": "5rk1/1p2p2p/p2p4/2pPb2R/2P1P3/1P1BKPrR/8/8 w - - 5 31",
+    "playedUci": "h3g3",
+    "explanation": "Taking the rook on g3 with your h3-rook is the only move that holds because it saves your pawn from capture.",
+    "reasons": [
+      "hanging",
+      "capture",
+      "saves_piece",
+      "open_file"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "0050w:wrong",
+    "fen": "5rk1/1p2p2p/p2p4/2pPb2R/2P1P3/1P1BKPrR/8/8 w - - 5 31",
+    "playedUci": "h5h6",
+    "explanation": "Moving your h5-rook to h6 leaves your pawn hanging to the black f8-rook and g3-rook. A better move would have been taking the rook on g3 with your h3-rook because it saves your pawn from capture.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "005HG:best",
+    "fen": "r2q1rk1/p1p2pp1/3bbn1p/4N3/8/1P4P1/PBQPPP1P/RN2K2R b KQ - 2 12",
+    "playedUci": "d6e5",
+    "explanation": "Taking the knight on e5 with your d6-bishop is the only move that holds because you pin the bishop to the rook and it unveils an attack from your queen on the white pawn.",
+    "reasons": [
+      "hanging",
+      "pin",
+      "discovered_attack",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "005HG:wrong",
+    "fen": "r2q1rk1/p1p2pp1/3bbn1p/4N3/8/1P4P1/PBQPPP1P/RN2K2R b KQ - 2 12",
+    "playedUci": "a8b8",
+    "explanation": "Moving your a8-rook to b8 is a blunder, but taking the knight on e5 with your d6-bishop would be better because you pin the bishop to the rook and it unveils an attack from your queen on the white pawn.",
+    "reasons": [
+      "semi_open_file"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "005do:best",
+    "fen": "5r2/pp1k4/4p1b1/3pP1Np/3P1P1K/8/P7/2R5 w - - 8 43",
+    "playedUci": "c1c7",
+    "explanation": "Moving your rook to c7 is the only move that holds because your rook gets onto the seventh rank and it forces the king to respond.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "rook_on_seventh",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "005do:wrong",
+    "fen": "5r2/pp1k4/4p1b1/3pP1Np/3P1P1K/8/P7/2R5 w - - 8 43",
+    "playedUci": "g5e6",
+    "explanation": "Taking the pawn on e6 with your knight puts it where the black king can take and you lose a knight. A better move would have been moving your rook to c7 because it puts your rook on the seventh rank and it puts the opponent in check.",
+    "reasons": [
+      "hanging",
+      "capture",
+      "passed_pawn",
+      "saves_piece"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "005nD:best",
+    "fen": "3rk2r/2qn2p1/p1Q1p3/3n3p/8/8/PP4PP/5R1K w k - 0 24",
+    "playedUci": "c6e6",
+    "explanation": "Taking the pawn on e6 with your queen is the only move that holds because you fork the black king and the black d7-knight and the pawn was undefended.",
+    "reasons": [
+      "back_rank",
+      "fork",
+      "wins_material",
+      "removed_defender"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "005nD:wrong",
+    "fen": "3rk2r/2qn2p1/p1Q1p3/3n3p/8/8/PP4PP/5R1K w k - 0 24",
+    "playedUci": "c6b7",
+    "explanation": "Moving your queen to b7 puts it at risk of attack from the black queen. A better move would have been taking the pawn on e6 with your queen because you fork the black king and the black d7-knight and the pawn was undefended.",
+    "reasons": [
+      "hanging",
+      "back_rank",
+      "fork",
+      "skewer"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "006om:best",
+    "fen": "1r3k2/5p1p/2p1pp2/P2n4/r3N3/P4PK1/2R2P1P/2R5 w - - 10 30",
+    "playedUci": "e4c5",
+    "explanation": "Moving your knight to c5 is the only move that holds.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "king_more_exposed"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "006om:wrong",
+    "fen": "1r3k2/5p1p/2p1pp2/P2n4/r3N3/P4PK1/2R2P1P/2R5 w - - 10 30",
+    "playedUci": "a5a6",
+    "explanation": "Moving your pawn to a6 puts it at risk of attack from the black a4-rook. A better move would have been moving your knight to c5.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "passed_pawn"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "006wz:best",
+    "fen": "2r5/4ppkp/6p1/1p6/1P6/P3B3/1br2PPP/1R1R2K1 w - - 3 23",
+    "playedUci": "b1b2",
+    "explanation": "Taking the bishop on b2 with your b1-rook is the only move that holds because it saves your pawn from capture.",
+    "reasons": [
+      "hanging",
+      "capture",
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "006wz:wrong",
+    "fen": "2r5/4ppkp/6p1/1p6/1P6/P3B3/1br2PPP/1R1R2K1 w - - 3 23",
+    "playedUci": "a3a4",
+    "explanation": "Moving your pawn to a4 puts it at risk of attack from the black pawn. A better move would have been taking the bishop on b2 with your b1-rook because it saves your pawn from capture.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00761:best",
+    "fen": "3r2k1/1b4bR/p2P2p1/3p2N1/2p5/2P2N2/PP6/2K5 w - - 0 29",
+    "playedUci": "h7g7",
+    "explanation": "Taking the bishop on g7 with your rook is the only move that holds because you fork the black king and the black b7-bishop.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "fork",
+      "capture",
+      "semi_open_file"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00761:wrong",
+    "fen": "3r2k1/1b4bR/p2P2p1/3p2N1/2p5/2P2N2/PP6/2K5 w - - 0 29",
+    "playedUci": "h7h8",
+    "explanation": "Moving your rook to h8 puts it at risk of attack from the black king and g7-bishop. A better move would have been taking the bishop on g7 with your rook because you fork the black king and the black b7-bishop.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "skewer",
+      "check"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "007XE:best",
+    "fen": "2kr3r/p1p1Rpp1/2p2n1p/8/8/1P6/P1P2PPP/RNB3K1 b - - 0 16",
+    "playedUci": "d8d1",
+    "explanation": "Moving your d8-rook to d1 is the only move that holds because you fork the white bishop and the white king.",
+    "reasons": [
+      "ignored_threat",
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "007XE:wrong",
+    "fen": "2kr3r/p1p1Rpp1/2p2n1p/8/8/1P6/P1P2PPP/RNB3K1 b - - 0 16",
+    "playedUci": "c8b7",
+    "explanation": "Moving your king to b7 leaves your pawn hanging to the white e7-rook. A better move would have been moving your d8-rook to d1 because you fork the white bishop and the white king.",
+    "reasons": [
+      "ignored_threat",
+      "pawn_shield",
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "008D5:best",
+    "fen": "r1bqk2r/pp3ppp/4p3/3pPn2/1b1P1P2/2N5/PP4PP/R1BQKB1R w KQkq - 3 10",
+    "playedUci": "d1a4",
+    "explanation": "Moving your queen to a4 is the only move that holds because you fork the black king and the black b4-bishop and then pin the pawn to the rook.",
+    "reasons": [
+      "hanging",
+      "fork",
+      "pin"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "008D5:wrong",
+    "fen": "r1bqk2r/pp3ppp/4p3/3pPn2/1b1P1P2/2N5/PP4PP/R1BQKB1R w KQkq - 3 10",
+    "playedUci": "a2a3",
+    "explanation": "Moving your pawn to a3 is a blunder, but moving your queen to a4 would be better because you fork the black king and the black b4-bishop and then pin the pawn to the rook.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "008P4:best",
+    "fen": "8/4k3/1p1p4/rP2p1p1/P2nP1P1/3B4/3K4/R7 b - - 1 35",
+    "playedUci": "d4b3",
+    "explanation": "Moving your knight to b3 is the only move that holds because you fork the white king and the white rook.",
+    "reasons": [
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "008P4:wrong",
+    "fen": "8/4k3/1p1p4/rP2p1p1/P2nP1P1/3B4/3K4/R7 b - - 1 35",
+    "playedUci": "e7d8",
+    "explanation": "Moving your king to d8 leaves your king with less pawn cover. A better move would have been moving your knight to b3 because you fork the white king and the white rook.",
+    "reasons": [
+      "pawn_shield"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "008lc:best",
+    "fen": "7k/pb1qn1rn/1p2R2Q/2p2p2/2Pp4/3B4/PP3P1P/4RK2 w - - 2 28",
+    "playedUci": "h6g7",
+    "explanation": "Taking the rook on g7 with your queen is the only move that holds because you fork the black king and the black e7-knight and then pin the knight to the queen.",
+    "reasons": [
+      "hanging",
+      "fork",
+      "pin",
+      "removed_defender"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "008lc:wrong",
+    "fen": "7k/pb1qn1rn/1p2R2Q/2p2p2/2Pp4/3B4/PP3P1P/4RK2 w - - 2 28",
+    "playedUci": "e6e7",
+    "explanation": "Taking the knight on e7 with your e6-rook puts it at risk of attack from the black queen and rook. A better move would have been taking the rook on g7 with your queen because you fork the black king and the black e7-knight and then pin the knight to the queen.",
+    "reasons": [
+      "hanging",
+      "fork",
+      "skewer",
+      "skewer"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "009tE:best",
+    "fen": "6k1/6pp/p1N5/1pP2bp1/5P2/8/PPP5/3K4 w - - 0 29",
+    "playedUci": "c6e7",
+    "explanation": "Moving your knight to e7 is the only move that holds because you fork the black king and the black bishop.",
+    "reasons": [
+      "ignored_threat",
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "009tE:wrong",
+    "fen": "6k1/6pp/p1N5/1pP2bp1/5P2/8/PPP5/3K4 w - - 0 29",
+    "playedUci": "c6a7",
+    "explanation": "Moving your knight to a7 leaves your pawn hanging to the black pawn. A better move would have been moving your knight to e7 because you fork the black king and the black bishop.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00Aas:best",
+    "fen": "3r1rk1/1p2q1pp/5p2/8/1P1n4/6Q1/PPBB1PPP/R4RK1 b - - 0 20",
+    "playedUci": "d4e2",
+    "explanation": "Moving your knight to e2 is the only move that holds because you fork the white queen and the white king and it unveils an attack from your rook on the white d2-bishop.",
+    "reasons": [
+      "fork",
+      "discovered_attack"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00Aas:wrong",
+    "fen": "3r1rk1/1p2q1pp/5p2/8/1P1n4/6Q1/PPBB1PPP/R4RK1 b - - 0 20",
+    "playedUci": "d8e8",
+    "explanation": "Moving your d8-rook to e8 is a blunder, but moving your knight to e2 would be better because you fork the white queen and the white king and it unveils an attack from your rook on the white d2-bishop.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00BJm:best",
+    "fen": "r4rk1/1Q2bppp/p1N1p3/1p1q4/2pP1n2/2P5/PP3PPP/R4RK1 w - - 2 19",
+    "playedUci": "c6e7",
+    "explanation": "Taking the bishop on e7 with your knight is the only move that holds because you fork the black king and the black queen and the bishop was undefended.",
+    "reasons": [
+      "ignored_threat",
+      "hanging",
+      "fork",
+      "wins_material",
+      "discovered_attack"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00BJm:wrong",
+    "fen": "r4rk1/1Q2bppp/p1N1p3/1p1q4/2pP1n2/2P5/PP3PPP/R4RK1 w - - 2 19",
+    "playedUci": "b7a8",
+    "explanation": "Taking the rook on a8 with your queen puts it at risk of attack from the black f8-rook. A better move would have been taking the bishop on e7 with your knight because you fork the black king and the black queen and the bishop was undefended.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "pin",
+      "removed_defender",
+      "capture"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00BNd:best",
+    "fen": "1rr3k1/4ppbp/3p1np1/1b1N4/P2BP3/5P2/P2R2PP/R5K1 w - - 0 22",
+    "playedUci": "d5e7",
+    "explanation": "Taking the pawn on e7 with your knight is the only move that holds because you fork the black c8-rook and the black king and the pawn was undefended.",
+    "reasons": [
+      "ignored_threat",
+      "fork",
+      "wins_material",
+      "removed_defender"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00BNd:wrong",
+    "fen": "1rr3k1/4ppbp/3p1np1/1b1N4/P2BP3/5P2/P2R2PP/R5K1 w - - 0 22",
+    "playedUci": "d5b6",
+    "explanation": "Moving your knight to b6 is a blunder, but taking the pawn on e7 with your knight would be better because you fork the black c8-rook and the black king and the pawn was undefended.",
+    "reasons": [
+      "saves_piece"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00Bn4:best",
+    "fen": "1k6/pp6/4nNp1/P3r2p/3p4/7P/3R1PPK/8 w - - 1 41",
+    "playedUci": "f6d7",
+    "explanation": "Moving your knight to d7 is the only move that holds because you fork the black king and the black rook.",
+    "reasons": [
+      "ignored_threat",
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00Bn4:wrong",
+    "fen": "1k6/pp6/4nNp1/P3r2p/3p4/7P/3R1PPK/8 w - - 1 41",
+    "playedUci": "f6e8",
+    "explanation": "Moving your knight to e8 leaves your pawn hanging to the black rook. A better move would have been moving your knight to d7 because you fork the black king and the black rook.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00BnG:best",
+    "fen": "4Q3/ppkr1pp1/2p3n1/2PP3p/1P6/4K3/P5P1/8 b - - 0 33",
+    "playedUci": "d7e7",
+    "explanation": "Moving your rook to e7 is the only move that holds because you fork the white queen and the white king.",
+    "reasons": [
+      "fork",
+      "open_file"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00BnG:wrong",
+    "fen": "4Q3/ppkr1pp1/2p3n1/2PP3p/1P6/4K3/P5P1/8 b - - 0 33",
+    "playedUci": "a7a6",
+    "explanation": "Moving your pawn to a6 is a blunder, but moving your rook to e7 would be better because you fork the white queen and the white king.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "0018S:best",
+    "fen": "2kr3r/p4p2/1p2p2p/1N1p2p1/3Q4/1P1P4/2q2PPP/5RK1 w - - 0 21",
+    "playedUci": "d4a1",
+    "explanation": "Moving your queen to a1 is the only move that holds.",
+    "reasons": [
+      "ignored_threat",
+      "hanging"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "0018S:wrong",
+    "fen": "2kr3r/p4p2/1p2p2p/1N1p2p1/3Q4/1P1P4/2q2PPP/5RK1 w - - 0 21",
+    "playedUci": "b5a7",
+    "explanation": "Taking the pawn on a7 with your knight leaves your pawn hanging to the black queen. A better move would have been moving your queen to a1.",
+    "reasons": [
+      "ignored_threat",
+      "wins_material",
+      "removed_defender",
+      "capture"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "001Hi:best",
+    "fen": "6k1/pp1r1pp1/2p1p2p/4P2P/3q1Q2/1P4R1/P1Pr1PP1/R5K1 w - - 5 24",
+    "playedUci": "f4f6",
+    "explanation": "Moving your queen to f6 is the only move that holds.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "ignored_threat"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "001Hi:wrong",
+    "fen": "6k1/pp1r1pp1/2p1p2p/4P2P/3q1Q2/1P4R1/P1Pr1PP1/R5K1 w - - 5 24",
+    "playedUci": "f4f5",
+    "explanation": "Moving your queen to f5 puts it at risk of attack from the black pawn. A better move would have been moving your queen to f6.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "pin",
+      "saves_piece"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "001kG:best",
+    "fen": "rnbq3r/1p3kpp/p4n2/2b5/2pNP3/2N5/PPP3PP/R1BQ1RK1 w - - 2 12",
+    "playedUci": "d1h5",
+    "explanation": "Moving your queen to h5 is the only move that holds because you fork the black king and the black c5-bishop and then pin the pawn to the rook.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "fork",
+      "pin"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "001kG:wrong",
+    "fen": "rnbq3r/1p3kpp/p4n2/2b5/2pNP3/2N5/PPP3PP/R1BQ1RK1 w - - 2 12",
+    "playedUci": "e4e5",
+    "explanation": "Moving your pawn to e5 leaves your d4-knight hanging to the black queen and c5-bishop. A better move would have been moving your queen to h5 because you fork the black king and the black c5-bishop and then pin the pawn to the rook.",
+    "reasons": [
+      "ignored_threat",
+      "passed_pawn"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "002e8:best",
+    "fen": "3rnrk1/1b3pp1/4pb2/p3q3/1p1N4/3B2R1/PPPQN2P/1K4R1 w - - 2 24",
+    "playedUci": "d2h6",
+    "explanation": "Moving your queen to h6 is the only move that holds because you pin the pawn to the rook.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "pin"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "002e8:wrong",
+    "fen": "3rnrk1/1b3pp1/4pb2/p3q3/1p1N4/3B2R1/PPPQN2P/1K4R1 w - - 2 24",
+    "playedUci": "d4b5",
+    "explanation": "Moving your d4-knight to b5 leaves your pawn hanging to the black queen. A better move would have been moving your queen to h6 because you pin the pawn to the rook.",
+    "reasons": [
+      "hanging",
+      "king_more_exposed",
+      "saves_piece"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "002rd:best",
+    "fen": "r6k/q1p2p1p/1b2bPr1/p1ppP2Q/3P2p1/4B3/PP2NRPP/3R2K1 w - - 2 26",
+    "playedUci": "e2f4",
+    "explanation": "Moving your knight to f4 is the only move that holds because you fork the black e6-bishop and the black g6-rook.",
+    "reasons": [
+      "hanging",
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "002rd:wrong",
+    "fen": "r6k/q1p2p1p/1b2bPr1/p1ppP2Q/3P2p1/4B3/PP2NRPP/3R2K1 w - - 2 26",
+    "playedUci": "h5g6",
+    "explanation": "Taking the rook on g6 with your queen puts it at risk of attack from the black pawn and pawn. A better move would have been moving your knight to f4 because you fork the black e6-bishop and the black g6-rook.",
+    "reasons": [
+      "hanging",
+      "capture"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "003Ec:best",
+    "fen": "3r4/p4R2/1pb2Pp1/n1p1Qqkp/8/P7/1P4PP/6RK w - - 3 33",
+    "playedUci": "e5e3",
+    "explanation": "Moving your queen to e3 is the only move that holds because it saves your queen from capture.",
+    "reasons": [
+      "saves_piece",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "003Ec:wrong",
+    "fen": "3r4/p4R2/1pb2Pp1/n1p1Qqkp/8/P7/1P4PP/6RK w - - 3 33",
+    "playedUci": "f7f8",
+    "explanation": "Moving your f7-rook to f8 leaves your queen hanging to the black queen. A better move would have been moving your queen to e3 because it saves your queen from capture.",
+    "reasons": [
+      "hanging",
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "003S3:best",
+    "fen": "1r3k1r/pNqnppb1/6pn/2p3Np/7P/2P2Q2/PP3PP1/R1B1K2R w KQ - 3 16",
+    "playedUci": "g5e6",
+    "explanation": "Moving your g5-knight to e6 is the only move that holds because you fork the black king and the black queen and it unveils an attack from your bishop on the black h6-knight.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "trapped",
+      "fork",
+      "discovered_attack"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "003S3:wrong",
+    "fen": "1r3k1r/pNqnppb1/6pn/2p3Np/7P/2P2Q2/PP3PP1/R1B1K2R w KQ - 3 16",
+    "playedUci": "b7d8",
+    "explanation": "Moving your b7-knight to d8 puts it where the black queen and b8-rook can take and you lose a knight. A better move would have been moving your g5-knight to e6 because you fork the black king and the black queen and it unveils an attack from your bishop on the black h6-knight.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "003nQ:best",
+    "fen": "6rk/pp6/2n5/3ppn1p/3p4/2P2P1q/PP3QNB/R5RK b - - 3 29",
+    "playedUci": "f5g3",
+    "explanation": "Moving your f5-knight to g3 is the only move that holds because it attacks the king directly.",
+    "reasons": [
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "003nQ:wrong",
+    "fen": "6rk/pp6/2n5/3ppn1p/3p4/2P2P1q/PP3QNB/R5RK b - - 3 29",
+    "playedUci": "g8g7",
+    "explanation": "Moving your rook to g7 is a blunder, but moving your f5-knight to g3 would be better because it attacks the king directly.",
+    "reasons": [
+      "pin"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "003wQ:best",
+    "fen": "2r2rk1/6pp/3Q1q2/8/3N1B2/6P1/PP1K3P/5R2 b - - 0 24",
+    "playedUci": "f6d6",
+    "explanation": "Taking the queen on d6 with your queen is the only move that holds because you pin the knight to the king and it unveils an attack from your rook on the white bishop.",
+    "reasons": [
+      "hanging",
+      "pin",
+      "discovered_attack",
+      "removed_defender"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "003wQ:wrong",
+    "fen": "2r2rk1/6pp/3Q1q2/8/3N1B2/6P1/PP1K3P/5R2 b - - 0 24",
+    "playedUci": "c8d8",
+    "explanation": "Moving your c8-rook to d8 is a blunder, but taking the queen on d6 with your queen would be better because you pin the knight to the king and it unveils an attack from your rook on the white bishop.",
+    "reasons": [
+      "skewer"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "004Op:best",
+    "fen": "2kr2r1/1bp4n/1pq1p2p/p1P5/1P3B2/P6P/5RP1/RB3QK1 b - - 4 26",
+    "playedUci": "d8d1",
+    "explanation": "Moving your d8-rook to d1 is the only move that holds because you fork the white b1-bishop and the white queen and then pin the queen to the king.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "ignored_threat",
+      "fork",
+      "pin",
+      "pin"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "004Op:wrong",
+    "fen": "2kr2r1/1bp4n/1pq1p2p/p1P5/1P3B2/P6P/5RP1/RB3QK1 b - - 4 26",
+    "playedUci": "c8d7",
+    "explanation": "Moving your king to d7 leaves your knight hanging to the white b1-bishop. A better move would have been moving your d8-rook to d1 because you fork the white b1-bishop and the white queen and then pin the queen to the king.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "king_more_exposed",
+      "pawn_shield"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "004zh:best",
+    "fen": "4b1k1/4Pr2/3R2pp/1ppBP2q/8/PP4P1/2P4P/3R3K w - - 3 39",
+    "playedUci": "d1f1",
+    "explanation": "Moving your d1-rook to f1 is the only move that holds.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "ignored_threat"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "004zh:wrong",
+    "fen": "4b1k1/4Pr2/3R2pp/1ppBP2q/8/PP4P1/2P4P/3R3K w - - 3 39",
+    "playedUci": "d6d7",
+    "explanation": "Moving your d6-rook to d7 puts it at risk of attack from the black bishop. A better move would have been moving your d1-rook to f1.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "ignored_threat",
+      "saves_piece",
+      "rook_on_seventh"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "005Bm:best",
+    "fen": "4rk2/p4q2/1p3Q1b/8/1p5N/2P1p3/P3P3/2K5 w - - 1 44",
+    "playedUci": "h4g6",
+    "explanation": "Moving your knight to g6 is the only move that holds because it puts the opponent in check.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "005Bm:wrong",
+    "fen": "4rk2/p4q2/1p3Q1b/8/1p5N/2P1p3/P3P3/2K5 w - - 1 44",
+    "playedUci": "f6e7",
+    "explanation": "Moving your queen to e7 puts it at risk of attack from the black king and queen. A better move would have been moving your knight to g6 because it puts the opponent in check.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "hanging",
+      "fork"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "006NL:best",
+    "fen": "1r6/k2qn1b1/p1N1p1p1/2PpPpN1/2n2P1P/p4B2/1PP2Q2/1K1R3R b - - 0 32",
+    "playedUci": "e7c6",
+    "explanation": "Taking the knight on c6 with your e7-knight is the only move that holds because the knight was undefended.",
+    "reasons": [
+      "wins_material",
+      "capture",
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "006NL:wrong",
+    "fen": "1r6/k2qn1b1/p1N1p1p1/2PpPpN1/2n2P1P/p4B2/1PP2Q2/1K1R3R b - - 0 32",
+    "playedUci": "a7a8",
+    "explanation": "Moving your king to a8 leaves your rook hanging to the white c6-knight. A better move would have been taking the knight on c6 with your e7-knight because the knight was undefended.",
+    "reasons": [
+      "ignored_threat",
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "006XF:best",
+    "fen": "r5kr/pp1qb1p1/2p4p/3pP2Q/3Pb3/2P1B3/PP4PP/R4RK1 w - - 2 18",
+    "playedUci": "h5f7",
+    "explanation": "Moving your queen to f7 is the only move that holds because you fork the black king and the black e7-bishop and then pin the bishop to the queen.",
+    "reasons": [
+      "fork",
+      "pin"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "006XF:wrong",
+    "fen": "r5kr/pp1qb1p1/2p4p/3pP2Q/3Pb3/2P1B3/PP4PP/R4RK1 w - - 2 18",
+    "playedUci": "e5e6",
+    "explanation": "Moving your pawn to e6 puts it at risk of attack from the black queen. A better move would have been moving your queen to f7 because you fork the black king and the black e7-bishop and then pin the bishop to the queen.",
+    "reasons": [
+      "hanging",
+      "discovered_attack",
+      "passed_pawn"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "006pe:best",
+    "fen": "r4r2/2q1Nb2/5Qpk/2n4p/pp5P/8/1PP2PP1/2KR3R w - - 0 29",
+    "playedUci": "e7f5",
+    "explanation": "Moving your knight to f5 is the only move that holds because it puts the opponent in check.",
+    "reasons": [
+      "hanging",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "006pe:wrong",
+    "fen": "r4r2/2q1Nb2/5Qpk/2n4p/pp5P/8/1PP2PP1/2KR3R w - - 0 29",
+    "playedUci": "e7c8",
+    "explanation": "Moving your knight to c8 puts it where the black queen and a8-rook can take and you lose a knight. A better move would have been moving your knight to f5 because it forces the king to respond.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00734:best",
+    "fen": "r4bk1/2rqp2p/n1p3p1/3p1p2/3P1P1B/pP1BP3/P1Q2PRP/1KR5 w - - 1 27",
+    "playedUci": "d3f5",
+    "explanation": "Taking the pawn on f5 with your d3-bishop is the only move that holds because you take the defender of the black queen.",
+    "reasons": [
+      "hanging",
+      "removed_defender",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00734:wrong",
+    "fen": "r4bk1/2rqp2p/n1p3p1/3p1p2/3P1P1B/pP1BP3/P1Q2PRP/1KR5 w - - 1 27",
+    "playedUci": "h4g5",
+    "explanation": "Moving your h4-bishop to g5 is a blunder, but taking the pawn on f5 with your d3-bishop would be better because you take the defender of the black queen.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "008LT:best",
+    "fen": "r4r1k/6p1/b3p1nN/p1pp4/1p3P1q/3P1Q1B/PPP2PK1/R6R w - - 1 27",
+    "playedUci": "h6f7",
+    "explanation": "Moving your knight to f7 is the only move that holds because it puts the opponent in check.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "008LT:wrong",
+    "fen": "r4r1k/6p1/b3p1nN/p1pp4/1p3P1q/3P1Q1B/PPP2PK1/R6R w - - 1 27",
+    "playedUci": "h6g8",
+    "explanation": "Moving your knight to g8 puts it where the black king and f8-rook can take and you lose a knight. A better move would have been moving your knight to f7 because it forces the king to respond.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "trapped"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "009BH:best",
+    "fen": "3r3k/6p1/4Q3/4B3/1p3P2/4PKP1/3q4/8 w - - 18 52",
+    "playedUci": "e6h6",
+    "explanation": "Moving your queen to h6 is the only move that holds because it attacks the king directly.",
+    "reasons": [
+      "hanging",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "009BH:wrong",
+    "fen": "3r3k/6p1/4Q3/4B3/1p3P2/4PKP1/3q4/8 w - - 18 52",
+    "playedUci": "e6d7",
+    "explanation": "Moving your queen to d7 puts it at risk of attack from the black queen and rook. A better move would have been moving your queen to h6 because it puts the opponent in check.",
+    "reasons": [
+      "hanging",
+      "fork"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00C8e:best",
+    "fen": "8/5p1k/5Ppb/2p3P1/qp6/8/KB5Q/8 w - - 5 59",
+    "playedUci": "a2b1",
+    "explanation": "Moving your king to b1 is the only move that holds because your king is harder to attack.",
+    "reasons": [
+      "ignored_threat",
+      "king_safer"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00C8e:wrong",
+    "fen": "8/5p1k/5Ppb/2p3P1/qp6/8/KB5Q/8 w - - 5 59",
+    "playedUci": "b2a3",
+    "explanation": "Moving your bishop to a3 puts it where the black queen and pawn can take and you lose a knight. A better move would have been moving your king to b1.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00Dt6:best",
+    "fen": "5rk1/p4p1p/4p1p1/5nq1/8/5QPP/5PK1/1R1R4 b - - 7 35",
+    "playedUci": "f5h4",
+    "explanation": "Moving your knight to h4 is the only move that holds because you fork the white queen and the white king.",
+    "reasons": [
+      "hanging",
+      "king_more_exposed",
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00Dt6:wrong",
+    "fen": "5rk1/p4p1p/4p1p1/5nq1/8/5QPP/5PK1/1R1R4 b - - 7 35",
+    "playedUci": "f8e8",
+    "explanation": "Moving your rook to e8 is a blunder, but moving your knight to h4 would be better because you fork the white queen and the white king.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00EJb:best",
+    "fen": "6k1/5pp1/2R1p2p/8/P1B5/1P4P1/1q3QKP/3r4 b - - 2 35",
+    "playedUci": "d1d2",
+    "explanation": "Moving your rook to d2 is the only move that holds because you pin the queen to the king.",
+    "reasons": [
+      "pin",
+      "saves_piece",
+      "rook_on_seventh"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00EJb:wrong",
+    "fen": "6k1/5pp1/2R1p2p/8/P1B5/1P4P1/1q3QKP/3r4 b - - 2 35",
+    "playedUci": "g8h8",
+    "explanation": "Moving your king to h8 leaves your queen hanging to the white queen. A better move would have been moving your rook to d2 because you pin the queen to the king.",
+    "reasons": [
+      "ignored_threat",
+      "hanging",
+      "pawn_shield",
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00F5G:best",
+    "fen": "2rqrbk1/pp3ppp/8/3p1N2/3NnnQ1/2P4P/PP3PP1/R4RK1 w - - 0 23",
+    "playedUci": "f5h6",
+    "explanation": "Moving your f5-knight to h6 is the only move that holds because it unveils an attack from your queen on the black c8-rook.",
+    "reasons": [
+      "hanging",
+      "discovered_attack",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00F5G:wrong",
+    "fen": "2rqrbk1/pp3ppp/8/3p1N2/3NnnQ1/2P4P/PP3PP1/R4RK1 w - - 0 23",
+    "playedUci": "f5d6",
+    "explanation": "Moving your f5-knight to d6 puts it where the black queen and bishop can take and you lose a knight. A better move would have been moving your f5-knight to h6 because it attacks the king directly.",
+    "reasons": [
+      "hanging",
+      "fork",
+      "discovered_attack",
+      "overload"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00GiQ:best",
+    "fen": "5r2/5p1k/6pp/ppqp1P2/7Q/5N2/6PP/5N1K w - - 0 32",
+    "playedUci": "f3g5",
+    "explanation": "Moving your f3-knight to g5 is the only move that holds because it puts the opponent in check.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00GiQ:wrong",
+    "fen": "5r2/5p1k/6pp/ppqp1P2/7Q/5N2/6PP/5N1K w - - 0 32",
+    "playedUci": "f5f6",
+    "explanation": "Moving your pawn to f6 is a blunder, but moving your f3-knight to g5 would be better because it puts the opponent in check.",
+    "reasons": [
+      "saves_piece"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00Gz6:best",
+    "fen": "r7/p4kp1/1p4p1/2qNn3/Q7/4PP2/PP3K2/6R1 w - - 1 26",
+    "playedUci": "a4f4",
+    "explanation": "Moving your queen to f4 is the only move that holds because you fork the black king and the black knight.",
+    "reasons": [
+      "ignored_threat",
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00Gz6:wrong",
+    "fen": "r7/p4kp1/1p4p1/2qNn3/Q7/4PP2/PP3K2/6R1 w - - 1 26",
+    "playedUci": "d5b6",
+    "explanation": "Taking the pawn on b6 with your knight puts it where the black queen and pawn can take and you lose a knight. A better move would have been moving your queen to f4 because you fork the black king and the black knight.",
+    "reasons": [
+      "hanging",
+      "capture"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00H5n:best",
+    "fen": "8/5Rpk/3p3p/p1qPp3/P7/5N1P/1Q3nPK/2r5 w - - 0 36",
+    "playedUci": "b2b7",
+    "explanation": "Moving your queen to b7 is the only move that holds because it saves your pawn from capture.",
+    "reasons": [
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00H5n:wrong",
+    "fen": "8/5Rpk/3p3p/p1qPp3/P7/5N1P/1Q3nPK/2r5 w - - 0 36",
+    "playedUci": "f7f8",
+    "explanation": "Moving your rook to f8 leaves your pawn hanging to the black queen. A better move would have been moving your queen to b7 because it saves your pawn from capture.",
+    "reasons": [
+      "ignored_threat",
+      "overload"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00JFF:best",
+    "fen": "4r1k1/ppqb4/6p1/3pb2Q/8/2P5/PP1B2PP/5RK1 w - - 0 21",
+    "playedUci": "h5g6",
+    "explanation": "Taking the pawn on g6 with your queen is the only move that holds because you fork the black rook and the black king and the pawn was undefended.",
+    "reasons": [
+      "hanging",
+      "fork",
+      "wins_material",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00JFF:wrong",
+    "fen": "4r1k1/ppqb4/6p1/3pb2Q/8/2P5/PP1B2PP/5RK1 w - - 0 21",
+    "playedUci": "h5h6",
+    "explanation": "Moving your queen to h6 is a blunder, but taking the pawn on g6 with your queen would be better because you fork the black rook and the black king and the pawn was undefended.",
+    "reasons": [
+      "saves_piece"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00KNB:best",
+    "fen": "3r2k1/2r2p2/4p2p/4N1pQ/1p3P2/4P3/np3P1P/2q2BRK w - - 2 33",
+    "playedUci": "h5h6",
+    "explanation": "Taking the pawn on h6 with your queen is the only move that holds because the pawn was undefended.",
+    "reasons": [
+      "wins_material",
+      "capture",
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00KNB:wrong",
+    "fen": "3r2k1/2r2p2/4p2p/4N1pQ/1p3P2/4P3/np3P1P/2q2BRK w - - 2 33",
+    "playedUci": "e5c6",
+    "explanation": "Moving your knight to c6 puts it where the black queen and c7-rook can take and you lose a knight. A better move would have been taking the pawn on h6 with your queen because the pawn was undefended.",
+    "reasons": [
+      "hanging",
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00KhM:best",
+    "fen": "5rk1/5ppp/1r6/3Qp3/2B1P3/2q3P1/3R1PKP/8 w - - 0 28",
+    "playedUci": "d5f7",
+    "explanation": "Taking the pawn on f7 with your queen is the only move that holds because you fork the black f8-rook and the black king.",
+    "reasons": [
+      "hanging",
+      "hanging",
+      "fork",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00KhM:wrong",
+    "fen": "5rk1/5ppp/1r6/3Qp3/2B1P3/2q3P1/3R1PKP/8 w - - 0 28",
+    "playedUci": "d5c6",
+    "explanation": "Moving your queen to c6 puts it at risk of attack from the black b6-rook. A better move would have been taking the pawn on f7 with your queen because you fork the black f8-rook and the black king.",
+    "reasons": [
+      "hanging",
+      "hanging",
+      "discovered_attack"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00Knu:best",
+    "fen": "r2q1rk1/p3bpp1/2pp2b1/4p1Q1/4n3/1B3N1P/PPP3P1/R1B2RK1 w - - 1 19",
+    "playedUci": "g5g6",
+    "explanation": "Taking the bishop on g6 with your queen is the only move that holds because you pin the pawn to the king and you take the defender of the black knight.",
+    "reasons": [
+      "hanging",
+      "pin",
+      "removed_defender",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00Knu:wrong",
+    "fen": "r2q1rk1/p3bpp1/2pp2b1/4p1Q1/4n3/1B3N1P/PPP3P1/R1B2RK1 w - - 1 19",
+    "playedUci": "g5f6",
+    "explanation": "Moving your queen to f6 puts it at risk of attack from the black e7-bishop and knight. A better move would have been taking the bishop on g6 with your queen because you take the defender of the black knight.",
+    "reasons": [
+      "hanging",
+      "trapped",
+      "pin",
+      "pin"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00LNH:best",
+    "fen": "1k2r3/pp2r2p/2pqbpp1/3n4/3P1p2/1B3N1P/PPQB1PP1/1K1RR3 b - - 3 22",
+    "playedUci": "e6f5",
+    "explanation": "Moving your bishop to f5 is the only move that holds because you pin the queen to the king and it unveils an attack from your rook on the white e1-rook.",
+    "reasons": [
+      "pin",
+      "discovered_attack"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00LNH:wrong",
+    "fen": "1k2r3/pp2r2p/2pqbpp1/3n4/3P1p2/1B3N1P/PPQB1PP1/1K1RR3 b - - 3 22",
+    "playedUci": "b8c8",
+    "explanation": "Moving your king to c8 weakens the pawns in front of your king. A better move would have been moving your bishop to f5 because you pin the queen to the king and it unveils an attack from your rook on the white e1-rook.",
+    "reasons": [
+      "pawn_shield"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00M1q:best",
+    "fen": "2r3k1/2r3p1/p3pqQ1/1p1p4/nP1P4/2P4R/P4PPP/2R3K1 w - - 1 31",
+    "playedUci": "g6h7",
+    "explanation": "Moving your queen to h7 is the only move that holds because you pin the pawn to the rook.",
+    "reasons": [
+      "ignored_threat",
+      "pin",
+      "saves_piece",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00M1q:wrong",
+    "fen": "2r3k1/2r3p1/p3pqQ1/1p1p4/nP1P4/2P4R/P4PPP/2R3K1 w - - 1 31",
+    "playedUci": "g6f7",
+    "explanation": "Moving your queen to f7 puts it at risk of attack from the black king and queen. A better move would have been moving your queen to h7 because you pin the pawn to the rook.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "fork"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00NEO:best",
+    "fen": "4qr2/pR4pk/2b2p1p/4pPP1/3bB3/3P3Q/P1r4P/4BR1K w - - 1 25",
+    "playedUci": "h3h6",
+    "explanation": "Taking the pawn on h6 with your queen is the only move that holds because you pin the pawn to the rook and you take the defender of the black pawn.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "ignored_threat",
+      "pin",
+      "removed_defender",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00NEO:wrong",
+    "fen": "4qr2/pR4pk/2b2p1p/4pPP1/3bB3/3P3Q/P1r4P/4BR1K w - - 1 25",
+    "playedUci": "b7b8",
+    "explanation": "Moving your b7-rook to b8 puts it at risk of attack from the black queen. A better move would have been taking the pawn on h6 with your queen because you pin the pawn to the rook and you take the defender of the black pawn.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "ignored_threat",
+      "skewer"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00O9Z:best",
+    "fen": "5Q1R/5p1p/1b3qp1/p6k/P2P4/8/1P2rPPP/5RK1 b - - 8 32",
+    "playedUci": "f6f2",
+    "explanation": "Taking the pawn on f2 with your queen is the only move that holds because you fork the white f1-rook and the white king and you take the defender of the white pawn.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "hanging",
+      "fork",
+      "removed_defender",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00O9Z:wrong",
+    "fen": "5Q1R/5p1p/1b3qp1/p6k/P2P4/8/1P2rPPP/5RK1 b - - 8 32",
+    "playedUci": "h7h6",
+    "explanation": "Moving your pawn to h6 puts it at risk of attack from the white queen and h8-rook. A better move would have been taking the pawn on f2 with your queen because you fork the white f1-rook and the white king and you take the defender of the white pawn.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00OKo:best",
+    "fen": "r3rk2/pbq5/1p2pp1p/2p1N3/2PP2Q1/1P1B4/P5PP/R5K1 w - - 2 25",
+    "playedUci": "a1f1",
+    "explanation": "Moving your rook to f1 is the only move that holds because you pin the pawn to the king.",
+    "reasons": [
+      "ignored_threat",
+      "pin",
+      "semi_open_file"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00OKo:wrong",
+    "fen": "r3rk2/pbq5/1p2pp1p/2p1N3/2PP2Q1/1P1B4/P5PP/R5K1 w - - 2 25",
+    "playedUci": "e5c6",
+    "explanation": "Moving your knight to c6 puts it where the black queen and bishop can take and you lose a knight. A better move would have been moving your rook to f1 because you pin the pawn to the king.",
+    "reasons": [
+      "hanging",
+      "trapped"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "000qP:best",
+    "fen": "8/7R/8/5p2/4bk1P/8/2r5/5KR1 b - - 8 51",
+    "playedUci": "f4f3",
+    "explanation": "Moving your king to f3 is the only move that holds.",
+    "reasons": [
+      "king_more_exposed"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "000qP:wrong",
+    "fen": "8/7R/8/5p2/4bk1P/8/2r5/5KR1 b - - 8 51",
+    "playedUci": "e4d5",
+    "explanation": "Moving your bishop to d5 is a blunder, but moving your king to f3 would be better.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "001m3:best",
+    "fen": "7r/6k1/2b1Rp2/8/P1N3p1/5nP1/5P2/Q4K2 b - - 0 38",
+    "playedUci": "h8h1",
+    "explanation": "Moving your rook to h1 is the only move that holds because you skewer the white king, exposing the white queen.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "skewer",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "001m3:wrong",
+    "fen": "7r/6k1/2b1Rp2/8/P1N3p1/5nP1/5P2/Q4K2 b - - 0 38",
+    "playedUci": "h8h7",
+    "explanation": "Moving your rook to h7 leaves your bishop hanging to the white rook. A better move would have been moving your rook to h1 because you skewer the white king, exposing the white queen.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "001xl:best",
+    "fen": "8/4R3/p4kpp/3B4/5q2/8/5P1P/6K1 w - - 6 41",
+    "playedUci": "e7f7",
+    "explanation": "Moving your rook to f7 is the only move that holds because you skewer the black king, exposing the black queen.",
+    "reasons": [
+      "skewer",
+      "saves_piece",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "001xl:wrong",
+    "fen": "8/4R3/p4kpp/3B4/5q2/8/5P1P/6K1 w - - 6 41",
+    "playedUci": "e7e8",
+    "explanation": "Moving your rook to e8 is a blunder, but moving your rook to f7 would be better because you skewer the black king, exposing the black queen.",
+    "reasons": [
+      "saves_piece"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "0039T:best",
+    "fen": "1r5r/p3kp2/4p2p/4P3/R4Pp1/6P1/P1P4P/4K2R b K - 2 25",
+    "playedUci": "b8b1",
+    "explanation": "Moving your b8-rook to b1 is the only move that holds because you skewer the white king, exposing the white h1-rook.",
+    "reasons": [
+      "ignored_threat",
+      "skewer",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "0039T:wrong",
+    "fen": "1r5r/p3kp2/4p2p/4P3/R4Pp1/6P1/P1P4P/4K2R b K - 2 25",
+    "playedUci": "b8c8",
+    "explanation": "Moving your b8-rook to c8 leaves your pawn hanging to the white a4-rook. A better move would have been moving your b8-rook to b1 because you skewer the white king, exposing the white h1-rook.",
+    "reasons": [
+      "ignored_threat",
+      "semi_open_file"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "003eP:best",
+    "fen": "6k1/r1b1q3/2p3p1/2Pp4/1P2p1n1/2B1P3/NQ6/2K4R w - - 2 37",
+    "playedUci": "h1h8",
+    "explanation": "Moving your rook to h8 is the only move that holds because it puts the opponent in check.",
+    "reasons": [
+      "ignored_threat",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "003eP:wrong",
+    "fen": "6k1/r1b1q3/2p3p1/2Pp4/1P2p1n1/2B1P3/NQ6/2K4R w - - 2 37",
+    "playedUci": "b4b5",
+    "explanation": "Moving your pawn to b5 leaves your pawn hanging to the black queen. A better move would have been moving your rook to h8 because it puts the opponent in check.",
+    "reasons": [
+      "ignored_threat",
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "004mT:best",
+    "fen": "5Q2/8/1bk1p1p1/5p2/3p4/5qPK/7P/8 w - - 2 52",
+    "playedUci": "f8a8",
+    "explanation": "Moving your queen to a8 is the only move that holds because you skewer the black king, exposing the black queen.",
+    "reasons": [
+      "skewer",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "004mT:wrong",
+    "fen": "5Q2/8/1bk1p1p1/5p2/3p4/5qPK/7P/8 w - - 2 52",
+    "playedUci": "f8g8",
+    "explanation": "Moving your queen to g8 is a blunder, but moving your queen to a8 would be better because you skewer the black king, exposing the black queen.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "006OI:best",
+    "fen": "6R1/p7/5k2/P7/6KP/8/8/5r2 b - - 6 53",
+    "playedUci": "f1g1",
+    "explanation": "Moving your rook to g1 is the only move that holds because you skewer the white king, exposing the white rook.",
+    "reasons": [
+      "skewer",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "006OI:wrong",
+    "fen": "6R1/p7/5k2/P7/6KP/8/8/5r2 b - - 6 53",
+    "playedUci": "a7a6",
+    "explanation": "Moving your pawn to a6 is a blunder, but moving your rook to g1 would be better because you skewer the white king, exposing the white rook.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "006yP:best",
+    "fen": "6R1/8/Kpk1p3/1p1pP3/6P1/PPr5/8/8 w - - 0 41",
+    "playedUci": "g8c8",
+    "explanation": "Moving your rook to c8 is the only move that holds because you skewer the black king, exposing the black rook.",
+    "reasons": [
+      "ignored_threat",
+      "skewer",
+      "open_file",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "006yP:wrong",
+    "fen": "6R1/8/Kpk1p3/1p1pP3/6P1/PPr5/8/8 w - - 0 41",
+    "playedUci": "g8h8",
+    "explanation": "Moving your rook to h8 leaves your pawn hanging to the black rook. A better move would have been moving your rook to c8 because you skewer the black king, exposing the black rook.",
+    "reasons": [
+      "ignored_threat",
+      "open_file"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "007tv:best",
+    "fen": "r3k1nr/1pp2ppp/1pnp4/4p1q1/2B1P3/3P1Q1P/PPP2PP1/R4RK1 w kq - 0 12",
+    "playedUci": "f3f7",
+    "explanation": "Taking the pawn on f7 with your queen is the only move that holds because you fork the black king and the black g8-knight and the pawn was undefended.",
+    "reasons": [
+      "fork",
+      "wins_material",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "007tv:wrong",
+    "fen": "r3k1nr/1pp2ppp/1pnp4/4p1q1/2B1P3/3P1Q1P/PPP2PP1/R4RK1 w kq - 0 12",
+    "playedUci": "c4b5",
+    "explanation": "Moving your bishop to b5 is a blunder, but taking the pawn on f7 with your queen would be better because you fork the black king and the black g8-knight and the pawn was undefended.",
+    "reasons": [
+      "pin"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "008EC:best",
+    "fen": "6k1/4rRp1/p6p/7P/q1pP4/2Pb2Q1/P4RP1/6K1 b - - 0 31",
+    "playedUci": "e7f7",
+    "explanation": "Taking the rook on f7 with your rook is the only move that holds because the rook was undefended.",
+    "reasons": [
+      "wins_material",
+      "capture",
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "008EC:wrong",
+    "fen": "6k1/4rRp1/p6p/7P/q1pP4/2Pb2Q1/P4RP1/6K1 b - - 0 31",
+    "playedUci": "g8h8",
+    "explanation": "Moving your king to h8 leaves your rook hanging to the white f7-rook. A better move would have been taking the rook on f7 with your rook because the rook was undefended.",
+    "reasons": [
+      "ignored_threat",
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00AB1:best",
+    "fen": "8/7Q/3p1kp1/1p6/2b5/2q4P/5PPK/8 w - - 0 37",
+    "playedUci": "h7h8",
+    "explanation": "Moving your queen to h8 is the only move that holds because you skewer the black king, exposing the black queen.",
+    "reasons": [
+      "skewer",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00AB1:wrong",
+    "fen": "8/7Q/3p1kp1/1p6/2b5/2q4P/5PPK/8 w - - 0 37",
+    "playedUci": "h7g8",
+    "explanation": "Moving your queen to g8 puts it at risk of attack from the black bishop. A better move would have been moving your queen to h8 because you skewer the black king, exposing the black queen.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00DZe:best",
+    "fen": "8/5k2/7p/p1P1bPpP/Pp2P3/1P1p1K2/5B2/8 b - - 2 47",
+    "playedUci": "g5g4",
+    "explanation": "Moving your pawn to g4 is the only move that holds because it leaves you with a passed pawn and it forces the king to respond.",
+    "reasons": [
+      "hanging",
+      "pawn_shield",
+      "passed_pawn",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00DZe:wrong",
+    "fen": "8/5k2/7p/p1P1bPpP/Pp2P3/1P1p1K2/5B2/8 b - - 2 47",
+    "playedUci": "f7e8",
+    "explanation": "Moving your king to e8 leaves your king with less pawn cover. A better move would have been moving your pawn to g4 because it gives you a passed pawn and it forces the king to respond.",
+    "reasons": [
+      "pawn_shield",
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00EoE:best",
+    "fen": "r1b5/ppr2k1p/5p2/5p2/8/2P3P1/P4PP1/4RK1R w - - 2 24",
+    "playedUci": "h1h7",
+    "explanation": "Taking the pawn on h7 with your h1-rook is the only move that holds because you skewer the black king, exposing the black c7-rook and the pawn was undefended.",
+    "reasons": [
+      "ignored_threat",
+      "skewer",
+      "wins_material",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00EoE:wrong",
+    "fen": "r1b5/ppr2k1p/5p2/5p2/8/2P3P1/P4PP1/4RK1R w - - 2 24",
+    "playedUci": "c3c4",
+    "explanation": "Moving your pawn to c4 puts it at risk of attack from the black c7-rook. A better move would have been taking the pawn on h7 with your h1-rook because you skewer the black king, exposing the black c7-rook and the pawn was undefended.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00F1l:best",
+    "fen": "8/2k1b3/5p2/RBpK1Pp1/P2p2P1/1p1P4/2r5/8 w - - 0 46",
+    "playedUci": "a5a7",
+    "explanation": "Moving your rook to a7 is the only move that holds because you skewer the black king, exposing the black bishop.",
+    "reasons": [
+      "skewer",
+      "rook_on_seventh",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00F1l:wrong",
+    "fen": "8/2k1b3/5p2/RBpK1Pp1/P2p2P1/1p1P4/2r5/8 w - - 0 46",
+    "playedUci": "a5a6",
+    "explanation": "Moving your rook to a6 is a blunder, but moving your rook to a7 would be better because you skewer the black king, exposing the black bishop.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00H87:best",
+    "fen": "6k1/4pp2/p5pB/2p4n/3pP1Q1/P2P2qP/1r4P1/5RK1 w - - 2 31",
+    "playedUci": "g4c8",
+    "explanation": "Moving your queen to c8 is the only move that holds because it forces the king to respond.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00H87:wrong",
+    "fen": "6k1/4pp2/p5pB/2p4n/3pP1Q1/P2P2qP/1r4P1/5RK1 w - - 2 31",
+    "playedUci": "h6g7",
+    "explanation": "Moving your bishop to g7 puts it where the black king and knight can take and you lose a knight. A better move would have been moving your queen to c8 because it forces the king to respond.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "ignored_threat",
+      "pin"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00ICz:best",
+    "fen": "2k3r1/1p1q3p/1p2p3/1NbpQr2/P1p2P2/6P1/6KP/R4R2 w - - 1 32",
+    "playedUci": "b5a7",
+    "explanation": "Moving your knight to a7 is the only move that holds because it forces the king to respond.",
+    "reasons": [
+      "ignored_threat",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00ICz:wrong",
+    "fen": "2k3r1/1p1q3p/1p2p3/1NbpQr2/P1p2P2/6P1/6KP/R4R2 w - - 1 32",
+    "playedUci": "b5c7",
+    "explanation": "Moving your knight to c7 leaves your queen hanging to the black f5-rook. A better move would have been moving your knight to a7 because it forces the king to respond.",
+    "reasons": [
+      "hanging",
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00KMV:best",
+    "fen": "1r3k2/1p1q1p2/p2p2p1/2pP2bp/2P1n1n1/1PQ3P1/P3N1K1/3N1R1R w - - 0 29",
+    "playedUci": "c3h8",
+    "explanation": "Moving your queen to h8 is the only move that holds because you skewer the black king, exposing the black rook.",
+    "reasons": [
+      "skewer",
+      "saves_piece",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00KMV:wrong",
+    "fen": "1r3k2/1p1q1p2/p2p2p1/2pP2bp/2P1n1n1/1PQ3P1/P3N1K1/3N1R1R w - - 0 29",
+    "playedUci": "b3b4",
+    "explanation": "Moving your pawn to b4 leaves your queen hanging to the black e4-knight. A better move would have been moving your queen to h8 because you skewer the black king, exposing the black rook.",
+    "reasons": [
+      "ignored_threat",
+      "backward_pawn"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00KOz:best",
+    "fen": "8/r4k2/7R/3n1PK1/8/8/8/8 w - - 4 57",
+    "playedUci": "h6h7",
+    "explanation": "Moving your rook to h7 is the only move that holds because you skewer the black king, exposing the black rook.",
+    "reasons": [
+      "skewer",
+      "rook_on_seventh",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00KOz:wrong",
+    "fen": "8/r4k2/7R/3n1PK1/8/8/8/8 w - - 4 57",
+    "playedUci": "h6h8",
+    "explanation": "Moving your rook to h8 is a blunder, but moving your rook to h7 would be better because you skewer the black king, exposing the black rook.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00OLF:best",
+    "fen": "k1r5/n1N3p1/Q2p4/P2Pp2p/q3Pp1P/2RK4/5PP1/8 b - - 0 36",
+    "playedUci": "c8c7",
+    "explanation": "Taking the knight on c7 with your rook is the only move that holds because your king is harder to attack.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "capture",
+      "king_safer"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00OLF:wrong",
+    "fen": "k1r5/n1N3p1/Q2p4/P2Pp2p/q3Pp1P/2RK4/5PP1/8 b - - 0 36",
+    "playedUci": "a8b8",
+    "explanation": "Moving your king to b8 leaves your pawn hanging to the white queen. A better move would have been taking the knight on c7 with your rook because your king is harder to attack.",
+    "reasons": [
+      "ignored_threat",
+      "king_more_exposed"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00PrK:best",
+    "fen": "8/7R/r3k3/4p2p/3b2p1/3K4/8/5R2 w - - 0 56",
+    "playedUci": "h7h6",
+    "explanation": "Moving your h7-rook to h6 is the only move that holds because you skewer the black king, exposing the black rook.",
+    "reasons": [
+      "skewer",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00PrK:wrong",
+    "fen": "8/7R/r3k3/4p2p/3b2p1/3K4/8/5R2 w - - 0 56",
+    "playedUci": "h7h8",
+    "explanation": "Moving your h7-rook to h8 is a blunder, but moving your h7-rook to h6 would be better because you skewer the black king, exposing the black rook.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00Q4v:best",
+    "fen": "8/2p1b3/q1Pp2k1/3Pp3/4Pr2/1Q3PK1/3N2P1/4R3 b - - 2 47",
+    "playedUci": "e7h4",
+    "explanation": "Moving your bishop to h4 is the only move that holds because you skewer the white king, exposing the white rook.",
+    "reasons": [
+      "skewer",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00Q4v:wrong",
+    "fen": "8/2p1b3/q1Pp2k1/3Pp3/4Pr2/1Q3PK1/3N2P1/4R3 b - - 2 47",
+    "playedUci": "e7d8",
+    "explanation": "Moving your bishop to d8 is a blunder, but moving your bishop to h4 would be better because you skewer the white king, exposing the white rook.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00TiV:best",
+    "fen": "8/1kp5/4n3/3p4/r2P3R/2K2N1P/8/8 b - - 6 48",
+    "playedUci": "a4a3",
+    "explanation": "Moving your rook to a3 is the only move that holds because you skewer the white king, exposing the white knight.",
+    "reasons": [
+      "skewer",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00TiV:wrong",
+    "fen": "8/1kp5/4n3/3p4/r2P3R/2K2N1P/8/8 b - - 6 48",
+    "playedUci": "b7a8",
+    "explanation": "Moving your king to a8 is a blunder, but moving your rook to a3 would be better because you skewer the white king, exposing the white knight.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00WJN:best",
+    "fen": "5Q2/7K/8/8/4p2P/3k2q1/8/8 w - - 2 54",
+    "playedUci": "f8a3",
+    "explanation": "Moving your queen to a3 is the only move that holds because you skewer the black king, exposing the black queen.",
+    "reasons": [
+      "ignored_threat",
+      "skewer",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00WJN:wrong",
+    "fen": "5Q2/7K/8/8/4p2P/3k2q1/8/8 w - - 2 54",
+    "playedUci": "f8g8",
+    "explanation": "Moving your queen to g8 leaves your pawn hanging to the black queen. A better move would have been moving your queen to a3 because you skewer the black king, exposing the black queen.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00WZO:best",
+    "fen": "8/1R2B3/5p2/4bP1p/p1k4r/5K2/8/8 w - - 8 46",
+    "playedUci": "b7b4",
+    "explanation": "Moving your rook to b4 is the only move that holds because you skewer the black king, exposing the black rook.",
+    "reasons": [
+      "skewer",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00WZO:wrong",
+    "fen": "8/1R2B3/5p2/4bP1p/p1k4r/5K2/8/8 w - - 8 46",
+    "playedUci": "b7b8",
+    "explanation": "Moving your rook to b8 puts it at risk of attack from the black bishop. A better move would have been moving your rook to b4 because you skewer the black king, exposing the black rook.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00bQA:best",
+    "fen": "r7/4n1k1/2b1R1n1/1p4R1/1P1p3p/3P1PpP/2N3P1/6K1 w - - 1 41",
+    "playedUci": "e6e7",
+    "explanation": "Taking the knight on e7 with your e6-rook is the only move that holds because your rook gets onto the seventh rank and it attacks the king directly.",
+    "reasons": [
+      "hanging",
+      "capture",
+      "rook_on_seventh",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00bQA:wrong",
+    "fen": "r7/4n1k1/2b1R1n1/1p4R1/1P1p3p/3P1PpP/2N3P1/6K1 w - - 1 41",
+    "playedUci": "e6f6",
+    "explanation": "Moving your e6-rook to f6 puts it at risk of attack from the black king. A better move would have been taking the knight on e7 with your e6-rook because your rook reaches the seventh rank and it puts the opponent in check.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00baa:best",
+    "fen": "1r1qr1k1/p1p2ppp/1p1b1n2/3N4/3Q4/1P4P1/PBP1PPKP/R3R3 b - - 2 15",
+    "playedUci": "d6e5",
+    "explanation": "Moving your bishop to e5 is the only move that holds because you skewer the white queen, exposing the white bishop and it unveils an attack from your queen on the white knight.",
+    "reasons": [
+      "skewer",
+      "discovered_attack",
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00baa:wrong",
+    "fen": "1r1qr1k1/p1p2ppp/1p1b1n2/3N4/3Q4/1P4P1/PBP1PPKP/R3R3 b - - 2 15",
+    "playedUci": "b8c8",
+    "explanation": "Moving your b8-rook to c8 leaves your knight hanging to the white queen and knight. A better move would have been moving your bishop to e5 because you skewer the white queen, exposing the white bishop and it unveils an attack from your queen on the white knight.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00coU:best",
+    "fen": "6k1/R3K3/8/1r6/5r2/p4N2/8/5R2 b - - 4 50",
+    "playedUci": "f4f7",
+    "explanation": "Moving your f4-rook to f7 is the only move that holds because you fork the white king and the white knight and you skewer the white king, exposing the white a7-rook.",
+    "reasons": [
+      "ignored_threat",
+      "fork",
+      "skewer",
+      "pin"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00coU:wrong",
+    "fen": "6k1/R3K3/8/1r6/5r2/p4N2/8/5R2 b - - 4 50",
+    "playedUci": "g8h8",
+    "explanation": "Moving your king to h8 leaves your pawn hanging to the white a7-rook. A better move would have been moving your f4-rook to f7 because you fork the white king and the white knight and you skewer the white king, exposing the white a7-rook.",
+    "reasons": [
+      "ignored_threat",
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00h95:best",
+    "fen": "7k/2p3p1/5p1p/2Qq4/3Pr3/4P3/P4P1P/1R4K1 b - - 3 26",
+    "playedUci": "e4g4",
+    "explanation": "Moving your rook to g4 is the only move that holds because it forces the king to respond.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00h95:wrong",
+    "fen": "7k/2p3p1/5p1p/2Qq4/3Pr3/4P3/P4P1P/1R4K1 b - - 3 26",
+    "playedUci": "h8h7",
+    "explanation": "Moving your king to h7 leaves your queen hanging to the white queen. A better move would have been moving your rook to g4 because it forces the king to respond.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "pawn_shield"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00l0K:best",
+    "fen": "2b5/2Q2p2/k7/1q2P3/1p6/1N3P2/1PP5/2K5 b - - 0 38",
+    "playedUci": "b5f1",
+    "explanation": "Moving your queen to f1 is the only move that holds because it attacks the king directly.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00l0K:wrong",
+    "fen": "2b5/2Q2p2/k7/1q2P3/1p6/1N3P2/1PP5/2K5 b - - 0 38",
+    "playedUci": "c8d7",
+    "explanation": "Moving your bishop to d7 is a blunder, but moving your queen to f1 would be better because it puts the opponent in check.",
+    "reasons": [
+      "saves_piece",
+      "saves_piece"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00lap:best",
+    "fen": "8/8/2k3r1/R7/P2p3p/3K4/8/8 w - - 0 46",
+    "playedUci": "a5a6",
+    "explanation": "Moving your rook to a6 is the only move that holds because you skewer the black king, exposing the black rook.",
+    "reasons": [
+      "skewer",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00lap:wrong",
+    "fen": "8/8/2k3r1/R7/P2p3p/3K4/8/8 w - - 0 46",
+    "playedUci": "a5a7",
+    "explanation": "Moving your rook to a7 is a blunder, but moving your rook to a6 would be better because you skewer the black king, exposing the black rook.",
+    "reasons": [
+      "rook_on_seventh"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00nl3:best",
+    "fen": "6R1/6p1/p1k4p/1p1p4/PP2p1P1/2b1P3/6K1/8 w - - 0 38",
+    "playedUci": "g8c8",
+    "explanation": "Moving your rook to c8 is the only move that holds because you skewer the black king, exposing the black bishop.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "skewer",
+      "open_file",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00nl3:wrong",
+    "fen": "6R1/6p1/p1k4p/1p1p4/PP2p1P1/2b1P3/6K1/8 w - - 0 38",
+    "playedUci": "g8h8",
+    "explanation": "Moving your rook to h8 leaves your pawn hanging to the black pawn. A better move would have been moving your rook to c8 because you skewer the black king, exposing the black bishop.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "semi_open_file"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00sXv:best",
+    "fen": "8/r4pp1/2k1p2p/8/pK1PP3/5PP1/6P1/1R6 b - - 2 35",
+    "playedUci": "a7b7",
+    "explanation": "Moving your rook to b7 is the only move that holds because you skewer the white king, exposing the white rook.",
+    "reasons": [
+      "hanging",
+      "skewer",
+      "open_file",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00sXv:wrong",
+    "fen": "8/r4pp1/2k1p2p/8/pK1PP3/5PP1/6P1/1R6 b - - 2 35",
+    "playedUci": "a7a8",
+    "explanation": "Moving your rook to a8 is a blunder, but moving your rook to b7 would be better because you skewer the white king, exposing the white rook.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00z9K:best",
+    "fen": "4B3/1b4kp/p7/3p3R/6P1/1P6/KPrn1r2/7R w - - 3 35",
+    "playedUci": "h5h7",
+    "explanation": "Taking the pawn on h7 with your h5-rook is the only move that holds because you skewer the black king, exposing the black bishop and the pawn was undefended.",
+    "reasons": [
+      "skewer",
+      "wins_material",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00z9K:wrong",
+    "fen": "4B3/1b4kp/p7/3p3R/6P1/1P6/KPrn1r2/7R w - - 3 35",
+    "playedUci": "e8f7",
+    "explanation": "Moving your bishop to f7 puts it where the black king and f2-rook can take and you lose a knight. A better move would have been taking the pawn on h7 with your h5-rook because you skewer the black king, exposing the black bishop and the pawn was undefended.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "0100g:best",
+    "fen": "8/8/5k2/R2K4/2P4r/8/P7/8 b - - 2 43",
+    "playedUci": "h4h5",
+    "explanation": "Moving your rook to h5 is the only move that holds because you skewer the white king, exposing the white rook.",
+    "reasons": [
+      "skewer",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "0100g:wrong",
+    "fen": "8/8/5k2/R2K4/2P4r/8/P7/8 b - - 2 43",
+    "playedUci": "f6e7",
+    "explanation": "Moving your king to e7 is a blunder, but moving your rook to h5 would be better because you skewer the white king, exposing the white rook.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "001XA:best",
+    "fen": "2r2rk1/pbq1bppp/8/8/2p1N3/P1Bn2P1/2Q2PBP/1R3RK1 w - - 4 24",
+    "playedUci": "b1b7",
+    "explanation": "Taking the bishop on b7 with your b1-rook is the only move that holds because you skewer the black queen, exposing the black e7-bishop and you take the defender of the black queen.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "skewer",
+      "removed_defender",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "001XA:wrong",
+    "fen": "2r2rk1/pbq1bppp/8/8/2p1N3/P1Bn2P1/2Q2PBP/1R3RK1 w - - 4 24",
+    "playedUci": "e4c5",
+    "explanation": "Moving your knight to c5 puts it where the black queen and e7-bishop can take and you lose a knight. A better move would have been taking the bishop on b7 with your b1-rook because you skewer the black queen, exposing the black e7-bishop and you take the defender of the black queen.",
+    "reasons": [
+      "hanging",
+      "king_more_exposed",
+      "fork",
+      "discovered_attack",
+      "saves_piece"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "002KJ:best",
+    "fen": "r3k2r/ppq1bppp/4pn2/2Ppn3/1P4bP/2P2N2/P3BPP1/RNBQ1RK1 w kq - 3 11",
+    "playedUci": "f3e5",
+    "explanation": "Taking the knight on e5 with your f3-knight is the only move that holds because it unveils an attack from your bishop on the black g4-bishop and you take the defender of the black g4-bishop.",
+    "reasons": [
+      "hanging",
+      "discovered_attack",
+      "removed_defender",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "002KJ:wrong",
+    "fen": "r3k2r/ppq1bppp/4pn2/2Ppn3/1P4bP/2P2N2/P3BPP1/RNBQ1RK1 w kq - 3 11",
+    "playedUci": "c5c6",
+    "explanation": "Moving your pawn to c6 puts it at risk of attack from the black queen and e5-knight. A better move would have been taking the knight on e5 with your f3-knight because it unveils an attack from your bishop on the black g4-bishop and you take the defender of the black g4-bishop.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "003cs:best",
+    "fen": "2r1kbnr/pp4pp/4p3/3pq1N1/8/1P2B3/P3Q1PP/nN3RK1 w k - 0 17",
+    "playedUci": "f1f8",
+    "explanation": "Taking the bishop on f8 with your rook is the only move that holds because you fork the black king and the black g8-knight and you skewer the black king, exposing the black c8-rook.",
+    "reasons": [
+      "hanging",
+      "fork",
+      "skewer",
+      "pin"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "003cs:wrong",
+    "fen": "2r1kbnr/pp4pp/4p3/3pq1N1/8/1P2B3/P3Q1PP/nN3RK1 w k - 0 17",
+    "playedUci": "g5e6",
+    "explanation": "Taking the pawn on e6 with your g5-knight puts it where the black queen can take and you lose a knight. A better move would have been taking the bishop on f8 with your rook because you fork the black king and the black g8-knight and you skewer the black king, exposing the black c8-rook.",
+    "reasons": [
+      "hanging",
+      "removed_defender",
+      "capture"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "004RF:best",
+    "fen": "5rk1/5ppp/1p6/1q3P1Q/2pp3P/6R1/6PK/8 w - - 0 31",
+    "playedUci": "g3g7",
+    "explanation": "Taking the pawn on g7 with your rook is the only move that holds because you take the defender of the black pawn.",
+    "reasons": [
+      "hanging",
+      "removed_defender",
+      "capture",
+      "rook_on_seventh"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "004RF:wrong",
+    "fen": "5rk1/5ppp/1p6/1q3P1Q/2pp3P/6R1/6PK/8 w - - 0 31",
+    "playedUci": "f5f6",
+    "explanation": "Moving your pawn to f6 leaves your queen hanging to the black queen. A better move would have been taking the pawn on g7 with your rook because you take the defender of the black pawn.",
+    "reasons": [
+      "hanging",
+      "hanging",
+      "discovered_attack"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "006fF:best",
+    "fen": "r1b4r/pp1k2p1/2nb2qp/1B1p2B1/3p3Q/8/PPP2PPP/3RR1K1 w - - 0 18",
+    "playedUci": "h4g4",
+    "explanation": "Moving your queen to g4 is the only move that holds because you skewer the black king, exposing the black c8-bishop.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "skewer",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "006fF:wrong",
+    "fen": "r1b4r/pp1k2p1/2nb2qp/1B1p2B1/3p3Q/8/PPP2PPP/3RR1K1 w - - 0 18",
+    "playedUci": "b5a6",
+    "explanation": "Moving your b5-bishop to a6 puts it where the black pawn can take and you lose a knight. A better move would have been moving your queen to g4 because you skewer the black king, exposing the black c8-bishop.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00798:best",
+    "fen": "8/4k1K1/4P3/6pp/6rP/4R1P1/8/8 b - - 1 60",
+    "playedUci": "g5h4",
+    "explanation": "Taking the pawn on h4 with your g-pawn is the only move that holds because it reveals an attack on the king and the pawn was undefended.",
+    "reasons": [
+      "doubled_pawns",
+      "isolated_pawn",
+      "discovered_check",
+      "wins_material",
+      "removed_defender"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00798:wrong",
+    "fen": "8/4k1K1/4P3/6pp/6rP/4R1P1/8/8 b - - 1 60",
+    "playedUci": "e7d8",
+    "explanation": "Moving your king to d8 is a blunder, but taking the pawn on h4 with your g-pawn would be better because it discovers check and the pawn was undefended.",
+    "reasons": [
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "008Y3:best",
+    "fen": "r5k1/1p1r1pp1/p3pnp1/2qN4/8/1Q5P/PP3PP1/3RR1K1 w - - 0 25",
+    "playedUci": "d5f6",
+    "explanation": "Taking the knight on f6 with your knight is the only move that holds because you fork the black king and the black d7-rook and it unveils an attack from your queen on the black pawn.",
+    "reasons": [
+      "hanging",
+      "fork",
+      "discovered_attack",
+      "discovered_attack"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "008Y3:wrong",
+    "fen": "r5k1/1p1r1pp1/p3pnp1/2qN4/8/1Q5P/PP3PP1/3RR1K1 w - - 0 25",
+    "playedUci": "d5b6",
+    "explanation": "Moving your knight to b6 is a blunder, but taking the knight on f6 with your knight would be better because you fork the black king and the black d7-rook.",
+    "reasons": [
+      "fork",
+      "discovered_attack",
+      "discovered_attack"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "009FS:best",
+    "fen": "r2qr1k1/p5bp/1pp1N1p1/8/2Q2p2/2P1n2P/PP3PP1/R1B1RNK1 b - - 0 18",
+    "playedUci": "e3c4",
+    "explanation": "Taking the queen on c4 with your knight is the only move that holds because the queen was undefended.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "wins_material",
+      "capture",
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "009FS:wrong",
+    "fen": "r2qr1k1/p5bp/1pp1N1p1/8/2Q2p2/2P1n2P/PP3PP1/R1B1RNK1 b - - 0 18",
+    "playedUci": "a8b8",
+    "explanation": "Moving your a8-rook to b8 leaves your queen hanging to the white e6-knight. A better move would have been taking the queen on c4 with your knight because the queen was undefended.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "ignored_threat",
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "009zR:best",
+    "fen": "3Q4/p1p2ppp/4k3/8/5P2/4P3/Prqn2PP/3R1RK1 b - - 0 22",
+    "playedUci": "d2f3",
+    "explanation": "Moving your knight to f3 is the only move that holds because it unveils an attack from your queen on the white pawn.",
+    "reasons": [
+      "hanging",
+      "discovered_attack",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "009zR:wrong",
+    "fen": "3Q4/p1p2ppp/4k3/8/5P2/4P3/Prqn2PP/3R1RK1 b - - 0 22",
+    "playedUci": "a7a6",
+    "explanation": "Moving your pawn to a6 is a blunder, but moving your knight to f3 would be better because it unveils an attack from your queen on the white pawn.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "009zS:best",
+    "fen": "r3r1k1/1p3p1p/p1p3p1/8/6bP/Q3b1P1/PP2B3/R3K2R b KQ - 0 20",
+    "playedUci": "g4e2",
+    "explanation": "Taking the bishop on e2 with your g4-bishop is the only move that holds.",
+    "reasons": [
+      "hanging",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "009zS:wrong",
+    "fen": "r3r1k1/1p3p1p/p1p3p1/8/6bP/Q3b1P1/PP2B3/R3K2R b KQ - 0 20",
+    "playedUci": "a8b8",
+    "explanation": "Moving your a8-rook to b8 leaves your g4-bishop hanging to the white bishop. A better move would have been taking the bishop on e2 with your g4-bishop.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00AFG:best",
+    "fen": "r4rk1/5ppp/p3bp2/2q2N1Q/Ppp5/8/1PP2PPP/R2R2K1 w - - 0 22",
+    "playedUci": "f5h6",
+    "explanation": "Moving your knight to h6 is the only move that holds because it unveils an attack from your queen on the black queen.",
+    "reasons": [
+      "hanging",
+      "hanging",
+      "discovered_attack",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00AFG:wrong",
+    "fen": "r4rk1/5ppp/p3bp2/2q2N1Q/Ppp5/8/1PP2PPP/R2R2K1 w - - 0 22",
+    "playedUci": "f5d6",
+    "explanation": "Moving your knight to d6 leaves your queen hanging to the black queen. A better move would have been moving your knight to h6 because it puts the opponent in check.",
+    "reasons": [
+      "hanging",
+      "discovered_attack",
+      "saves_piece"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00AdI:best",
+    "fen": "3r4/4kp1p/1PQ1p1p1/p3b3/1p2P2P/1P5K/6P1/8 b - - 2 36",
+    "playedUci": "d8d3",
+    "explanation": "Moving your rook to d3 is the only move that holds because it forces the king to respond.",
+    "reasons": [
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00AdI:wrong",
+    "fen": "3r4/4kp1p/1PQ1p1p1/p3b3/1p2P2P/1P5K/6P1/8 b - - 2 36",
+    "playedUci": "d8e8",
+    "explanation": "Moving your rook to e8 is a blunder, but moving your rook to d3 would be better because it attacks the king directly.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00Bul:best",
+    "fen": "rnbqk2r/pp3ppp/5n2/4N3/2p5/2P5/P1PPQPPP/R1B1K2R w KQkq - 0 9",
+    "playedUci": "e5c6",
+    "explanation": "Moving your knight to c6 is the only move that holds because you fork the black b8-knight and the black queen and it opens a line to the king.",
+    "reasons": [
+      "hanging",
+      "fork",
+      "discovered_check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00Bul:wrong",
+    "fen": "rnbqk2r/pp3ppp/5n2/4N3/2p5/2P5/P1PPQPPP/R1B1K2R w KQkq - 0 9",
+    "playedUci": "e5d7",
+    "explanation": "Moving your knight to d7 puts it where the black king and queen can take and you lose a knight. A better move would have been moving your knight to c6 because you fork the black b8-knight and the black queen.",
+    "reasons": [
+      "hanging",
+      "fork",
+      "discovered_check",
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00DEc:best",
+    "fen": "8/p5pk/1p3b1p/3r3P/6P1/3nBN2/P4PK1/3R4 b - - 4 30",
+    "playedUci": "d3f4",
+    "explanation": "Moving your knight to f4 is the only move that holds because it unveils an attack from your rook on the white rook.",
+    "reasons": [
+      "hanging",
+      "discovered_attack",
+      "king_safer",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00DEc:wrong",
+    "fen": "8/p5pk/1p3b1p/3r3P/6P1/3nBN2/P4PK1/3R4 b - - 4 30",
+    "playedUci": "a7a6",
+    "explanation": "Moving your pawn to a6 leaves your pawn hanging to the white bishop. A better move would have been moving your knight to f4 because it unveils an attack from your rook on the white rook.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00Dke:best",
+    "fen": "5bk1/2Q2p1p/5qp1/p7/P1Bp4/1P5P/2r2PP1/3R2K1 w - - 6 28",
+    "playedUci": "c4f7",
+    "explanation": "Taking the pawn on f7 with your bishop is the only move that holds because it unveils an attack from your queen on the black rook.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "hanging",
+      "discovered_attack",
+      "capture",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00Dke:wrong",
+    "fen": "5bk1/2Q2p1p/5qp1/p7/P1Bp4/1P5P/2r2PP1/3R2K1 w - - 6 28",
+    "playedUci": "c7b8",
+    "explanation": "Moving your queen to b8 leaves your pawn hanging to the black queen and rook. A better move would have been taking the pawn on f7 with your bishop because it unveils an attack from your queen on the black rook.",
+    "reasons": [
+      "ignored_threat",
+      "pin"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00E29:best",
+    "fen": "r1b2rk1/4bppp/p1n5/3q4/Pp6/3B1N2/1B3PPP/R2Q1RK1 w - - 0 18",
+    "playedUci": "d3h7",
+    "explanation": "Taking the pawn on h7 with your d3-bishop is the only move that holds because it unveils an attack from your queen on the black queen.",
+    "reasons": [
+      "hanging",
+      "back_rank",
+      "discovered_attack",
+      "capture",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00E29:wrong",
+    "fen": "r1b2rk1/4bppp/p1n5/3q4/Pp6/3B1N2/1B3PPP/R2Q1RK1 w - - 0 18",
+    "playedUci": "a4a5",
+    "explanation": "Moving your pawn to a5 puts it at risk of attack from the black queen and knight. A better move would have been taking the pawn on h7 with your d3-bishop because it unveils an attack from your queen on the black queen.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00EXS:best",
+    "fen": "r3r1k1/p2Q1p1p/1p2p1p1/8/1P1P4/P3P3/1B2Nb1q/2KR3R b - - 1 19",
+    "playedUci": "f2e3",
+    "explanation": "Taking the pawn on e3 with your bishop is the only move that holds because the pawn was undefended and it unveils an attack from your queen on the white knight.",
+    "reasons": [
+      "ignored_threat",
+      "wins_material",
+      "discovered_attack",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00EXS:wrong",
+    "fen": "r3r1k1/p2Q1p1p/1p2p1p1/8/1P1P4/P3P3/1B2Nb1q/2KR3R b - - 1 19",
+    "playedUci": "a8b8",
+    "explanation": "Moving your a8-rook to b8 leaves your queen hanging to the white h1-rook. A better move would have been taking the pawn on e3 with your bishop because the pawn was undefended and it unveils an attack from your queen on the white knight.",
+    "reasons": [
+      "ignored_threat",
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00GBX:best",
+    "fen": "r6k/pp2n1pp/2nN4/4p1r1/1PB5/2P4b/P3Nb1P/R2R3K w - - 0 23",
+    "playedUci": "d6f7",
+    "explanation": "Moving your d6-knight to f7 is the only move that holds because you fork the black king and the black g5-rook.",
+    "reasons": [
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00GBX:wrong",
+    "fen": "r6k/pp2n1pp/2nN4/4p1r1/1PB5/2P4b/P3Nb1P/R2R3K w - - 0 23",
+    "playedUci": "d6b7",
+    "explanation": "Taking the pawn on b7 with your d6-knight is a blunder because the pawn was undefended. A better move would have been moving your d6-knight to f7 because you fork the black king and the black g5-rook.",
+    "reasons": [
+      "wins_material",
+      "capture",
+      "passed_pawn"
+    ],
+    "classification": "blunder",
+    "concept": "capture"
+  },
+  {
+    "id": "00Gt0:best",
+    "fen": "R7/4k3/5p2/3p2p1/4b2p/2K1PP1P/6P1/8 b - - 0 47",
+    "playedUci": "d5d4",
+    "explanation": "Moving your pawn to d4 is the only move that holds because it unveils an attack from your bishop on the white rook.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "pawn_shield",
+      "discovered_attack",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00Gt0:wrong",
+    "fen": "R7/4k3/5p2/3p2p1/4b2p/2K1PP1P/6P1/8 b - - 0 47",
+    "playedUci": "e7f7",
+    "explanation": "Moving your king to f7 leaves your bishop hanging to the white pawn. A better move would have been moving your pawn to d4 because it unveils an attack from your bishop on the white rook.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00IYg:best",
+    "fen": "r1b2r2/pp2n1p1/1qn1ppk1/3pP1N1/3P3P/P7/1P1Q1PP1/RN2K2R w KQ - 0 14",
+    "playedUci": "h4h5",
+    "explanation": "Moving your pawn to h5 is the only move that holds because it puts the opponent in check.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "ignored_threat",
+      "backward_pawn",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00IYg:wrong",
+    "fen": "r1b2r2/pp2n1p1/1qn1ppk1/3pP1N1/3P3P/P7/1P1Q1PP1/RN2K2R w KQ - 0 14",
+    "playedUci": "e5f6",
+    "explanation": "Taking the pawn on f6 with your e-pawn puts it at risk of attack from the black king and f8-rook. A better move would have been moving your pawn to h5 because it attacks the king directly.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "doubled_pawns",
+      "isolated_pawn",
+      "removed_defender",
+      "capture",
+      "saves_piece"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00Kia:best",
+    "fen": "5r1k/4n2p/1p4p1/pP5Q/P2pB2K/6P1/2P4P/4q3 w - - 0 38",
+    "playedUci": "h5e5",
+    "explanation": "Moving your queen to e5 is the only move that holds because you fork the black king and the black knight.",
+    "reasons": [
+      "fork",
+      "saves_piece",
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00Kia:wrong",
+    "fen": "5r1k/4n2p/1p4p1/pP5Q/P2pB2K/6P1/2P4P/4q3 w - - 0 38",
+    "playedUci": "h5g6",
+    "explanation": "Taking the pawn on g6 with your queen puts it at risk of attack from the black knight and pawn. A better move would have been moving your queen to e5 because you fork the black king and the black knight.",
+    "reasons": [
+      "hanging",
+      "removed_defender",
+      "capture",
+      "saves_piece"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00Lh9:best",
+    "fen": "4r3/7P/1p4Q1/1b4B1/1k4n1/8/1P2n1P1/4R2K b - - 3 41",
+    "playedUci": "e2g3",
+    "explanation": "Moving your e2-knight to g3 is the only move that holds because it unveils an attack from your rook on the white rook.",
+    "reasons": [
+      "ignored_threat",
+      "hanging",
+      "discovered_attack",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00Lh9:wrong",
+    "fen": "4r3/7P/1p4Q1/1b4B1/1k4n1/8/1P2n1P1/4R2K b - - 3 41",
+    "playedUci": "e8f8",
+    "explanation": "Moving your rook to f8 leaves your pawn hanging to the white queen. A better move would have been moving your e2-knight to g3 because it unveils an attack from your rook on the white rook.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00Lt1:best",
+    "fen": "r4k2/pp3p2/2pNR2p/5Qp1/1P3n2/2KP4/P1P2qPP/8 b - - 7 31",
+    "playedUci": "f4d5",
+    "explanation": "Moving your knight to d5 is the only move that holds because it unveils an attack from your queen on the white queen.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "ignored_threat",
+      "hanging",
+      "discovered_attack",
+      "outpost",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00Lt1:wrong",
+    "fen": "r4k2/pp3p2/2pNR2p/5Qp1/1P3n2/2KP4/P1P2qPP/8 b - - 7 31",
+    "playedUci": "a8b8",
+    "explanation": "Moving your rook to b8 leaves your pawn hanging to the white queen and knight. A better move would have been moving your knight to d5 because it unveils an attack from your queen on the white queen.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "saves_piece"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00MQl:best",
+    "fen": "r1b2k1r/pp3ppp/2p5/2bp4/5Pnq/1B2BN2/PPP3PP/RN1QR2K b - - 5 15",
+    "playedUci": "c5e3",
+    "explanation": "Taking the bishop on e3 with your c5-bishop is the only move that holds because the bishop was undefended and you take the defender of the white pawn.",
+    "reasons": [
+      "ignored_threat",
+      "wins_material",
+      "removed_defender",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00MQl:wrong",
+    "fen": "r1b2k1r/pp3ppp/2p5/2bp4/5Pnq/1B2BN2/PPP3PP/RN1QR2K b - - 5 15",
+    "playedUci": "a8b8",
+    "explanation": "Moving your a8-rook to b8 leaves your queen hanging to the white f3-knight. A better move would have been taking the bishop on e3 with your c5-bishop because the bishop was undefended and you take the defender of the white pawn.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00MZC:best",
+    "fen": "5r1k/p5p1/1pb4p/3pR3/1Q6/P1P4P/1P3qP1/R6K b - - 1 24",
+    "playedUci": "d5d4",
+    "explanation": "Moving your pawn to d4 is the only move that holds because it unveils an attack from your bishop on the white pawn.",
+    "reasons": [
+      "hanging",
+      "discovered_attack"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00MZC:wrong",
+    "fen": "5r1k/p5p1/1pb4p/3pR3/1Q6/P1P4P/1P3qP1/R6K b - - 1 24",
+    "playedUci": "f8g8",
+    "explanation": "Moving your rook to g8 is a blunder, but moving your pawn to d4 would be better because it unveils an attack from your bishop on the white pawn.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00O37:best",
+    "fen": "r1q1r1k1/1p3pp1/n1p4p/p2pp2P/P3P3/2P2P2/1P1QBb2/R1BK3R w - - 0 24",
+    "playedUci": "e2a6",
+    "explanation": "Taking the knight on a6 with your e2-bishop is the only move that holds because you pin the pawn to the queen and it unveils an attack from your queen on the black bishop.",
+    "reasons": [
+      "hanging",
+      "pin",
+      "discovered_attack",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00O37:wrong",
+    "fen": "r1q1r1k1/1p3pp1/n1p4p/p2pp2P/P3P3/2P2P2/1P1QBb2/R1BK3R w - - 0 24",
+    "playedUci": "e4d5",
+    "explanation": "Taking the pawn on d5 with your e-pawn is a blunder because the pawn was undefended. A better move would have been taking the knight on a6 with your e2-bishop because you pin the pawn to the queen and it unveils an attack from your queen on the black bishop.",
+    "reasons": [
+      "isolated_pawn",
+      "wins_material",
+      "capture"
+    ],
+    "classification": "blunder",
+    "concept": "capture"
+  },
+  {
+    "id": "00P81:best",
+    "fen": "6k1/5p2/4p2p/3pPP2/1R5P/2r5/2B5/2b2K2 w - - 1 47",
+    "playedUci": "b4b8",
+    "explanation": "Moving your rook to b8 is the only move that holds because it forces the king to respond.",
+    "reasons": [
+      "ignored_threat",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00P81:wrong",
+    "fen": "6k1/5p2/4p2p/3pPP2/1R5P/2r5/2B5/2b2K2 w - - 1 47",
+    "playedUci": "f5f6",
+    "explanation": "Moving your pawn to f6 leaves your bishop hanging to the black rook. A better move would have been moving your rook to b8 because it forces the king to respond.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00Pms:best",
+    "fen": "r3kr2/p1p2pQp/bp2pP2/8/8/1P4P1/P2KNP1P/R1B4q w q - 1 18",
+    "playedUci": "g7f8",
+    "explanation": "Taking the rook on f8 with your queen is the only move that holds because you skewer the black king, exposing the black a8-rook.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "skewer",
+      "capture",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00Pms:wrong",
+    "fen": "r3kr2/p1p2pQp/bp2pP2/8/8/1P4P1/P2KNP1P/R1B4q w q - 1 18",
+    "playedUci": "g7g8",
+    "explanation": "Moving your queen to g8 puts it at risk of attack from the black f8-rook. A better move would have been taking the rook on f8 with your queen because you skewer the black king, exposing the black a8-rook.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "pin"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00R2A:best",
+    "fen": "2kr1b1R/p5p1/8/3P1p2/2P5/4B3/PP1K1P2/8 b - - 0 25",
+    "playedUci": "f8b4",
+    "explanation": "Moving your bishop to b4 is the only move that holds because it unveils an attack from your rook on the white rook.",
+    "reasons": [
+      "ignored_threat",
+      "king_more_exposed",
+      "discovered_attack",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00R2A:wrong",
+    "fen": "2kr1b1R/p5p1/8/3P1p2/2P5/4B3/PP1K1P2/8 b - - 0 25",
+    "playedUci": "c8d7",
+    "explanation": "Moving your king to d7 leaves your pawn hanging to the white bishop. A better move would have been moving your bishop to b4 because it unveils an attack from your rook on the white rook.",
+    "reasons": [
+      "ignored_threat",
+      "king_more_exposed"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00RtC:best",
+    "fen": "r4k2/ppp3p1/3p3r/2q5/1PNnP3/2Q2PBp/P4R1P/5RK1 b - - 0 25",
+    "playedUci": "d4e2",
+    "explanation": "Moving your knight to e2 is the only move that holds because you fork the white queen and the white bishop and it unveils an attack from your queen on the white f2-rook.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "king_more_exposed",
+      "fork",
+      "discovered_attack"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00RtC:wrong",
+    "fen": "r4k2/ppp3p1/3p3r/2q5/1PNnP3/2Q2PBp/P4R1P/5RK1 b - - 0 25",
+    "playedUci": "a8b8",
+    "explanation": "Moving your a8-rook to b8 leaves your queen hanging to the white pawn. A better move would have been moving your knight to e2 because you fork the white queen and the white bishop and it unveils an attack from your queen on the white f2-rook.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00SlL:best",
+    "fen": "r5k1/2p1qp1p/2b1p1pQ/pp5P/3P2P1/3r4/PP2N3/2KR3R w - - 0 24",
+    "playedUci": "d1d3",
+    "explanation": "Taking the rook on d3 with your d1-rook is the only move that holds because the rook was undefended.",
+    "reasons": [
+      "ignored_threat",
+      "wins_material",
+      "capture",
+      "king_safer"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00SlL:wrong",
+    "fen": "r5k1/2p1qp1p/2b1p1pQ/pp5P/3P2P1/3r4/PP2N3/2KR3R w - - 0 24",
+    "playedUci": "h6g7",
+    "explanation": "Moving your queen to g7 puts it at risk of attack from the black king. A better move would have been taking the rook on d3 with your d1-rook because the rook was undefended.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "pin",
+      "check"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00T4i:best",
+    "fen": "2r4k/q2b1Q1p/2p2P2/1p2p3/4P3/p2P3R/4N1K1/R7 b - - 0 38",
+    "playedUci": "d7h3",
+    "explanation": "Taking the rook on h3 with your bishop is the only move that holds because you come out a bishop ahead and it unveils an attack from your queen on the white queen.",
+    "reasons": [
+      "hanging",
+      "hanging",
+      "wins_material",
+      "discovered_attack",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00T4i:wrong",
+    "fen": "2r4k/q2b1Q1p/2p2P2/1p2p3/4P3/p2P3R/4N1K1/R7 b - - 0 38",
+    "playedUci": "c8d8",
+    "explanation": "Moving your rook to d8 leaves your pawn hanging to the white queen and h3-rook. A better move would have been taking the rook on h3 with your bishop because you come out a bishop ahead and it unveils an attack from your queen on the white queen.",
+    "reasons": [
+      "ignored_threat",
+      "semi_open_file"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00UHZ:best",
+    "fen": "6k1/6p1/pp2np1p/8/2r1NR1P/6P1/1PP5/1K6 w - - 2 33",
+    "playedUci": "e4f6",
+    "explanation": "Taking the pawn on f6 with your knight is the only move that holds because it unveils an attack from your rook on the black rook.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "discovered_attack",
+      "capture",
+      "open_file"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00UHZ:wrong",
+    "fen": "6k1/6p1/pp2np1p/8/2r1NR1P/6P1/1PP5/1K6 w - - 2 33",
+    "playedUci": "e4c5",
+    "explanation": "Moving your knight to c5 puts it where the black rook and knight can take and you lose a knight. A better move would have been taking the pawn on f6 with your knight because your rook gets an open file.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "discovered_attack"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00Uo9:best",
+    "fen": "4Q3/4qppk/2p2b1p/1p2pP2/2r1B3/5P1P/6P1/5R1K w - - 4 34",
+    "playedUci": "e8e7",
+    "explanation": "Taking the queen on e7 with your queen is the only move that holds because you take the defender of the black pawn.",
+    "reasons": [
+      "hanging",
+      "removed_defender",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00Uo9:wrong",
+    "fen": "4Q3/4qppk/2p2b1p/1p2pP2/2r1B3/5P1P/6P1/5R1K w - - 4 34",
+    "playedUci": "e8f8",
+    "explanation": "Moving your queen to f8 puts it at risk of attack from the black queen. A better move would have been taking the queen on e7 with your queen because you take the defender of the black pawn.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "001Wz:best",
+    "fen": "6k1/5ppp/r1p5/p1n1rP2/8/2P2N1P/2P3P1/3R2K1 w - - 0 22",
+    "playedUci": "d1d8",
+    "explanation": "Moving your rook to d8 is the only move that holds because it forces checkmate in 2 moves.",
+    "reasons": [
+      "ignored_threat",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "001Wz:wrong",
+    "fen": "6k1/5ppp/r1p5/p1n1rP2/8/2P2N1P/2P3P1/3R2K1 w - - 0 22",
+    "playedUci": "f5f6",
+    "explanation": "Moving your pawn to f6 puts it at risk of attack from the black pawn. A better move would have been moving your rook to d8 because it forces checkmate in 2 moves.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "0030b:best",
+    "fen": "6k1/5ppp/5n2/pp6/4b1rP/5N1Q/Pq2r1P1/3R2RK w - - 5 33",
+    "playedUci": "d1d8",
+    "explanation": "Moving your d1-rook to d8 is the only move that holds because it forces checkmate in 2 moves.",
+    "reasons": [
+      "ignored_threat",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "0030b:wrong",
+    "fen": "6k1/5ppp/5n2/pp6/4b1rP/5N1Q/Pq2r1P1/3R2RK w - - 5 33",
+    "playedUci": "h4h5",
+    "explanation": "Moving your pawn to h5 leaves your pawn hanging to the black queen. A better move would have been moving your d1-rook to d8 because it forces checkmate in 2 moves.",
+    "reasons": [
+      "ignored_threat",
+      "backward_pawn"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "0042j:best",
+    "fen": "3r2k1/4nppp/pq3b2/1p2p3/2r2P2/2P1NR2/PP1Q2BP/3R2K1 w - - 0 25",
+    "playedUci": "d2d8",
+    "explanation": "Taking the rook on d8 with your queen is the only move that holds because the rook was undefended and then fork the black king and the black knight.",
+    "reasons": [
+      "ignored_threat",
+      "wins_material",
+      "fork",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "0042j:wrong",
+    "fen": "3r2k1/4nppp/pq3b2/1p2p3/2r2P2/2P1NR2/PP1Q2BP/3R2K1 w - - 0 25",
+    "playedUci": "f4f5",
+    "explanation": "Moving your pawn to f5 leaves your queen hanging to the black d8-rook. A better move would have been taking the rook on d8 with your queen because the rook was undefended and then fork the black king and the black knight.",
+    "reasons": [
+      "ignored_threat",
+      "saves_piece"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00465:best",
+    "fen": "5r1k/pp4pp/2p5/6q1/5R2/2P5/P1P2PPP/3rR1K1 w - - 0 28",
+    "playedUci": "f4f8",
+    "explanation": "Taking the rook on f8 with your f4-rook is the only move that holds because the rook was undefended.",
+    "reasons": [
+      "ignored_threat",
+      "wins_material",
+      "capture",
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00465:wrong",
+    "fen": "5r1k/pp4pp/2p5/6q1/5R2/2P5/P1P2PPP/3rR1K1 w - - 0 28",
+    "playedUci": "f4f5",
+    "explanation": "Moving your f4-rook to f5 puts it at risk of attack from the black queen and f8-rook. A better move would have been taking the rook on f8 with your f4-rook because the rook was undefended.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "fork"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "005N7:best",
+    "fen": "r6k/2q3pp/8/2p5/R1np4/7P/2PB1PP1/6K1 w - - 0 33",
+    "playedUci": "a4a8",
+    "explanation": "Taking the rook on a8 with your rook is the only move that holds because the rook was undefended.",
+    "reasons": [
+      "ignored_threat",
+      "wins_material",
+      "capture",
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "005N7:wrong",
+    "fen": "r6k/2q3pp/8/2p5/R1np4/7P/2PB1PP1/6K1 w - - 0 33",
+    "playedUci": "a4a5",
+    "explanation": "Moving your rook to a5 puts it at risk of attack from the black queen and rook. A better move would have been taking the rook on a8 with your rook because the rook was undefended.",
+    "reasons": [
+      "hanging",
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "007mr:best",
+    "fen": "5k2/p2r3p/1p4pP/3r1q2/4R3/2P5/PP3PQ1/K3R3 b - - 0 33",
+    "playedUci": "d5d1",
+    "explanation": "Moving your d5-rook to d1 is the only move that holds because you fork the white king and the white e1-rook.",
+    "reasons": [
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "007mr:wrong",
+    "fen": "5k2/p2r3p/1p4pP/3r1q2/4R3/2P5/PP3PQ1/K3R3 b - - 0 33",
+    "playedUci": "f8g8",
+    "explanation": "Moving your king to g8 is a blunder, but moving your d5-rook to d1 would be better because you fork the white king and the white e1-rook.",
+    "reasons": [
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "008GK:best",
+    "fen": "1k6/ppp3p1/8/1P5p/8/P3n2P/2P1r1P1/B2rNRK1 w - - 5 32",
+    "playedUci": "f1f8",
+    "explanation": "Moving your rook to f8 is the only move that holds because it saves your rook from capture.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "ignored_threat",
+      "saves_piece",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "008GK:wrong",
+    "fen": "1k6/ppp3p1/8/1P5p/8/P3n2P/2P1r1P1/B2rNRK1 w - - 5 32",
+    "playedUci": "b5b6",
+    "explanation": "Moving your pawn to b6 leaves your bishop hanging to the black d1-rook. A better move would have been moving your rook to f8 because it saves your rook from capture.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "ignored_threat",
+      "ignored_threat",
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "008Nz:best",
+    "fen": "6k1/2p2ppp/pnp5/B7/2P3PP/1P2PPR1/r3b2r/3R2K1 w - - 2 30",
+    "playedUci": "d1d8",
+    "explanation": "Moving your d1-rook to d8 is the only move that holds because it saves your d8-rook from capture.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "saves_piece",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "008Nz:wrong",
+    "fen": "6k1/2p2ppp/pnp5/B7/2P3PP/1P2PPR1/r3b2r/3R2K1 w - - 2 30",
+    "playedUci": "a5b6",
+    "explanation": "Taking the knight on b6 with your bishop leaves your d1-rook hanging to the black bishop. A better move would have been moving your d1-rook to d8 because it saves your d8-rook from capture.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "ignored_threat",
+      "capture"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "008aL:best",
+    "fen": "7k/6p1/1r5p/P4p2/3Rp3/4P3/5PPP/6K1 b - - 0 39",
+    "playedUci": "b6b1",
+    "explanation": "Moving your rook to b1 is the only move that holds because it saves your rook from capture.",
+    "reasons": [
+      "saves_piece",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "008aL:wrong",
+    "fen": "7k/6p1/1r5p/P4p2/3Rp3/4P3/5PPP/6K1 b - - 0 39",
+    "playedUci": "h8h7",
+    "explanation": "Moving your king to h7 leaves your rook hanging to the white pawn. A better move would have been moving your rook to b1 because it saves your rook from capture.",
+    "reasons": [
+      "ignored_threat",
+      "pawn_shield"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "009L0:best",
+    "fen": "6k1/pb2r1pN/1n4Bp/3p4/1P2pR2/P7/5PPP/2rR2K1 b - - 3 30",
+    "playedUci": "c1d1",
+    "explanation": "Taking the rook on d1 with your c1-rook is the only move that holds because the rook was undefended.",
+    "reasons": [
+      "wins_material",
+      "capture",
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "009L0:wrong",
+    "fen": "6k1/pb2r1pN/1n4Bp/3p4/1P2pR2/P7/5PPP/2rR2K1 b - - 3 30",
+    "playedUci": "g8h8",
+    "explanation": "Moving your king to h8 leaves your c1-rook hanging to the white d1-rook. A better move would have been taking the rook on d1 with your c1-rook because the rook was undefended.",
+    "reasons": [
+      "ignored_threat",
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "009YT:best",
+    "fen": "rqnr2k1/5ppp/p7/4p3/8/1P5P/PBP2PP1/R2R2K1 w - - 0 24",
+    "playedUci": "d1d8",
+    "explanation": "Taking the rook on d8 with your d1-rook is the only move that holds because the rook was undefended and then fork the black knight and the black king.",
+    "reasons": [
+      "wins_material",
+      "fork",
+      "pin"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "009YT:wrong",
+    "fen": "rqnr2k1/5ppp/p7/4p3/8/1P5P/PBP2PP1/R2R2K1 w - - 0 24",
+    "playedUci": "b3b4",
+    "explanation": "Moving your pawn to b4 puts it at risk of attack from the black queen. A better move would have been taking the rook on d8 with your d1-rook because the rook was undefended and then fork the black knight and the black king.",
+    "reasons": [
+      "hanging",
+      "backward_pawn"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00Aq4:best",
+    "fen": "2k1r3/pppn1pp1/3b2b1/3B2Pp/5P2/3P3P/PPPR4/2K3NR b - - 0 18",
+    "playedUci": "e8e1",
+    "explanation": "Moving your rook to e1 is the only move that holds because you fork the white king and the white knight and then pin the knight to the rook.",
+    "reasons": [
+      "fork",
+      "pin"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00Aq4:wrong",
+    "fen": "2k1r3/pppn1pp1/3b2b1/3B2Pp/5P2/3P3P/PPPR4/2K3NR b - - 0 18",
+    "playedUci": "c8d8",
+    "explanation": "Moving your king to d8 leaves your pawn hanging to the white bishop. A better move would have been moving your rook to e1 because you fork the white king and the white knight and then pin the knight to the rook.",
+    "reasons": [
+      "hanging",
+      "pawn_shield",
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00BQD:best",
+    "fen": "4r3/3R1pkp/6p1/1P6/1b6/5B2/1P1R1PPP/6K1 b - - 0 36",
+    "playedUci": "e8e1",
+    "explanation": "Moving your rook to e1 is the only move that holds because it forces checkmate in 2 moves.",
+    "reasons": [
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00BQD:wrong",
+    "fen": "4r3/3R1pkp/6p1/1P6/1b6/5B2/1P1R1PPP/6K1 b - - 0 36",
+    "playedUci": "e8f8",
+    "explanation": "Moving your rook to f8 is a blunder, but moving your rook to e1 would be better because it forces checkmate in 2 moves.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00Bg4:best",
+    "fen": "3r2k1/1q3ppp/p3p3/Qp1r4/7P/P4P2/1PP3P1/1K1R3R w - - 0 22",
+    "playedUci": "a5d8",
+    "explanation": "Taking the rook on d8 with your queen is the only move that holds because you fork the black king and the black d5-rook and you come out a pawn ahead.",
+    "reasons": [
+      "hanging",
+      "fork",
+      "wins_material",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00Bg4:wrong",
+    "fen": "3r2k1/1q3ppp/p3p3/Qp1r4/7P/P4P2/1PP3P1/1K1R3R w - - 0 22",
+    "playedUci": "a5a6",
+    "explanation": "Taking the pawn on a6 with your queen puts it at risk of attack from the black queen. A better move would have been taking the rook on d8 with your queen because you fork the black king and the black d5-rook and you come out a pawn ahead.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "capture"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00DYf:best",
+    "fen": "1R6/6kp/3p1pp1/2r1p3/PP6/8/2r2PPP/1R4K1 b - - 0 30",
+    "playedUci": "c2c1",
+    "explanation": "Moving your c2-rook to c1 is the only move that holds because you fork the white b1-rook and the white king.",
+    "reasons": [
+      "ignored_threat",
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00DYf:wrong",
+    "fen": "1R6/6kp/3p1pp1/2r1p3/PP6/8/2r2PPP/1R4K1 b - - 0 30",
+    "playedUci": "g7h6",
+    "explanation": "Moving your king to h6 leaves your c5-rook hanging to the white pawn. A better move would have been moving your c2-rook to c1 because you fork the white b1-rook and the white king.",
+    "reasons": [
+      "ignored_threat",
+      "pawn_shield",
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00EXM:best",
+    "fen": "r1n3k1/3R1ppp/2p5/5P2/8/1P2r3/P7/5RK1 w - - 0 34",
+    "playedUci": "d7d8",
+    "explanation": "Moving your d7-rook to d8 is the only move that holds because you fork the black knight and the black king and then pin the knight to the rook.",
+    "reasons": [
+      "ignored_threat",
+      "fork",
+      "pin"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00EXM:wrong",
+    "fen": "r1n3k1/3R1ppp/2p5/5P2/8/1P2r3/P7/5RK1 w - - 0 34",
+    "playedUci": "d7e7",
+    "explanation": "Moving your d7-rook to e7 puts it at risk of attack from the black e3-rook and knight. A better move would have been moving your d7-rook to d8 because you fork the black knight and the black king and then pin the knight to the rook.",
+    "reasons": [
+      "hanging",
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00EXP:best",
+    "fen": "2n3k1/p4ppp/2p1p3/P1NrP3/1N1r4/8/5PPP/1R1R2K1 b - - 0 29",
+    "playedUci": "d4d1",
+    "explanation": "Taking the rook on d1 with your d4-rook is the only move that holds because the rook was undefended and then fork the white b1-rook and the white king.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "wins_material",
+      "fork",
+      "removed_defender"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00EXP:wrong",
+    "fen": "2n3k1/p4ppp/2p1p3/P1NrP3/1N1r4/8/5PPP/1R1R2K1 b - - 0 29",
+    "playedUci": "c8e7",
+    "explanation": "Moving your knight to e7 leaves your d5-rook hanging to the white b4-knight. A better move would have been taking the rook on d1 with your d4-rook because the rook was undefended and then fork the white b1-rook and the white king.",
+    "reasons": [
+      "ignored_threat",
+      "overload",
+      "saves_piece"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00HAM:best",
+    "fen": "q4r1k/1p3Qpp/1n6/3P2pP/2PP2P1/1P6/2K5/5R2 w - - 0 30",
+    "playedUci": "f7f8",
+    "explanation": "Taking the rook on f8 with your queen is the only move that holds because the rook was undefended and then fork the black queen and the black king.",
+    "reasons": [
+      "wins_material",
+      "fork",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00HAM:wrong",
+    "fen": "q4r1k/1p3Qpp/1n6/3P2pP/2PP2P1/1P6/2K5/5R2 w - - 0 30",
+    "playedUci": "f7e8",
+    "explanation": "Moving your queen to e8 puts it at risk of attack from the black queen and rook. A better move would have been taking the rook on f8 with your queen because the rook was undefended and then fork the black queen and the black king.",
+    "reasons": [
+      "hanging",
+      "hanging",
+      "fork",
+      "pin",
+      "discovered_attack"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00IqI:best",
+    "fen": "r5k1/pp3ppp/2p5/4pb2/2n2q2/P1P2P2/1P1Q3P/3R1R1K w - - 0 23",
+    "playedUci": "d2d8",
+    "explanation": "Moving your queen to d8 is the only move that holds because you fork the black rook and the black king.",
+    "reasons": [
+      "hanging",
+      "hanging",
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00IqI:wrong",
+    "fen": "r5k1/pp3ppp/2p5/4pb2/2n2q2/P1P2P2/1P1Q3P/3R1R1K w - - 0 23",
+    "playedUci": "a3a4",
+    "explanation": "Moving your pawn to a4 leaves your queen hanging to the black queen and knight. A better move would have been moving your queen to d8 because you fork the black rook and the black king.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00JET:best",
+    "fen": "6k1/5ppp/3rp3/8/8/8/1P3PPP/2R3K1 w - - 0 35",
+    "playedUci": "c1c8",
+    "explanation": "Moving your rook to c8 is the only move that holds because it forces checkmate in 2 moves.",
+    "reasons": [
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00JET:wrong",
+    "fen": "6k1/5ppp/3rp3/8/8/8/1P3PPP/2R3K1 w - - 0 35",
+    "playedUci": "b2b3",
+    "explanation": "Moving your pawn to b3 is a blunder, but moving your rook to c8 would be better because it forces checkmate in 2 moves.",
+    "reasons": [
+      "passed_pawn"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00JQS:best",
+    "fen": "7k/pb3rpp/2p5/5p2/3P4/8/PPP2PPP/4R1K1 w - - 0 22",
+    "playedUci": "e1e8",
+    "explanation": "Moving your rook to e8 is the only move that holds because it forces checkmate in 2 moves.",
+    "reasons": [
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00JQS:wrong",
+    "fen": "7k/pb3rpp/2p5/5p2/3P4/8/PPP2PPP/4R1K1 w - - 0 22",
+    "playedUci": "d4d5",
+    "explanation": "Moving your pawn to d5 puts it at risk of attack from the black pawn. A better move would have been moving your rook to e8 because it forces checkmate in 2 moves.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00MDG:best",
+    "fen": "3r2k1/4ppnp/pp4p1/2p5/4q3/3rP3/P2P1QPP/3R1RK1 w - - 0 29",
+    "playedUci": "f2f7",
+    "explanation": "Taking the pawn on f7 with your queen is the only move that holds because you fork the black king and the black knight and the pawn was undefended.",
+    "reasons": [
+      "hanging",
+      "fork",
+      "wins_material",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00MDG:wrong",
+    "fen": "3r2k1/4ppnp/pp4p1/2p5/4q3/3rP3/P2P1QPP/3R1RK1 w - - 0 29",
+    "playedUci": "a2a3",
+    "explanation": "Moving your pawn to a3 puts it at risk of attack from the black d3-rook. A better move would have been taking the pawn on f7 with your queen because you fork the black king and the black knight and the pawn was undefended.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00MS3:best",
+    "fen": "rn1qr1k1/1p3ppp/2p2b2/p2p4/3P4/2N2N2/PPP1QPPP/2KRR3 w - - 0 13",
+    "playedUci": "e2e8",
+    "explanation": "Taking the rook on e8 with your queen is the only move that holds because the rook was undefended and then fork the black queen and the black king.",
+    "reasons": [
+      "wins_material",
+      "fork",
+      "skewer"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00MS3:wrong",
+    "fen": "rn1qr1k1/1p3ppp/2p2b2/p2p4/3P4/2N2N2/PPP1QPPP/2KRR3 w - - 0 13",
+    "playedUci": "c3a4",
+    "explanation": "Moving your c3-knight to a4 leaves your queen hanging to the black e8-rook. A better move would have been taking the rook on e8 with your queen because the rook was undefended and then fork the black queen and the black king.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00NOI:best",
+    "fen": "3r4/2k2p1p/pp2pN2/2p5/3n4/6P1/PPP2PRP/2K5 b - - 0 23",
+    "playedUci": "d4e2",
+    "explanation": "Moving your knight to e2 is the only move that holds because it forces checkmate in 2 moves.",
+    "reasons": [
+      "ignored_threat",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00NOI:wrong",
+    "fen": "3r4/2k2p1p/pp2pN2/2p5/3n4/6P1/PPP2PRP/2K5 b - - 0 23",
+    "playedUci": "d8e8",
+    "explanation": "Moving your rook to e8 puts it at risk of attack from the white knight. A better move would have been moving your knight to e2 because it forces checkmate in 2 moves.",
+    "reasons": [
+      "hanging",
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00O9a:best",
+    "fen": "1k3r2/q5r1/2Qp3p/3Bp3/2N1P1p1/P7/1PP2PPP/R5K1 b - - 13 35",
+    "playedUci": "a7f2",
+    "explanation": "Taking the pawn on f2 with your queen is the only move that holds because the pawn was undefended.",
+    "reasons": [
+      "ignored_threat",
+      "wins_material",
+      "capture",
+      "open_file"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00O9a:wrong",
+    "fen": "1k3r2/q5r1/2Qp3p/3Bp3/2N1P1p1/P7/1PP2PPP/R5K1 b - - 13 35",
+    "playedUci": "f8g8",
+    "explanation": "Moving your f8-rook to g8 puts it where the white bishop can take and you lose the exchange. A better move would have been taking the pawn on f2 with your queen because the pawn was undefended.",
+    "reasons": [
+      "hanging",
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00QZV:best",
+    "fen": "r1bk4/pppp3p/2n5/2b1prN1/8/1B6/PPPP2PP/RNB2R1K b - - 2 14",
+    "playedUci": "f5f1",
+    "explanation": "Taking the rook on f1 with your f5-rook is the only move that holds because the rook was undefended and then fork the white c1-bishop and the white king.",
+    "reasons": [
+      "ignored_threat",
+      "wins_material",
+      "fork",
+      "removed_defender"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00QZV:wrong",
+    "fen": "r1bk4/pppp3p/2n5/2b1prN1/8/1B6/PPPP2PP/RNB2R1K b - - 2 14",
+    "playedUci": "a8b8",
+    "explanation": "Moving your a8-rook to b8 leaves your f5-rook hanging to the white f1-rook. A better move would have been taking the rook on f1 with your f5-rook because the rook was undefended and then fork the white c1-bishop and the white king.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00RYH:best",
+    "fen": "1k5r/ppp1R2p/r4p2/5Q2/3p4/2qP4/2P2PPP/2K1R3 w - - 6 27",
+    "playedUci": "e7e8",
+    "explanation": "Moving your e7-rook to e8 is the only move that holds because you fork the black king and the black h8-rook.",
+    "reasons": [
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00RYH:wrong",
+    "fen": "1k5r/ppp1R2p/r4p2/5Q2/3p4/2qP4/2P2PPP/2K1R3 w - - 6 27",
+    "playedUci": "e7f7",
+    "explanation": "Moving your e7-rook to f7 leaves your e1-rook hanging to the black queen. A better move would have been moving your e7-rook to e8 because you fork the black king and the black h8-rook.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00TU2:best",
+    "fen": "1k1r4/1p3Qp1/p2q3p/8/1N6/8/PP3PPP/2R3K1 b - - 0 22",
+    "playedUci": "d6d1",
+    "explanation": "Moving your queen to d1 is the only move that holds because you fork the white rook and the white king.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00TU2:wrong",
+    "fen": "1k1r4/1p3Qp1/p2q3p/8/1N6/8/PP3PPP/2R3K1 b - - 0 22",
+    "playedUci": "b8a7",
+    "explanation": "Moving your king to a7 leaves your pawn hanging to the white queen. A better move would have been moving your queen to d1 because you fork the white rook and the white king.",
+    "reasons": [
+      "ignored_threat",
+      "pawn_shield",
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00VC1:best",
+    "fen": "1k2r3/p2Q1R2/8/1p5p/P1P3p1/8/6PP/7K b - - 0 44",
+    "playedUci": "e8e1",
+    "explanation": "Moving your rook to e1 is the only move that holds because it saves your rook from capture.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "saves_piece",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00VC1:wrong",
+    "fen": "1k2r3/p2Q1R2/8/1p5p/P1P3p1/8/6PP/7K b - - 0 44",
+    "playedUci": "b8a8",
+    "explanation": "Moving your king to a8 leaves your rook hanging to the white queen. A better move would have been moving your rook to e1 because it saves your rook from capture.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "ignored_threat",
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00Ycz:best",
+    "fen": "5k2/5r1p/pp2Q3/8/8/1P6/P1q2PPP/4R1K1 b - - 0 32",
+    "playedUci": "c2f2",
+    "explanation": "Taking the pawn on f2 with your queen is the only move that holds because you fork the white rook and the white king and the pawn was undefended.",
+    "reasons": [
+      "fork",
+      "wins_material",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00Ycz:wrong",
+    "fen": "5k2/5r1p/pp2Q3/8/8/1P6/P1q2PPP/4R1K1 b - - 0 32",
+    "playedUci": "f8g8",
+    "explanation": "Moving your king to g8 leaves your pawn hanging to the white queen. A better move would have been taking the pawn on f2 with your queen because you fork the white rook and the white king and the pawn was undefended.",
+    "reasons": [
+      "ignored_threat",
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00ZKw:best",
+    "fen": "rn1q1r1k/ppp5/1b2pRQ1/6B1/8/2P5/PP4PP/RN5K b - - 0 18",
+    "playedUci": "d8d1",
+    "explanation": "Moving your queen to d1 is the only move that holds because you fork the white knight and the white king and then pin the knight to the rook.",
+    "reasons": [
+      "ignored_threat",
+      "hanging",
+      "fork",
+      "pin"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00ZKw:wrong",
+    "fen": "rn1q1r1k/ppp5/1b2pRQ1/6B1/8/2P5/PP4PP/RN5K b - - 0 18",
+    "playedUci": "b8d7",
+    "explanation": "Moving your knight to d7 leaves your pawn hanging to the white f6-rook. A better move would have been moving your queen to d1 because you fork the white knight and the white king and then pin the knight to the rook.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00aBq:best",
+    "fen": "r5k1/pp3ppp/1qn2b2/3r4/4QB2/1P3N2/P4PPP/4R1K1 w - - 0 19",
+    "playedUci": "e4e8",
+    "explanation": "Moving your queen to e8 is the only move that holds because you fork the black a8-rook and the black king.",
+    "reasons": [
+      "hanging",
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00aBq:wrong",
+    "fen": "r5k1/pp3ppp/1qn2b2/3r4/4QB2/1P3N2/P4PPP/4R1K1 w - - 0 19",
+    "playedUci": "e4d5",
+    "explanation": "Taking the rook on d5 with your queen is a blunder because the rook was undefended and then pin the pawn to the king. A better move would have been moving your queen to e8 because you fork the black a8-rook and the black king.",
+    "reasons": [
+      "wins_material",
+      "pin",
+      "capture"
+    ],
+    "classification": "blunder",
+    "concept": "capture"
+  },
+  {
+    "id": "00all:best",
+    "fen": "6k1/5ppp/4p1b1/1n1pP3/1P6/r7/5PPP/2R2BK1 w - - 0 26",
+    "playedUci": "c1c8",
+    "explanation": "Moving your rook to c8 is the only move that holds because it forces checkmate in 2 moves.",
+    "reasons": [
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00all:wrong",
+    "fen": "6k1/5ppp/4p1b1/1n1pP3/1P6/r7/5PPP/2R2BK1 w - - 0 26",
+    "playedUci": "f2f3",
+    "explanation": "Moving your pawn to f3 is a blunder, but moving your rook to c8 would be better because it forces checkmate in 2 moves.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00awK:best",
+    "fen": "r6k/2p2Qpp/p7/4b3/8/8/1PP1KR2/2q5 w - - 1 25",
+    "playedUci": "f7f8",
+    "explanation": "Moving your queen to f8 is the only move that holds because you fork the black rook and the black king.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "ignored_threat",
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00awK:wrong",
+    "fen": "r6k/2p2Qpp/p7/4b3/8/8/1PP1KR2/2q5 w - - 1 25",
+    "playedUci": "f7e8",
+    "explanation": "Moving your queen to e8 puts it at risk of attack from the black rook. A better move would have been moving your queen to f8 because you fork the black rook and the black king.",
+    "reasons": [
+      "hanging",
+      "ignored_threat",
+      "ignored_threat",
+      "fork"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "008nF:best",
+    "fen": "2rq1rk1/7p/1n4pb/1R2Q3/pPpP1P2/P1B5/3N2PP/2R3K1 b - - 0 31",
+    "playedUci": "f8e8",
+    "explanation": "Moving your f8-rook to e8 is the only move that holds because it gives your rook an open file.",
+    "reasons": [
+      "overload",
+      "open_file"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "008nF:wrong",
+    "fen": "2rq1rk1/7p/1n4pb/1R2Q3/pPpP1P2/P1B5/3N2PP/2R3K1 b - - 0 31",
+    "playedUci": "c8c7",
+    "explanation": "Moving your c8-rook to c7 leaves your knight where the white b5-rook can take, losing a knight. A better move would have been moving your f8-rook to e8 because your rook gets an open file.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "009FP:best",
+    "fen": "r1b1k1nr/ppp2pbp/3p1qp1/4p3/2BnP3/N2P2QP/PPP2PP1/R1B1K2R w KQkq - 0 10",
+    "playedUci": "c1g5",
+    "explanation": "Moving your c1-bishop to g5 is the only move that holds.",
+    "reasons": [
+      "development"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "009FP:wrong",
+    "fen": "r1b1k1nr/ppp2pbp/3p1qp1/4p3/2BnP3/N2P2QP/PPP2PP1/R1B1K2R w KQkq - 0 10",
+    "playedUci": "c4b5",
+    "explanation": "Moving your c4-bishop to b5 is a blunder because it attacks the king directly. A better move would have been moving your c1-bishop to g5.",
+    "reasons": [
+      "check"
+    ],
+    "classification": "blunder",
+    "concept": "check"
+  },
+  {
+    "id": "00AhO:best",
+    "fen": "Q1b2rk1/2q2p1p/1p2pbp1/pP6/2P5/P2B1N2/5PPP/3R1RK1 b - - 0 20",
+    "playedUci": "c8b7",
+    "explanation": "Moving your c8-bishop to b7 is the only move that holds because you fork the white queen and the white knight and it unveils an attack from your rook on the white queen.",
+    "reasons": [
+      "king_more_exposed",
+      "fork",
+      "discovered_attack"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00AhO:wrong",
+    "fen": "Q1b2rk1/2q2p1p/1p2pbp1/pP6/2P5/P2B1N2/5PPP/3R1RK1 b - - 0 20",
+    "playedUci": "c8d7",
+    "explanation": "Moving your c8-bishop to d7 makes your king easier to attack. A better move would have been moving your c8-bishop to b7 because you fork the white queen and the white knight.",
+    "reasons": [
+      "king_more_exposed",
+      "discovered_attack"
+    ],
+    "classification": "blunder",
+    "concept": "king_safety"
+  },
+  {
+    "id": "00BM8:best",
+    "fen": "3r1rk1/pp2bppp/2ppnn2/8/N1P1P3/q1P4P/P2N2PB/R2Q1R1K w - - 1 17",
+    "playedUci": "d2b1",
+    "explanation": "Moving your d2-knight to b1 is the only move that holds because it unveils an attack from your queen on the black pawn.",
+    "reasons": [
+      "hanging",
+      "discovered_attack"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00BM8:wrong",
+    "fen": "3r1rk1/pp2bppp/2ppnn2/8/N1P1P3/q1P4P/P2N2PB/R2Q1R1K w - - 1 17",
+    "playedUci": "a4b6",
+    "explanation": "Moving your a4-knight to b6 puts it where the black pawn can take and you lose a knight. A better move would have been moving your d2-knight to b1 because it unveils an attack from your queen on the black pawn.",
+    "reasons": [
+      "hanging",
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00DdW:best",
+    "fen": "5rk1/5ppp/4b3/1p1pPpPP/2pP4/b1P5/rqNQKP2/2RRN3 w - - 6 24",
+    "playedUci": "c1b1",
+    "explanation": "Moving your c1-rook to b1 is the only move that holds because you skewer the black queen, exposing the black pawn.",
+    "reasons": [
+      "skewer",
+      "semi_open_file"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00DdW:wrong",
+    "fen": "5rk1/5ppp/4b3/1p1pPpPP/2pP4/b1P5/rqNQKP2/2RRN3 w - - 6 24",
+    "playedUci": "g5g6",
+    "explanation": "Moving your pawn to g6 puts it at risk of attack from the black pawn and pawn. A better move would have been moving your c1-rook to b1 because you skewer the black queen, exposing the black pawn.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00Ksa:best",
+    "fen": "8/5p2/5pk1/8/4PPr1/8/5K2/7R w - - 3 47",
+    "playedUci": "f2f3",
+    "explanation": "Moving your king to f3 is the only move that holds because it saves your pawn from capture.",
+    "reasons": [
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00Ksa:wrong",
+    "fen": "8/5p2/5pk1/8/4PPr1/8/5K2/7R w - - 3 47",
+    "playedUci": "e4e5",
+    "explanation": "Moving your pawn to e5 leaves your pawn hanging to the black rook. A better move would have been moving your king to f3 because it saves your pawn from capture.",
+    "reasons": [
+      "ignored_threat",
+      "pawn_shield"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "00YeV:best",
+    "fen": "r3r1k1/ppp2ppp/2nbpq2/5b2/3P4/2P1BN2/P1PQBPPP/3R1RK1 w - - 8 12",
+    "playedUci": "e3g5",
+    "explanation": "Moving your e3-bishop to g5 is the only move that holds.",
+    "reasons": [],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00YeV:wrong",
+    "fen": "r3r1k1/ppp2ppp/2nbpq2/5b2/3P4/2P1BN2/P1PQBPPP/3R1RK1 w - - 8 12",
+    "playedUci": "d4d5",
+    "explanation": "Moving your pawn to d5 is a blunder, but moving your e3-bishop to g5 would be better.",
+    "reasons": [
+      "discovered_attack"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00ZWf:best",
+    "fen": "r1b2bnr/ppQp3p/2n2q1k/6pP/2B1P3/2PP4/PP3PP1/RNB1K2R b KQ - 0 11",
+    "playedUci": "f8d6",
+    "explanation": "Moving your f8-bishop to d6 is the only move that holds.",
+    "reasons": [
+      "development"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00ZWf:wrong",
+    "fen": "r1b2bnr/ppQp3p/2n2q1k/6pP/2B1P3/2PP4/PP3PP1/RNB1K2R b KQ - 0 11",
+    "playedUci": "a8b8",
+    "explanation": "Moving your a8-rook to b8 is a blunder, but moving your f8-bishop to d6 would be better.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "00e63:best",
+    "fen": "r4r1k/pp4pp/2pp1b2/4p3/N2qP3/3Q4/PPP2PPP/3RR1K1 w - - 4 17",
+    "playedUci": "d3b3",
+    "explanation": "Moving your queen to b3 is the only move that holds because it unveils an attack from your rook on the black queen.",
+    "reasons": [
+      "back_rank",
+      "discovered_attack",
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00e63:wrong",
+    "fen": "r4r1k/pp4pp/2pp1b2/4p3/N2qP3/3Q4/PPP2PPP/3RR1K1 w - - 4 17",
+    "playedUci": "a4b6",
+    "explanation": "Moving your knight to b6 puts it where the black queen and pawn can take and you lose a knight. A better move would have been moving your queen to b3 because it unveils an attack from your rook on the black queen.",
+    "reasons": [
+      "hanging",
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "00kSx:best",
+    "fen": "r1bq3k/pppnp2r/5nQb/3p2N1/8/3B4/PPPP1PPP/RNB1K2R b KQ - 3 11",
+    "playedUci": "d7e5",
+    "explanation": "Moving your d7-knight to e5 is the only move that holds because you fork the white queen and the white d3-bishop.",
+    "reasons": [
+      "ignored_threat",
+      "fork"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "00kSx:wrong",
+    "fen": "r1bq3k/pppnp2r/5nQb/3p2N1/8/3B4/PPPP1PPP/RNB1K2R b KQ - 3 11",
+    "playedUci": "a8b8",
+    "explanation": "Moving your a8-rook to b8 leaves your h7-rook hanging to the white queen and g5-knight. A better move would have been moving your d7-knight to e5 because you fork the white queen and the white d3-bishop.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "01Bmi:best",
+    "fen": "rn1qk2r/ppp2ppp/5b2/3P4/4P3/5Q1P/PPP2PP1/RN2KB1R b KQkq - 0 10",
+    "playedUci": "f6b2",
+    "explanation": "Taking the pawn on b2 with your bishop is the only move that holds because the pawn was undefended.",
+    "reasons": [
+      "king_more_exposed",
+      "wins_material",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "01Bmi:wrong",
+    "fen": "rn1qk2r/ppp2ppp/5b2/3P4/4P3/5Q1P/PPP2PP1/RN2KB1R b KQkq - 0 10",
+    "playedUci": "b8d7",
+    "explanation": "Moving your knight to d7 is a blunder, but taking the pawn on b2 with your bishop would be better because the pawn was undefended.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "01BrE:best",
+    "fen": "3r3r/Qbk5/Rp1p3p/1P1qpp2/6p1/2P2NP1/3N1PP1/5RK1 b - - 2 25",
+    "playedUci": "d5b5",
+    "explanation": "Taking the pawn on b5 with your queen is the only move that holds because the pawn was undefended and it unveils an attack from your bishop on the white f3-knight.",
+    "reasons": [
+      "wins_material",
+      "discovered_attack",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "01BrE:wrong",
+    "fen": "3r3r/Qbk5/Rp1p3p/1P1qpp2/6p1/2P2NP1/3N1PP1/5RK1 b - - 2 25",
+    "playedUci": "d8e8",
+    "explanation": "Moving your d8-rook to e8 leaves your pawn hanging to the white queen and a6-rook. A better move would have been taking the pawn on b5 with your queen because the pawn was undefended and it unveils an attack from your bishop on the white f3-knight.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "01G5k:best",
+    "fen": "8/b6p/P1K5/2p1k1p1/6P1/8/1P3P2/8 w - - 2 50",
+    "playedUci": "c6b7",
+    "explanation": "Moving your king to b7 is the only move that holds because it keeps your king safer.",
+    "reasons": [
+      "king_safer"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "01G5k:wrong",
+    "fen": "8/b6p/P1K5/2p1k1p1/6P1/8/1P3P2/8 w - - 2 50",
+    "playedUci": "c6c7",
+    "explanation": "Moving your king to c7 is a blunder, but moving your king to b7 would be better.",
+    "reasons": [
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "01HgH:best",
+    "fen": "r3k2r/pppqbppp/2n1b3/3p2PQ/PP1Pp2P/2P1P3/5PB1/RNB1K1NR b KQkq - 0 11",
+    "playedUci": "e6g4",
+    "explanation": "Moving your e6-bishop to g4 is the only move that holds.",
+    "reasons": [],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "01HgH:wrong",
+    "fen": "r3k2r/pppqbppp/2n1b3/3p2PQ/PP1Pp2P/2P1P3/5PB1/RNB1K1NR b KQkq - 0 11",
+    "playedUci": "a8b8",
+    "explanation": "Moving your a8-rook to b8 is a blunder, but moving your e6-bishop to g4 would be better.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "01Lo7:best",
+    "fen": "r2qb2r/6k1/p2p1p2/1ppN1Pp1/4P1Q1/2PP2PP/P7/3R1RK1 b - - 0 29",
+    "playedUci": "e8h5",
+    "explanation": "Moving your bishop to h5 is the only move that holds because you skewer the white queen, exposing the white d1-rook.",
+    "reasons": [
+      "skewer"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "01Lo7:wrong",
+    "fen": "r2qb2r/6k1/p2p1p2/1ppN1Pp1/4P1Q1/2PP2PP/P7/3R1RK1 b - - 0 29",
+    "playedUci": "a8b8",
+    "explanation": "Moving your a8-rook to b8 is a blunder, but moving your bishop to h5 would be better because you skewer the white queen, exposing the white d1-rook.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "01V4g:best",
+    "fen": "3r1rk1/p2nppbp/2p2np1/q1Pp4/p2P1B2/PP1BP2P/5PP1/R2Q1RK1 w - - 0 16",
+    "playedUci": "b3b4",
+    "explanation": "Moving your pawn to b4 is the only move that holds because it unveils an attack from your queen on the black pawn.",
+    "reasons": [
+      "discovered_attack"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "01V4g:wrong",
+    "fen": "3r1rk1/p2nppbp/2p2np1/q1Pp4/p2P1B2/PP1BP2P/5PP1/R2Q1RK1 w - - 0 16",
+    "playedUci": "f4e5",
+    "explanation": "Moving your f4-bishop to e5 is a blunder, but moving your pawn to b4 would be better because it unveils an attack from your queen on the black pawn.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "01ctt:best",
+    "fen": "8/ppp1kpp1/3b2np/3p3b/3P1B2/2P4P/PPBN1PP1/5K2 w - - 1 24",
+    "playedUci": "f4d6",
+    "explanation": "Taking the bishop on d6 with your f4-bishop is the only move that holds because you take the defender of the black pawn.",
+    "reasons": [
+      "hanging",
+      "removed_defender",
+      "capture",
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "01ctt:wrong",
+    "fen": "8/ppp1kpp1/3b2np/3p3b/3P1B2/2P4P/PPBN1PP1/5K2 w - - 1 24",
+    "playedUci": "f4e5",
+    "explanation": "Moving your f4-bishop to e5 puts it at risk of attack from the black d6-bishop and knight. A better move would have been taking the bishop on d6 with your f4-bishop because you take the defender of the black pawn.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "01gjE:best",
+    "fen": "1Q2n1kr/B4ppp/q7/bb6/4p3/2P1P3/P3NPPP/RN2K2R b KQ - 0 21",
+    "playedUci": "a5c7",
+    "explanation": "Moving your a5-bishop to c7 is the only move that holds because it unveils an attack from your queen on the white pawn.",
+    "reasons": [
+      "discovered_attack"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "01gjE:wrong",
+    "fen": "1Q2n1kr/B4ppp/q7/bb6/4p3/2P1P3/P3NPPP/RN2K2R b KQ - 0 21",
+    "playedUci": "g8f8",
+    "explanation": "Moving your king to f8 leaves your king with less protection. A better move would have been moving your a5-bishop to c7 because it unveils an attack from your queen on the white pawn.",
+    "reasons": [
+      "king_more_exposed",
+      "pawn_shield"
+    ],
+    "classification": "blunder",
+    "concept": "king_safety"
+  },
+  {
+    "id": "01iqw:best",
+    "fen": "r3kb1r/1p4p1/p1p1bp2/4p1Bp/4P3/2NQ1PP1/PPP2qBP/R6K w kq - 0 17",
+    "playedUci": "g5e3",
+    "explanation": "Moving your g5-bishop to e3 is the only move that holds because it saves your e3-bishop from capture.",
+    "reasons": [
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "01iqw:wrong",
+    "fen": "r3kb1r/1p4p1/p1p1bp2/4p1Bp/4P3/2NQ1PP1/PPP2qBP/R6K w kq - 0 17",
+    "playedUci": "g5f6",
+    "explanation": "Taking the pawn on f6 with your g5-bishop puts it where the black pawn can take and you lose a knight. A better move would have been moving your g5-bishop to e3 because it saves your e3-bishop from capture.",
+    "reasons": [
+      "hanging",
+      "pin",
+      "removed_defender",
+      "capture"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "01jyS:best",
+    "fen": "r1b2rk1/pp3ppp/5n2/1N1p4/B7/7P/q4PP1/2RQR1K1 w - - 0 19",
+    "playedUci": "e1e2",
+    "explanation": "Moving your e1-rook to e2 is the only move that holds because it gives your king better protection.",
+    "reasons": [
+      "overload",
+      "king_safer"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "01jyS:wrong",
+    "fen": "r1b2rk1/pp3ppp/5n2/1N1p4/B7/7P/q4PP1/2RQR1K1 w - - 0 19",
+    "playedUci": "b5a7",
+    "explanation": "Taking the pawn on a7 with your knight puts it where the black a8-rook can take and you lose a knight. A better move would have been moving your e1-rook to e2 because your king is harder to attack.",
+    "reasons": [
+      "hanging",
+      "capture"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "01q0R:best",
+    "fen": "r3k2r/pp1n1pp1/4p1p1/3pP3/3pq3/1P3N1P/P1P2KP1/R1Q4R w kq - 0 19",
+    "playedUci": "h1e1",
+    "explanation": "Moving your h1-rook to e1 is the only move that holds because it saves your pawn from capture.",
+    "reasons": [
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "01q0R:wrong",
+    "fen": "r3k2r/pp1n1pp1/4p1p1/3pP3/3pq3/1P3N1P/P1P2KP1/R1Q4R w kq - 0 19",
+    "playedUci": "b3b4",
+    "explanation": "Moving your pawn to b4 leaves your pawn hanging to the black queen and knight. A better move would have been moving your h1-rook to e1 because it saves your pawn from capture.",
+    "reasons": [
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "01rBE:best",
+    "fen": "r1bqr3/ppp1k1pp/1b3n2/nP1pp1NP/4P3/2PP4/P4PP1/RNBQK2R w KQ - 0 12",
+    "playedUci": "c1a3",
+    "explanation": "Moving your bishop to a3 is the only move that holds because it attacks the king directly.",
+    "reasons": [
+      "check"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "01rBE:wrong",
+    "fen": "r1bqr3/ppp1k1pp/1b3n2/nP1pp1NP/4P3/2PP4/P4PP1/RNBQK2R w KQ - 0 12",
+    "playedUci": "g5e6",
+    "explanation": "Moving your g5-knight to e6 puts it where the black king and c8-bishop can take and you lose a knight. A better move would have been moving your bishop to a3 because it attacks the king directly.",
+    "reasons": [
+      "hanging",
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "01sqg:best",
+    "fen": "4rr1k/pp4pp/2p1B3/2bnpP1q/8/2NP1R2/PPPB2QP/4K3 w - - 7 21",
+    "playedUci": "f3h3",
+    "explanation": "Moving your rook to h3 is the only move that holds because you skewer the black queen, exposing the black pawn and it unveils an attack from your queen on the black knight.",
+    "reasons": [
+      "king_more_exposed",
+      "skewer",
+      "discovered_attack"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "01sqg:wrong",
+    "fen": "4rr1k/pp4pp/2p1B3/2bnpP1q/8/2NP1R2/PPPB2QP/4K3 w - - 7 21",
+    "playedUci": "e6d7",
+    "explanation": "Moving your e6-bishop to d7 is a blunder, but moving your rook to h3 would be better because you skewer the black queen, exposing the black pawn and it unveils an attack from your queen on the black knight.",
+    "reasons": [],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "01vxD:best",
+    "fen": "Nn1q1r1k/pb6/1pp1Qp1p/2Pp2p1/3Pn3/P7/1P2PPPP/R3KBNR b KQ - 0 17",
+    "playedUci": "b7c8",
+    "explanation": "Moving your bishop to c8 is the only move that holds.",
+    "reasons": [],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "01vxD:wrong",
+    "fen": "Nn1q1r1k/pb6/1pp1Qp1p/2Pp2p1/3Pn3/P7/1P2PPPP/R3KBNR b KQ - 0 17",
+    "playedUci": "b8d7",
+    "explanation": "Moving your b8-knight to d7 is a blunder, but moving your bishop to c8 would be better.",
+    "reasons": [
+      "discovered_attack"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "01xk5:best",
+    "fen": "r3k2r/pp1n1p2/4p1p1/3pPnPp/2pP1Q1P/2B2N2/qPPK1P2/3R3R w kq - 0 20",
+    "playedUci": "d1a1",
+    "explanation": "Moving your d1-rook to a1 is the only move that holds because you skewer the black queen, exposing the black pawn.",
+    "reasons": [
+      "skewer",
+      "semi_open_file"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "01xk5:wrong",
+    "fen": "r3k2r/pp1n1p2/4p1p1/3pPnPp/2pP1Q1P/2B2N2/qPPK1P2/3R3R w kq - 0 20",
+    "playedUci": "f4f5",
+    "explanation": "Taking the knight on f5 with your queen puts it at risk of attack from the black pawn and pawn. A better move would have been moving your d1-rook to a1 because you skewer the black queen, exposing the black pawn.",
+    "reasons": [
+      "hanging",
+      "capture",
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "01zU8:best",
+    "fen": "6k1/3bnppp/p4n2/1pp5/4N3/1B1P1N2/PPP2PPP/6K1 b - - 1 19",
+    "playedUci": "f6e4",
+    "explanation": "Taking the knight on e4 with your f6-knight is the only move that holds because it saves your pawn from capture.",
+    "reasons": [
+      "hanging",
+      "capture",
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "01zU8:wrong",
+    "fen": "6k1/3bnppp/p4n2/1pp5/4N3/1B1P1N2/PPP2PPP/6K1 b - - 1 19",
+    "playedUci": "g8h8",
+    "explanation": "Moving your king to h8 leaves your pawn hanging to the white bishop. A better move would have been taking the knight on e4 with your f6-knight because it saves your pawn from capture.",
+    "reasons": [
+      "ignored_threat",
+      "hanging",
+      "pawn_shield",
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "025gx:best",
+    "fen": "5r1k/2b1Npp1/1p2p2p/1qn5/3Q4/P7/1R3PPP/3R2K1 b - - 1 26",
+    "playedUci": "b5e8",
+    "explanation": "Moving your queen to e8 is the only move that holds because it saves your queen from capture.",
+    "reasons": [
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "025gx:wrong",
+    "fen": "5r1k/2b1Npp1/1p2p2p/1qn5/3Q4/P7/1R3PPP/3R2K1 b - - 1 26",
+    "playedUci": "f8g8",
+    "explanation": "Moving your rook to g8 leaves your queen hanging to the white b2-rook. A better move would have been moving your queen to e8 because it saves your queen from capture.",
+    "reasons": [
+      "hanging",
+      "ignored_threat"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "026Br:best",
+    "fen": "3r2k1/p3pp1p/2Q3pb/q3P3/N4P2/P5P1/3r3P/2R2R1K w - - 1 25",
+    "playedUci": "c1c5",
+    "explanation": "Moving your c1-rook to c5 is the only move that holds.",
+    "reasons": [],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "026Br:wrong",
+    "fen": "3r2k1/p3pp1p/2Q3pb/q3P3/N4P2/P5P1/3r3P/2R2R1K w - - 1 25",
+    "playedUci": "c6b7",
+    "explanation": "Moving your queen to b7 leaves your knight where the black queen can take, losing a knight. A better move would have been moving your c1-rook to c5.",
+    "reasons": [
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "02A3t:best",
+    "fen": "2q2bk1/Q6p/p5p1/1p3pB1/8/5N1P/PP3PP1/6K1 b - - 2 30",
+    "playedUci": "f8c5",
+    "explanation": "Moving your bishop to c5 is the only move that holds because you pin the pawn to the king.",
+    "reasons": [
+      "pin"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "02A3t:wrong",
+    "fen": "2q2bk1/Q6p/p5p1/1p3pB1/8/5N1P/PP3PP1/6K1 b - - 2 30",
+    "playedUci": "c8d8",
+    "explanation": "Moving your queen to d8 puts it at risk of attack from the white bishop. A better move would have been moving your bishop to c5 because you pin the pawn to the king.",
+    "reasons": [
+      "hanging",
+      "hanging"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "02E9M:best",
+    "fen": "r2qk2r/p1p2ppp/2pb1n2/3p2Q1/2P3b1/1PN1P3/PB3PPP/R3KB1R b KQkq - 5 12",
+    "playedUci": "h7h6",
+    "explanation": "Moving your pawn to h6 is the only move that holds.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "02E9M:wrong",
+    "fen": "r2qk2r/p1p2ppp/2pb1n2/3p2Q1/2P3b1/1PN1P3/PB3PPP/R3KB1R b KQkq - 5 12",
+    "playedUci": "a8b8",
+    "explanation": "Moving your a8-rook to b8 leaves your pawn hanging to the white queen. A better move would have been moving your pawn to h6.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "semi_open_file"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "02FSn:best",
+    "fen": "r2qk2r/1Qp3p1/p1nbbn1p/3p1p2/3P4/P1N1PN1P/1PPB1P2/R3KB1R b KQkq - 0 13",
+    "playedUci": "c6a5",
+    "explanation": "Moving your c6-knight to a5 is the only move that holds because it saves your a5-knight from capture.",
+    "reasons": [
+      "ignored_threat",
+      "saves_piece"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "02FSn:wrong",
+    "fen": "r2qk2r/1Qp3p1/p1nbbn1p/3p1p2/3P4/P1N1PN1P/1PPB1P2/R3KB1R b KQkq - 0 13",
+    "playedUci": "a8b8",
+    "explanation": "Moving your a8-rook to b8 leaves your c6-knight hanging to the white queen. A better move would have been moving your c6-knight to a5 because it saves your a5-knight from capture.",
+    "reasons": [
+      "ignored_threat",
+      "ignored_threat",
+      "skewer",
+      "semi_open_file"
+    ],
+    "classification": "blunder",
+    "concept": "threat"
+  },
+  {
+    "id": "02Hq5:best",
+    "fen": "r2qk2r/2p1n1pp/1bP2p2/pP2p3/Q2PP3/B2b4/P2N1PPP/RN2R1K1 b kq - 0 18",
+    "playedUci": "d8d4",
+    "explanation": "Taking the pawn on d4 with your queen is the only move that holds because you fork the white queen and the white a1-rook and then pin the pawn to the king.",
+    "reasons": [
+      "fork",
+      "pin",
+      "wins_material"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "02Hq5:wrong",
+    "fen": "r2qk2r/2p1n1pp/1bP2p2/pP2p3/Q2PP3/B2b4/P2N1PPP/RN2R1K1 b kq - 0 18",
+    "playedUci": "a8b8",
+    "explanation": "Moving your a8-rook to b8 is a blunder, but taking the pawn on d4 with your queen would be better because you fork the white queen and the white a1-rook and then pin the pawn to the king.",
+    "reasons": [
+      "semi_open_file"
+    ],
+    "classification": "blunder",
+    "concept": "missed_improvement"
+  },
+  {
+    "id": "02K3C:best",
+    "fen": "r3kb1r/pp2pppp/2n2n2/3P4/2B3b1/q4N2/P2B1PPP/1R1QK2R w Kkq - 3 12",
+    "playedUci": "d5c6",
+    "explanation": "Taking the knight on c6 with your d-pawn is the only move that holds because you come out a bishop ahead and it unveils an attack from your bishop on the black pawn.",
+    "reasons": [
+      "hanging",
+      "wins_material",
+      "discovered_attack",
+      "capture"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "02K3C:wrong",
+    "fen": "r3kb1r/pp2pppp/2n2n2/3P4/2B3b1/q4N2/P2B1PPP/1R1QK2R w Kkq - 3 12",
+    "playedUci": "d5d6",
+    "explanation": "Moving your pawn to d6 puts it at risk of attack from the black queen and pawn. A better move would have been taking the knight on c6 with your d-pawn because you come out a bishop ahead.",
+    "reasons": [
+      "hanging",
+      "discovered_attack"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  },
+  {
+    "id": "02Nzx:best",
+    "fen": "r3r3/2pbkp1p/2p2P2/1pb5/p7/1BN5/PPP2PPP/2KRR3 b - - 0 15",
+    "playedUci": "e7f8",
+    "explanation": "Moving your king to f8 is the only move that holds because it unveils an attack from your rook on the white e1-rook.",
+    "reasons": [
+      "hanging",
+      "discovered_attack",
+      "king_safer"
+    ],
+    "classification": "best",
+    "concept": "best_move"
+  },
+  {
+    "id": "02Nzx:wrong",
+    "fen": "r3r3/2pbkp1p/2p2P2/1pb5/p7/1BN5/PPP2PPP/2KRR3 b - - 0 15",
+    "playedUci": "e7d8",
+    "explanation": "Moving your king to d8 leaves your pawn hanging to the white bishop. A better move would have been moving your king to f8.",
+    "reasons": [
+      "hanging",
+      "discovered_attack",
+      "king_safer"
+    ],
+    "classification": "blunder",
+    "concept": "piece_safety"
+  }
+]

@@ -1,4 +1,5 @@
 import { Chess, type Color, type Square } from "chess.js";
+import { isHangingBySee } from "@/domain/analysis/see";
 import { createChess, findKingOnChess } from "@/domain/game";
 import type { GameMove } from "@/domain/game/types";
 
@@ -100,21 +101,15 @@ export function hangingSquaresFor(chess: Chess, color: Color): string[] {
 }
 
 /**
- * A piece is hanging when attacked by the opponent and not defended.
+ * A piece is hanging when capturing it wins material by static exchange.
  * Deliberately turn-independent (uses attack maps, not side-to-move legal moves).
- * Cheaper-attacker-on-defended-piece cases are left to the engine eval loss.
  */
 export function isHangingOn(
   chess: Chess,
   square: Square,
   owner: Color,
 ): boolean {
-  const piece = chess.get(square);
-  if (!piece || piece.color !== owner || piece.type === "k") return false;
-
-  const attacker: Color = owner === "w" ? "b" : "w";
-  if (!chess.isAttacked(square, attacker)) return false;
-  return !chess.isAttacked(square, owner);
+  return isHangingBySee(chess, square, owner);
 }
 
 function isDevelopingMove(move: GameMove): boolean {

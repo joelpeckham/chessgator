@@ -4,6 +4,7 @@ import {
   describeBecause,
   describeMove,
   describePlayedProblem,
+  describeRefutationPunchline,
 } from "@/domain/teaching/move-copy";
 
 function move(
@@ -81,10 +82,40 @@ describe("describePlayedProblem", () => {
           kind: "hanging",
           piece: { type: "n", color: "w", square: "h4" },
           attackers: [{ type: "q", color: "b", square: "d8" }],
+          seeCp: 900,
         },
         played,
       ),
     ).toBe("puts it at risk of attack from the black queen");
+  });
+
+  it("names a SEE exchange loss instead of a generic hanging", () => {
+    const played = move({ from: "a1", to: "a8", piece: "r", san: "Ra8" });
+    expect(
+      describePlayedProblem(
+        {
+          kind: "hanging",
+          piece: { type: "r", color: "w", square: "a8" },
+          attackers: [{ type: "b", color: "b", square: "c6" }],
+          seeCp: 200,
+        },
+        played,
+      ),
+    ).toMatch(/lose the exchange/i);
+  });
+
+  it("names the chased piece when a pawn can kick it", () => {
+    const played = move({ from: "d1", to: "h5", piece: "q", san: "Qh5" });
+    expect(
+      describePlayedProblem(
+        {
+          kind: "kicked_by_pawn",
+          piece: { type: "q", color: "w", square: "h5" },
+          attackers: [{ type: "p", color: "b", square: "g6" }],
+        },
+        played,
+      ),
+    ).toBe("puts your queen where a pawn can chase it");
   });
 });
 
@@ -102,6 +133,7 @@ describe("describeBecause", () => {
             kind: "pin",
             pinned: { type: "n", color: "b", square: "c6" },
             target: { type: "k", color: "b", square: "e8" },
+            pinner: { type: "r", color: "w", square: "e1" },
             likely: true,
           },
         ],
@@ -118,9 +150,100 @@ describe("describeBecause", () => {
     );
   });
 
-  it("falls back to a verified positional claim", () => {
+  it("varies center-control copy by seed but keeps the canonical phrasing without one", () => {
     expect(describeBecause([{ kind: "center_control" }], "w")).toBe(
       "you control more central squares",
+    );
+    const a = describeBecause([{ kind: "center_control" }], "w", {
+      seed: "node-a",
+    });
+    const b = describeBecause([{ kind: "center_control" }], "w", {
+      seed: "node-b",
+    });
+    expect(a).toMatch(/center|central/);
+    expect(b).toMatch(/center|central/);
+    expect(
+      new Set([a, b, "you control more central squares"]).size,
+    ).toBeGreaterThan(1);
+  });
+
+  it("says nothing when there is no extra reason", () => {
+    expect(describeBecause([], "w")).toBeNull();
+  });
+
+  it("does not pair check with a forced-mate reason", () => {
+    expect(
+      describeBecause(
+        [{ kind: "forces_mate", mateIn: 2 }, { kind: "check" }],
+        "w",
+      ),
+    ).toBe("it forces checkmate in 2 moves");
+  });
+
+  it("explains a winning capture by SEE instead of restating the take", () => {
+    expect(
+      describeBecause(
+        [
+          {
+            kind: "wins_material",
+            captured: { type: "p", color: "b", square: "d4" },
+            seeCp: 100,
+          },
+        ],
+        "w",
+      ),
+    ).toBe("the pawn was undefended");
+  });
+});
+
+describe("describeRefutationPunchline", () => {
+  it("walks a take-and-recapture into a material punchline", () => {
+    const played = move({
+      from: "d8",
+      to: "d4",
+      piece: "q",
+      color: "b",
+      captured: "n",
+      san: "Qxd4",
+    });
+    const recapture = move({
+      from: "c3",
+      to: "d4",
+      piece: "p",
+      captured: "q",
+      san: "cxd4",
+    });
+    expect(
+      describeRefutationPunchline(
+        [
+          {
+            ply: 0,
+            move: played,
+            captured: { type: "n", color: "w", square: "d4" },
+            gaveCheck: false,
+            pins: [],
+            forks: [],
+            skewers: [],
+            discovered: [],
+            promotion: false,
+          },
+          {
+            ply: 1,
+            move: recapture,
+            captured: { type: "q", color: "b", square: "d4" },
+            gaveCheck: false,
+            pins: [],
+            forks: [],
+            skewers: [],
+            discovered: [],
+            promotion: false,
+          },
+        ],
+        -200,
+        "w",
+      ),
+    ).toMatch(
+      /after the black queen takes your knight[\s\S]*recapture[\s\S]*down/i,
     );
   });
 });

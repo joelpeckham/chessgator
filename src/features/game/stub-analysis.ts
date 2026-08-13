@@ -97,7 +97,7 @@ export function createStubAnalysisEngine(options?: {
   };
 }
 
-function defaultStubScripts(): StubAnalysisScript[] {
+export function defaultStubScripts(): StubAnalysisScript[] {
   // Starting position — e4 is best.
   const start = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
   // After 1.e4 — Black to move.

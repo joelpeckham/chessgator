@@ -9,12 +9,13 @@
     "tests/**/*.{spec,test}.{ts,tsx,mjs}",
     "tests/**/build-smoke.mjs",
     "tests/**/static-server.mjs",
-    "tests/shared/**/*.{ts,mjs}"
+    "tests/shared/**/*.{ts,mjs}",
+    "scripts/**/*.{js,mjs,ts}"
   ],
   "project": [
     "src/**/*.{ts,tsx,css}",
     "tests/**/*.{ts,tsx,mjs}",
-    "scripts/**/*.{js,mjs}"
+    "scripts/**/*.{js,mjs,ts}"
   ],
   "ignoreDependencies": ["stockfish"],
   "exclude": [
