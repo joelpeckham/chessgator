@@ -154,6 +154,9 @@ export async function runPostMoveCoaching(args: {
       fenBefore: args.fenBefore,
       fenAfter: node.fen,
       playedMove: args.playedMove,
+      previousMove: node.parentId
+        ? (getNode(useGameStore.getState().tree, node.parentId)?.move ?? null)
+        : null,
     });
   }
 

@@ -5,22 +5,30 @@ import {
   namedUnitAt,
   oppositeColor,
   PIECE_VALUE_CP,
+  rankIndex,
 } from "@/domain/analysis/board-units";
 import {
   type DiscoveredAttack,
   detectBackRankVulnerability,
   detectDiscoveredAttacks,
   detectForks,
+  detectHitsQueen,
   detectOverloadedDefenders,
   detectPassedPawns,
+  detectPawnKicks,
   detectPins,
   detectRemovedDefender,
   detectSkewers,
   detectTrappedPieces,
+  detectUnpin,
+  discoveredAttackIsUsable,
   type ForkFact,
+  isFianchetto,
+  isPawnBreak,
   type OverloadFact,
   type PinFact,
   type RemovedDefenderFact,
+  relativePinIsExploitable,
   type SkewerFact,
 } from "@/domain/analysis/motifs";
 import { cheapestAttacker, seeGainCp } from "@/domain/analysis/see";
@@ -44,6 +52,8 @@ export type CastleSide = "kingside" | "queenside";
 export type ThreatenedUnit = {
   piece: NamedUnit;
   attackers: NamedUnit[];
+  defenders: NamedUnit[];
+  defenderCount: number;
   seeCp: number;
 };
 
@@ -51,6 +61,7 @@ export type LineEvent = {
   ply: number;
   move: GameMove;
   captured: NamedUnit | null;
+  capturedSeeCp: number;
   gaveCheck: boolean;
   pins: PinFact[];
   forks: ForkFact[];
@@ -70,14 +81,21 @@ export type MoveEffects = {
   castleSide: CastleSide | null;
   captured: NamedUnit | null;
   capturedSeeCp: number;
+  capturedDefenderCount: number;
+  isRecapture: boolean;
+  previousCapturedCp: number;
   gaveCheck: boolean;
   developedPiece: boolean;
   kingSafer: boolean;
   kingMoreExposed: boolean;
+  escapedCheck: boolean;
+  blockedCheck: boolean;
+  kingActivity: boolean;
   castlingRightsLost: boolean;
   retreatedToSafety: boolean;
   movedPieceHanging: ThreatenedUnit | null;
   kickedByPawn: ThreatenedUnit | null;
+  kickedEnemy: NamedUnit | null;
   newlyHanging: ThreatenedUnit[];
   ignoredThreats: ThreatenedUnit[];
   savedHanging: NamedUnit[];
@@ -92,6 +110,13 @@ export type MoveEffects = {
   removedDefender: RemovedDefenderFact | null;
   backRankVulnerable: boolean;
   createdPassedPawn: NamedUnit | null;
+  pushedPassedPawn: NamedUnit | null;
+  gambitOffer: NamedUnit | null;
+  pawnBreak: boolean;
+  fianchetto: boolean;
+  unpinned: boolean;
+  hitsQueen: NamedUnit | null;
+  zwischenzug: boolean;
   structure: StructureDelta;
   phase: GamePhase;
   centerControlDelta: number;
@@ -141,19 +166,31 @@ function threatenedAt(
 ): ThreatenedUnit[] {
   const piece = namedUnitAt(chess, square);
   if (!piece) return [];
+  const defenders = namedAttackers(chess, square, piece.color);
   return [
     {
       piece,
       attackers: namedAttackers(chess, square, attacker),
+      defenders,
+      defenderCount: defenders.length,
       seeCp: seeGainCp(chess, square, attacker),
     },
   ];
+}
+
+function isRecaptureOf(
+  move: GameMove,
+  previousMove: GameMove | null | undefined,
+): boolean {
+  if (!move.captured || !previousMove?.captured) return false;
+  return move.to === previousMove.to;
 }
 
 export function collectMoveEffects(input: {
   fenBefore: string;
   move: GameMove;
   fenAfter: string;
+  previousMove?: GameMove | null;
 }): MoveEffects {
   const { fenBefore, move, fenAfter } = input;
   const before = createChess(fenBefore);
@@ -170,14 +207,22 @@ export function collectMoveEffects(input: {
   const castleSide = castleSideOf(move);
   const exposureBefore = kingExposure(before, mover);
   const exposureAfter = kingExposure(after, mover);
+  const inCheckBefore = before.isCheck();
+  const inCheckAfter = after.isCheck();
+  const escapedCheck =
+    inCheckBefore && !inCheckAfter && move.piece === "k" && !move.captured;
+  const blockedCheck = inCheckBefore && !inCheckAfter && move.piece !== "k";
 
   const movedPiece = namedUnitAt(after, move.to);
   const movedSee = seeGainCp(after, move.to, opponent);
+  const movedDefenders = namedAttackers(after, move.to, mover);
   const movedPieceHanging =
     hangingAfterSet.has(move.to) && movedPiece
       ? {
           piece: movedPiece,
           attackers: namedAttackers(after, move.to, opponent),
+          defenders: movedDefenders,
+          defenderCount: movedDefenders.length,
           seeCp: movedSee,
         }
       : null;
@@ -191,9 +236,24 @@ export function collectMoveEffects(input: {
       ? {
           piece: movedPiece,
           attackers: [pawnKicker],
+          defenders: movedDefenders,
+          defenderCount: movedDefenders.length,
           seeCp: movedSee,
         }
       : null;
+
+  const kickerUnit: NamedUnit = {
+    type: move.piece,
+    color: mover,
+    square: move.to,
+  };
+  const pawnKicks = detectPawnKicks(after, kickerUnit);
+  const kickedEnemy =
+    pawnKicks.find(
+      (kick) => kick.target.type === "q" || kick.target.type === "b",
+    )?.target ??
+    pawnKicks[0]?.target ??
+    null;
 
   const newlyHanging = hangingAfter
     .filter((sq) => sq !== move.to && !hangingBeforeSet.has(sq))
@@ -229,6 +289,7 @@ export function collectMoveEffects(input: {
     (pin) =>
       !pin.absolute &&
       pin.pinner.square === move.to &&
+      relativePinIsExploitable(after, pin) &&
       !opponentPinsBefore.some(
         (old) =>
           old.pinned.square === pin.pinned.square &&
@@ -254,14 +315,24 @@ export function collectMoveEffects(input: {
     square: move.to,
   };
   const forksCreated = detectForks(after, forker);
-  const discoveredAttacks = detectDiscoveredAttacks(before, after, move);
+  const discoveredAttacks = detectDiscoveredAttacks(before, after, move).filter(
+    (attack) => discoveredAttackIsUsable(after, attack),
+  );
 
   const passedBefore = new Set(
     detectPassedPawns(before, mover).map((p) => p.square),
   );
-  const createdPassedPawn =
-    detectPassedPawns(after, mover).find((p) => !passedBefore.has(p.square)) ??
-    null;
+  const pushedPassedPawn =
+    move.piece === "p" &&
+    passedBefore.has(move.from) &&
+    detectPassedPawns(after, mover).some((p) => p.square === move.to)
+      ? (namedUnitAt(after, move.to) ?? null)
+      : null;
+  const createdPassedPawn = pushedPassedPawn
+    ? null
+    : (detectPassedPawns(after, mover).find(
+        (p) => !passedBefore.has(p.square),
+      ) ?? null);
 
   const developedPiece =
     move.piece !== "p" &&
@@ -274,19 +345,56 @@ export function collectMoveEffects(input: {
   const castlingRightsLost =
     (rightsBefore.k || rightsBefore.q) && !rightsAfter.k && !rightsAfter.q;
 
+  const phase = detectGamePhase(after);
+  const moveNumber = Number(fenBefore.split(" ")[5] ?? "1");
+  const twoSquarePawn =
+    move.piece === "p" &&
+    Math.abs(rankIndex(move.from) - rankIndex(move.to)) === 2;
+  const gambitOffer =
+    phase === "opening" && twoSquarePawn && movedPieceHanging && moveNumber <= 6
+      ? movedPieceHanging.piece
+      : null;
+
+  const endgameKingWalk =
+    phase === "endgame" && move.piece === "k" && !inCheckBefore;
+  const kingActivity = endgameKingWalk && exposureAfter >= exposureBefore;
+  const kingMoreExposed =
+    !endgameKingWalk && !escapedCheck && exposureAfter > exposureBefore;
+  const kingSafer =
+    !escapedCheck && !blockedCheck && exposureAfter < exposureBefore;
+
+  const recapture = isRecaptureOf(move, input.previousMove);
+  const zwischenzug = Boolean(
+    input.previousMove?.captured &&
+      after.isCheck() &&
+      !move.captured &&
+      move.to !== input.previousMove.to,
+  );
+
   return {
     move,
     castleSide,
     captured,
     capturedSeeCp: captured ? seeGainCp(before, captured.square, mover) : 0,
+    capturedDefenderCount: captured
+      ? namedAttackers(before, captured.square, opponent).length
+      : 0,
+    isRecapture: recapture,
+    previousCapturedCp: input.previousMove?.captured
+      ? PIECE_VALUE_CP[input.previousMove.captured]
+      : 0,
     gaveCheck: after.isCheck(),
     developedPiece,
-    kingSafer: exposureAfter < exposureBefore,
-    kingMoreExposed: exposureAfter > exposureBefore,
+    kingSafer,
+    kingMoreExposed,
+    escapedCheck,
+    blockedCheck,
+    kingActivity,
     castlingRightsLost,
-    retreatedToSafety,
-    movedPieceHanging,
+    retreatedToSafety: retreatedToSafety && !escapedCheck,
+    movedPieceHanging: gambitOffer ? null : movedPieceHanging,
     kickedByPawn,
+    kickedEnemy,
     newlyHanging,
     ignoredThreats,
     savedHanging,
@@ -303,8 +411,15 @@ export function collectMoveEffects(input: {
       detectBackRankVulnerability(after, mover) &&
       !detectBackRankVulnerability(before, mover),
     createdPassedPawn,
+    pushedPassedPawn,
+    gambitOffer,
+    pawnBreak: isPawnBreak(move, after),
+    fianchetto: isFianchetto(move),
+    unpinned: detectUnpin(before, after, move),
+    hitsQueen: detectHitsQueen(before, after, move),
+    zwischenzug,
     structure: collectStructureDelta(before, after, mover),
-    phase: detectGamePhase(after),
+    phase,
     centerControlDelta:
       centerControlScore(after, mover) - centerControlScore(before, mover),
   };
@@ -365,6 +480,9 @@ export function summarizeLine(
       ply,
       move: applied.move,
       captured,
+      capturedSeeCp: captured
+        ? seeGainCp(before, captured.square, applied.move.color)
+        : 0,
       gaveCheck,
       pins: pinsAfter.filter(
         (pin) =>

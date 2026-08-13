@@ -1,4 +1,4 @@
-import type { Color } from "chess.js";
+import type { Color, Square } from "chess.js";
 import { scoreToCpWhite } from "@/domain/analysis/classification";
 import type {
   LineEvent,
@@ -26,12 +26,14 @@ export type ExplanationReason =
       piece: NamedUnit;
       attackers: NamedUnit[];
       seeCp: number;
+      defenderCount: number;
     }
   | {
       kind: "ignored_threat";
       piece: NamedUnit;
       attackers: NamedUnit[];
       seeCp: number;
+      defenderCount: number;
     }
   | {
       kind: "kicked_by_pawn";
@@ -39,9 +41,14 @@ export type ExplanationReason =
       attackers: NamedUnit[];
     }
   | {
+      kind: "kicks_piece";
+      piece: NamedUnit;
+    }
+  | {
       kind: "capture";
       captured: NamedUnit;
       likely: boolean;
+      recapture?: boolean;
     }
   | {
       kind: "pin";
@@ -75,14 +82,22 @@ export type ExplanationReason =
       newlyHanging: NamedUnit;
     }
   | { kind: "check" }
+  | { kind: "escapes_check" }
+  | { kind: "blocks_check" }
   | { kind: "castle"; side: "kingside" | "queenside" }
   | { kind: "king_safer" }
   | { kind: "king_more_exposed" }
+  | { kind: "king_activity" }
   | { kind: "back_rank" }
-  | { kind: "saves_piece"; piece: NamedUnit }
+  | { kind: "saves_piece"; piece: NamedUnit; origin?: Square }
   | { kind: "development"; piece: NamedUnit }
   | { kind: "center_control" }
-  | { kind: "passed_pawn"; piece: NamedUnit; endgame?: boolean }
+  | {
+      kind: "passed_pawn";
+      piece: NamedUnit;
+      endgame?: boolean;
+      created?: boolean;
+    }
   | { kind: "promotion"; to: NamedUnit["type"] }
   | { kind: "doubled_pawns" }
   | { kind: "isolated_pawn" }
@@ -105,7 +120,15 @@ export type ExplanationReason =
       kind: "wins_material";
       captured: NamedUnit;
       seeCp: number;
-    };
+      defenderCount: number;
+    }
+  | { kind: "gambit_offer"; piece: NamedUnit }
+  | { kind: "pawn_break" }
+  | { kind: "fianchetto" }
+  | { kind: "unpin" }
+  | { kind: "hits_queen"; piece: NamedUnit }
+  | { kind: "zwischenzug" }
+  | { kind: "perpetual" };
 
 const TACTIC_KINDS = new Set<ExplanationReason["kind"]>([
   "capture",
@@ -117,11 +140,19 @@ const TACTIC_KINDS = new Set<ExplanationReason["kind"]>([
   "discovered_check",
   "removed_defender",
   "check",
+  "escapes_check",
+  "blocks_check",
+  "kicks_piece",
+  "hits_queen",
   "castle",
   "saves_piece",
   "passed_pawn",
   "promotion",
   "forces_mate",
+  "gambit_offer",
+  "zwischenzug",
+  "unpin",
+  "pawn_break",
 ]);
 
 const GENERIC_KINDS = new Set<ExplanationReason["kind"]>([
@@ -148,14 +179,30 @@ export function reasonSeverity(reason: ExplanationReason): number {
       return 200;
     case "refutation_material":
       return 180 + Math.min(300, Math.abs(reason.netCp) / 3);
+    case "check":
+    case "escapes_check":
+    case "blocks_check":
+      return 178;
     case "fork":
       return reason.likely ? 160 : 175;
     case "skewer":
       return reason.likely ? 155 : 170;
+    case "kicks_piece":
+    case "hits_queen":
+      return 168;
     case "pin":
+      if (
+        !reason.likely &&
+        reason.pinned.type === "p" &&
+        reason.target.type === "r"
+      ) {
+        return 48;
+      }
       return reason.likely ? 150 : 165;
     case "discovered_check":
       return 160;
+    case "zwischenzug":
+      return 158;
     case "discovered_attack":
       return 145;
     case "removed_defender":
@@ -165,29 +212,38 @@ export function reasonSeverity(reason: ExplanationReason): number {
     case "capture":
       return reason.likely ? 120 : 135;
     case "kicked_by_pawn":
-      return 130;
+      return 168;
     case "overload":
       return 125;
     case "saves_piece":
       return 110;
+    case "gambit_offer":
+      return 108;
+    case "unpin":
+      return 105;
     case "back_rank":
     case "king_more_exposed":
       return 100;
     case "castle":
     case "king_safer":
+    case "king_activity":
       return 90;
     case "promotion":
       return 85;
+    case "pawn_break":
+      return 82;
     case "passed_pawn":
       return reason.endgame ? 125 : 80;
+    case "perpetual":
+      return 78;
+    case "fianchetto":
+      return 60;
     case "rook_on_seventh":
     case "outpost":
     case "open_file":
       return 55;
     case "semi_open_file":
       return 48;
-    case "check":
-      return 50;
     case "only_move":
       return 45;
     case "pawn_shield":
@@ -272,6 +328,7 @@ export function pickProblemReasons(
       piece: effects.movedPieceHanging.piece,
       attackers: effects.movedPieceHanging.attackers,
       seeCp: effects.movedPieceHanging.seeCp,
+      defenderCount: effects.movedPieceHanging.defenderCount,
     });
   }
   if (effects.kickedByPawn) {
@@ -287,6 +344,7 @@ export function pickProblemReasons(
       piece: threat.piece,
       attackers: threat.attackers,
       seeCp: threat.seeCp,
+      defenderCount: threat.defenderCount,
     });
   }
   for (const hanging of effects.newlyHanging) {
@@ -295,6 +353,7 @@ export function pickProblemReasons(
       piece: hanging.piece,
       attackers: hanging.attackers,
       seeCp: hanging.seeCp,
+      defenderCount: hanging.defenderCount,
     });
   }
   for (const trapped of effects.trapped) {
@@ -324,6 +383,7 @@ export function pickProblemReasons(
         },
       ],
       seeCp: 100,
+      defenderCount: 0,
     });
   }
 
@@ -374,6 +434,7 @@ export function pickBenefitReasons(
   effects: MoveEffects,
   lineEvents: LineEvent[] = [],
   comparedTo?: MoveEffects | null,
+  opts: { keepGenerics?: boolean } = {},
 ): ExplanationReason[] {
   const reasons: ExplanationReason[] = [];
   const mover = effects.move.color;
@@ -382,18 +443,28 @@ export function pickBenefitReasons(
     color: mover,
     square: effects.move.to,
   };
+  const originPiece: NamedUnit = {
+    type: effects.move.piece,
+    color: mover,
+    square: effects.move.from,
+  };
 
   if (effects.captured) {
     reasons.push({
       kind: "capture",
       captured: effects.captured,
       likely: false,
+      recapture: effects.isRecapture,
     });
-    if (effects.capturedSeeCp >= 80) {
+    const winsNet = effects.isRecapture
+      ? effects.capturedSeeCp - effects.previousCapturedCp
+      : effects.capturedSeeCp;
+    if (winsNet >= 80) {
       reasons.push({
         kind: "wins_material",
         captured: effects.captured,
         seeCp: effects.capturedSeeCp,
+        defenderCount: effects.capturedDefenderCount,
       });
     }
   }
@@ -448,8 +519,14 @@ export function pickBenefitReasons(
       });
     }
   }
+  if (effects.escapedCheck) {
+    reasons.push({ kind: "escapes_check" });
+  } else if (effects.blockedCheck) {
+    reasons.push({ kind: "blocks_check" });
+  }
   if (
     effects.gaveCheck &&
+    !effects.escapedCheck &&
     !reasons.some(
       (reason) =>
         reason.kind === "discovered_check" ||
@@ -459,13 +536,25 @@ export function pickBenefitReasons(
   ) {
     reasons.push({ kind: "check" });
   }
+  if (effects.kickedEnemy) {
+    reasons.push({ kind: "kicks_piece", piece: effects.kickedEnemy });
+  }
+  if (effects.hitsQueen && effects.hitsQueen.type === "q") {
+    reasons.push({ kind: "hits_queen", piece: effects.hitsQueen });
+  }
   if (effects.castleSide) {
     reasons.push({ kind: "castle", side: effects.castleSide });
+  } else if (effects.kingActivity) {
+    reasons.push({ kind: "king_activity" });
   } else if (effects.kingSafer) {
     reasons.push({ kind: "king_safer" });
   }
   if (effects.retreatedToSafety) {
-    reasons.push({ kind: "saves_piece", piece: movedPiece });
+    reasons.push({
+      kind: "saves_piece",
+      piece: originPiece,
+      origin: effects.move.from,
+    });
   }
   for (const saved of effects.savedHanging) {
     reasons.push({ kind: "saves_piece", piece: saved });
@@ -482,11 +571,26 @@ export function pickBenefitReasons(
       kind: "passed_pawn",
       piece: effects.createdPassedPawn,
       endgame: effects.phase === "endgame",
+      created: true,
+    });
+  } else if (effects.pushedPassedPawn) {
+    reasons.push({
+      kind: "passed_pawn",
+      piece: effects.pushedPassedPawn,
+      endgame: effects.phase === "endgame",
+      created: false,
     });
   }
   if (effects.move.promotion) {
     reasons.push({ kind: "promotion", to: effects.move.promotion });
   }
+  if (effects.gambitOffer) {
+    reasons.push({ kind: "gambit_offer", piece: effects.gambitOffer });
+  }
+  if (effects.pawnBreak) reasons.push({ kind: "pawn_break" });
+  if (effects.fianchetto) reasons.push({ kind: "fianchetto" });
+  if (effects.unpinned) reasons.push({ kind: "unpin" });
+  if (effects.zwischenzug) reasons.push({ kind: "zwischenzug" });
   if (effects.structure.gainedOpenFile) reasons.push({ kind: "open_file" });
   else if (effects.structure.gainedSemiOpenFile) {
     reasons.push({ kind: "semi_open_file" });
@@ -498,11 +602,11 @@ export function pickBenefitReasons(
     reasons.push({ kind: "outpost" });
   }
 
-  const later = lineEvents.filter(
-    (event) => event.move.color === mover && event.ply > 0,
+  const followUp = lineEvents.filter(
+    (event) => event.move.color === mover && event.ply === 2,
   );
-  for (const event of later) {
-    if (event.captured) {
+  for (const event of followUp) {
+    if (event.captured && event.capturedSeeCp >= 80) {
       reasons.push({
         kind: "capture",
         captured: event.captured,
@@ -512,33 +616,12 @@ export function pickBenefitReasons(
     if (event.promotion && event.move.promotion) {
       reasons.push({ kind: "promotion", to: event.move.promotion });
     }
-    for (const pin of event.pins) {
-      reasons.push({
-        kind: "pin",
-        pinned: pin.pinned,
-        target: pin.target,
-        pinner: pin.pinner,
-        likely: true,
-      });
-    }
-    for (const fork of event.forks) {
-      reasons.push({
-        kind: "fork",
-        targets: fork.targets,
-        likely: true,
-      });
-    }
-    for (const skewer of event.skewers) {
-      reasons.push({
-        kind: "skewer",
-        front: skewer.front,
-        back: skewer.back,
-        likely: true,
-      });
-    }
-    if (event.gaveCheck && !reasons.some((reason) => reason.kind === "check")) {
-      reasons.push({ kind: "check" });
-    }
+  }
+  const moverChecks = lineEvents.filter(
+    (event) => event.move.color === mover && event.gaveCheck && !event.captured,
+  );
+  if (moverChecks.length >= 2) {
+    reasons.push({ kind: "perpetual" });
   }
 
   const opening = effects.phase === "opening";
@@ -564,9 +647,47 @@ export function pickBenefitReasons(
     reasons.push({ kind: "mobility" });
   }
 
-  const deduped = dedupeReasons(reasons);
+  const deduped = dropWeakCenterControl(dedupeReasons(reasons));
+  if (opts.keepGenerics) return rankReasons(deduped, 3);
   const concrete = dropGenericReasons(deduped);
   return rankReasons(concrete.length > 0 ? concrete : deduped, 3);
+}
+
+export function fallbackBenefitReasons(
+  effects: MoveEffects,
+): ExplanationReason[] {
+  if (effects.blockedCheck) return [{ kind: "blocks_check" }];
+  if (effects.escapedCheck) return [{ kind: "escapes_check" }];
+  if (effects.developedPiece) {
+    return [
+      {
+        kind: "development",
+        piece: {
+          type: effects.move.piece,
+          color: effects.move.color,
+          square: effects.move.to,
+        },
+      },
+    ];
+  }
+  if (effects.gaveCheck) return [{ kind: "check" }];
+  if (effects.pawnBreak) return [{ kind: "pawn_break" }];
+  if (effects.fianchetto) return [{ kind: "fianchetto" }];
+  if (effects.centerControlDelta > 0) return [{ kind: "center_control" }];
+  return [{ kind: "stronger_position" }];
+}
+
+function dropWeakCenterControl(
+  reasons: ExplanationReason[],
+): ExplanationReason[] {
+  const developmentFloor = 20;
+  const stronger = reasons.some(
+    (reason) =>
+      reason.kind !== "center_control" &&
+      reasonSeverity(reason) > developmentFloor,
+  );
+  if (!stronger) return reasons;
+  return reasons.filter((reason) => reason.kind !== "center_control");
 }
 
 export function pickMateBenefits(input: {
@@ -626,6 +747,9 @@ export function reasonSquares(reason: ExplanationReason): string[] {
     case "ignored_threat":
     case "kicked_by_pawn":
       return [reason.piece.square, ...reason.attackers.map((a) => a.square)];
+    case "kicks_piece":
+    case "hits_queen":
+    case "gambit_offer":
     case "trapped":
     case "saves_piece":
     case "passed_pawn":
@@ -693,6 +817,14 @@ function contrastKey(reason: ExplanationReason): string {
       return "center_control";
     case "king_safer":
       return "king_safer";
+    case "kicks_piece":
+      return `kicks:${reason.piece.type}`;
+    case "hits_queen":
+      return "hits_queen";
+    case "pawn_break":
+      return "pawn_break";
+    case "fianchetto":
+      return "fianchetto";
     default:
       return reason.kind;
   }
@@ -728,7 +860,11 @@ function reasonKey(reason: ExplanationReason): string {
     case "skewer":
       return `skewer:${reason.front.square}:${reason.likely ? "l" : "i"}`;
     case "saves_piece":
-      return `saves:${reason.piece.square}`;
+      return `saves:${reason.piece.square}:${reason.origin ?? ""}`;
+    case "kicks_piece":
+    case "hits_queen":
+    case "gambit_offer":
+      return `${reason.kind}:${reason.piece.square}`;
     case "development":
       return `dev:${reason.piece.square}`;
     case "castle":
@@ -760,6 +896,7 @@ export function dropTautologyReasons(
 function restatesMove(reason: ExplanationReason, move: GameMove): boolean {
   switch (reason.kind) {
     case "capture":
+      if (reason.recapture) return false;
       return (
         !reason.likely &&
         Boolean(move.captured) &&

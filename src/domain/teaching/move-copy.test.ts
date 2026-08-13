@@ -83,10 +83,11 @@ describe("describePlayedProblem", () => {
           piece: { type: "n", color: "w", square: "h4" },
           attackers: [{ type: "q", color: "b", square: "d8" }],
           seeCp: 900,
+          defenderCount: 0,
         },
         played,
       ),
-    ).toBe("puts it at risk of attack from the black queen");
+    ).toMatch(/black queen/);
   });
 
   it("names a SEE exchange loss instead of a generic hanging", () => {
@@ -98,6 +99,7 @@ describe("describePlayedProblem", () => {
           piece: { type: "r", color: "w", square: "a8" },
           attackers: [{ type: "b", color: "b", square: "c6" }],
           seeCp: 200,
+          defenderCount: 0,
         },
         played,
       ),
@@ -140,7 +142,7 @@ describe("describeBecause", () => {
         "w",
       ),
     ).toBe(
-      "you can likely take a knight and then pin another knight to the king",
+      "you can likely take a knight and then you pin another knight to the king",
     );
   });
 
@@ -167,6 +169,90 @@ describe("describeBecause", () => {
     ).toBeGreaterThan(1);
   });
 
+  it("saves a piece from its origin square, never the destination", () => {
+    expect(
+      describeBecause(
+        [
+          {
+            kind: "saves_piece",
+            piece: { type: "b", color: "w", square: "a6" },
+            origin: "a6",
+          },
+        ],
+        "w",
+      ),
+    ).toMatch(/saves your bishop from a6/);
+    expect(
+      describeBecause(
+        [
+          {
+            kind: "saves_piece",
+            piece: { type: "b", color: "w", square: "a6" },
+            origin: "a6",
+          },
+        ],
+        "w",
+      ),
+    ).not.toMatch(/c4-bishop|c8-bishop|from c8|from c4/);
+  });
+
+  it("names a hanging bishop as a bishop, not a knight", () => {
+    const played = move({ from: "c1", to: "f4", piece: "b", san: "Bf4" });
+    expect(
+      describePlayedProblem(
+        {
+          kind: "hanging",
+          piece: { type: "b", color: "w", square: "f4" },
+          attackers: [{ type: "p", color: "b", square: "e5" }],
+          seeCp: 300,
+          defenderCount: 0,
+        },
+        played,
+      ),
+    ).toMatch(/a bishop/);
+    expect(
+      describePlayedProblem(
+        {
+          kind: "hanging",
+          piece: { type: "b", color: "w", square: "f4" },
+          attackers: [{ type: "p", color: "b", square: "e5" }],
+          seeCp: 300,
+          defenderCount: 0,
+        },
+        played,
+      ),
+    ).not.toMatch(/knight/);
+  });
+
+  it("does not call a defended capture undefended", () => {
+    expect(
+      describeBecause(
+        [
+          {
+            kind: "wins_material",
+            captured: { type: "p", color: "b", square: "e5" },
+            seeCp: 100,
+            defenderCount: 1,
+          },
+        ],
+        "w",
+      ),
+    ).toMatch(/attacked more times than it was defended/);
+    expect(
+      describeBecause(
+        [
+          {
+            kind: "wins_material",
+            captured: { type: "p", color: "b", square: "e5" },
+            seeCp: 100,
+            defenderCount: 1,
+          },
+        ],
+        "w",
+      ),
+    ).not.toMatch(/undefended/);
+  });
+
   it("says nothing when there is no extra reason", () => {
     expect(describeBecause([], "w")).toBeNull();
   });
@@ -188,11 +274,12 @@ describe("describeBecause", () => {
             kind: "wins_material",
             captured: { type: "p", color: "b", square: "d4" },
             seeCp: 100,
+            defenderCount: 0,
           },
         ],
         "w",
       ),
-    ).toBe("the pawn was undefended");
+    ).toBe("the d4 pawn was undefended");
   });
 });
 
@@ -220,6 +307,7 @@ describe("describeRefutationPunchline", () => {
             ply: 0,
             move: played,
             captured: { type: "n", color: "w", square: "d4" },
+            capturedSeeCp: 300,
             gaveCheck: false,
             pins: [],
             forks: [],
@@ -231,6 +319,7 @@ describe("describeRefutationPunchline", () => {
             ply: 1,
             move: recapture,
             captured: { type: "q", color: "b", square: "d4" },
+            capturedSeeCp: 900,
             gaveCheck: false,
             pins: [],
             forks: [],

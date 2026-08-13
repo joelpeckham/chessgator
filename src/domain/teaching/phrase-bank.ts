@@ -24,11 +24,7 @@ export const PHRASE_BANK = {
     "it reveals an attack on the king",
     "it opens a line to the king",
   ],
-  check: [
-    "it puts the opponent in check",
-    "it forces the king to respond",
-    "it attacks the king directly",
-  ],
+  check: ["it puts the opponent in check", "it attacks the king directly"],
   king_more_exposed: [
     "your king is more open to attack",
     "it leaves your king with fewer defenders",

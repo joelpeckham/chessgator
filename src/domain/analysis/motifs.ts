@@ -1,5 +1,6 @@
 import { Chess, type Color, type PieceSymbol, type Square } from "chess.js";
 import {
+  ALL_SQUARES,
   allPieces,
   fileIndex,
   type NamedUnit,
@@ -49,6 +50,11 @@ export type OverloadFact = {
 export type RemovedDefenderFact = {
   defender: NamedUnit;
   newlyHanging: NamedUnit;
+};
+
+export type PawnKickFact = {
+  kicker: NamedUnit;
+  target: NamedUnit;
 };
 
 const FORK_TARGET_TYPES = new Set<PieceSymbol>(["n", "b", "r", "q", "k"]);
@@ -121,7 +127,9 @@ export function detectSkewers(chess: Chess, defender: Color): SkewerFact[] {
       if (front.type !== "k" && front.type !== "q" && front.type !== "r") {
         continue;
       }
-      skewers.push({ skewer: slider, front, back });
+      const fact: SkewerFact = { skewer: slider, front, back };
+      if (!skewerWinsRear(chess, fact)) continue;
+      skewers.push(fact);
     }
   }
   return skewers;
@@ -141,9 +149,73 @@ export function detectForks(chess: Chess, forker: NamedUnit): ForkFact[] {
   if (targets.length < 2) return [];
   const notable =
     forker.type === "n" ||
+    forker.type === "p" ||
     targets.some((target) => target.type === "k" || target.type === "q");
   if (!notable) return [];
-  return [{ forker, targets }];
+  const fact: ForkFact = { forker, targets };
+  if (!forkIsUsable(chess, fact)) return [];
+  return [fact];
+}
+
+/** King+hanging piece, or at least two hanging non-king targets. */
+function forkIsUsable(chess: Chess, fork: ForkFact): boolean {
+  const king = fork.targets.some((target) => target.type === "k");
+  const others = fork.targets.filter((target) => target.type !== "k");
+  const hanging = others.filter((target) =>
+    isHangingBySee(chess, target.square, target.color),
+  );
+  if (king) return hanging.length >= 1 || others.some((t) => t.type === "q");
+  return hanging.length >= 2;
+}
+
+/** Relative pins only if pinned to a queen, or the pin is exploitable this ply. */
+export function relativePinIsExploitable(chess: Chess, pin: PinFact): boolean {
+  if (pin.absolute) return true;
+  if (pin.target.type === "q") return true;
+  const attacker = oppositeColor(pin.pinned.color);
+  if (!chess.isAttacked(pin.pinned.square, attacker)) return false;
+  return (
+    isHangingBySee(chess, pin.pinned.square, pin.pinned.color) ||
+    seeGainCp(chess, pin.pinned.square, pin.pinner.color) > 0
+  );
+}
+
+/** True when capturing the rear unit is SEE-positive after the front piece leaves. */
+function skewerWinsRear(chess: Chess, skewer: SkewerFact): boolean {
+  const clone = new Chess(chess.fen());
+  const front = clone.get(skewer.front.square);
+  if (!front) return false;
+  clone.remove(skewer.front.square);
+  if (front.type === "k") {
+    const park = ALL_SQUARES.find(
+      (sq) =>
+        sq !== skewer.front.square &&
+        sq !== skewer.back.square &&
+        sq !== skewer.skewer.square &&
+        !clone.get(sq),
+    );
+    if (!park) return true;
+    clone.put(front, park);
+  }
+  return seeGainCp(clone, skewer.back.square, skewer.skewer.color) > 0;
+}
+
+export function detectPawnKicks(
+  chess: Chess,
+  kicker: NamedUnit,
+): PawnKickFact[] {
+  if (kicker.type !== "p") return [];
+  const opponent = oppositeColor(kicker.color);
+  const kicks: PawnKickFact[] = [];
+  for (const unit of allPieces(chess)) {
+    if (unit.color !== opponent) continue;
+    if (unit.type === "k" || unit.type === "p") continue;
+    if (!chess.attackers(unit.square, kicker.color).includes(kicker.square)) {
+      continue;
+    }
+    kicks.push({ kicker, target: unit });
+  }
+  return kicks;
 }
 
 export function detectDiscoveredAttacks(
@@ -246,8 +318,7 @@ export function detectRemovedDefender(
   );
   if (!newly) return null;
   const defendersBefore = namedAttackers(before, newly.square, opponent);
-  const wasSole = defendersBefore.some((d) => d.square === capturedSq);
-  if (!wasSole && defendersBefore.length !== 1) return null;
+  if (!defendersBefore.some((d) => d.square === capturedSq)) return null;
   return {
     defender: {
       type: move.captured,
@@ -315,6 +386,77 @@ export function detectPassedPawns(chess: Chess, color: Color): NamedUnit[] {
     if (isPassedPawn(chess, unit, enemy)) passed.push(unit);
   }
   return passed;
+}
+
+const PAWN_BREAK_SQUARES = new Set<Square>([
+  "c4",
+  "c5",
+  "d4",
+  "d5",
+  "e4",
+  "e5",
+  "f4",
+  "f5",
+  "e6",
+  "c6",
+  "f6",
+]);
+
+const FIANCHETTO_SQUARES = new Set<Square>(["b2", "g2", "b7", "g7"]);
+
+export function isPawnBreak(move: GameMove, after: Chess): boolean {
+  if (move.piece !== "p") return false;
+  if (!PAWN_BREAK_SQUARES.has(move.to)) return false;
+  const enemy = oppositeColor(move.color);
+  return allPieces(after).some(
+    (unit) =>
+      unit.color === enemy &&
+      unit.type === "p" &&
+      after.attackers(unit.square, move.color).includes(move.to),
+  );
+}
+
+export function isFianchetto(move: GameMove): boolean {
+  return move.piece === "b" && FIANCHETTO_SQUARES.has(move.to);
+}
+
+export function detectUnpin(
+  before: Chess,
+  after: Chess,
+  move: GameMove,
+): boolean {
+  const owner = move.color;
+  const pinnedBefore = detectPins(before, owner).some(
+    (pin) => pin.pinned.square === move.from,
+  );
+  if (!pinnedBefore) return false;
+  return !detectPins(after, owner).some((pin) => pin.pinned.square === move.to);
+}
+
+export function detectHitsQueen(
+  before: Chess,
+  after: Chess,
+  move: GameMove,
+): NamedUnit | null {
+  const opponent = oppositeColor(move.color);
+  const queen = allPieces(after).find(
+    (unit) => unit.color === opponent && unit.type === "q",
+  );
+  if (!queen) return null;
+  if (!after.attackers(queen.square, move.color).includes(move.to)) return null;
+  if (before.attackers(queen.square, move.color).includes(move.from)) {
+    return null;
+  }
+  return queen;
+}
+
+export function discoveredAttackIsUsable(
+  chess: Chess,
+  attack: DiscoveredAttack,
+): boolean {
+  if (attack.isCheck) return true;
+  if (attack.target.type === "k") return true;
+  return isHangingBySee(chess, attack.target.square, attack.target.color);
 }
 
 function isPassedPawn(chess: Chess, pawn: NamedUnit, enemy: Color): boolean {

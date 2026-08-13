@@ -57,6 +57,7 @@ export type AnalyzePlayerMoveInput = {
   fenBefore: string;
   fenAfter: string;
   playedMove: GameMove;
+  previousMove?: GameMove | null;
   movetimeMs?: number;
 };
 
@@ -309,6 +310,7 @@ export function createCoachingController(
           requestId: input.requestId,
           gameNodeId: input.gameNodeId,
           playedMove: input.playedMove,
+          previousMove: input.previousMove ?? null,
           fenBefore: input.fenBefore,
           fenAfter: input.fenAfter,
           before,

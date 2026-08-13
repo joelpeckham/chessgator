@@ -78,8 +78,9 @@ export function classifyEvalLoss(lossCp: number): MoveClassification {
 }
 
 /**
- * Prefer `best` when the played UCI matches the engine's top move, even if
- * MultiPV noise reports a tiny positive loss.
+ * Prefer `best` when the played UCI matches the engine's top move, as long as
+ * the reported loss stays within the excellent band. Larger losses classify
+ * by eval even if the UCI strings match.
  */
 export function classifyPlayedMove(input: {
   lossCp: number;
@@ -90,7 +91,11 @@ export function classifyPlayedMove(input: {
     input.bestMoveUci &&
     input.playedUci.toLowerCase() === input.bestMoveUci.toLowerCase()
   ) {
-    return "best";
+    if (input.lossCp <= CLASSIFICATION_THRESHOLDS.excellentMaxLossCp) {
+      return "best";
+    }
+    // Mate-score artifacts (delivering mate) can look like a huge loss.
+    if (input.lossCp >= 5000) return "best";
   }
   return classifyEvalLoss(input.lossCp);
 }

@@ -57,7 +57,11 @@ export function renderExplanation(ctx: TemplateContext): string {
     } else {
       parts.push(`${played} ${ctx.problem}.`);
     }
-    if (ctx.consequence && !containsIgnoreCase(ctx.problem, ctx.consequence)) {
+    if (
+      ctx.consequence &&
+      !containsIgnoreCase(ctx.problem, ctx.consequence) &&
+      !sameMateLesson(ctx.problem, ctx.consequence)
+    ) {
       parts.push(`${capitalizePhrase(ctx.consequence)}.`);
     }
     const better = betterMoveSentence(ctx);
@@ -110,6 +114,9 @@ function verdictClause(ctx: TemplateContext): string {
     return "is the only move that holds";
   }
   if (ctx.concept === "best_move") {
+    if (!ctx.playedBecause) {
+      return "is the engine's choice here";
+    }
     if (ctx.margin === "near_equal") {
       return "is one of several strong moves";
     }
@@ -121,16 +128,16 @@ function verdictClause(ctx: TemplateContext): string {
   if (ctx.concept === "solid_move") {
     return `is a solid ${CLASSIFICATION_LABEL[ctx.classification].toLowerCase()} move`;
   }
-  if (ctx.evalFrame === "still_winning") {
+  const teachable =
+    ctx.classification === "inaccuracy" ||
+    ctx.classification === "mistake" ||
+    ctx.classification === "blunder";
+  if (!teachable && ctx.evalFrame === "still_winning") {
     return "keeps you winning";
   }
   if (ctx.evalFrame === "hands_advantage") {
     return "hands the opponent the advantage";
   }
-  const teachable =
-    ctx.classification === "inaccuracy" ||
-    ctx.classification === "mistake" ||
-    ctx.classification === "blunder";
   if (teachable && ctx.evalFrame === "still_losing") {
     return "doesn't ease a difficult position";
   }
@@ -162,9 +169,6 @@ function missedImprovementSentence(
   if (ctx.suggestedPhrase && ctx.suggestedBecause) {
     return `${lead}, but ${ctx.suggestedPhrase} would be better because ${ctx.suggestedBecause}.`;
   }
-  if (ctx.suggestedPhrase) {
-    return `${lead}, but ${ctx.suggestedPhrase} would be better.`;
-  }
   if (ctx.playedBecause) {
     return mild
       ? `${played} is playable because ${ctx.playedBecause}, but there was a clearer improvement.`
@@ -184,10 +188,8 @@ function evalLead(ctx: TemplateContext): string | null {
 
 function betterMoveSentence(ctx: TemplateContext): string {
   if (!ctx.suggestedPhrase || ctx.concept === "best_move") return "";
-  if (ctx.suggestedBecause) {
-    return ` A better move would have been ${ctx.suggestedPhrase} because ${ctx.suggestedBecause}.`;
-  }
-  return ` A better move would have been ${ctx.suggestedPhrase}.`;
+  if (!ctx.suggestedBecause) return "";
+  return ` A better move would have been ${ctx.suggestedPhrase} because ${ctx.suggestedBecause}.`;
 }
 
 function capitalizePhrase(text: string): string {
@@ -202,6 +204,11 @@ function lowerFirst(text: string): string {
 
 function containsIgnoreCase(haystack: string, needle: string): boolean {
   return haystack.toLowerCase().includes(needle.toLowerCase().slice(0, 24));
+}
+
+function sameMateLesson(problem: string, consequence: string): boolean {
+  const mate = /checkmate|mate in \d/i;
+  return mate.test(problem) && mate.test(consequence);
 }
 
 function collapseSpaces(text: string): string {

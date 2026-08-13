@@ -43,6 +43,26 @@ describe("classification thresholds", () => {
     ).toBe("best");
   });
 
+  it("still treats delivering mate as best when UCI matches", () => {
+    expect(
+      classifyPlayedMove({
+        lossCp: 10_000,
+        playedUci: "e1e8",
+        bestMoveUci: "e1e8",
+      }),
+    ).toBe("best");
+  });
+
+  it("does not force best when eval loss is past the excellent band", () => {
+    expect(
+      classifyPlayedMove({
+        lossCp: 150,
+        playedUci: "e2e4",
+        bestMoveUci: "e2e4",
+      }),
+    ).toBe("mistake");
+  });
+
   it("nudges only mistakes and blunders", () => {
     expect(shouldNudge("best")).toBe(false);
     expect(shouldNudge("good")).toBe(false);

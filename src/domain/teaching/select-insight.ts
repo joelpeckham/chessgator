@@ -7,6 +7,7 @@ import {
   classifyMoveMargin,
   contrastBenefits,
   dropTautologyReasons,
+  fallbackBenefitReasons,
   pickBenefitReasons,
   pickMateBenefits,
   pickProblemReasons,
@@ -75,12 +76,14 @@ export function selectTeachingInsight(
     fenBefore: evidence.fenBefore,
     move: evidence.playedMove,
     fenAfter: evidence.fenAfter,
+    previousMove: evidence.previousMove,
   });
   const suggestedEffects = suggestedApplied
     ? collectMoveEffects({
         fenBefore: evidence.fenBefore,
         move: suggestedApplied.move,
         fenAfter: suggestedApplied.fenAfter,
+        previousMove: evidence.previousMove,
       })
     : null;
 
@@ -109,12 +112,11 @@ export function selectTeachingInsight(
     mover: evidence.playedMove.color,
   });
 
-  const explainPlayedAsBenefit =
-    concept === "best_move" ||
-    concept === "solid_move" ||
-    concept === "check" ||
-    concept === "capture" ||
-    concept === "development";
+  const teachable =
+    evidence.classification === "inaccuracy" ||
+    evidence.classification === "mistake" ||
+    evidence.classification === "blunder";
+  const explainPlayedAsBenefit = !teachable;
 
   let playedBenefits = dropTautologyReasons(
     pickBenefitReasons(playedEffects, []),
@@ -133,6 +135,17 @@ export function selectTeachingInsight(
         suggestedEffects.move,
       )
     : [];
+  if (suggestedEffects && suggestedBenefits.length === 0) {
+    suggestedBenefits = dropTautologyReasons(
+      pickBenefitReasons(suggestedEffects, improvement.events, playedEffects, {
+        keepGenerics: true,
+      }),
+      suggestedEffects.move,
+    );
+  }
+  if (suggestedEffects && suggestedBenefits.length === 0) {
+    suggestedBenefits = fallbackBenefitReasons(suggestedEffects);
+  }
   suggestedBenefits = contrastBenefits(
     verifyLikelyTactics(
       [
@@ -147,6 +160,9 @@ export function selectTeachingInsight(
     playedBenefits,
   );
   suggestedBenefits = rankReasons(suggestedBenefits);
+  if (suggestedEffects && suggestedBenefits.length === 0) {
+    suggestedBenefits = fallbackBenefitReasons(suggestedEffects);
+  }
 
   const copyOpts = {
     fen: evidence.fenBefore,
@@ -175,15 +191,21 @@ export function selectTeachingInsight(
             copyOpts,
           )
         : null));
-  const becauseReasons =
-    explainPlayedAsBenefit || problemReasons.length === 0
-      ? playedBenefits
-      : problemReasons;
-  const playedBecause = describeBecause(
+  const becauseReasons = explainPlayedAsBenefit
+    ? playedBenefits
+    : problemReasons;
+  let playedBecause = describeBecause(
     becauseReasons,
     evidence.playedMove.color,
     copyOpts,
   );
+  if (!playedBecause && explainPlayedAsBenefit && playedBenefits.length === 0) {
+    playedBecause = describeBecause(
+      fallbackBenefitReasons(playedEffects),
+      evidence.playedMove.color,
+      copyOpts,
+    );
+  }
   const margin = classifyMoveMargin(
     evidence.alternatives,
     evidence.playedMove.color,
@@ -227,7 +249,10 @@ export function selectTeachingInsight(
     lineUci: evidence.shortPvUci,
     refutationUci: evidence.refutationUci,
     classification: evidence.classification,
-    quip: renderQuip(evidence.classification),
+    quip:
+      playedBecause || suggestedBecause || problem
+        ? renderQuip(evidence.classification)
+        : "",
     nudge: shouldNudge(evidence.classification),
   };
 }

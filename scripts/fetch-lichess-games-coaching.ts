@@ -15,6 +15,7 @@ import { buildMoveAnalysisEvidence } from "@/domain/analysis/move-analysis";
 import { collectMoveEffects } from "@/domain/analysis/move-effects";
 import type { EvaluationScore } from "@/domain/analysis/types";
 import { createChess, tryApplyMove } from "@/domain/game/rules";
+import type { GameMove } from "@/domain/game/types";
 import { selectTeachingInsight } from "@/domain/teaching/select-insight";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -221,6 +222,7 @@ export function dumpGame(game: LichessGame): GameCoachingDump | null {
   if (sans.length === 0) return null;
   const chess = createChess();
   const moves: GameMoveCoaching[] = [];
+  let previousMove: GameMove | null = null;
 
   for (let i = 0; i < sans.length; i += 1) {
     const san = sans[i];
@@ -231,12 +233,15 @@ export function dumpGame(game: LichessGame): GameCoachingDump | null {
     chess.load(applied.fenAfter);
     const plyAnalysis = analysis[i];
     const prevAnalysis = i === 0 ? undefined : analysis[i - 1];
+    const lastMove = previousMove;
+    previousMove = applied.move;
     if (!plyAnalysis) continue;
     const row = dumpMove({
       gameId: game.id,
       ply: i + 1,
       san,
       applied,
+      previousMove: lastMove,
       fenBefore,
       plyAnalysis,
       prevAnalysis,
@@ -271,6 +276,7 @@ function dumpMove(input: {
   ply: number;
   san: string;
   applied: NonNullable<ReturnType<typeof tryApplyMove>>;
+  previousMove: GameMove | null;
   fenBefore: string;
   plyAnalysis: LichessAnalysisPly;
   prevAnalysis: LichessAnalysisPly | undefined;
@@ -291,6 +297,7 @@ function dumpMove(input: {
     requestId: id,
     gameNodeId: id,
     playedMove: input.applied.move,
+    previousMove: input.previousMove,
     fenBefore: input.fenBefore,
     fenAfter: input.applied.fenAfter,
     before: {
@@ -317,6 +324,7 @@ function dumpMove(input: {
     fenBefore: input.fenBefore,
     move: input.applied.move,
     fenAfter: input.applied.fenAfter,
+    previousMove: input.previousMove,
   });
   const reasons = [
     ...pickProblemReasons(effects),
@@ -373,6 +381,4 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-if (import.meta.main) {
-  await main();
-}
+await main();

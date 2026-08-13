@@ -60,9 +60,7 @@ describe("renderExplanation", () => {
       suggestedBecause: null,
       margin: "near_equal",
     });
-    expect(text).toBe(
-      "Moving your knight to f3 is one of several strong moves.",
-    );
+    expect(text).toBe("Moving your knight to f3 is the engine's choice here.");
     expect(text).not.toMatch(/because/i);
   });
 
@@ -120,6 +118,33 @@ describe("renderExplanation", () => {
     expect(text.toLowerCase()).not.toMatch(/only move that holds/);
   });
 
+  it("prints a mate lesson only once", () => {
+    const text = renderExplanation({
+      ...ctx,
+      concept: "king_safety",
+      classification: "blunder",
+      problem: "lets black force checkmate in 1 move",
+      consequence: "this lets black force checkmate in 1 move",
+      suggestedPhrase: null,
+      suggestedBecause: null,
+      playedBecause: null,
+    });
+    expect(text.toLowerCase().match(/checkmate/g)?.length).toBe(1);
+  });
+
+  it("drops a suggested SAN that has no because", () => {
+    const text = renderExplanation({
+      ...ctx,
+      concept: "piece_safety",
+      classification: "mistake",
+      problem: "puts it at risk of attack from the black queen",
+      suggestedPhrase: "moving your knight to f3",
+      suggestedBecause: null,
+      playedBecause: null,
+    });
+    expect(text).not.toMatch(/a better move would have been/i);
+  });
+
   it("calls out a clearly strongest move", () => {
     expect(
       renderExplanation({
@@ -129,9 +154,11 @@ describe("renderExplanation", () => {
         margin: "clear",
         suggestedPhrase: null,
         suggestedBecause: null,
-        playedBecause: null,
+        playedBecause: "it develops your knight",
       }),
-    ).toBe("Moving your knight to f3 is clearly the strongest move.");
+    ).toBe(
+      "Moving your knight to f3 is clearly the strongest move because it develops your knight.",
+    );
   });
 
   it("does not restate check as the because", () => {
@@ -170,6 +197,7 @@ describe("renderExplanation", () => {
         classification: "blunder",
         concept: "missed_improvement",
         playedBecause: null,
+        suggestedBecause: "you control more central squares",
       }),
     ).toMatch(/is a blunder, but moving your knight to c3 would be better/i);
     expect(

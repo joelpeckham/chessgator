@@ -6,6 +6,7 @@ import {
   detectForks,
   detectPassedPawns,
   detectPins,
+  detectRemovedDefender,
   detectSkewers,
 } from "@/domain/analysis/motifs";
 import {
@@ -60,6 +61,23 @@ describe("motif detectors", () => {
   it("flags a boxed king as a back-rank concern", () => {
     const chess = createChess("6k1/5ppp/8/8/8/8/8/R6K w - - 0 1");
     expect(detectBackRankVulnerability(chess, "b")).toBe(true);
+  });
+
+  it("requires the captured unit to have defended the hanging target", () => {
+    const before = createChess("4k3/8/8/3n4/8/8/8/R1B4K w - - 0 1");
+    const applied = tryApplyMove(before.fen(), "c1a3")!;
+    const after = createChess(applied.fenAfter);
+    const removed = detectRemovedDefender(before, after, applied.move);
+    expect(removed).toBeNull();
+  });
+
+  it("detects a pawn fork of two hanging pieces", () => {
+    const before = "4k3/8/8/2n1n3/8/3P4/8/4K3 w - - 0 1";
+    const applied = tryApplyMove(before, "d3d4")!;
+    const after = createChess(applied.fenAfter);
+    const forker = namedUnitAt(after, "d4")!;
+    const forks = detectForks(after, forker);
+    expect(forks[0]?.targets.filter((t) => t.type === "n")).toHaveLength(2);
   });
 
   it("still detects a knight fork of king and queen", () => {

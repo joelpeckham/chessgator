@@ -75,7 +75,8 @@ function sameTypeCount(fen: string, unit: NamedUnit): number {
 
 function labeledPiece(unit: NamedUnit, fen: string | undefined): string {
   const name = pieceName(unit.type);
-  if (!fen || unit.type === "k" || unit.type === "p") return name;
+  if (unit.type === "p") return `${unit.square} pawn`;
+  if (!fen || unit.type === "k") return name;
   if (sameTypeCount(fen, unit) <= 1) return name;
   return `${unit.square}-${name}`;
 }
@@ -119,7 +120,7 @@ export function describePlayedProblem(
     case "hanging": {
       const attacker = attackerPhrase(reason.attackers, opts.fen);
       const piece = ownedPhrase(reason.piece, played.color, opts.fen);
-      const loss = hangingLossCopy(reason.seeCp);
+      const loss = hangingLossCopy(reason.seeCp, reason.piece);
       if (reason.piece.square === played.to) {
         if (loss) {
           return attacker
@@ -255,30 +256,50 @@ function isTacticalAction(reason: ExplanationReason): boolean {
     reason.kind === "discovered_attack" ||
     reason.kind === "discovered_check" ||
     reason.kind === "removed_defender" ||
-    reason.kind === "wins_material"
+    reason.kind === "wins_material" ||
+    reason.kind === "kicks_piece" ||
+    reason.kind === "hits_queen" ||
+    reason.kind === "zwischenzug"
   );
 }
 
 function selectBecauseReasons(
   reasons: ExplanationReason[],
 ): ExplanationReason[] {
-  const withoutCheckIfMate = reasons.some(
+  const mate = reasons.find(
     (reason) =>
       reason.kind === "forces_mate" ||
       reason.kind === "allows_mate" ||
-      reason.kind === "discovered_check",
+      reason.kind === "missed_mate",
+  );
+  if (mate) return [mate];
+
+  const withoutCheckIfDiscovered = reasons.some(
+    (reason) => reason.kind === "discovered_check",
   )
     ? reasons.filter((reason) => reason.kind !== "check")
     : reasons;
-  const tactical = withoutCheckIfMate.filter((reason) =>
+  const tactical = withoutCheckIfDiscovered.filter((reason) =>
     isTacticalAction(reason),
   );
-  if (tactical.length >= 1) return tactical.slice(0, 2);
-  const save = withoutCheckIfMate.find(
+  const uniqueTactical = uniqueKinds(tactical);
+  if (uniqueTactical.length >= 1) return uniqueTactical.slice(0, 2);
+  const save = withoutCheckIfDiscovered.find(
     (reason) => reason.kind === "saves_piece",
   );
   if (save) return [save];
-  return withoutCheckIfMate.slice(0, 2);
+  return uniqueKinds(withoutCheckIfDiscovered).slice(0, 2);
+}
+
+function uniqueKinds(reasons: ExplanationReason[]): ExplanationReason[] {
+  const seen = new Set<string>();
+  const out: ExplanationReason[] = [];
+  for (const reason of reasons) {
+    if (seen.has(reason.kind)) continue;
+    seen.add(reason.kind);
+    out.push(reason);
+  }
+  return out;
 }
 
 function describeReason(
@@ -290,7 +311,7 @@ function describeReason(
     another?: boolean;
   },
 ): string {
-  const then = opts.followUp ? "then " : "";
+  const then = opts.followUp ? "then you " : "";
   switch (reason.kind) {
     case "hanging":
     case "ignored_threat":
@@ -309,6 +330,10 @@ function describeReason(
         : reason.likely
           ? indefinite(reason.captured.type)
           : `the ${pieceName(reason.captured.type)} on ${reason.captured.square}`;
+      if (reason.recapture && !reason.likely) {
+        if (opts.followUp) return `${then}recapture ${name}`;
+        return "you recapture and restore the balance";
+      }
       if (reason.likely) {
         if (opts.followUp) return `${then}take ${name}`;
         return `you can likely take ${name}`;
@@ -320,7 +345,10 @@ function describeReason(
       const piece = pieceName(reason.captured.type);
       const pieceValue = PIECE_VALUE_CP[reason.captured.type];
       if (reason.seeCp >= pieceValue - 50) {
-        return `the ${piece} was undefended`;
+        if (reason.defenderCount === 0) {
+          return `the ${reason.captured.type === "p" ? `${reason.captured.square} pawn` : piece} was undefended`;
+        }
+        return `the ${reason.captured.type === "p" ? `${reason.captured.square} pawn` : piece} was attacked more times than it was defended`;
       }
       return `you come out ${materialLabel(reason.seeCp)} ahead`;
     }
@@ -374,12 +402,40 @@ function describeReason(
     case "back_rank":
       return bankPhrase("back_rank", opts.seed);
     case "saves_piece":
+      if (reason.origin) {
+        return `it saves ${ownedPhrase(reason.piece, mover, opts.fen)} from ${reason.origin}`;
+      }
       return `it saves ${ownedPhrase(reason.piece, mover, opts.fen)} from capture`;
+    case "kicks_piece":
+      return `it kicks ${ownedPhrase(reason.piece, mover, opts.fen)} with a pawn`;
+    case "hits_queen":
+      return `it attacks the queen`;
+    case "escapes_check":
+      return "it gets your king out of check";
+    case "blocks_check":
+      return "it blocks the check";
+    case "king_activity":
+      return "your king steps toward the action";
+    case "gambit_offer":
+      return "you offer a pawn to speed up development";
+    case "pawn_break":
+      return "it challenges the pawn structure";
+    case "fianchetto":
+      return "it fianchettos your bishop";
+    case "unpin":
+      return "it breaks the pin";
+    case "zwischenzug":
+      return "you insert a check before recapturing";
+    case "perpetual":
+      return "you can force a draw by perpetual check";
     case "development":
       return `it develops your ${pieceName(reason.piece.type)}`;
     case "center_control":
       return bankPhrase("center_control", opts.seed);
     case "passed_pawn":
+      if (reason.created === false) {
+        return "it advances your passed pawn";
+      }
       return bankPhrase("passed_pawn", opts.seed);
     case "promotion":
       return `you can promote to a ${pieceName(reason.to)}`;
@@ -420,14 +476,19 @@ function describeReason(
   }
 }
 
-function hangingLossCopy(seeCp: number): string | null {
+function hangingLossCopy(seeCp: number, piece: NamedUnit): string | null {
   const abs = Math.abs(seeCp);
-  if (abs < 150 || abs > 400) return null;
+  if (abs < 80) return null;
   if (abs >= 180 && abs <= 220) return "the exchange";
-  return materialLabel(seeCp);
+  return indefinite(piece.type);
 }
 
 function ownedPhrase(unit: NamedUnit, mover: Color, fen?: string): string {
+  if (unit.type === "p") {
+    return unit.color === mover
+      ? `your ${unit.square} pawn`
+      : `the ${unit.square} pawn`;
+  }
   const name = labeledPiece(unit, fen);
   if (unit.color === mover) return `your ${name}`;
   return `the ${colorName(unit.color)} ${name}`;

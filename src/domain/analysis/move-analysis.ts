@@ -27,6 +27,8 @@ export type MoveAnalysisEvidence = {
   /** Game-tree node id for the position *after* the move. */
   gameNodeId: string;
   playedMove: GameMove;
+  /** Opponent's last move, if any — used to detect recaptures. */
+  previousMove: GameMove | null;
   fenBefore: string;
   fenAfter: string;
   sideThatMoved: "w" | "b";
@@ -54,6 +56,7 @@ export type BuildMoveAnalysisInput = {
   requestId: string;
   gameNodeId: string;
   playedMove: GameMove;
+  previousMove?: GameMove | null;
   fenBefore: string;
   fenAfter: string;
   before: AnalysisEvidence;
@@ -122,6 +125,7 @@ export function buildMoveAnalysisEvidence(
     requestId: input.requestId,
     gameNodeId: input.gameNodeId,
     playedMove: input.playedMove,
+    previousMove: input.previousMove ?? null,
     fenBefore: input.fenBefore,
     fenAfter: input.fenAfter,
     sideThatMoved,

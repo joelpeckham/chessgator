@@ -17,7 +17,7 @@ import {
 import { tryApplyMove } from "@/domain/game/rules";
 
 describe("explanation reasons", () => {
-  it("keeps a later pin from the improvement line as likely", () => {
+  it("keeps a follow-up capture from the improvement line as likely", () => {
     const fen = "4k3/4n3/8/3p4/4P3/7p/8/R6K w - - 0 1";
     const applied = tryApplyMove(fen, "e4d5")!;
     const effects = collectMoveEffects({
@@ -33,7 +33,7 @@ describe("explanation reasons", () => {
         (reason) =>
           reason.kind === "pin" && reason.likely && reason.pinned.type === "n",
       ),
-    ).toBe(true);
+    ).toBe(false);
     expect(
       reasons.some(
         (reason) => reason.kind === "capture" && reason.captured.type === "p",
@@ -48,6 +48,7 @@ describe("explanation reasons", () => {
         piece: { type: "q", color: "w", square: "h5" },
         attackers: [{ type: "p", color: "b", square: "g6" }],
         seeCp: 800,
+        defenderCount: 0,
       }),
     );
   });
@@ -179,6 +180,55 @@ describe("explanation reasons", () => {
     expect(benefits.some((reason) => reason.kind === "overload")).toBe(false);
   });
 
+  it("does not call a recapture of an equal pawn a material win", () => {
+    const previous = tryApplyMove(
+      "rnbqkbnr/ppp2ppp/4p3/3p4/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3",
+      "c4d5",
+    )!;
+    const before = previous.fenAfter;
+    const applied = tryApplyMove(before, "e6d5")!;
+    const effects = collectMoveEffects({
+      fenBefore: before,
+      move: applied.move,
+      fenAfter: applied.fenAfter,
+      previousMove: previous.move,
+    });
+    expect(effects.isRecapture).toBe(true);
+    const reasons = pickBenefitReasons(effects, []);
+    expect(reasons.some((reason) => reason.kind === "wins_material")).toBe(
+      false,
+    );
+  });
+
+  it("names the origin square when a piece retreats to safety", () => {
+    const fen = "4k3/8/b7/8/8/8/8/R3K3 b - - 0 1";
+    const applied = tryApplyMove(fen, "a6c8")!;
+    const effects = collectMoveEffects({
+      fenBefore: fen,
+      move: applied.move,
+      fenAfter: applied.fenAfter,
+    });
+    expect(effects.retreatedToSafety).toBe(true);
+    const reasons = pickBenefitReasons(effects, []);
+    const save = reasons.find((reason) => reason.kind === "saves_piece");
+    expect(save?.kind === "saves_piece" && save.origin).toBe("a6");
+    expect(save?.kind === "saves_piece" && save.piece.square).toBe("a6");
+  });
+
+  it("treats the King's Gambit pawn as an offer, not a hanging blunder", () => {
+    const fen = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2";
+    const applied = tryApplyMove(fen, "f2f4")!;
+    const effects = collectMoveEffects({
+      fenBefore: fen,
+      move: applied.move,
+      fenAfter: applied.fenAfter,
+    });
+    expect(effects.gambitOffer).not.toBeNull();
+    expect(effects.movedPieceHanging).toBeNull();
+    const reasons = pickBenefitReasons(effects, []);
+    expect(reasons.some((reason) => reason.kind === "gambit_offer")).toBe(true);
+  });
+
   it("ranks an endgame passed pawn above a middlegame one", () => {
     expect(
       reasonSeverity({
@@ -192,5 +242,48 @@ describe("explanation reasons", () => {
         piece: { type: "p", color: "w", square: "e6" },
       }),
     );
+  });
+
+  it("ranks check above a pawn-to-rook pin", () => {
+    expect(reasonSeverity({ kind: "check" })).toBeGreaterThan(
+      reasonSeverity({
+        kind: "pin",
+        pinned: { type: "p", color: "b", square: "e5" },
+        target: { type: "r", color: "b", square: "e8" },
+        pinner: { type: "b", color: "w", square: "a1" },
+        likely: false,
+      }),
+    );
+  });
+
+  it("drops center control when a kick is present", () => {
+    const fen = "rnbqkbnr/pppp1ppp/8/4p2Q/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 1 2";
+    const applied = tryApplyMove(fen, "g7g6")!;
+    const effects = collectMoveEffects({
+      fenBefore: fen,
+      move: applied.move,
+      fenAfter: applied.fenAfter,
+    });
+    const reasons = pickBenefitReasons(effects, []);
+    expect(reasons.some((reason) => reason.kind === "kicks_piece")).toBe(true);
+    expect(reasons.some((reason) => reason.kind === "center_control")).toBe(
+      false,
+    );
+  });
+
+  it("treats walking the king out of check as escaping, not saving a piece", () => {
+    const fen = "4k3/8/8/8/8/8/8/4R2K b - - 0 1";
+    const applied = tryApplyMove(fen, "e8f8")!;
+    const effects = collectMoveEffects({
+      fenBefore: fen,
+      move: applied.move,
+      fenAfter: applied.fenAfter,
+    });
+    expect(effects.escapedCheck).toBe(true);
+    const reasons = pickBenefitReasons(effects, []);
+    expect(reasons.some((reason) => reason.kind === "escapes_check")).toBe(
+      true,
+    );
+    expect(reasons.some((reason) => reason.kind === "saves_piece")).toBe(false);
   });
 });
