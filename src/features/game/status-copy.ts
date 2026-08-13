@@ -23,6 +23,13 @@ export type StatusPresentationInput = {
   hintAnnouncement?: string | null;
   enginesWarming?: boolean;
   humanColor?: Color;
+  timelineMode?: "live" | "review" | "practice";
+  practicePhase?:
+    | "playerTurn"
+    | "opponentThinking"
+    | "gameOver"
+    | "error"
+    | null;
 };
 
 export type StatusPresentation = {
@@ -44,7 +51,12 @@ export function getStatusPresentation(
   const coachUnavailable = args.coachUnavailable ?? null;
 
   const badgeVariant = badgeVariantFor(mode, maia);
-  const badgeLabel = badgeLabelFor(mode, maia, args.enginesWarming);
+  const badgeLabel = badgeLabelFor(
+    mode,
+    maia,
+    args.enginesWarming,
+    args.timelineMode,
+  );
   const headline = headlineFor({
     mode,
     status,
@@ -52,6 +64,8 @@ export function getStatusPresentation(
     maia,
     lastError,
     humanColor: args.humanColor,
+    timelineMode: args.timelineMode,
+    practicePhase: args.practicePhase,
   });
   const detail = detailFor({
     mode,
@@ -61,6 +75,7 @@ export function getStatusPresentation(
     lastError,
     coachUnavailable,
     enginesWarming: args.enginesWarming,
+    timelineMode: args.timelineMode,
   });
 
   let announcement: string;
@@ -99,14 +114,16 @@ function badgeLabelFor(
   mode: SessionMode,
   maia: MaiaSessionState,
   enginesWarming?: boolean,
+  timelineMode?: "live" | "review" | "practice",
 ): string {
   if (maia.phase === "failed" || mode === "error") return "Error";
   if (mode === "gameOver") return "Game over";
+  if (timelineMode === "practice") return "Practicing";
+  if (timelineMode === "review" || mode === "reviewing") return "Reviewing";
   if (mode === "opponentThinking" || maia.phase === "thinking") {
     return "Opponent thinking";
   }
   if (mode === "analyzing") return "Analyzing";
-  if (mode === "reviewing") return "Reviewing";
   if (enginesWarming || maia.phase === "starting") return "Your turn";
   if (mode === "playerTurn") return "Your turn";
   // Remaining SessionMode after the guards above is "loading".
@@ -120,10 +137,29 @@ function headlineFor(args: {
   maia: MaiaSessionState;
   lastError: string | null;
   humanColor?: Color;
+  timelineMode?: "live" | "review" | "practice";
+  practicePhase?:
+    | "playerTurn"
+    | "opponentThinking"
+    | "gameOver"
+    | "error"
+    | null;
 }): string {
   const { mode, status, terminalReason, maia, lastError } = args;
   if (maia.phase === "failed" || mode === "error") {
     return lastError ?? maia.message ?? "Something went wrong";
+  }
+  if (args.timelineMode === "practice") {
+    if (args.practicePhase === "error") {
+      return lastError ?? "Practice — Maia failed";
+    }
+    if (args.practicePhase === "opponentThinking") {
+      return "Practice — Maia is thinking…";
+    }
+    if (args.practicePhase === "gameOver") {
+      return "Practice — line over";
+    }
+    return "Practice — your move";
   }
   if (mode === "gameOver") {
     if (terminalReason === "resignation") return "You resigned";
@@ -137,12 +173,12 @@ function headlineFor(args: {
     if (status.result === "draw") return "Draw";
     return "Game over";
   }
+  if (args.timelineMode === "review" || mode === "reviewing")
+    return "Reviewing";
   if (mode === "opponentThinking" || maia.phase === "thinking") {
     return "Maia is thinking…";
   }
   if (mode === "playerTurn" || mode === "loading") return "Your move";
-  if (mode === "reviewing") return "Reviewing";
-  // Remaining SessionMode after the guards above is "analyzing".
   return "Analyzing…";
 }
 
@@ -154,6 +190,7 @@ function detailFor(args: {
   lastError: string | null;
   coachUnavailable: string | null;
   enginesWarming?: boolean;
+  timelineMode?: "live" | "review" | "practice";
 }): string | null {
   const {
     mode,
@@ -164,6 +201,9 @@ function detailFor(args: {
     coachUnavailable,
     enginesWarming,
   } = args;
+  if (args.timelineMode === "practice") {
+    return "Live game paused.";
+  }
   if (coachUnavailable) return coachUnavailable;
   if (lastError) return lastError;
   if (mode === "gameOver") {

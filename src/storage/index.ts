@@ -9,6 +9,7 @@ export {
   type ReconstructedGame,
   reconstructGame,
   type SavedGameV2,
+  type SavedLesson,
   type SavedNode,
   toPersistedGame,
 } from "@/storage/schema";

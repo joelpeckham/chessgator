@@ -12,10 +12,31 @@ export const GAME_STORAGE_KEY = "chessgator:game:v2";
 /** Legacy key — ignored / cleared; no v1→v2 migration. */
 export const LEGACY_GAME_STORAGE_KEY = "chessgator:game:v1";
 
+export type SavedLesson = {
+  classification:
+    | "best"
+    | "excellent"
+    | "good"
+    | "inaccuracy"
+    | "mistake"
+    | "blunder";
+  concept: string;
+  confidence: number;
+  explanation: string;
+  suggestedMoveUci: string | null;
+  suggestedMoveSan: string | null;
+  lineUci: string[];
+  refutationUci: string[];
+  quip: string;
+  nudge: boolean;
+};
+
 export type SavedNode = {
   /** Absent on the root. */
   uci?: string;
   children?: SavedNode[];
+  /** Compact coaching insight for this committed node (human-move keyed). */
+  lesson?: SavedLesson;
 };
 
 export type SavedGameV2 = {
@@ -37,6 +58,8 @@ export type ReconstructedGame = {
   maiaElo: number;
   humanColor: Color;
   resigned: boolean;
+  /** Lessons keyed by reconstructed (fresh) node ids. */
+  lessons: Record<string, SavedLesson>;
 };
 
 export interface GameRepository {
@@ -55,6 +78,74 @@ function isString(value: unknown): value is string {
 
 function isFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
+}
+
+function isBoolean(value: unknown): value is boolean {
+  return value === true || value === false;
+}
+
+const SAVED_CLASSIFICATIONS = new Set<SavedLesson["classification"]>([
+  "best",
+  "excellent",
+  "good",
+  "inaccuracy",
+  "mistake",
+  "blunder",
+]);
+
+function parseUciList(value: unknown): string[] | null {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) return null;
+  const out: string[] = [];
+  for (const item of value) {
+    if (!isString(item) || item.length < 4) return null;
+    out.push(item);
+  }
+  return out;
+}
+
+/** Invalid lessons are dropped (do not fail the whole snapshot). */
+function parseSavedLesson(value: unknown): SavedLesson | undefined {
+  if (!isRecord(value)) return undefined;
+  if (
+    !isString(value.classification) ||
+    !SAVED_CLASSIFICATIONS.has(
+      value.classification as SavedLesson["classification"],
+    )
+  ) {
+    return undefined;
+  }
+  if (!isString(value.concept) || value.concept.length === 0) return undefined;
+  if (!isFiniteNumber(value.confidence)) return undefined;
+  if (!isString(value.explanation)) return undefined;
+  if (value.suggestedMoveUci !== null && !isString(value.suggestedMoveUci)) {
+    return undefined;
+  }
+  if (value.suggestedMoveSan !== null && !isString(value.suggestedMoveSan)) {
+    return undefined;
+  }
+  const lineUci = parseUciList(value.lineUci);
+  const refutationUci = parseUciList(value.refutationUci);
+  if (!lineUci || !refutationUci) return undefined;
+  if (value.quip !== undefined && !isString(value.quip)) return undefined;
+  if (value.nudge !== undefined && !isBoolean(value.nudge)) return undefined;
+
+  return {
+    classification: value.classification as SavedLesson["classification"],
+    concept: value.concept,
+    confidence: value.confidence,
+    explanation: value.explanation,
+    suggestedMoveUci: isString(value.suggestedMoveUci)
+      ? value.suggestedMoveUci
+      : null,
+    suggestedMoveSan: isString(value.suggestedMoveSan)
+      ? value.suggestedMoveSan
+      : null,
+    lineUci,
+    refutationUci,
+    quip: isString(value.quip) ? value.quip : "",
+    nudge: value.nudge === true,
+  };
 }
 
 function committedChildren(tree: GameTree, nodeId: string): GameNode[] {
@@ -86,10 +177,14 @@ function nearestCommittedNodeId(tree: GameTree, nodeId: string): string {
   return tree.rootId;
 }
 
-function persistCommittedSubtree(tree: GameTree, nodeId: string): SavedNode {
+function persistCommittedSubtree(
+  tree: GameTree,
+  nodeId: string,
+  lessons: Readonly<Record<string, SavedLesson>> | undefined,
+): SavedNode {
   const node = tree.nodes[nodeId]!;
   const children = committedChildren(tree, nodeId).map((child) =>
-    persistCommittedSubtree(tree, child.id),
+    persistCommittedSubtree(tree, child.id, lessons),
   );
   const saved: SavedNode = {};
   if (node.move?.uci) {
@@ -97,6 +192,10 @@ function persistCommittedSubtree(tree: GameTree, nodeId: string): SavedNode {
   }
   if (children.length > 0) {
     saved.children = children;
+  }
+  const lesson = lessons?.[nodeId];
+  if (lesson) {
+    saved.lesson = lesson;
   }
   return saved;
 }
@@ -131,7 +230,12 @@ function pathToNode(tree: GameTree, targetId: string): number[] | null {
 
 export function toPersistedGame(
   tree: GameTree,
-  options: { maiaElo: number; humanColor?: Color; resigned?: boolean },
+  options: {
+    maiaElo: number;
+    humanColor?: Color;
+    resigned?: boolean;
+    lessons?: Readonly<Record<string, SavedLesson>>;
+  },
 ): SavedGameV2 {
   const root = tree.nodes[tree.rootId];
   if (!root) {
@@ -146,7 +250,7 @@ export function toPersistedGame(
     version: 2,
     rootFen: root.fen,
     currentPath,
-    tree: persistCommittedSubtree(tree, tree.rootId),
+    tree: persistCommittedSubtree(tree, tree.rootId, options.lessons),
     maiaElo: options.maiaElo,
     humanColor,
   };
@@ -181,6 +285,10 @@ function parseSavedNode(value: unknown, isRoot: boolean): SavedNode | null {
   const node: SavedNode = {};
   if (uci) node.uci = uci;
   if (children && children.length > 0) node.children = children;
+  if ("lesson" in value && value.lesson !== undefined) {
+    const lesson = parseSavedLesson(value.lesson);
+    if (lesson) node.lesson = lesson;
+  }
   return node;
 }
 
@@ -254,6 +362,7 @@ export function reconstructGame(saved: SavedGameV2): ReconstructedGame | null {
   };
 
   const nodes: Record<string, GameNode> = { [rootId]: root };
+  const lessons: Record<string, SavedLesson> = {};
 
   function addChildren(
     parentId: string,
@@ -280,6 +389,9 @@ export function reconstructGame(saved: SavedGameV2): ReconstructedGame | null {
       };
       nodes[childId] = child;
       childIds.push(childId);
+      if (savedChild.lesson) {
+        lessons[childId] = savedChild.lesson;
+      }
 
       if (!addChildren(childId, savedChild.children)) {
         return false;
@@ -314,5 +426,6 @@ export function reconstructGame(saved: SavedGameV2): ReconstructedGame | null {
     maiaElo: saved.maiaElo,
     humanColor: saved.humanColor ?? DEFAULT_HUMAN_COLOR,
     resigned: saved.resigned === true,
+    lessons,
   };
 }

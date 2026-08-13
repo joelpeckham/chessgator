@@ -10,8 +10,6 @@ export type TeachingCardProps = {
   insight: TeachingInsight | null;
   analyzing?: boolean;
   onTrySuggested?: () => void;
-  onUndoHumanMove: () => void;
-  canUndoHumanMove: boolean;
   hint?: HintStep | null;
   hintDisabled?: boolean;
   onRequestHint?: () => void;
@@ -28,8 +26,6 @@ export function TeachingCard({
   insight,
   analyzing = false,
   onTrySuggested,
-  onUndoHumanMove,
-  canUndoHumanMove,
   hint = null,
   hintDisabled = false,
   onRequestHint,
@@ -120,12 +116,12 @@ export function TeachingCard({
           className="text-xs text-muted-foreground"
           data-testid="tutor-lane-hint"
         >
-          Alternate line shown on the timeline (dashed diamond).
+          Alternate line shown on the timeline as Gator&apos;s idea.
         </p>
       ) : null}
       {hintLadder}
       <div className="flex flex-wrap gap-1.5 pt-0.5">
-        {onTrySuggested && insight.suggestedMoveUci ? (
+        {onTrySuggested ? (
           <Button
             type="button"
             size="sm"
@@ -133,19 +129,9 @@ export function TeachingCard({
             onClick={onTrySuggested}
             data-testid="explore-line-button"
           >
-            Try from here
+            Try again from here
           </Button>
         ) : null}
-        <Button
-          type="button"
-          size="sm"
-          variant="secondary"
-          disabled={!canUndoHumanMove}
-          onClick={onUndoHumanMove}
-          data-testid="undo-human-move-button"
-        >
-          Undo my move
-        </Button>
       </div>
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { type CSSProperties, useState } from "react";
 import { BoardPreview } from "@/components/board/board-preview";
-import type { TimelineOverflowGroup } from "@/components/timeline/branch-graph";
+import type { SavedTryView } from "@/components/timeline/decision-types";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -15,30 +15,30 @@ import {
 import { cn } from "@/lib/utils";
 
 export type BranchPickerProps = {
-  group: TimelineOverflowGroup;
+  tries: readonly SavedTryView[];
   disabled?: boolean;
   orientation?: "white" | "black";
-  onSelectBranch: (branchKey: string, headNodeId: string) => void;
+  onSelectTry: (nodeId: string) => void;
   onPreviewNode?: (nodeId: string | null) => void;
   className?: string;
   style?: CSSProperties;
 };
 
 /**
- * Accessible overflow branch picker at a divergence point.
- * Selecting a hidden branch pins it into a variation lane.
+ * Accessible overflow picker for saved tries at a decision.
  */
 export function BranchPicker({
-  group,
+  tries,
   disabled = false,
   orientation = "white",
-  onSelectBranch,
+  onSelectTry,
   onPreviewNode,
   className,
   style,
 }: BranchPickerProps) {
   const [open, setOpen] = useState(false);
-  const count = group.hiddenBranches.length;
+  const count = tries.length;
+  if (count === 0) return null;
 
   return (
     <Popover
@@ -54,14 +54,14 @@ export function BranchPicker({
             type="button"
             disabled={disabled}
             aria-haspopup="dialog"
-            aria-label={`${count} more branches`}
-            data-testid={`overflow-${group.id}`}
+            aria-label={`${count} more tries`}
+            data-testid="saved-tries"
             data-timeline-node="true"
             data-kind="variation"
             data-overflow="true"
             className={cn(
-              "absolute flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full sm:size-7",
-              "outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              "flex size-11 items-center justify-center rounded-full bg-transparent sm:size-9",
+              "outline-none hover:bg-muted/70 focus-visible:ring-2 focus-visible:ring-ring",
               "touch-manipulation",
               className,
             )}
@@ -83,22 +83,22 @@ export function BranchPicker({
         data-testid="branch-picker"
       >
         <PopoverHeader>
-          <PopoverTitle>More branches</PopoverTitle>
+          <PopoverTitle>Saved tries</PopoverTitle>
           <PopoverDescription>
-            Choose a line to show on the timeline.
+            Choose a line you already explored.
           </PopoverDescription>
         </PopoverHeader>
         <ul className="flex max-h-64 flex-col gap-1.5 overflow-y-auto">
-          {group.hiddenBranches.map((branch) => (
-            <li key={branch.branchKey}>
+          {tries.map((branch) => (
+            <li key={branch.nodeId}>
               <Button
                 type="button"
                 variant="ghost"
                 className="h-auto w-full justify-start gap-3 px-2 py-2"
-                data-testid={`branch-picker-item-${branch.headNodeId}`}
-                onPointerEnter={() => onPreviewNode?.(branch.headNodeId)}
+                data-testid={`branch-picker-item-${branch.nodeId}`}
+                onPointerEnter={() => onPreviewNode?.(branch.nodeId)}
                 onClick={() => {
-                  onSelectBranch(branch.branchKey, branch.headNodeId);
+                  onSelectTry(branch.nodeId);
                   setOpen(false);
                 }}
               >

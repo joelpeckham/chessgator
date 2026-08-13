@@ -34,12 +34,20 @@ test.describe("accessibility + responsive smoke", () => {
     await expect(page.getByTestId("timeline-status")).toContainText(
       /Reviewing|start/i,
     );
+    await expect(page.getByTestId("timeline-live")).toBeVisible();
     await expect(page.getByTestId("board-preview-veil")).toHaveAttribute(
       "aria-hidden",
       "true",
     );
     await page.keyboard.press("End");
     await expect(page.getByTestId("timeline-status")).toContainText(/Live/i);
+    const selected = page
+      .locator('[data-testid="move-timeline"] [aria-selected="true"]')
+      .first();
+    await expect(selected).toBeVisible();
+    const selectedId = await selected.evaluate((el) => el.id);
+    expect(selectedId).toMatch(/^timeline-node-/);
+    await expect(timeline).toHaveAttribute("aria-activedescendant", selectedId);
 
     // Single listbox tab stop — option nodes are not separately tabbable.
     const optionTabIndexes = await page

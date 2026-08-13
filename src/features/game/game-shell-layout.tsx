@@ -93,21 +93,32 @@ export function GameShellLayout({
         }
         footer={
           <MoveTimeline
-            tree={view.timeline.tree}
             graph={view.timeline.graph}
-            reviewNodeId={view.timeline.reviewNodeId}
-            previewNodeId={view.timeline.previewNodeId}
+            focusedNodeId={view.timeline.focusedNodeId}
+            startNodeId={view.timeline.startNodeId}
+            liveNodeId={view.timeline.liveNodeId}
+            mode={view.timeline.mode}
+            statusText={view.timeline.statusText}
+            canGoPrev={view.timeline.canGoPrev}
+            canGoNext={view.timeline.canGoNext}
+            prevNodeId={view.timeline.prevNodeId}
+            nextNodeId={view.timeline.nextNodeId}
+            canPracticeUndo={view.timeline.canPracticeUndo}
+            canPracticeRedo={view.timeline.canPracticeRedo}
+            canCommitPractice={view.timeline.canCommitPractice}
+            canTakeBackLive={view.timeline.canTakeBackLive}
             disabled={view.timeline.disabled}
-            compact={view.timeline.compact}
             orientation={view.timeline.orientation}
-            expandedOverflowKeys={view.timeline.expandedOverflowKeys}
-            onExpandedOverflowChange={(keys) =>
-              ui.setExpandedOverflowKeys([...keys])
-            }
+            onSelectDecision={ui.handleSelectDecision}
             onSelectNode={ui.handleSelectTimelineNode}
             onPreviewNode={ui.setPreviewNodeId}
             onReturnLive={ui.handleReturnLive}
             onOpenCoach={ui.handleOpenCoach}
+            onPracticeUndo={ui.handlePracticeUndo}
+            onPracticeRedo={ui.handlePracticeRedo}
+            onCommitPractice={ui.handleCommitPractice}
+            onCancelPractice={ui.handleCancelPractice}
+            onTakeBackLive={ui.handleUndoHumanMove}
             className="rounded-none border-0 bg-transparent shadow-none ring-0"
           />
         }
@@ -122,12 +133,15 @@ export function GameShellLayout({
           <div
             className={
               view.mascotBelow
-                ? "order-2 flex shrink-0 items-end pl-6 pr-3 pb-3 pt-1"
+                ? "order-2 flex min-h-0 shrink-0 items-end overflow-visible pl-6 pr-3 pb-3 pt-1"
                 : "absolute bottom-0 left-0 z-20 flex flex-col justify-end pl-6 pr-5 pb-3 pt-2"
             }
             style={
               view.mascotBelow
-                ? { height: MASCOT_DOCK_HEIGHT_PX }
+                ? {
+                    height: MASCOT_DOCK_HEIGHT_PX,
+                    maxHeight: MASCOT_DOCK_HEIGHT_PX,
+                  }
                 : { width: MASCOT_DOCK_WIDTH_PX }
             }
           >
@@ -136,8 +150,6 @@ export function GameShellLayout({
               onExpandedChange={ui.handleCoachExpandedChange}
               insight={view.coach.insight}
               analyzing={view.coach.analyzing}
-              canUndoHumanMove={view.coach.canUndoHumanMove}
-              onUndoHumanMove={ui.handleUndoHumanMove}
               onTrySuggested={
                 view.coach.showTrySuggested ? ui.handleTrySuggested : undefined
               }
@@ -157,7 +169,7 @@ export function GameShellLayout({
           <div
             className={
               view.mascotBelow
-                ? "flex min-h-0 min-w-0 flex-1 items-center justify-center px-4 pt-3"
+                ? "flex min-h-0 min-w-0 flex-1 items-start justify-center px-4 pt-3"
                 : "absolute"
             }
             style={
@@ -202,7 +214,9 @@ export function GameShellLayout({
                 onPromotionNeeded={(from, to) => ui.setPromotion({ from, to })}
                 className="h-full w-full"
               />
-              <BoardPreviewVeil active={view.isViewingNonLive} />
+              <BoardPreviewVeil
+                active={view.isViewingNonLive || view.isBoardPreview}
+              />
             </div>
           </div>
         </div>

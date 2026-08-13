@@ -185,4 +185,55 @@ describe("persistence schema v2", () => {
     expect(await repo.load()).toBeNull();
     expect(storage.getItem("chessgator:game:v1")).toBeNull();
   });
+
+  it("round-trips compact lessons onto reconstructed node ids", () => {
+    let tree = createInitialTree();
+    tree = play(tree, "d2d4");
+    const d4Id = tree.currentNodeId;
+    const persisted = toPersistedGame(tree, {
+      maiaElo: 1500,
+      lessons: {
+        [d4Id]: {
+          classification: "mistake",
+          concept: "missed_improvement",
+          confidence: 0.8,
+          explanation: "d4 is a mistake because e4 claims more of the center.",
+          suggestedMoveUci: "e2e4",
+          suggestedMoveSan: "e4",
+          lineUci: ["e2e4"],
+          refutationUci: [],
+          quip: "There's better.",
+          nudge: true,
+        },
+      },
+    });
+    expect(persisted.tree.children?.[0]?.lesson?.suggestedMoveSan).toBe("e4");
+
+    const restored = reconstructGame(persisted)!;
+    const newId = restored.tree.currentNodeId;
+    expect(newId).not.toBe(d4Id);
+    expect(restored.lessons[newId]?.suggestedMoveSan).toBe("e4");
+  });
+
+  it("drops invalid lessons without failing the snapshot", () => {
+    const tree = play(createInitialTree(), "e2e4");
+    const persisted = toPersistedGame(tree, { maiaElo: 1500 });
+    persisted.tree.children![0]!.lesson = {
+      classification: "not-a-class" as never,
+      concept: "missed_improvement",
+      confidence: 0.8,
+      explanation: "nope",
+      suggestedMoveUci: null,
+      suggestedMoveSan: null,
+      lineUci: [],
+      refutationUci: [],
+      quip: "",
+      nudge: false,
+    };
+    const parsed = parseSavedGame(JSON.parse(JSON.stringify(persisted)));
+    expect(parsed).not.toBeNull();
+    expect(parsed!.tree.children?.[0]?.lesson).toBeUndefined();
+    const restored = reconstructGame(parsed!)!;
+    expect(Object.keys(restored.lessons)).toEqual([]);
+  });
 });

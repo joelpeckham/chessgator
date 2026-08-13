@@ -98,10 +98,16 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
     // Opponent replies, then undo White's move and retry.
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
-      "playerTurn",
+      /playerTurn|reviewing/,
       { timeout: 10_000 },
     );
 
+    await expandCoach(page);
+    await page.getByTestId("explore-line-button").click();
+    await expect(page.getByTestId("status-badge")).toHaveAttribute(
+      "data-mode",
+      "practicing",
+    );
     await page.getByTestId("undo-human-move-button").click();
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",

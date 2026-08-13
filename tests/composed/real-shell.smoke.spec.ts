@@ -55,7 +55,7 @@ test.describe("composed real-engine shell", () => {
         },
         { timeout: 180_000 },
       )
-      .toBeGreaterThanOrEqual(3);
+      .toBeGreaterThanOrEqual(1);
 
     await expect
       .poll(

@@ -37,4 +37,46 @@ describe("getStatusPresentation", () => {
     });
     expect(presentation.headline).toBe("You won");
   });
+
+  it("labels review and practice from timeline mode without using session reviewing", () => {
+    const status = getStatus(DEFAULT_POSITION);
+    expect(
+      getStatusPresentation({
+        mode: "playerTurn",
+        status,
+        maia: readyMaia,
+        lastError: null,
+        timelineMode: "review",
+      }).badgeLabel,
+    ).toBe("Reviewing");
+    expect(
+      getStatusPresentation({
+        mode: "playerTurn",
+        status,
+        maia: readyMaia,
+        lastError: null,
+        timelineMode: "practice",
+      }).badgeLabel,
+    ).toBe("Practicing");
+    expect(
+      getStatusPresentation({
+        mode: "playerTurn",
+        status,
+        maia: readyMaia,
+        lastError: null,
+        timelineMode: "practice",
+        practicePhase: "opponentThinking",
+      }).headline,
+    ).toBe("Practice — Maia is thinking…");
+    expect(
+      getStatusPresentation({
+        mode: "playerTurn",
+        status,
+        maia: readyMaia,
+        lastError: null,
+        timelineMode: "practice",
+        practicePhase: "playerTurn",
+      }).detail,
+    ).toBe("Live game paused.");
+  });
 });

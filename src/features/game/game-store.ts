@@ -20,6 +20,11 @@ import {
   sessionModeForTurn,
   takebackOne,
 } from "@/domain/game";
+import type { TeachingInsight } from "@/domain/teaching";
+import {
+  lessonsFromSaved,
+  lessonsToSaved,
+} from "@/features/game/learning-moments";
 import {
   createLocalStorageGameRepository,
   type GameRepository,
@@ -38,6 +43,8 @@ export type GameStoreState = {
   /** Side the human is playing in the active game. */
   humanColor: Color;
   preferences: GameStorePreferences;
+  /** Coaching insights keyed by the analyzed human-move node id. */
+  lessons: Readonly<Record<string, TeachingInsight>>;
   hydrated: boolean;
   /** True when a persisted snapshot was loaded (tree may be resumed). */
   resumed: boolean;
@@ -55,6 +62,7 @@ export type GameStoreState = {
   resign: () => boolean;
   setMode: (mode: SessionMode, errorMessage?: string | null) => boolean;
   setMaiaElo: (elo: number) => void;
+  setLesson: (nodeId: string, insight: TeachingInsight) => void;
 
   hydrate: (repository?: GameRepository) => Promise<boolean>;
   persist: (repository?: GameRepository) => Promise<void>;
@@ -104,6 +112,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   session: initial.session,
   humanColor: DEFAULT_HUMAN_COLOR,
   preferences: defaultPreferences,
+  lessons: {},
   hydrated: false,
   resumed: false,
   lastError: null,
@@ -119,6 +128,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       lastError: null,
       hydrated: true,
       resumed: false,
+      lessons: {},
     });
   },
 
@@ -243,6 +253,15 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     });
   },
 
+  setLesson: (nodeId, insight) => {
+    set({
+      lessons: {
+        ...get().lessons,
+        [nodeId]: insight,
+      },
+    });
+  },
+
   hydrate: async (repository = defaultRepository()) => {
     try {
       const loaded = await repository.load();
@@ -277,6 +296,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         preferences: {
           maiaElo: reconstructed.maiaElo,
         },
+        lessons: lessonsFromSaved(reconstructed.lessons),
       });
       return true;
     } catch {
@@ -295,6 +315,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       maiaElo: state.preferences.maiaElo,
       humanColor: state.humanColor,
       resigned: state.session.terminalReason === "resignation",
+      lessons: lessonsToSaved(state.lessons),
     });
     await repository.save(snapshot);
   },

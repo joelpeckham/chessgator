@@ -33,8 +33,6 @@ export type CoachMascotProps = {
   onExpandedChange: (expanded: boolean) => void;
   insight: TeachingInsight | null;
   analyzing: boolean;
-  canUndoHumanMove: boolean;
-  onUndoHumanMove: () => void;
   onTrySuggested?: () => void;
   onDismiss: () => void;
   hint: HintStep | null;
@@ -99,8 +97,6 @@ export function CoachMascot({
   onExpandedChange,
   insight,
   analyzing,
-  canUndoHumanMove,
-  onUndoHumanMove,
   onTrySuggested,
   onDismiss,
   hint,
@@ -217,8 +213,6 @@ export function CoachMascot({
             <TeachingCard
               insight={insight}
               analyzing={analyzing}
-              canUndoHumanMove={canUndoHumanMove}
-              onUndoHumanMove={onUndoHumanMove}
               onTrySuggested={onTrySuggested}
               hint={hint}
               hintDisabled={hintDisabled}

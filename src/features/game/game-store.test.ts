@@ -135,4 +135,34 @@ describe("game store adapter", () => {
     useGameStore.getState().resumePlay();
     expect(useGameStore.getState().session.mode).toBe("playerTurn");
   });
+
+  it("persists lessons keyed by reconstructed node ids", async () => {
+    const storage = memoryStorage();
+    const repo = createLocalStorageGameRepository({ storage });
+
+    useGameStore.getState().startGame();
+    useGameStore.getState().playMove("d2d4");
+    const oldId = useGameStore.getState().tree.currentNodeId;
+    useGameStore.getState().setLesson(oldId, {
+      concept: "missed_improvement",
+      confidence: 0.8,
+      explanation: "d4 is a mistake because e4 claims more of the center.",
+      suggestedMoveUci: "e2e4",
+      suggestedMoveSan: "e4",
+      lineUci: ["e2e4"],
+      refutationUci: [],
+      classification: "mistake",
+      quip: "There's better.",
+      nudge: true,
+    });
+    await useGameStore.getState().persist(repo);
+
+    useGameStore.setState({ ...useGameStore.getInitialState() });
+    expect(await useGameStore.getState().hydrate(repo)).toBe(true);
+    const restoredId = useGameStore.getState().tree.currentNodeId;
+    expect(restoredId).not.toBe(oldId);
+    expect(useGameStore.getState().lessons[restoredId]?.suggestedMoveSan).toBe(
+      "e4",
+    );
+  });
 });

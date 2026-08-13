@@ -19,6 +19,7 @@ export function GameShell(props: GameRuntimeOptions = {}) {
   const session = useGameStore((s) => s.session);
   const humanColor = useGameStore((s) => s.humanColor);
   const preferences = useGameStore((s) => s.preferences);
+  const lessons = useGameStore((s) => s.lessons);
   const hydrated = useGameStore((s) => s.hydrated);
   const resumed = useGameStore((s) => s.resumed);
   const lastError = useGameStore((s) => s.lastError);
@@ -32,6 +33,7 @@ export function GameShell(props: GameRuntimeOptions = {}) {
     session,
     humanColor,
     preferences,
+    lessons,
     hydrated,
     resumed,
     lastError,

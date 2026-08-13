@@ -17,7 +17,7 @@ describe("computeViewportLayout", () => {
 
   it("shrinks the board beside the mascot once width is the constraint", () => {
     const wide = computeViewportLayout(900, 800);
-    const squeezed = computeViewportLayout(580, 800);
+    const squeezed = computeViewportLayout(600, 800);
     expect(wide.mascotBelow).toBe(false);
     expect(squeezed.mascotBelow).toBe(false);
     expect(squeezed.boardSize).toBeLessThan(wide.boardSize);

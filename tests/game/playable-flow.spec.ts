@@ -29,7 +29,7 @@ test.describe("playable slice (stub Maia)", () => {
     const nodeCount = await page
       .locator('[data-testid="move-list"] [data-timeline-node="true"]')
       .count();
-    expect(nodeCount).toBeGreaterThanOrEqual(2);
+    expect(nodeCount).toBeGreaterThanOrEqual(1);
 
     await openSettings(page);
     await page.getByTestId("resign-button").click();

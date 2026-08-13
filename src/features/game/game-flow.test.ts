@@ -3,6 +3,8 @@ import type { MoveAnalysisEvidence } from "@/domain/analysis";
 import {
   createInitialTree,
   createVariationExplorer,
+  DEFAULT_POSITION,
+  getCurrentNode,
   getMoveHistory,
   getNode,
   playMoveOnTree,
@@ -10,13 +12,19 @@ import {
 } from "@/domain/game";
 import type { GameTree } from "@/domain/game/types";
 import type { TeachingInsight } from "@/domain/teaching";
+import { createCoachingController } from "@/features/game/coaching-controller";
 import {
+  buildTutorLine,
+  commitPracticeMove,
   commitTryInstead,
+  firstHumanUciFromDraft,
   requestOpponentMove,
+  runPostMoveCoaching,
   trySuggestedMove,
   undoHumanMove,
 } from "@/features/game/game-flow";
 import { useGameStore } from "@/features/game/game-store";
+import { createStubAnalysisEngine } from "@/features/game/stub-analysis";
 import { createStubMaiaSession } from "@/features/game/stub-maia";
 
 function play(tree: GameTree, uci: string): GameTree {
@@ -157,6 +165,134 @@ describe("trySuggestedMove", () => {
   });
 });
 
+describe("commitPracticeMove", () => {
+  beforeEach(() => {
+    useGameStore.setState({
+      ...useGameStore.getInitialState(),
+    });
+  });
+
+  it("commits the first draft ply and keeps the abandoned live line", () => {
+    useGameStore.getState().startGame();
+    let tree = useGameStore.getState().tree;
+    tree = play(tree, "d2d4");
+    const d4Id = tree.currentNodeId;
+    tree = play(tree, "d7d5");
+    useGameStore.setState({ tree });
+
+    const result = commitPracticeMove({
+      liveTree: tree,
+      originNodeId: tree.rootId,
+      commitUci: "e2e4",
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.needsOpponent).toBe(true);
+    expect(result.tree.nodes[result.tree.currentNodeId]?.move?.uci).toBe(
+      "e2e4",
+    );
+    const origin = getNode(result.tree, result.tree.rootId);
+    expect(origin?.childIds).toContain(d4Id);
+    expect(origin?.childIds[0]).toBe(result.tree.currentNodeId);
+    expect(result.tree.nodes[d4Id]?.move?.uci).toBe("d2d4");
+  });
+
+  it("promotes only the first practiced human ply from a longer draft", () => {
+    let draft = createInitialTree();
+    draft = play(draft, "e2e4");
+    draft = play(draft, "e7e5");
+    draft = play(draft, "d2d4");
+    expect(
+      firstHumanUciFromDraft({
+        draft,
+        originId: draft.rootId,
+        humanColor: "w",
+      }),
+    ).toBe("e2e4");
+  });
+});
+
+describe("buildTutorLine", () => {
+  it("projects from the analyzed human node's parent, not a tutor origin", () => {
+    let tree = createInitialTree();
+    tree = play(tree, "d2d4");
+    const analyzedId = tree.currentNodeId;
+    tree = play(tree, "d7d5");
+
+    const line = buildTutorLine(
+      tree,
+      {
+        concept: "missed_improvement",
+        confidence: 0.8,
+        explanation: "e4 is better because it claims the center.",
+        suggestedMoveUci: "e2e4",
+        suggestedMoveSan: "e4",
+        lineUci: ["e2e4", "e7e5"],
+        refutationUci: [],
+        classification: "mistake",
+        quip: "There's better.",
+        nudge: true,
+      },
+      analyzedId,
+    );
+    expect(line).not.toBeNull();
+    expect(line!.rootNodeId).toBe(tree.rootId);
+    expect(line!.kind).toBe("tutor");
+    expect(line!.plies[0]?.san).toBe("e4");
+  });
+});
+
+describe("runPostMoveCoaching", () => {
+  beforeEach(() => {
+    useGameStore.setState({
+      ...useGameStore.getInitialState(),
+    });
+  });
+
+  it("does not leave analyzing when the flow was superseded", async () => {
+    useGameStore.getState().startGame();
+    useGameStore.getState().playMove("e2e4", { afterMode: "analyzing" });
+    const node = getCurrentNode(useGameStore.getState().tree);
+    expect(node.move).toBeDefined();
+    const coach = createCoachingController({
+      createEngine: () => createStubAnalysisEngine({ delayMs: 10 }),
+    });
+    await coach.start();
+    await runPostMoveCoaching({
+      coach,
+      fenBefore: DEFAULT_POSITION,
+      gameNodeId: node.id,
+      playedMove: node.move!,
+      coachUnavailable: null,
+      requestId: "coach-stale",
+      isCurrent: () => false,
+    });
+    expect(useGameStore.getState().session.mode).toBe("analyzing");
+    await coach.dispose();
+  });
+
+  it("moves to opponentThinking when analysis still owns the node", async () => {
+    useGameStore.getState().startGame();
+    useGameStore.getState().playMove("e2e4", { afterMode: "analyzing" });
+    const node = getCurrentNode(useGameStore.getState().tree);
+    expect(node.move).toBeDefined();
+    const coach = createCoachingController({
+      createEngine: () => createStubAnalysisEngine({ delayMs: 10 }),
+    });
+    await coach.start();
+    await runPostMoveCoaching({
+      coach,
+      fenBefore: DEFAULT_POSITION,
+      gameNodeId: node.id,
+      playedMove: node.move!,
+      coachUnavailable: null,
+      requestId: "coach-ok",
+    });
+    expect(useGameStore.getState().session.mode).toBe("opponentThinking");
+    await coach.dispose();
+  });
+});
+
 describe("requestOpponentMove", () => {
   beforeEach(() => {
     useGameStore.setState({
@@ -205,6 +341,30 @@ describe("requestOpponentMove", () => {
         useGameStore.getState().tree.currentNodeId,
       ).map((m) => m.uci),
     ).toEqual(["e2e4", "e7e5"]);
+    await maia.dispose();
+  });
+
+  it("does not apply a move after the target is superseded", async () => {
+    useGameStore.getState().startGame();
+    useGameStore.getState().playMove("e2e4");
+    const maia = createStubMaiaSession({ scriptedMoves: ["e7e5"] });
+    await maia.start();
+    let checks = 0;
+    await requestOpponentMove({
+      maia,
+      requestId: "opp-stale-target",
+      isCurrent: () => {
+        checks += 1;
+        return checks === 1;
+      },
+    });
+    expect(
+      getMoveHistory(
+        useGameStore.getState().tree,
+        useGameStore.getState().tree.currentNodeId,
+      ).map((m) => m.uci),
+    ).toEqual(["e2e4"]);
+    expect(useGameStore.getState().session.mode).toBe("opponentThinking");
     await maia.dispose();
   });
 

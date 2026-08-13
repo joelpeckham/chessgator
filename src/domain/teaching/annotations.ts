@@ -19,7 +19,7 @@ export const EMPTY_BOARD_ANNOTATIONS: SemanticBoardAnnotation = {
 /** Derive board marks from the current insight and hint ladder. */
 export function annotationsFromInsight(
   insight: TeachingInsight | null,
-  evidence: MoveAnalysisEvidence | null,
+  _evidence: MoveAnalysisEvidence | null,
   hint: HintStep | null,
 ): SemanticBoardAnnotation {
   const highlightSquares = new Set<string>();
@@ -51,7 +51,7 @@ export function annotationsFromInsight(
     }
   }
 
-  if (insight?.suggestedMoveUci && evidence) {
+  if (insight?.suggestedMoveUci) {
     const uci = insight.suggestedMoveUci;
     if (uci.length >= 4) {
       arrows.push({

@@ -43,6 +43,7 @@ export function useGameRuntime(options: GameRuntimeOptions = {}): GameRuntime {
   const mode = useGameStore((s) => s.session.mode);
   const terminalReason = useGameStore((s) => s.session.terminalReason);
   const maiaElo = useGameStore((s) => s.preferences.maiaElo);
+  const lessons = useGameStore((s) => s.lessons);
   const humanColor = useGameStore((s) => s.humanColor);
   const hydrate = useGameStore((s) => s.hydrate);
   const persist = useGameStore((s) => s.persist);
@@ -98,7 +99,16 @@ export function useGameRuntime(options: GameRuntimeOptions = {}): GameRuntime {
     return () => {
       if (persistTimer.current) clearTimeout(persistTimer.current);
     };
-  }, [hydrated, tree, mode, terminalReason, maiaElo, humanColor, persist]);
+  }, [
+    hydrated,
+    tree,
+    mode,
+    terminalReason,
+    maiaElo,
+    humanColor,
+    lessons,
+    persist,
+  ]);
 
   useEffect(() => {
     return () => {
