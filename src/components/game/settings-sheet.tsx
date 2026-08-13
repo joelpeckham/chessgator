@@ -19,7 +19,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Spinner } from "@/components/ui/spinner";
-import type { GameMove } from "@/domain/game";
+import type { Color, GameMove } from "@/domain/game";
 
 export type SettingsEngineStatus = {
   message: string | null;
@@ -40,6 +40,8 @@ export type SettingsSheetProps = {
   engine: SettingsEngineStatus;
   canResign: boolean;
   canRestart: boolean;
+  pendingHumanColor: Color;
+  onPendingHumanColorChange: (color: Color) => void;
   onResign: () => void;
   onRestart: () => void;
 };
@@ -55,6 +57,8 @@ export function SettingsSheet({
   engine,
   canResign,
   canRestart,
+  pendingHumanColor,
+  onPendingHumanColorChange,
   onResign,
   onRestart,
 }: SettingsSheetProps) {
@@ -74,6 +78,32 @@ export function SettingsSheet({
 
         <div className="flex flex-1 flex-col gap-6 overflow-y-auto p-4">
           <section className="flex flex-col gap-2" data-testid="game-controls">
+            <label
+              htmlFor="play-as"
+              className="text-xs font-medium text-muted-foreground"
+            >
+              Play as
+            </label>
+            <Select
+              value={pendingHumanColor}
+              onValueChange={(value) => {
+                if (value === "w" || value === "b") {
+                  onPendingHumanColorChange(value);
+                }
+              }}
+              disabled={engine.starting}
+            >
+              <SelectTrigger id="play-as" data-testid="play-as-select">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="w">White</SelectItem>
+                <SelectItem value="b">Black</SelectItem>
+              </SelectContent>
+            </Select>
+          </section>
+
+          <section className="flex flex-col gap-2">
             <label
               htmlFor="maia-elo"
               className="text-xs font-medium text-muted-foreground"

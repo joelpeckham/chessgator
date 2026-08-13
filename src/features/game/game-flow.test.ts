@@ -14,6 +14,7 @@ import {
   commitTryInstead,
   requestOpponentMove,
   trySuggestedMove,
+  undoHumanMove,
 } from "@/features/game/game-flow";
 import { useGameStore } from "@/features/game/game-store";
 import { createStubMaiaSession } from "@/features/game/stub-maia";
@@ -113,6 +114,47 @@ describe("trySuggestedMove", () => {
       "g1f3",
     );
   });
+
+  it("reports opponent-to-move after a Black try-instead", () => {
+    useGameStore.setState({
+      ...useGameStore.getInitialState(),
+    });
+    useGameStore.getState().startGame({ humanColor: "b" });
+    let tree = useGameStore.getState().tree;
+    tree = play(tree, "e2e4");
+    tree = play(tree, "e7e5");
+    const playedNode = getNode(tree, tree.currentNodeId);
+    expect(playedNode?.move).toBeDefined();
+    if (!playedNode?.move) return;
+
+    useGameStore.setState({ tree, humanColor: "b" });
+    const result = trySuggestedMove({
+      tree,
+      insight: {
+        concept: "missed_improvement",
+        confidence: 0.8,
+        explanation: "Strike the center.",
+        suggestedMoveUci: "d7d5",
+        suggestedMoveSan: "d5",
+        lineUci: ["d7d5", "e4d5"],
+        refutationUci: [],
+        classification: "inaccuracy",
+        quip: "There's better.",
+        nudge: false,
+      } satisfies TeachingInsight,
+      evidence: {
+        gameNodeId: tree.currentNodeId,
+        playedMove: playedNode.move,
+      } as MoveAnalysisEvidence,
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.needsOpponent).toBe(true);
+    expect(result.mode).toBe("opponentThinking");
+    expect(result.tree.nodes[result.tree.currentNodeId]?.move?.uci).toBe(
+      "d7d5",
+    );
+  });
 });
 
 describe("requestOpponentMove", () => {
@@ -173,5 +215,70 @@ describe("requestOpponentMove", () => {
     await requestOpponentMove({ maia, requestId: "opp-fail" });
     expect(useGameStore.getState().session.mode).toBe("error");
     await maia.dispose();
+  });
+
+  it("plays Maia's opening move when the human is Black", async () => {
+    useGameStore.getState().startGame({ humanColor: "b" });
+    const maia = createStubMaiaSession({
+      scriptedMoves: ["e2e4"],
+    });
+    await maia.start();
+    await requestOpponentMove({ maia, requestId: "opp-black-open" });
+    expect(useGameStore.getState().session.mode).toBe("playerTurn");
+    expect(
+      getMoveHistory(
+        useGameStore.getState().tree,
+        useGameStore.getState().tree.currentNodeId,
+      ).map((m) => m.uci),
+    ).toEqual(["e2e4"]);
+    await maia.dispose();
+  });
+});
+
+describe("undoHumanMove", () => {
+  beforeEach(() => {
+    useGameStore.setState({
+      ...useGameStore.getInitialState(),
+    });
+  });
+
+  it("takes back the human ply and the opponent reply", () => {
+    useGameStore.getState().startGame();
+    useGameStore.getState().playMove("e2e4");
+    useGameStore.getState().playMove("e7e5");
+    undoHumanMove();
+    expect(
+      getMoveHistory(
+        useGameStore.getState().tree,
+        useGameStore.getState().tree.currentNodeId,
+      ),
+    ).toEqual([]);
+    expect(useGameStore.getState().session.mode).toBe("playerTurn");
+  });
+
+  it("does not take back Maia's opening when the human has not moved", () => {
+    useGameStore.getState().startGame({ humanColor: "b" });
+    useGameStore.getState().playMove("e2e4");
+    undoHumanMove();
+    expect(
+      getMoveHistory(
+        useGameStore.getState().tree,
+        useGameStore.getState().tree.currentNodeId,
+      ).map((m) => m.uci),
+    ).toEqual(["e2e4"]);
+  });
+
+  it("takes back only the Black human ply when it is last", () => {
+    useGameStore.getState().startGame({ humanColor: "b" });
+    useGameStore.getState().playMove("e2e4");
+    useGameStore.getState().playMove("e7e5");
+    undoHumanMove();
+    expect(
+      getMoveHistory(
+        useGameStore.getState().tree,
+        useGameStore.getState().tree.currentNodeId,
+      ).map((m) => m.uci),
+    ).toEqual(["e2e4"]);
+    expect(useGameStore.getState().session.mode).toBe("playerTurn");
   });
 });

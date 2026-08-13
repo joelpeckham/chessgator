@@ -43,6 +43,7 @@ export function useGameRuntime(options: GameRuntimeOptions = {}): GameRuntime {
   const mode = useGameStore((s) => s.session.mode);
   const terminalReason = useGameStore((s) => s.session.terminalReason);
   const maiaElo = useGameStore((s) => s.preferences.maiaElo);
+  const humanColor = useGameStore((s) => s.humanColor);
   const hydrate = useGameStore((s) => s.hydrate);
   const persist = useGameStore((s) => s.persist);
   const setMode = useGameStore((s) => s.setMode);
@@ -97,7 +98,7 @@ export function useGameRuntime(options: GameRuntimeOptions = {}): GameRuntime {
     return () => {
       if (persistTimer.current) clearTimeout(persistTimer.current);
     };
-  }, [hydrated, tree, mode, terminalReason, maiaElo, persist]);
+  }, [hydrated, tree, mode, terminalReason, maiaElo, humanColor, persist]);
 
   useEffect(() => {
     return () => {
@@ -121,7 +122,7 @@ export function useGameRuntime(options: GameRuntimeOptions = {}): GameRuntime {
     const tipId = tree.currentNodeId;
     const tip = getNode(tree, tipId);
     if (!tip) return;
-    if (!isHumanTurn(getTurn(tip.fen))) {
+    if (!isHumanTurn(getTurn(tip.fen), humanColor)) {
       coach.clearFuture();
       return;
     }
@@ -129,7 +130,7 @@ export function useGameRuntime(options: GameRuntimeOptions = {}): GameRuntime {
       fen: tip.fen,
       gameNodeId: tipId,
     });
-  }, [hydrated, tree, mode, coach]);
+  }, [hydrated, tree, mode, coach, humanColor]);
 
   async function retryEngines(): Promise<void> {
     await maiaSession.dispose();

@@ -10,7 +10,6 @@ import {
   getNode,
   getStatusAtNode,
   isHumanTurn,
-  OPPONENT_COLOR,
   type PieceSymbol,
   type SessionMode,
   sessionModeForTurn,
@@ -230,15 +229,16 @@ export function trySuggestedMove(args: {
     return { ok: false, message: "Could not play that try-instead move" };
   }
 
+  const humanColor = useGameStore.getState().humanColor;
   const status = getStatusAtNode(played.tree, played.tree.currentNodeId);
   const mode: SessionMode = status.isGameOver
     ? "gameOver"
-    : sessionModeForTurn(status.turn);
+    : sessionModeForTurn(status.turn, humanColor);
   return {
     ok: true,
     tree: played.tree,
     mode,
-    needsOpponent: !status.isGameOver && !isHumanTurn(status.turn),
+    needsOpponent: !status.isGameOver && !isHumanTurn(status.turn, humanColor),
     message: `Trying ${played.node.move?.san ?? "alternate"} instead — prior line kept as a branch`,
   };
 }
@@ -246,9 +246,16 @@ export function trySuggestedMove(args: {
 export function undoHumanMove(): void {
   const store = useGameStore.getState();
   const history = getMoveHistory(store.tree, store.tree.currentNodeId);
-  const last = history[history.length - 1];
-  if (last?.color === OPPONENT_COLOR) {
+  let lastHumanIndex = -1;
+  for (let i = history.length - 1; i >= 0; i -= 1) {
+    if (history[i]?.color === store.humanColor) {
+      lastHumanIndex = i;
+      break;
+    }
+  }
+  if (lastHumanIndex < 0) return;
+  const pliesToUndo = history.length - lastHumanIndex;
+  for (let i = 0; i < pliesToUndo; i += 1) {
     store.retryMove();
   }
-  store.retryMove();
 }

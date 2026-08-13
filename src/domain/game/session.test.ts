@@ -6,12 +6,13 @@ import {
   playMoveOnTree,
   sessionModeForTurn,
 } from "@/domain/game";
-import { HUMAN_COLOR, OPPONENT_COLOR } from "@/domain/game/types";
 
 describe("session policy", () => {
   it("maps the human side to playerTurn and the opponent to opponentThinking", () => {
-    expect(sessionModeForTurn(HUMAN_COLOR)).toBe("playerTurn");
-    expect(sessionModeForTurn(OPPONENT_COLOR)).toBe("opponentThinking");
+    expect(sessionModeForTurn("w", "w")).toBe("playerTurn");
+    expect(sessionModeForTurn("b", "w")).toBe("opponentThinking");
+    expect(sessionModeForTurn("b", "b")).toBe("playerTurn");
+    expect(sessionModeForTurn("w", "b")).toBe("opponentThinking");
   });
 
   it("normalizes transient modes on resume", () => {

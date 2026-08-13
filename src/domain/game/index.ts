@@ -63,9 +63,9 @@ export type {
 } from "@/domain/game/types";
 export {
   createSessionState,
-  HUMAN_COLOR,
+  DEFAULT_HUMAN_COLOR,
   isHumanTurn,
-  OPPONENT_COLOR,
+  opponentColor,
 } from "@/domain/game/types";
 export type { VariationExplorerState } from "@/domain/game/variation";
 export {

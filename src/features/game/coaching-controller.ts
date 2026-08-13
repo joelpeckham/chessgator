@@ -74,7 +74,7 @@ export type CoachingController = {
     gameNodeId: string;
     movetimeMs?: number;
   }) => Promise<ProjectedLine | null>;
-  /** Clear the engine future line (e.g. while it is Black's turn). */
+  /** Clear the engine future line (e.g. while it is the opponent's turn). */
   clearFuture: () => void;
   getCachedInsight: (gameNodeId: string) => TeachingInsight | null;
   dismissInsight: () => void;
@@ -82,7 +82,7 @@ export type CoachingController = {
   escalateHint: (input: {
     fen: string;
     gameNodeId: string;
-    sideToMove?: "w" | "b";
+    sideToMove: "w" | "b";
   }) => Promise<HintStep | null>;
   resetHints: () => void;
   clearFeedback: () => void;
@@ -465,7 +465,7 @@ export function createCoachingController(
 
       const built = buildHintStep({
         fen: input.fen,
-        sideToMove: input.sideToMove ?? "w",
+        sideToMove: input.sideToMove,
         positionAnalysis,
         level: nextLevel,
       });

@@ -1,6 +1,11 @@
 import { createNodeId } from "@/domain/game/id";
 import { isValidFen, tryApplyMove } from "@/domain/game/rules";
-import type { GameNode, GameTree } from "@/domain/game/types";
+import {
+  type Color,
+  DEFAULT_HUMAN_COLOR,
+  type GameNode,
+  type GameTree,
+} from "@/domain/game/types";
 
 export const GAME_SCHEMA_VERSION = 2 as const;
 export const GAME_STORAGE_KEY = "chessgator:game:v2";
@@ -20,6 +25,8 @@ export type SavedGameV2 = {
   currentPath: number[];
   tree: SavedNode;
   maiaElo: number;
+  /** Absent on pre-color snapshots; treated as White. */
+  humanColor?: Color;
   resigned?: true;
 };
 
@@ -28,6 +35,7 @@ export type PersistedGame = SavedGameV2;
 export type ReconstructedGame = {
   tree: GameTree;
   maiaElo: number;
+  humanColor: Color;
   resigned: boolean;
 };
 
@@ -123,7 +131,7 @@ function pathToNode(tree: GameTree, targetId: string): number[] | null {
 
 export function toPersistedGame(
   tree: GameTree,
-  options: { maiaElo: number; resigned?: boolean },
+  options: { maiaElo: number; humanColor?: Color; resigned?: boolean },
 ): SavedGameV2 {
   const root = tree.nodes[tree.rootId];
   if (!root) {
@@ -132,6 +140,7 @@ export function toPersistedGame(
 
   const targetId = nearestCommittedNodeId(tree, tree.currentNodeId);
   const currentPath = pathToNode(tree, targetId) ?? [];
+  const humanColor = options.humanColor ?? DEFAULT_HUMAN_COLOR;
 
   const saved: SavedGameV2 = {
     version: 2,
@@ -139,6 +148,7 @@ export function toPersistedGame(
     currentPath,
     tree: persistCommittedSubtree(tree, tree.rootId),
     maiaElo: options.maiaElo,
+    humanColor,
   };
   if (options.resigned) {
     saved.resigned = true;
@@ -192,6 +202,12 @@ export function parseSavedGame(raw: unknown): SavedGameV2 | null {
   }
   if (!isFiniteNumber(raw.maiaElo)) return null;
 
+  let humanColor: Color | undefined;
+  if ("humanColor" in raw && raw.humanColor !== undefined) {
+    if (raw.humanColor !== "w" && raw.humanColor !== "b") return null;
+    humanColor = raw.humanColor;
+  }
+
   const tree = parseSavedNode(raw.tree, true);
   if (!tree) return null;
 
@@ -211,6 +227,9 @@ export function parseSavedGame(raw: unknown): SavedGameV2 | null {
     tree,
     maiaElo: raw.maiaElo,
   };
+  if (humanColor) {
+    saved.humanColor = humanColor;
+  }
   if (raw.resigned === true) {
     saved.resigned = true;
   }
@@ -293,6 +312,7 @@ export function reconstructGame(saved: SavedGameV2): ReconstructedGame | null {
       currentNodeId,
     },
     maiaElo: saved.maiaElo,
+    humanColor: saved.humanColor ?? DEFAULT_HUMAN_COLOR,
     resigned: saved.resigned === true,
   };
 }

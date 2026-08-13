@@ -9,10 +9,10 @@ import {
 } from "@/components/coach/teaser-timing";
 
 describe("isIdleHintEligible", () => {
-  it("is true only on ply 0 of a playable turn with no coach content", () => {
+  it("is true only on the first human turn with no coach content", () => {
     expect(
       isIdleHintEligible({
-        ply: 0,
+        firstHumanTurn: true,
         playerTurn: true,
         hasInsight: false,
         hasHint: false,
@@ -20,7 +20,7 @@ describe("isIdleHintEligible", () => {
     ).toBe(true);
     expect(
       isIdleHintEligible({
-        ply: 1,
+        firstHumanTurn: false,
         playerTurn: true,
         hasInsight: false,
         hasHint: false,
@@ -28,7 +28,7 @@ describe("isIdleHintEligible", () => {
     ).toBe(false);
     expect(
       isIdleHintEligible({
-        ply: 0,
+        firstHumanTurn: true,
         playerTurn: false,
         hasInsight: false,
         hasHint: false,
@@ -36,7 +36,7 @@ describe("isIdleHintEligible", () => {
     ).toBe(false);
     expect(
       isIdleHintEligible({
-        ply: 0,
+        firstHumanTurn: true,
         playerTurn: true,
         hasInsight: true,
         hasHint: false,
@@ -44,7 +44,7 @@ describe("isIdleHintEligible", () => {
     ).toBe(false);
     expect(
       isIdleHintEligible({
-        ply: 0,
+        firstHumanTurn: true,
         playerTurn: true,
         hasInsight: false,
         hasHint: true,

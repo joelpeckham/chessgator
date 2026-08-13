@@ -55,6 +55,12 @@ describe("game store adapter", () => {
     expect(state.lastError).toBe("Engines failed to start");
   });
 
+  it("starts Black games on the opponent's turn", () => {
+    useGameStore.getState().startGame({ humanColor: "b" });
+    expect(useGameStore.getState().humanColor).toBe("b");
+    expect(useGameStore.getState().session.mode).toBe("opponentThinking");
+  });
+
   it("resumePlay after error restores the side to move", () => {
     useGameStore.getState().startGame();
     useGameStore.getState().playMove("e2e4");
@@ -112,5 +118,21 @@ describe("game store adapter", () => {
     expect(await useGameStore.getState().hydrate(repo)).toBe(true);
     expect(useGameStore.getState().session.mode).toBe("gameOver");
     expect(useGameStore.getState().session.terminalReason).toBe("resignation");
+  });
+
+  it("persists and hydrates Black as the human side", async () => {
+    const storage = memoryStorage();
+    const repo = createLocalStorageGameRepository({ storage });
+
+    useGameStore.getState().startGame({ humanColor: "b" });
+    useGameStore.getState().playMove("e2e4");
+    await useGameStore.getState().persist(repo);
+
+    useGameStore.setState({ ...useGameStore.getInitialState() });
+    expect(await useGameStore.getState().hydrate(repo)).toBe(true);
+    expect(useGameStore.getState().humanColor).toBe("b");
+    expect(useGameStore.getState().session.mode).toBe("reviewing");
+    useGameStore.getState().resumePlay();
+    expect(useGameStore.getState().session.mode).toBe("playerTurn");
   });
 });

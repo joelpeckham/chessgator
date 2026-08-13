@@ -15,7 +15,7 @@ export const MAX_HINT_LEVEL: HintLevel = 3;
 
 export type BuildHintInput = {
   fen: string;
-  /** Side to move that will receive the hint (usually White). */
+  /** Side to move that will receive the hint. */
   sideToMove: "w" | "b";
   /** Engine analysis of the current position (MultiPV). */
   positionAnalysis: AnalysisEvidence | null;

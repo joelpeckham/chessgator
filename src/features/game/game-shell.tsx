@@ -17,6 +17,7 @@ import { useShellUi } from "@/features/game/use-shell-ui";
 export function GameShell(props: GameRuntimeOptions = {}) {
   const tree = useGameStore((s) => s.tree);
   const session = useGameStore((s) => s.session);
+  const humanColor = useGameStore((s) => s.humanColor);
   const preferences = useGameStore((s) => s.preferences);
   const hydrated = useGameStore((s) => s.hydrated);
   const resumed = useGameStore((s) => s.resumed);
@@ -29,6 +30,7 @@ export function GameShell(props: GameRuntimeOptions = {}) {
   const view = buildShellView({
     tree,
     session,
+    humanColor,
     preferences,
     hydrated,
     resumed,

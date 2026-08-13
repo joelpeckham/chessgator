@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 export type BoardPreviewProps = {
   fen: string;
   san?: string | null;
+  orientation?: "white" | "black";
   className?: string;
 };
 
@@ -14,12 +15,13 @@ export type BoardPreviewProps = {
 export function BoardPreview({
   fen,
   san = null,
+  orientation = "white",
   className,
 }: BoardPreviewProps) {
   const options = {
     id: `preview-${fen.slice(0, 24)}`,
     position: fen,
-    boardOrientation: "white" as const,
+    boardOrientation: orientation,
     allowDragging: false,
     showAnimations: false,
     allowDrawingArrows: false,

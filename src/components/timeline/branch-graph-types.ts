@@ -1,5 +1,5 @@
 import type { ProjectedLine } from "@/domain/analysis/projected-lines";
-import type { GameTree } from "@/domain/game";
+import type { Color, GameTree } from "@/domain/game";
 
 export type TimelineNodeKind =
   | "committed"
@@ -113,6 +113,8 @@ export type BuildBranchGraphInput = {
    * When false, suppress the coach projected line.
    */
   showCoachLine?: boolean;
+  /** Human's playing side; engine futures are shown only on this side to move. */
+  humanColor?: Color;
 };
 
 export const LANE = {

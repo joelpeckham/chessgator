@@ -9,6 +9,7 @@ import {
   type TimelineGraph,
 } from "@/components/timeline/branch-graph";
 import {
+  type Color,
   findKingSquare,
   type GameSession,
   type GameTree,
@@ -17,7 +18,6 @@ import {
   getNode,
   getStatusAtNode,
   getTurn,
-  HUMAN_COLOR,
   isHumanTurn,
   type SessionMode,
 } from "@/domain/game";
@@ -52,6 +52,7 @@ export type ShellView = {
   board: {
     fen: string;
     interactive: boolean;
+    orientation: "white" | "black";
     lastMove: { from: string; to: string } | null;
     isCheck: boolean;
     checkSquare: string | null;
@@ -81,6 +82,7 @@ export type ShellView = {
     previewNodeId: string | null;
     disabled: boolean;
     compact: boolean;
+    orientation: "white" | "black";
     expandedOverflowKeys: string[];
   };
   settings: {
@@ -89,6 +91,7 @@ export type ShellView = {
     canPlayMove: boolean;
     engine: Omit<SettingsEngineStatus, "onRetry">;
     canResign: boolean;
+    pendingHumanColor: Color;
   };
   promotion: {
     open: boolean;
@@ -100,6 +103,7 @@ export type ShellView = {
 export function buildShellView(args: {
   tree: GameTree;
   session: GameSession["session"];
+  humanColor: Color;
   preferences: GameStorePreferences;
   hydrated: boolean;
   resumed: boolean;
@@ -111,7 +115,7 @@ export function buildShellView(args: {
   runtime: GameRuntime;
   ui: ShellChrome;
 }): ShellView {
-  const { tree, session, runtime, ui } = args;
+  const { tree, session, humanColor, runtime, ui } = args;
   const liveFen = getCurrentNode(tree).fen;
   const currentStatus = getStatusAtNode(tree, tree.currentNodeId);
   const moves = getMoveHistory(tree, tree.currentNodeId);
@@ -130,7 +134,7 @@ export function buildShellView(args: {
   );
   const liveTurn = getTurn(liveFen);
   const futureLine =
-    isHumanTurn(liveTurn) &&
+    isHumanTurn(liveTurn, humanColor) &&
     !isReviewing &&
     runtime.coaching.futureNodeId === tree.currentNodeId
       ? runtime.coaching.futureLine
@@ -143,8 +147,11 @@ export function buildShellView(args: {
     tutorLine,
     expandedOverflowKeys: ui.expandedOverflowKeys,
     maxLaneSide: args.compact ? 1 : 2,
-    showEngineLine: args.compact ? !tutorLine : isHumanTurn(liveTurn),
+    showEngineLine: args.compact
+      ? !tutorLine
+      : isHumanTurn(liveTurn, humanColor),
     showCoachLine: Boolean(tutorLine),
+    humanColor,
   });
 
   const boardFen = resolveReviewFen(tree, graph, viewedNodeId);
@@ -155,7 +162,7 @@ export function buildShellView(args: {
 
   const interactive =
     mode === "playerTurn" &&
-    isHumanTurn(getTurn(liveFen)) &&
+    isHumanTurn(getTurn(liveFen), humanColor) &&
     !isViewingNonLive &&
     runtime.maia.phase !== "failed";
 
@@ -188,6 +195,7 @@ export function buildShellView(args: {
     lastMove,
     navigationMessage: ui.navMessage,
     enginesWarming: runtime.enginesWarming,
+    humanColor,
   };
   const status = getStatusPresentation(statusInput);
 
@@ -197,7 +205,7 @@ export function buildShellView(args: {
     mode === "analyzing" ||
     mode === "reviewing";
   const canUndoHumanMove =
-    moves.some((m) => m.color === HUMAN_COLOR) &&
+    moves.some((m) => m.color === humanColor) &&
     (mode === "playerTurn" ||
       mode === "analyzing" ||
       mode === "reviewing" ||
@@ -248,6 +256,7 @@ export function buildShellView(args: {
     board: {
       fen: boardFen,
       interactive,
+      orientation: humanColor === "b" ? "black" : "white",
       lastMove: boardLastMove,
       isCheck: boardStatus.isCheck && !boardStatus.isGameOver,
       checkSquare,
@@ -271,7 +280,7 @@ export function buildShellView(args: {
       hintFen: liveFen,
       showTutorLaneHint: Boolean(tutorLine),
       idleHintEligible: isIdleHintEligible({
-        ply: getCurrentNode(tree).ply,
+        firstHumanTurn: !moves.some((m) => m.color === humanColor),
         playerTurn: interactive,
         hasInsight: Boolean(visibleInsight),
         hasHint: Boolean(runtime.coaching.hint),
@@ -284,6 +293,7 @@ export function buildShellView(args: {
       previewNodeId: ui.previewNodeId,
       disabled: mode === "error",
       compact: args.compact,
+      orientation: humanColor === "b" ? "black" : "white",
       expandedOverflowKeys: ui.expandedOverflowKeys,
     },
     settings: {
@@ -306,6 +316,7 @@ export function buildShellView(args: {
             : null),
       },
       canResign,
+      pendingHumanColor: ui.pendingHumanColor,
     },
     promotion: {
       open: ui.promotion != null,

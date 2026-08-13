@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import type { BoardMove } from "@/components/board/move-utils";
 import { parseVirtualTimelineId } from "@/components/timeline/branch-graph";
 import {
+  type Color,
   type GameMove,
   getCurrentNode,
   getTurn,
-  HUMAN_COLOR,
   isHumanTurn,
 } from "@/domain/game";
 import {
@@ -30,6 +30,7 @@ export type ShellChrome = {
   expandedOverflowKeys: string[];
   navMessage: string | null;
   dismissedNotices: ReadonlySet<string>;
+  pendingHumanColor: Color;
 };
 
 export type ShellUi = ShellChrome & {
@@ -46,6 +47,7 @@ export type ShellUi = ShellChrome & {
   handleUndoHumanMove: () => void;
   handleResign: () => void;
   handleRestart: () => void;
+  setPendingHumanColor: (color: Color) => void;
   handleRetryEngines: () => Promise<void>;
   handleSelectTimelineNode: (nodeId: string) => void;
   handleReturnLive: () => void;
@@ -71,6 +73,9 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
   const [navMessage, setNavMessage] = useState<string | null>(null);
   const [dismissedNotices, setDismissedNotices] = useState<Set<string>>(
     () => new Set(),
+  );
+  const [pendingHumanColor, setPendingHumanColor] = useState<Color>(
+    () => useGameStore.getState().humanColor,
   );
 
   const startGame = useGameStore((s) => s.startGame);
@@ -134,6 +139,9 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
         queueNav(hydrateError);
       }
     }
+    if (useGameStore.getState().session.mode === "opponentThinking") {
+      requestOpponent();
+    }
     // Bootstrap once after hydrate; startGame/resumePlay are stable store actions.
     // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated]);
@@ -146,7 +154,7 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
       viewedNodeId != null && viewedNodeId !== tree.currentNodeId;
     return (
       session.mode === "playerTurn" &&
-      isHumanTurn(getTurn(liveFen)) &&
+      isHumanTurn(getTurn(liveFen), useGameStore.getState().humanColor) &&
       !isViewingNonLive &&
       runtime.maia.phase !== "failed"
     );
@@ -220,8 +228,11 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
   function handleRestart(): void {
     resetPending({ clearCoach: true });
     useGameStore.setState({ resumed: false });
-    startGame();
+    startGame({ humanColor: pendingHumanColor });
     setExpandedOverflowKeys([]);
+    if (useGameStore.getState().session.mode === "opponentThinking") {
+      requestOpponent();
+    }
     queueNav("New game started");
   }
 
@@ -271,7 +282,7 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     void runtime.coach.escalateHint({
       fen: getCurrentNode(tree).fen,
       gameNodeId: tree.currentNodeId,
-      sideToMove: HUMAN_COLOR,
+      sideToMove: useGameStore.getState().humanColor,
     });
   }
 
@@ -282,7 +293,10 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
 
   function handleSettingsOpenChange(open: boolean): void {
     setSettingsOpen(open);
-    if (open) setCoachExpanded(false);
+    if (open) {
+      setPendingHumanColor(useGameStore.getState().humanColor);
+      setCoachExpanded(false);
+    }
   }
 
   function dismissNotice(id: string): void {
@@ -312,6 +326,8 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     handleUndoHumanMove,
     handleResign,
     handleRestart,
+    pendingHumanColor,
+    setPendingHumanColor,
     handleRetryEngines,
     handleSelectTimelineNode,
     handleReturnLive,

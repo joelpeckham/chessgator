@@ -14,7 +14,7 @@ const figtree = Figtree({
 });
 
 const description =
-  "Local-only chess coach. Play as White against Maia with Stockfish coaching analysis.";
+  "Local-only chess coach. Play as White or Black against Maia with Stockfish coaching analysis.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://chessgator.com"),

@@ -28,6 +28,7 @@ export type BoardSquareLabel = {
 export type ChessboardAdapterProps = {
   fen: string;
   interactive: boolean;
+  orientation?: "white" | "black";
   lastMove?: { from: string; to: string } | null;
   isCheck?: boolean;
   checkSquare?: string | null;
@@ -68,6 +69,7 @@ function usePrefersReducedMotion(): boolean {
 export function ChessboardAdapter({
   fen,
   interactive,
+  orientation = "white",
   lastMove = null,
   isCheck = false,
   checkSquare = null,
@@ -156,7 +158,7 @@ export function ChessboardAdapter({
   const options = {
     id,
     position: fen,
-    boardOrientation: "white" as const,
+    boardOrientation: orientation,
     allowDragging: interactive,
     showAnimations: !reducedMotion,
     animationDurationInMs: reducedMotion ? 0 : 200,
@@ -214,6 +216,7 @@ export function ChessboardAdapter({
     <div
       className={cn("chessboard-adapter aspect-square", className)}
       data-testid="chessboard"
+      data-orientation={orientation}
     >
       <Chessboard options={options} />
     </div>

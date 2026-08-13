@@ -81,8 +81,7 @@ chessgator/
 ## Out of scope for v1
 
 Accounts, backend APIs, cloud sync, LLM prose, monetization, multi-threaded
-Stockfish, Stockfish-as-opponent fallback, large curriculum, multi-game library,
-playing as Black.
+Stockfish, Stockfish-as-opponent fallback, large curriculum, multi-game library.
 
 ## Nonblocking limits (documented, not release gates)
 

@@ -128,6 +128,37 @@ describe("persistence schema v2", () => {
     expect(restored.resigned).toBe(true);
   });
 
+  it("persists human color and defaults missing snapshots to White", () => {
+    const tree = play(createInitialTree(), "e2e4");
+    const asBlack = toPersistedGame(tree, {
+      maiaElo: 1500,
+      humanColor: "b",
+    });
+    expect(asBlack.humanColor).toBe("b");
+    expect(reconstructGame(asBlack)!.humanColor).toBe("b");
+
+    const asWhite = toPersistedGame(tree, { maiaElo: 1500 });
+    expect(asWhite.humanColor).toBe("w");
+    const withoutColor = {
+      version: asWhite.version,
+      rootFen: asWhite.rootFen,
+      currentPath: asWhite.currentPath,
+      tree: asWhite.tree,
+      maiaElo: asWhite.maiaElo,
+    };
+    expect(parseSavedGame(withoutColor)?.humanColor).toBeUndefined();
+    expect(reconstructGame(parseSavedGame(withoutColor)!)!.humanColor).toBe(
+      "w",
+    );
+
+    expect(
+      parseSavedGame({
+        ...asWhite,
+        humanColor: "green",
+      }),
+    ).toBeNull();
+  });
+
   it("localStorage repository recovers from missing/corrupt data", async () => {
     const storage = memoryStorage({ [GAME_STORAGE_KEY]: "{not-json" });
     const repo = createLocalStorageGameRepository({ storage });

@@ -1,4 +1,5 @@
 import type {
+  Color,
   GameMove,
   GameStatus,
   GameStatusReason,
@@ -21,6 +22,7 @@ export type StatusPresentationInput = {
   /** Polite hint escalation announcement. */
   hintAnnouncement?: string | null;
   enginesWarming?: boolean;
+  humanColor?: Color;
 };
 
 export type StatusPresentation = {
@@ -49,6 +51,7 @@ export function getStatusPresentation(
     terminalReason,
     maia,
     lastError,
+    humanColor: args.humanColor,
   });
   const detail = detailFor({
     mode,
@@ -116,6 +119,7 @@ function headlineFor(args: {
   terminalReason: GameStatusReason;
   maia: MaiaSessionState;
   lastError: string | null;
+  humanColor?: Color;
 }): string {
   const { mode, status, terminalReason, maia, lastError } = args;
   if (maia.phase === "failed" || mode === "error") {
@@ -123,8 +127,13 @@ function headlineFor(args: {
   }
   if (mode === "gameOver") {
     if (terminalReason === "resignation") return "You resigned";
-    if (status.result === "whiteWins") return "You won";
-    if (status.result === "blackWins") return "Black won";
+    const humanColor = args.humanColor ?? "w";
+    if (status.result === "whiteWins") {
+      return humanColor === "w" ? "You won" : "You lost";
+    }
+    if (status.result === "blackWins") {
+      return humanColor === "b" ? "You won" : "You lost";
+    }
     if (status.result === "draw") return "Draw";
     return "Game over";
   }

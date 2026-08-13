@@ -3,13 +3,16 @@ export const IDLE_HINT_DELAY_MS = 30_000;
 export const IDLE_HINT_QUIP = "Tap the gator to get a hint.";
 
 export function isIdleHintEligible(input: {
-  ply: number;
+  firstHumanTurn: boolean;
   playerTurn: boolean;
   hasInsight: boolean;
   hasHint: boolean;
 }): boolean {
   return (
-    input.ply === 0 && input.playerTurn && !input.hasInsight && !input.hasHint
+    input.firstHumanTurn &&
+    input.playerTurn &&
+    !input.hasInsight &&
+    !input.hasHint
   );
 }
 

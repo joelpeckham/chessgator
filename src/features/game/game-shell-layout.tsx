@@ -99,6 +99,7 @@ export function GameShellLayout({
             previewNodeId={view.timeline.previewNodeId}
             disabled={view.timeline.disabled}
             compact={view.timeline.compact}
+            orientation={view.timeline.orientation}
             expandedOverflowKeys={view.timeline.expandedOverflowKeys}
             onExpandedOverflowChange={(keys) =>
               ui.setExpandedOverflowKeys([...keys])
@@ -189,6 +190,7 @@ export function GameShellLayout({
               <ChessboardAdapter
                 fen={view.board.fen}
                 interactive={view.board.interactive}
+                orientation={view.board.orientation}
                 lastMove={view.board.lastMove}
                 isCheck={view.board.isCheck}
                 checkSquare={view.board.checkSquare}
@@ -229,6 +231,8 @@ export function GameShellLayout({
         }}
         canResign={view.settings.canResign}
         canRestart
+        pendingHumanColor={view.settings.pendingHumanColor}
+        onPendingHumanColorChange={ui.setPendingHumanColor}
         onResign={ui.handleResign}
         onRestart={ui.handleRestart}
       />

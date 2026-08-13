@@ -2,7 +2,6 @@ import { getStatusAtNode } from "@/domain/game/tree";
 import {
   type Color,
   type GameSession,
-  HUMAN_COLOR,
   type SessionMode,
 } from "@/domain/game/types";
 
@@ -46,6 +45,7 @@ export function normalizeSessionForResume(game: GameSession): GameSession {
 
 export function sessionModeForTurn(
   turn: Color,
+  humanColor: Color,
 ): Extract<SessionMode, "playerTurn" | "opponentThinking"> {
-  return turn === HUMAN_COLOR ? "playerTurn" : "opponentThinking";
+  return turn === humanColor ? "playerTurn" : "opponentThinking";
 }

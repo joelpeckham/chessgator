@@ -2,12 +2,15 @@ import type { Color, PieceSymbol, Square } from "chess.js";
 
 export type { Color, PieceSymbol, Square };
 
-/** v1: the human always plays White. Playing as Black is out of scope. */
-export const HUMAN_COLOR: Color = "w";
-export const OPPONENT_COLOR: Color = "b";
+/** Default side for a first visit / missing persisted color. */
+export const DEFAULT_HUMAN_COLOR: Color = "w";
 
-export function isHumanTurn(turn: Color): boolean {
-  return turn === HUMAN_COLOR;
+export function opponentColor(humanColor: Color): Color {
+  return humanColor === "w" ? "b" : "w";
+}
+
+export function isHumanTurn(turn: Color, humanColor: Color): boolean {
+  return turn === humanColor;
 }
 
 /** Input accepted by move-application helpers (object or UCI/SAN string). */

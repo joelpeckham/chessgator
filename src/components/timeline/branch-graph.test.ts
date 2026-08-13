@@ -92,6 +92,26 @@ describe("buildBranchGraph", () => {
     expect(graph.nodes.some((n) => n.kind === "projected")).toBe(false);
   });
 
+  it("shows engine future when the human is Black and Black is to move", () => {
+    let tree = createInitialTree();
+    tree = playMoveOnTree(tree, tree.rootId, "e2e4")!.tree;
+    const future = projectUciLine({
+      rootFen: tree.nodes[tree.currentNodeId]!.fen,
+      rootNodeId: tree.currentNodeId,
+      lineUci: ["e7e5", "g1f3"],
+      kind: "future",
+    });
+
+    const graph = buildBranchGraph({
+      tree,
+      futureLine: future,
+      humanColor: "b",
+    });
+    const projected = graph.nodes.filter((n) => n.kind === "projected");
+    expect(projected.length).toBeGreaterThan(0);
+    expect(projected.every((n) => n.lane === LANE.engine)).toBe(true);
+  });
+
   it("attaches coach alternate on the coach lane", () => {
     let tree = createInitialTree();
     tree = playMoveOnTree(tree, tree.rootId, "d2d4")!.tree;

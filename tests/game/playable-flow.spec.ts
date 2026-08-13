@@ -48,4 +48,40 @@ test.describe("playable slice (stub Maia)", () => {
     );
     await expect(page.getByTestId("move-list")).toContainText("No moves yet");
   });
+
+  test("new game as Black orients the board and waits for Maia's opening", async ({
+    page,
+  }) => {
+    await startStubGame(page);
+    await expect(page.getByTestId("chessboard")).toHaveAttribute(
+      "data-orientation",
+      "white",
+    );
+
+    await openSettings(page);
+    await page.getByTestId("play-as-select").click();
+    await page.getByRole("option", { name: "Black" }).click();
+    await page.getByTestId("restart-button").click();
+
+    await expect(page.getByTestId("chessboard")).toHaveAttribute(
+      "data-orientation",
+      "black",
+    );
+    await expect(page.getByTestId("status-badge")).toHaveAttribute(
+      "data-mode",
+      "playerTurn",
+      { timeout: 10_000 },
+    );
+    await expect(page.getByTestId("move-list")).not.toContainText(
+      "No moves yet",
+    );
+
+    await chooseLegalMove(page, "e5");
+    await expect(page.getByTestId("move-list")).toContainText("e5");
+    await expect(page.getByTestId("status-badge")).toHaveAttribute(
+      "data-mode",
+      "playerTurn",
+      { timeout: 10_000 },
+    );
+  });
 });

@@ -103,4 +103,63 @@ test.describe("local resume + corruption", () => {
     );
     await expect(page.getByTestId("move-list")).toContainText("No moves yet");
   });
+
+  test("reloads a Black game with side, orientation, and turn", async ({
+    page,
+  }) => {
+    await startStubGame(page);
+
+    await openSettings(page);
+    await page.getByTestId("play-as-select").click();
+    await page.getByRole("option", { name: "Black" }).click();
+    await page.getByTestId("restart-button").click();
+
+    await expect(page.getByTestId("status-badge")).toHaveAttribute(
+      "data-mode",
+      "playerTurn",
+      { timeout: 10_000 },
+    );
+    await expect(page.getByTestId("chessboard")).toHaveAttribute(
+      "data-orientation",
+      "black",
+    );
+
+    await expect
+      .poll(async () => {
+        const raw = await page.evaluate(
+          (key) => localStorage.getItem(key),
+          STORAGE_KEY,
+        );
+        if (!raw) return null;
+        try {
+          return JSON.parse(raw) as {
+            version?: number;
+            humanColor?: string;
+            tree?: { children?: Array<{ uci?: string }> };
+          };
+        } catch {
+          return null;
+        }
+      })
+      .toMatchObject({
+        version: 2,
+        humanColor: "b",
+      });
+
+    await page.reload();
+    await expect(page.getByTestId("game-shell")).toHaveAttribute(
+      "data-hydrated",
+      "true",
+      { timeout: 10_000 },
+    );
+    await expect(page.getByTestId("chessboard")).toHaveAttribute(
+      "data-orientation",
+      "black",
+    );
+    await expect(page.getByTestId("status-badge")).toHaveAttribute(
+      "data-mode",
+      "playerTurn",
+      { timeout: 15_000 },
+    );
+  });
 });

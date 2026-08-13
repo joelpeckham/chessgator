@@ -2,12 +2,16 @@
 
 import { create } from "zustand";
 import {
+  type Color,
   createBootstrapTree,
   createInitialTree,
   createSessionState,
+  DEFAULT_HUMAN_COLOR,
   type GameSession,
   type GameTree,
+  getCurrentNode,
   getStatusAtNode,
+  getTurn,
   type MoveInput,
   normalizeSessionForResume,
   playMoveOnTree,
@@ -31,13 +35,15 @@ export type GameStorePreferences = {
 export type GameStoreState = {
   tree: GameSession["tree"];
   session: GameSession["session"];
+  /** Side the human is playing in the active game. */
+  humanColor: Color;
   preferences: GameStorePreferences;
   hydrated: boolean;
   /** True when a persisted snapshot was loaded (tree may be resumed). */
   resumed: boolean;
   lastError: string | null;
 
-  startGame: (fen?: string) => void;
+  startGame: (options?: { fen?: string; humanColor?: Color }) => void;
   /** Continue a hydrated game without wiping the tree. */
   resumePlay: () => void;
   replaceTree: (tree: GameTree) => void;
@@ -96,15 +102,20 @@ const initial = {
 export const useGameStore = create<GameStoreState>((set, get) => ({
   tree: initial.tree,
   session: initial.session,
+  humanColor: DEFAULT_HUMAN_COLOR,
   preferences: defaultPreferences,
   hydrated: false,
   resumed: false,
   lastError: null,
 
-  startGame: (fen?: string) => {
+  startGame: (options) => {
+    const humanColor = options?.humanColor ?? get().humanColor;
+    const tree = createInitialTree(options?.fen);
+    const turn = getTurn(getCurrentNode(tree).fen);
     set({
-      tree: createInitialTree(fen),
-      session: sessionState("playerTurn"),
+      tree,
+      humanColor,
+      session: sessionState(sessionModeForTurn(turn, humanColor)),
       lastError: null,
       hydrated: true,
       resumed: false,
@@ -112,7 +123,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   },
 
   resumePlay: () => {
-    const { tree, session } = get();
+    const { tree, session, humanColor } = get();
     const status = getStatusAtNode(tree, tree.currentNodeId);
     if (status.isGameOver) {
       set({
@@ -125,7 +136,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       return;
     }
     set({
-      session: sessionState(sessionModeForTurn(status.turn)),
+      session: sessionState(sessionModeForTurn(status.turn, humanColor)),
       lastError: null,
     });
   },
@@ -151,8 +162,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
     const status = getStatusAtNode(played.tree, played.tree.currentNodeId);
     let mode: SessionMode =
-      options?.afterMode ??
-      (session.mode === "opponentThinking" ? "playerTurn" : "opponentThinking");
+      options?.afterMode ?? sessionModeForTurn(status.turn, get().humanColor);
     let terminalReason: SessionState["terminalReason"] = null;
 
     if (status.isGameOver) {
@@ -185,7 +195,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
     set({
       tree: nextTree,
-      session: sessionState(sessionModeForTurn(status.turn)),
+      session: sessionState(sessionModeForTurn(status.turn, get().humanColor)),
       lastError: null,
     });
     return true;
@@ -260,6 +270,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       set({
         tree: game.tree,
         session: game.session,
+        humanColor: reconstructed.humanColor,
         lastError: null,
         hydrated: true,
         resumed: Object.keys(game.tree.nodes).length > 1,
@@ -282,6 +293,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     const state = get();
     const snapshot: SavedGameV2 = toPersistedGame(state.tree, {
       maiaElo: state.preferences.maiaElo,
+      humanColor: state.humanColor,
       resigned: state.session.terminalReason === "resignation",
     });
     await repository.save(snapshot);

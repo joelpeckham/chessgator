@@ -96,6 +96,7 @@ export function buildBranchGraph(input: BuildBranchGraphInput): TimelineGraph {
     maxLaneSide = MAX_LANE_SIDE_DEFAULT,
     showEngineLine = true,
     showCoachLine = true,
+    humanColor = "w",
   } = input;
   const liveId = tree.currentNodeId;
   const reviewId = input.reviewNodeId ?? liveId;
@@ -438,10 +439,10 @@ export function buildBranchGraph(input: BuildBranchGraphInput): TimelineGraph {
     if (!showEngineLine) return false;
     // Only at the live tip while reviewing live — never while scrubbing history.
     if (reviewId !== liveId) return false;
-    // Player-facing only: never draw an engine line that starts on Black's turn
-    // (that reads as "hints for the opponent").
+    // Player-facing only: never draw an engine line that starts on the
+    // opponent's turn (that reads as "hints for the opponent").
     const side = line.rootFen.split(" ")[1];
-    if (side !== "w") return false;
+    if (side !== humanColor) return false;
     // Must be rooted at the live tip so a stale pre-move projection cannot linger.
     return line.rootNodeId === liveId;
   }

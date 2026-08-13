@@ -215,5 +215,6 @@ Golden tests should be promoted from the swarm flags, not from puzzles. The wors
 ## Limits of this run
 
 - Coach evals came from Lichess analysis, not the in-app Stockfish MultiPV. Some “no because on the alternative” lines will look better in product if MultiPV supplies a real PV.
-- Copy always says “your,” as if the mover is the student. That matches the app’s v1 (human is White) better than this both-sides dump.
+- Copy always says “your,” as if the mover is the student. That matches in-app
+  coaching of the human’s moves, but this dump includes both sides.
 - Reviewers were instructed to be harsh. The 48% flag rate is not “half the product is unshippable”; it is “half the plies failed a picky 1200.” The high-severity wrong-chess cluster is the part that is unshippable.

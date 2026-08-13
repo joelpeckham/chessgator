@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 export type BranchPickerProps = {
   group: TimelineOverflowGroup;
   disabled?: boolean;
+  orientation?: "white" | "black";
   onSelectBranch: (branchKey: string, headNodeId: string) => void;
   onPreviewNode?: (nodeId: string | null) => void;
   className?: string;
@@ -30,6 +31,7 @@ export type BranchPickerProps = {
 export function BranchPicker({
   group,
   disabled = false,
+  orientation = "white",
   onSelectBranch,
   onPreviewNode,
   className,
@@ -103,6 +105,7 @@ export function BranchPicker({
                 <BoardPreview
                   fen={branch.fen}
                   san={branch.san}
+                  orientation={orientation}
                   className="w-16 shrink-0"
                 />
                 <span className="flex min-w-0 flex-col items-start text-left">

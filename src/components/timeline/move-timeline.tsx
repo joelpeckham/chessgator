@@ -33,6 +33,7 @@ export type MoveTimelineProps = {
   onExpandedOverflowChange?: (keys: readonly string[]) => void;
   /** Narrow layout: fewer variation lanes, hide unused lane labels. */
   compact?: boolean;
+  orientation?: "white" | "black";
   onSelectNode: (nodeId: string) => void;
   onPreviewNode?: (nodeId: string | null) => void;
   onReturnLive: () => void;
@@ -84,6 +85,7 @@ export function MoveTimeline({
   expandedOverflowKeys: controlledKeys,
   onExpandedOverflowChange,
   compact = false,
+  orientation = "white",
   onSelectNode,
   onPreviewNode,
   onReturnLive,
@@ -369,6 +371,7 @@ export function MoveTimeline({
                     key={node.id}
                     group={group}
                     disabled={disabled}
+                    orientation={orientation}
                     style={{ left: cx, top: cy }}
                     className={cn(dimmed && "opacity-40")}
                     onSelectBranch={(branchKey, headNodeId) => {
