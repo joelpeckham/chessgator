@@ -1,0 +1,300 @@
+{
+  "gameId": "s2xPOvCI",
+  "white": "habibaram (1324)",
+  "black": "ivaldonm (1214)",
+  "movesReviewed": 61,
+  "movesFlagged": 25,
+  "okShare": 0.59,
+  "flags": [
+    {
+      "ply": 8,
+      "san": "Bb4",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "both",
+      "quote": "Moving your f8-bishop to b4 puts it where the white pawn can take and you lose a knight. A better move would have been moving your pawn to c5.",
+      "critique": "This is the whole game and you named the wrong piece. I hung the bishop to cxb4. There is no knight on b4, no knight recapture, nothing that makes this 'lose a knight.' If I cannot trust you on a free bishop, I am not reading the rest."
+    },
+    {
+      "ply": 60,
+      "san": "b6",
+      "severity": "high",
+      "category": "classification",
+      "perspective": "technical",
+      "quote": "Moving your pawn to b6 is the strongest move.",
+      "critique": "b6 walks into Nc6+, forking my king on b8 and the rook on d8. You then praise that fork on the next ply. A 571-centipawn dump is not 'the strongest move' with no because-clause. Tell me I stepped into a royal fork."
+    },
+    {
+      "ply": 56,
+      "san": "Qxg4",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Taking the bishop on g4 with your queen is the strongest move.",
+      "critique": "You just taught Bg4 as a pin of queen to king, then called taking that bishop 'the strongest move' as if I won something. White recaptures with Qxg4+. I am dropping the queen to break the pin. In a lost position 'engine best' is not a lesson — say the pin left no good option and this trades queen for bishop."
+    },
+    {
+      "ply": 22,
+      "san": "Qg4",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "both",
+      "quote": "You are still worse, but moving your queen to g4 creates a backward pawn to defend. A better move would have been moving your queen to f6.",
+      "critique": "Creates a backward pawn to defend — defend what? Qg4 does not make a backward pawn. I am a queen being kicked after Qh4+, and you want Qf6. Teach that the queen is misplaced on g4 (and Be2 will hit it), not this phrase-bank wreck."
+    },
+    {
+      "ply": 54,
+      "san": "axb4",
+      "severity": "high",
+      "category": "classification",
+      "perspective": "technical",
+      "quote": "Taking the pawn on b4 with your a-pawn is the strongest move because the pawn was undefended.",
+      "critique": "287 centipawns gone and you sell me a free pawn. Next move is Bg4 pinning my queen to the king. If grabbing b4 is that expensive, it was not a free pawn — it ignored the pin coming. Do not stamp engine-best on a horizon blunder."
+    },
+    {
+      "ply": 45,
+      "san": "Rb1",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "both",
+      "quote": "Moving your a1-rook to b1 is the strongest move because it saves your b1-rook from capture.",
+      "critique": "The rook on a1 is hanging to Nb3. I move it to b1. You correctly call it the a1-rook in the first half, then say I saved the b1-rook — a piece that was not on b1 and was not hanging there. Pick a square. This is a destination-label bug, and it makes the save sound like nonsense."
+    },
+    {
+      "ply": 52,
+      "san": "c5",
+      "severity": "high",
+      "category": "classification",
+      "perspective": "technical",
+      "quote": "Moving your pawn to c5 is the strongest move.",
+      "critique": "King on c8, I shove the c-pawn, 151 centipawns disappear, and your own reasons include pawn_shield and ignored_threat. Then the spoken line is empty praise. If the shield is the story, say I ripped the pawns in front of my king. Do not call that strongest."
+    },
+    {
+      "ply": 20,
+      "san": "Qh4+",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your queen to h4 is the strongest move because you pin the pawn to the rook.",
+      "critique": "It is check. The plus in Qh4+ is the whole point: king on e1, queen on h4. You ranked a pin of the h2-pawn to Rh1 over check. I do not need a geometry trivia fact about a pawn pin when I just checked the king."
+    },
+    {
+      "ply": 17,
+      "san": "Nb3",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Moving your d2-knight to b3 is the strongest move because you claim more of the center.",
+      "critique": "Nb3 leaves the center. The knight is heading for c5 or a5, a queenside outpost, maybe hitting the bishop on e6 later. 'Claim more of the center' is the same lie you used on e3, d3, and c3. 66 centipawns gone and still 'strongest.'"
+    },
+    {
+      "ply": 1,
+      "san": "e3",
+      "severity": "high",
+      "category": "overclaim",
+      "perspective": "both",
+      "quote": "Moving your pawn to e3 is the strongest move because you claim more of the center.",
+      "critique": "e3 is Van't Kruijs, a sideline, and the eval already dropped 25 centipawns. e4 claims the center; e3 tucks a pawn under it. Calling this the strongest move on move one trains me to ignore opening names and listen to a center-control template."
+    },
+    {
+      "ply": 21,
+      "san": "g3",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your pawn to g3 is the strongest move because your king is harder to attack.",
+      "critique": "I am in check from Qh4+. g3 blocks the check and kicks the queen. 'King is harder to attack' is the aftertaste, not the move. Teach: you have to get out of check, and this pawn does it while attacking the queen."
+    },
+    {
+      "ply": 23,
+      "san": "Be2",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your f1-bishop to e2 is the strongest move because your king is harder to attack.",
+      "critique": "Be2 develops and attacks the queen on g4. That is why I have to run to g6 next. You used the same king-safer line as g3. I need 'you hit the queen,' not another safety slogan."
+    },
+    {
+      "ply": 39,
+      "san": "b5",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your pawn to b5 is the strongest move.",
+      "critique": "b5 attacks the knight on c6. That is a pawn kicking a piece. Your reasons list backward_pawn and the sentence has no because. I already know how to push a pawn. Tell me I am attacking the knight."
+    },
+    {
+      "ply": 43,
+      "san": "b4",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your pawn to b4 is the strongest move.",
+      "critique": "Same miss as b5. The knight is on a5; b4 attacks it, and next I have to go Nb3. Empty 'strongest' on a forcing pawn hit is how this coach sounds like a slot machine."
+    },
+    {
+      "ply": 27,
+      "san": "Nxe6",
+      "severity": "medium",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the bishop on e6 with your c5-knight is the strongest move.",
+      "critique": "The bishop is defended by the queen on g6. This is knight for bishop, not a hanging piece, and you still stuffed hanging into the reasons. Teach the trade: you remove their bishop and they recapture with the queen. 'Strongest' with no because is a shrug."
+    },
+    {
+      "ply": 35,
+      "san": "Bxf6",
+      "severity": "medium",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the knight on f6 with your g5-bishop is the strongest move.",
+      "critique": "f6 is defended by the queen. Reasons say hanging anyway, eval drops 89 centipawns, classification stays best. Another equal-ish trade sold as taking something free. I am learning the wrong definition of hanging."
+    },
+    {
+      "ply": 3,
+      "san": "d3",
+      "severity": "medium",
+      "category": "overclaim",
+      "perspective": "technical",
+      "quote": "Moving your pawn to d3 is the strongest move because you put more pressure on the center.",
+      "critique": "d3 is timid. It does not pressure the center; it dens up behind e3 while Black already has a pawn on d5. Eval flips to −32 and you still say strongest. If this is not e4 or Nf3, do not pretend it is a central squeeze."
+    },
+    {
+      "ply": 7,
+      "san": "c3",
+      "severity": "medium",
+      "category": "generic",
+      "perspective": "both",
+      "quote": "Moving your pawn to c3 is the strongest move because you claim more of the center.",
+      "critique": "c3 attacks the d4 pawn. That is the lesson: undermine the advanced pawn, maybe take it. 'Claim more of the center' is copy-paste from e3 and d5. I would remember cxd4 / challenging d4. I will not remember this sentence."
+    },
+    {
+      "ply": 41,
+      "san": "a4",
+      "severity": "medium",
+      "category": "classification",
+      "perspective": "technical",
+      "quote": "Moving your pawn to a4 is the strongest move.",
+      "critique": "101 centipawns is an inaccuracy in your own thresholds, but matching the engine's top move stamps it best with a blank sentence. If the eval crash is search noise, do not narrate it as a lesson. If a4 is slow, say so."
+    },
+    {
+      "ply": 46,
+      "san": "Qb6",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "aesthetic",
+      "quote": "Moving your queen to b6 is the strongest move.",
+      "critique": "Reasons: ignored_threat, hanging, trapped — and the spoken line is nothing. The knight on b3 is about to get taken. Either I am saving something, hanging something, or walking into Rxb3. Pick one and say it. Empty strongest next to 'trapped' is contempt."
+    },
+    {
+      "ply": 19,
+      "san": "fxe4",
+      "severity": "medium",
+      "category": "overclaim",
+      "perspective": "both",
+      "quote": "Taking the pawn on e4 with your f-pawn is the strongest move because the pawn was undefended and it unveils an attack from your queen on the black pawn.",
+      "critique": "This is a recapture, not winning material, and 'the black pawn' never says h5. You mashed an equal pawn take with a discovered queen hit and called it wins_material. Name the target pawn or drop the discovery until it actually wins something."
+    },
+    {
+      "ply": 26,
+      "san": "h4",
+      "severity": "medium",
+      "category": "overclaim",
+      "perspective": "technical",
+      "quote": "Moving your pawn to h4 is the strongest move.",
+      "critique": "Nc5 is sitting on the bishop. Reasons include ignored_threat, then you praise the h-pawn push as strongest. Either I missed Nxe6 or I did not. You cannot file both."
+    },
+    {
+      "ply": 58,
+      "san": "Kb8",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your king to b8 is the strongest move because it keeps your king safer.",
+      "critique": "I am in check from Qxg4+. Kb8 is getting out of check, not a lifestyle choice about safety. Same king_safer template as g3, Be2, Nf3. When the move is a check escape, say that."
+    },
+    {
+      "ply": 10,
+      "san": "h5",
+      "severity": "medium",
+      "category": "generic",
+      "perspective": "aesthetic",
+      "quote": "Moving your pawn to h5 is the strongest move.",
+      "critique": "I just hung a bishop. The follow-up you bless is a flank pawn with zero reasons and 'That's the one.' Develop a knight. If the engine likes h5 in a lost position, tell me it is damage control, not a best-move parade."
+    },
+    {
+      "ply": 25,
+      "san": "Nc5",
+      "severity": "low",
+      "category": "generic",
+      "perspective": "technical",
+      "quote": "Moving your b3-knight to c5 is the strongest move.",
+      "critique": "This is the outpost that attacks the bishop on e6 — the idea Nb3 was actually for. You had nothing to say, then two plies later you take on e6 with no why. Connect them: knight to c5 hits the bishop."
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "loss-label-from-piece",
+      "title": "Name the hanging piece, not a SEE bucket",
+      "feasibility": "high",
+      "layer": "templates",
+      "detail": "hangingLossCopy runs materialLabel(seeCp), and materialLabel maps 250+ to 'a knight' before it can say 'a bishop'. Bb4 hangs a bishop (~300cp) and the learner hears 'you lose a knight'. Pass the hanging NamedUnit.type into the loss phrase (or special-case bishop vs knight) so piece-safety copy cannot lie on the game-deciding hang."
+    },
+    {
+      "id": "cap-engine-best-override",
+      "title": "Do not stamp best on huge eval crashes",
+      "feasibility": "high",
+      "layer": "classification",
+      "detail": "classifyPlayedMove returns best whenever played UCI matches the engine top move, even at 101, 151, 287, 571cp loss (a4, c5, axb4, b6). A 1200 then watches you praise the move that walks into Nc6+ and the pin on g4. If loss exceeds inaccuracyMaxLossCp, keep classifyEvalLoss (or a 'engine liked it, eval disagrees' frame). still_losing already exists but only fires for inaccuracy/mistake/blunder, so queen-losing 'best' recaptures never get it."
+    },
+    {
+      "id": "rank-check-above-pawn-pins",
+      "title": "Prefer check over pawn-to-rook pins",
+      "feasibility": "high",
+      "layer": "reasons",
+      "detail": "reasonSeverity puts pin at 150–165 and check at 50, so Qh4+ teaches 'you pin the pawn to the rook'. king_safer is 90, so g3 and Kb8 talk about safety instead of blocking or escaping check. Boost check (and check-escape saves) above pins of pawns and generic king_safer when the move is check or the king was in check. A club player needs the plus sign, not h2-Rh1 geometry."
+    },
+    {
+      "id": "saves-piece-from-square",
+      "title": "Label saved pieces by origin square",
+      "feasibility": "high",
+      "layer": "templates",
+      "detail": "describeMove labels the rook as a1-rook (from-square) but saves_piece uses NamedUnit.square = move.to from pickBenefitReasons, so Rb1 'saves your b1-rook'. Use the from-square for the unit being saved, or drop the square prefix when origin and destination disagree. This is a one-line facts/copy mismatch a 1200 will quote back at you."
+    },
+    {
+      "id": "wins-material-not-recaptures",
+      "title": "Stop calling recaptures wins_material",
+      "feasibility": "high",
+      "layer": "reasons",
+      "detail": "pickBenefitReasons pushes wins_material whenever capturedSeeCp >= 80, so Qxe6, Qxf6, fxe4 recaptures, and Qxg4+ all look like winning free pieces. Gate on net material vs the previous ply, or suppress when the captured unit just captured on that square. Pair with hanging: a piece defended by a queen (Be6, Nf6) is not hanging just because you can trade a minor piece for it."
+    },
+    {
+      "id": "prefer-attacks-over-center",
+      "title": "Surface attacks on pieces before center_control",
+      "feasibility": "medium",
+      "layer": "discourse",
+      "detail": "c3 undermines d4, Nb3 is a queenside outpost, Be2 hits Qg4, b5/b4 kick knights, Nc5 hits Be6, Nf6 hits Bg5, Qe6 hits Ne5. Almost all of those came out as center_control, king_safer, or a blank strongest. Add or promote a created-attack / pawn-kick benefit in pickBenefitReasons (kicked_by_pawn already exists the other way) and rank it above center_control (severity 15). This is the pattern a 1200 actually needs in this game."
+    },
+    {
+      "id": "gate-false-structure-reasons",
+      "title": "Stop firing backward_pawn on noise",
+      "feasibility": "medium",
+      "layer": "facts",
+      "detail": "backward_pawn attaches to 1...d5, Qg4 ('creates a backward pawn to defend'), b5, Na5, and even the Nc6+ fork. The Qg4 line is unreadable phrase-bank output (problem_backward_pawn) on a queen retreat. Tighten structure.backwardPawnsCreated so opening pawn pushes and unrelated queen moves do not mint the reason, and never pick it as the playedBecause on a queen move that is not about pawns."
+    },
+    {
+      "id": "ban-empty-strongest",
+      "title": "Do not say strongest with nothing to teach",
+      "feasibility": "high",
+      "layer": "templates",
+      "detail": "When reasons are empty or only ignored_threat/hanging that discourse dropped, verdictSentence still emits 'is the strongest move' plus quip 'That's the one.' That is most of this game (h5, a3, Nc5, g4, h3, a4, b4, Qb6, b6). If there is no because-clause, use near_equal ('one of several strong moves'), a development/quiet template, or skip the verdict and ask the hint. Identical quips make the empties worse."
+    }
+  ],
+  "whatWorked": [
+    "cxb4: 'the bishop was undefended' is the actual lesson after Bb4.",
+    "f3 / Be6 / Qg6 / Na5 / Nb3 / Nc4: saves-piece copy is concrete when the attacker is real.",
+    "O-O-O: castle phrase (shelter plus rook) is one of the few lines that teaches.",
+    "Bg4: 'you pin the queen to the king' is the right tactic, named clearly.",
+    "Nc6+: fork of king and d8-rook is the payoff sentence this game earned."
+  ]
+}

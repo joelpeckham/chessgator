@@ -1,0 +1,301 @@
+{
+  "gameId": "y07QnqjA",
+  "white": "tymsonek_jelonek (1428)",
+  "black": "rottenrook (1732)",
+  "movesReviewed": 53,
+  "movesFlagged": 25,
+  "okShare": 0.528,
+  "flags": [
+    {
+      "ply": 1,
+      "san": "f4",
+      "severity": "high",
+      "category": "overclaim",
+      "perspective": "both",
+      "quote": "Moving your pawn to f4 is the strongest move because you claim more of the center.",
+      "critique": "Eval dropped 50cp and you still called it the strongest move. This is Bird's Opening: f4 is about e5 and a later f-file, not the same generic 'center' line you stamp on e4. I already know d4 and e4 exist; calling this the strongest first move makes me distrust every later 'strongest'."
+    },
+    {
+      "ply": 3,
+      "san": "g3",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your pawn to g3 is the strongest move.",
+      "critique": "Empty reasons. The whole point of g3 after f4 is to fianchetto the bishop onto the long diagonal. You said nothing, then 'That's the one.' If you have no idea, don't pretend it's the strongest."
+    },
+    {
+      "ply": 6,
+      "san": "Nf6",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your g8-knight to f6 is a mistake, but moving your pawn to d5 would be better.",
+      "critique": "Lichess called this an inaccuracy, not a mistake, and you never say why d5 is the move. d5 actually fights the f4/g3 setup. Your reasons are development and center_control, which describe Nf6, not the miss. Name the idea or don't bother suggesting d5."
+    },
+    {
+      "ply": 10,
+      "san": "Ne4",
+      "severity": "high",
+      "category": "tautology",
+      "perspective": "both",
+      "quote": "Moving your f6-knight to e4 is the strongest move because it saves your e4-knight from capture.",
+      "critique": "The knight was on f6. e5 attacked it, so I jumped it forward to an outpost. You talked about saving an e4-knight that did not exist until I put it there. Teach the kick-and-outpost, not a destination tautology, and drop the random backward_pawn reason."
+    },
+    {
+      "ply": 12,
+      "san": "Nxc3",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the knight on c3 with your e4-knight is the strongest move because you take the defender of the white queen.",
+      "critique": "The white queen is sitting on d1. Nobody is attacking it. Nc3 is not 'the defender of the queen' in any line I need to learn. I traded my centralized knight. Don't invent a hanging queen to justify a recapture."
+    },
+    {
+      "ply": 13,
+      "san": "dxc3",
+      "severity": "high",
+      "category": "overclaim",
+      "perspective": "technical",
+      "quote": "Taking the knight on c3 with your d-pawn is the strongest move because the knight was undefended and it unveils an attack from your queen on the black pawn.",
+      "critique": "I recaptured. That is not winning material, and 'the knight was undefended' makes a 1-for-1 trade sound like a free piece. The discovered queen-on-d5 bit is the only real lesson. wins_material on a recapture is a lie."
+    },
+    {
+      "ply": 16,
+      "san": "O-O",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "both",
+      "quote": "Castling kingside is an inaccuracy because it gets your king out of danger and activates your rook. A better move would have been moving your pawn to a5.",
+      "critique": "You used the benefits of castling as the reason it is an inaccuracy. That is backwards and I will quote it to make fun of this coach. If a5 is better, tell me why (queenside space, not rushing the king onto a soon-to-open kingside). Never attach a praise-clause to a punishment verdict."
+    },
+    {
+      "ply": 18,
+      "san": "f6",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your pawn to f6 is a mistake, but moving your pawn to b5 would be better.",
+      "critique": "130cp and zero reasons. f6 is the thematic break against the e5 wedge, and it also rips my king open after I already castled short. b5 is queenside play. Contrast those plans. 'Would be better' with no why is a database, not a coach."
+    },
+    {
+      "ply": 19,
+      "san": "Qd3",
+      "severity": "high",
+      "category": "classification",
+      "perspective": "both",
+      "quote": "Moving your queen to d3 is a mistake, but taking the pawn on f6 with your e-pawn would be better.",
+      "critique": "Lichess says blunder, 183cp, and you still said mistake. You have pin in the reasons and never mention it. The lesson is exf6: open the king, wreck the structure, don't park the queen. I needed that sentence, not another empty 'would be better'."
+    },
+    {
+      "ply": 21,
+      "san": "Nxe5",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the pawn on e5 with your knight is the strongest move because the pawn was undefended and it unveils an attack from your bishop on the black pawn.",
+      "critique": "Nc6 defends e5. I can see the knight. Calling that pawn undefended is a factual error, and wins_material on a capture that gets recaptured is the same recapture lie as dxc3. The discovered Bg2-on-d5 is fine. Don't lie about the pawn."
+    },
+    {
+      "ply": 22,
+      "san": "Nxe5",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the knight on e5 with your knight is the strongest move because you take the defender of the white queen.",
+      "critique": "Same 'defender of the white queen' hallucination as Nxc3. This is a recapture on e5. The queen is not hanging. If removed_defender fires whenever a knight is near a queen, turn it off."
+    },
+    {
+      "ply": 27,
+      "san": "Kb1",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your king to b1 is the strongest move.",
+      "critique": "Empty. Last move I pinned Be3 to the king on the c1–h6 diagonal, and the king is also on a half-open c-file after c5. Kb1 steps off both. That is the textbook reason you castle long and then tuck the king, and you taught nothing."
+    },
+    {
+      "ply": 28,
+      "san": "Bxe3",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the bishop on e3 with your g5-bishop is the strongest move because it saves your pawn from capture.",
+      "critique": "I traded bishops. Which pawn did this save? If my bishop on g5 was hanging, say I traded it before it got taken. 'Saves your pawn' is the wrong piece and the wrong lesson."
+    },
+    {
+      "ply": 30,
+      "san": "b5",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "both",
+      "quote": "You are still worse, but moving your pawn to b5 leaves your pawn hanging to the white queen. A better move would have been moving your queen to c7 because it saves your pawn from capture.",
+      "critique": "Qe3 does not attack b5. It attacks c5. I ignored a hanging c-pawn and you made it sound like the pawn I just pushed is the one that hangs. Name the square. Qc7 defends c5; that part is the actual lesson, buried under the wrong pawn."
+    },
+    {
+      "ply": 32,
+      "san": "Bd7",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your bishop to d7 is a blunder, but moving your queen to b6 would be better.",
+      "critique": "318cp, Lichess agrees it's a blunder, and you give me a SAN with no idea. Qb6 challenges the queen on c5. Your only reason is saves_piece, which is a benefit label on a blunder. If you cannot say why, don't call it a blunder and walk away."
+    },
+    {
+      "ply": 33,
+      "san": "Rhf1",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Moving your h1-rook to f1 is a blunder, but taking the pawn on d5 with your bishop would be better because you pin the pawn to the king and you take the defender of the black a8-rook.",
+      "critique": "d5 is not pinned to the king on g8, and a pawn on d5 is not the defender of the a8-rook. Bxd5 puts the bishop on the long diagonal toward a8 and can pin e6 to the king. You mashed blocker, defender, and pin into the wrong objects. Lichess called this a mistake, not a blunder."
+    },
+    {
+      "ply": 34,
+      "san": "a5",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your pawn to a5 is a blunder, but moving your f8-rook to e8 would be better.",
+      "critique": "238cp, empty reasons, Re8 with no why. The next four white misses are all Rxf8+. If the 8th rank is the problem, say so on this ply instead of waiting to dump fork-and-skewer jargon on a3. Lichess called this a mistake."
+    },
+    {
+      "ply": 35,
+      "san": "a3",
+      "severity": "high",
+      "category": "jargon",
+      "perspective": "both",
+      "quote": "Moving your pawn to a3 is a blunder, but taking the rook on f8 with your f1-rook would be better because you fork the black queen and the black king and you skewer the black queen, exposing the black a8-rook.",
+      "critique": "That is tactics bingo, not a lesson. Rxf8+ is a back-rank rook check on the 8th: king, queen, and a8-rook are on the same rank. Pick one sentence. Fork AND skewer of the same queen is how you make me skip the panel. This is also the start of you repeating Rxf8+ for four different plies."
+    },
+    {
+      "ply": 37,
+      "san": "cxb4",
+      "severity": "high",
+      "category": "eval_frame",
+      "perspective": "both",
+      "quote": "Taking the pawn on b4 with your c-pawn keeps you winning because the pawn was undefended. A better move would have been taking the rook on f8 with your f1-rook because you fork the black queen and the black king and you skewer the black queen, exposing the black a8-rook.",
+      "critique": "Classification is blunder, Lichess says inaccuracy, and the lead is 'keeps you winning' because you took a pawn. You cannot call it a blunder and a winning capture in one breath, then paste the same fork-and-skewer paragraph. I already heard this on a3."
+    },
+    {
+      "ply": 39,
+      "san": "Qxb4",
+      "severity": "medium",
+      "category": "redundant",
+      "perspective": "aesthetic",
+      "quote": "Taking the pawn on b4 with your queen keeps you winning because the pawn was undefended. A better move would have been taking the rook on f8 with your f1-rook because you fork the black queen and the black king and you skewer the black queen, exposing the black a8-rook.",
+      "critique": "Third copy of the same Rxf8+ word salad, plus the same 'keeps you winning' frame on a punished capture. If the idea has not changed, say 'still the back-rank rook check' once. I am not learning; I am being looped."
+    },
+    {
+      "ply": 40,
+      "san": "Qc7",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your queen to c7 is a blunder, but moving your f8-rook to e8 would be better.",
+      "critique": "339cp, empty reasons, Re8 with no why. The 8th rank is on fire and you keep suggesting rook moves without saying back rank. Lichess says mistake. At least admit the queen leaving d8 changes the Rxf8+ idea."
+    },
+    {
+      "ply": 41,
+      "san": "Qd4",
+      "severity": "high",
+      "category": "jargon",
+      "perspective": "both",
+      "quote": "Moving your queen to d4 is a blunder, but taking the rook on f8 with your f1-rook would be better because you fork the black a8-rook and the black king and you take the defender of the black a8-rook.",
+      "critique": "Fourth Rxf8+ lecture. Now the queen is off d8 so you switched from forking the queen to forking the a8-rook, then also 'take the defender of the a8-rook' which is the same rook you are capturing. That is circular. One line: rook check on the 8th, the other rook hangs. Reasons say saves_piece on a 395cp blunder. Stop."
+    },
+    {
+      "ply": 48,
+      "san": "Bb5",
+      "severity": "high",
+      "category": "classification",
+      "perspective": "technical",
+      "quote": "Moving your bishop to b5 is the strongest move.",
+      "critique": "105cp gone and you classified it best because it matched some top UCI. That is not MultiPV noise I can ignore. 'That's the one' after hanging a pawn's worth of eval trains me to ignore your labels."
+    },
+    {
+      "ply": 50,
+      "san": "Bxd3",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "You are still worse, but taking the bishop on d3 with your bishop puts it where the white rook and pawn can take and you lose a knight. A better move would have been taking the pawn on e5 with your queen because the pawn was undefended.",
+      "critique": "There are no knights left. I traded them on e5 ten moves ago. I put a bishop on d3 and you told me I lose a knight because your SEE bucket names a 300cp swing 'a knight'. Name the hanging bishop. Qxe5 is the real miss from the previous ply; that part is fine."
+    },
+    {
+      "ply": 51,
+      "san": "Qxe6+",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Taking the pawn on e6 with your queen is the strongest move because the pawn was undefended and you take the defender of the black pawn.",
+      "critique": "It is check. The SAN has a plus and you talked about an undefended pawn and a defender of another pawn. Check is the thing I need to notice. ignored_threat as a reason on a best move is also junk. Lead with the check."
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "no-benefit-because-on-punishment",
+      "title": "Never praise a punished move's benefits",
+      "feasibility": "high",
+      "layer": "discourse",
+      "detail": "Ply 16 used the castle phrase-bank line as the because-clause of an inaccuracy: 'inaccuracy because it gets your king out of danger'. Root cause: king_safety matches castlingRightsLost, so O-O is treated as a king-safety problem, problem reasons are empty, and playedBenefits leak into playedBecause. Do not match king_safety on the act of castling. If concept is not a benefit concept, refuse positive castle/development/king_safer clauses on inaccuracy/mistake/blunder."
+    },
+    {
+      "id": "saves-piece-not-destination",
+      "title": "Drop saves_piece when it names the square you just moved to",
+      "feasibility": "high",
+      "layer": "reasons",
+      "detail": "Ne4 was 'saves your e4-knight from capture' and Bxe3 was 'saves your pawn from capture'. Extend dropTautologyReasons/restatesMove: if saves_piece.piece.square === move.to, it is a destination tautology (the piece you moved is not a piece you rescued there). Prefer kicked_by_pawn / outpost for a knight jump away from a pawn kick."
+    },
+    {
+      "id": "recapture-is-not-undefended",
+      "title": "Stop calling recaptures winning an undefended piece",
+      "feasibility": "high",
+      "layer": "facts",
+      "detail": "dxc3, Nxe5, fxe5, Qxe3 all got wins_material plus 'the X was undefended' on equal trades. Gate wins_material on net SEE after legal recapture, and never say undefended if the captured unit had a defender on the before-FEN (Nc6 on e5). A 1200 notices immediately when a recapture is sold as a free piece."
+    },
+    {
+      "id": "gate-removed-defender",
+      "title": "Require the newly hanging unit to actually hang",
+      "feasibility": "high",
+      "layer": "facts",
+      "detail": "Nxc3 and Nxe5 both became 'take the defender of the white queen' with the queen safe on its starting file. Bxd5 became 'defender of the a8-rook' when d5 was a blocker on the long diagonal, not a defender. Emit removed_defender only if newlyHanging is attacked and not adequately defended after the move, and do not treat a line-blocker as a defender of the piece behind it."
+    },
+    {
+      "id": "name-hanging-piece-not-see-bucket",
+      "title": "Say the hanging piece, not the SEE piece-name",
+      "feasibility": "high",
+      "layer": "templates",
+      "detail": "Bxd3 produced 'you lose a knight' because hangingLossCopy → materialLabel maps 250–399cp to 'a knight', and a bishop sits in that bucket. Use the hanging unit's type from the reason (bishop on d3). Also put the square in ignored_threat copy (c5 not 'your pawn') so b5 is not blamed for Qe3×c5."
+    },
+    {
+      "id": "one-back-rank-sentence",
+      "title": "Collapse 8th-rank rook checks to one tactic",
+      "feasibility": "high",
+      "layer": "discourse",
+      "detail": "Rxf8+ was explained four times as fork AND skewer of the queen, then later fork of a8 AND take the defender of a8. When a rook captures on the back rank with check and other pieces sit on that rank, pick back_rank/check plus at most one hanging target. Do not concatenate fork + skewer + removed_defender. Repeat suggestions across plies should shorten, not reprint the paragraph."
+    },
+    {
+      "id": "cap-best-uci-override",
+      "title": "Don't call 50–100cp swings the strongest move",
+      "feasibility": "high",
+      "layer": "classification",
+      "detail": "classifyPlayedMove returns best whenever UCI matches the engine top move, so f4 (−50), Bb5 (−105), and other noisy swings still get 'is the strongest move' / 'That's the one.' Cap that override at a small loss (about 20–30cp) and fall through to classifyEvalLoss. If benefit reasons are empty, templates should not use the strongest-move verdict; say it is a normal developing move or name fianchetto/outpost from a real reason kind."
+    },
+    {
+      "id": "always-surface-check",
+      "title": "Lead with check when the move checks",
+      "feasibility": "high",
+      "layer": "discourse",
+      "detail": "Qxe6+ never mentioned check; describeBecause preferred wins_material and removed_defender. If effects.gaveCheck, force check/discovered_check into the because set ahead of material on a best move. A beginner-intermediate player is training to see the plus sign, not 'defender of the black pawn'."
+    }
+  ],
+  "whatWorked": [
+    "e5 really did unveil Bg2 onto d5; that discovered-attack sentence was true.",
+    "Bg5 'pin the bishop to the king' after O-O-O was the right tactic, named correctly.",
+    "Qxc5 'the pawn was undefended' was the one recapture-adjacent line that actually was a free pawn.",
+    "O-O-O tying king tuck to a rook coming in is the right lesson, even if the sentence is run-on.",
+    "Rb8 pinning the b2-pawn to the king on b1 is concrete and useful.",
+    "Bxf1 taking the hanging rook was short and true."
+  ]
+}

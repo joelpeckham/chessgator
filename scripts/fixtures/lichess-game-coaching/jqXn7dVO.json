@@ -1,0 +1,886 @@
+{
+  "gameId": "jqXn7dVO",
+  "white": {
+    "name": "peribimba",
+    "rating": 1652
+  },
+  "black": {
+    "name": "Shisui",
+    "rating": 1670
+  },
+  "speed": "blitz",
+  "opening": "Rat Defense: Small Center Defense",
+  "result": "1-0",
+  "moveCount": 44,
+  "moves": [
+    {
+      "ply": 1,
+      "san": "e4",
+      "uci": "e2e4",
+      "color": "w",
+      "fenBefore": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your pawn to e4 is the strongest move because you put more pressure on the center.",
+      "quip": "That's the one.",
+      "reasons": [
+        "center_control"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 25,
+      "evalAfterCp": 18,
+      "evalLossCp": 7,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 2,
+      "san": "e6",
+      "uci": "e7e6",
+      "color": "b",
+      "fenBefore": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your pawn to e6 is the strongest move because you control more central squares.",
+      "quip": "That's the one.",
+      "reasons": [
+        "center_control"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 18,
+      "evalAfterCp": 22,
+      "evalLossCp": 4,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 3,
+      "san": "d4",
+      "uci": "d2d4",
+      "color": "w",
+      "fenBefore": "rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your pawn to d4 is the strongest move because you control more central squares.",
+      "quip": "That's the one.",
+      "reasons": [
+        "backward_pawn",
+        "center_control"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 22,
+      "evalAfterCp": 29,
+      "evalLossCp": 0,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 4,
+      "san": "d6",
+      "uci": "d7d6",
+      "color": "b",
+      "fenBefore": "rnbqkbnr/pppp1ppp/4p3/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq - 0 2",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your pawn to d6 is the strongest move because you control more central squares.",
+      "quip": "That's the one.",
+      "reasons": [
+        "center_control"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 29,
+      "evalAfterCp": 68,
+      "evalLossCp": 39,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 5,
+      "san": "f4",
+      "uci": "f2f4",
+      "color": "w",
+      "fenBefore": "rnbqkbnr/ppp2ppp/3pp3/8/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your pawn to f4 is the strongest move.",
+      "quip": "That's the one.",
+      "reasons": [
+        "backward_pawn"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 68,
+      "evalAfterCp": 38,
+      "evalLossCp": 30,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 6,
+      "san": "Bd7",
+      "uci": "c8d7",
+      "color": "b",
+      "fenBefore": "rnbqkbnr/ppp2ppp/3pp3/8/3PPP2/8/PPP3PP/RNBQKBNR b KQkq - 0 3",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your c8-bishop to d7 is the strongest move.",
+      "quip": "That's the one.",
+      "reasons": [
+        "development"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 38,
+      "evalAfterCp": 80,
+      "evalLossCp": 42,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 7,
+      "san": "Nf3",
+      "uci": "g1f3",
+      "color": "w",
+      "fenBefore": "rn1qkbnr/pppb1ppp/3pp3/8/3PPP2/8/PPP3PP/RNBQKBNR w KQkq - 1 4",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your g1-knight to f3 is the strongest move.",
+      "quip": "That's the one.",
+      "reasons": [
+        "development"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 80,
+      "evalAfterCp": 51,
+      "evalLossCp": 29,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 8,
+      "san": "Be7",
+      "uci": "f8e7",
+      "color": "b",
+      "fenBefore": "rn1qkbnr/pppb1ppp/3pp3/8/3PPP2/5N2/PPP3PP/RNBQKB1R b KQkq - 2 4",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your f8-bishop to e7 is the strongest move.",
+      "quip": "That's the one.",
+      "reasons": [
+        "development"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 51,
+      "evalAfterCp": 72,
+      "evalLossCp": 21,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 9,
+      "san": "Be3",
+      "uci": "c1e3",
+      "color": "w",
+      "fenBefore": "rn1qk1nr/pppbbppp/3pp3/8/3PPP2/5N2/PPP3PP/RNBQKB1R w KQkq - 3 5",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your c1-bishop to e3 is the strongest move.",
+      "quip": "That's the one.",
+      "reasons": [
+        "development"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 72,
+      "evalAfterCp": 47,
+      "evalLossCp": 25,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 10,
+      "san": "Nf6",
+      "uci": "g8f6",
+      "color": "b",
+      "fenBefore": "rn1qk1nr/pppbbppp/3pp3/8/3PPP2/4BN2/PPP3PP/RN1QKB1R b KQkq - 4 5",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your g8-knight to f6 is the strongest move because you put more pressure on the center.",
+      "quip": "That's the one.",
+      "reasons": [
+        "development",
+        "center_control"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 47,
+      "evalAfterCp": 78,
+      "evalLossCp": 31,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 11,
+      "san": "Nc3",
+      "uci": "b1c3",
+      "color": "w",
+      "fenBefore": "rn1qk2r/pppbbppp/3ppn2/8/3PPP2/4BN2/PPP3PP/RN1QKB1R w KQkq - 5 6",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your b1-knight to c3 is the strongest move because it saves your pawn from capture.",
+      "quip": "That's the one.",
+      "reasons": [
+        "saves_piece"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 78,
+      "evalAfterCp": 52,
+      "evalLossCp": 26,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 12,
+      "san": "Ng4",
+      "uci": "f6g4",
+      "color": "b",
+      "fenBefore": "rn1qk2r/pppbbppp/3ppn2/8/3PPP2/2N1BN2/PPP3PP/R2QKB1R b KQkq - 6 6",
+      "classification": "inaccuracy",
+      "concept": "missed_improvement",
+      "explanation": "Moving your f6-knight to g4 is playable, but moving your pawn to c5 would be better because you can likely take a pawn.",
+      "quip": "There's better.",
+      "reasons": [],
+      "suggestedMoveSan": "c5",
+      "evalBeforeCp": 52,
+      "evalAfterCp": 111,
+      "evalLossCp": 59,
+      "lichessJudgment": "Inaccuracy"
+    },
+    {
+      "ply": 13,
+      "san": "Bg1",
+      "uci": "e3g1",
+      "color": "w",
+      "fenBefore": "rn1qk2r/pppbbppp/3pp3/8/3PPPn1/2N1BN2/PPP3PP/R2QKB1R w KQkq - 7 7",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your e3-bishop to g1 is the strongest move because it saves your g1-bishop from capture.",
+      "quip": "That's the one.",
+      "reasons": [
+        "saves_piece"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 111,
+      "evalAfterCp": 119,
+      "evalLossCp": 0,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 14,
+      "san": "e5",
+      "uci": "e6e5",
+      "color": "b",
+      "fenBefore": "rn1qk2r/pppbbppp/3pp3/8/3PPPn1/2N2N2/PPP3PP/R2QKBBR b KQkq - 8 7",
+      "classification": "inaccuracy",
+      "concept": "piece_safety",
+      "explanation": "You are still worse, but moving your pawn to e5 puts it at risk of attack from the white f3-knight and pawn. A better move would have been moving your pawn to c5.",
+      "quip": "There's better.",
+      "reasons": [
+        "hanging",
+        "center_control"
+      ],
+      "suggestedMoveSan": "c5",
+      "evalBeforeCp": 119,
+      "evalAfterCp": 212,
+      "evalLossCp": 93,
+      "lichessJudgment": "Inaccuracy"
+    },
+    {
+      "ply": 15,
+      "san": "dxe5",
+      "uci": "d4e5",
+      "color": "w",
+      "fenBefore": "rn1qk2r/pppbbppp/3p4/4p3/3PPPn1/2N2N2/PPP3PP/R2QKBBR w KQkq - 0 8",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Taking the pawn on e5 with your d-pawn is the strongest move because the pawn was undefended and it unveils an attack from your queen on the black pawn.",
+      "quip": "That's the one.",
+      "reasons": [
+        "doubled_pawns",
+        "wins_material",
+        "discovered_attack",
+        "discovered_attack"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 212,
+      "evalAfterCp": 214,
+      "evalLossCp": 0,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 16,
+      "san": "dxe5",
+      "uci": "d6e5",
+      "color": "b",
+      "fenBefore": "rn1qk2r/pppbbppp/3p4/4P3/4PPn1/2N2N2/PPP3PP/R2QKBBR b KQkq - 0 8",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Taking the pawn on e5 with your d-pawn is the strongest move.",
+      "quip": "That's the one.",
+      "reasons": [
+        "hanging",
+        "king_more_exposed",
+        "capture"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 214,
+      "evalAfterCp": 200,
+      "evalLossCp": 0,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 17,
+      "san": "f5",
+      "uci": "f4f5",
+      "color": "w",
+      "fenBefore": "rn1qk2r/pppbbppp/8/4p3/4PPn1/2N2N2/PPP3PP/R2QKBBR w KQkq - 0 9",
+      "classification": "mistake",
+      "concept": "missed_improvement",
+      "explanation": "Moving your pawn to f5 is a mistake, but moving your pawn to h3 would be better.",
+      "quip": "That was shaky.",
+      "reasons": [
+        "saves_piece"
+      ],
+      "suggestedMoveSan": "h3",
+      "evalBeforeCp": 200,
+      "evalAfterCp": 70,
+      "evalLossCp": 130,
+      "lichessJudgment": "Mistake"
+    },
+    {
+      "ply": 18,
+      "san": "Bh4+",
+      "uci": "e7h4",
+      "color": "b",
+      "fenBefore": "rn1qk2r/pppbbppp/8/4pP2/4P1n1/2N2N2/PPP3PP/R2QKBBR b KQkq - 0 9",
+      "classification": "blunder",
+      "concept": "check",
+      "explanation": "Moving your e7-bishop to h4 is a blunder because it forces the king to respond. A better move would have been moving your d7-bishop to c6 because it unveils an attack from your queen on the white queen.",
+      "quip": "Want to look at that?",
+      "reasons": [
+        "check"
+      ],
+      "suggestedMoveSan": "Bc6",
+      "evalBeforeCp": 70,
+      "evalAfterCp": 511,
+      "evalLossCp": 441,
+      "lichessJudgment": "Blunder"
+    },
+    {
+      "ply": 19,
+      "san": "g3",
+      "uci": "g2g3",
+      "color": "w",
+      "fenBefore": "rn1qk2r/pppb1ppp/8/4pP2/4P1nb/2N2N2/PPP3PP/R2QKBBR w KQkq - 1 10",
+      "classification": "blunder",
+      "concept": "missed_improvement",
+      "explanation": "Moving your pawn to g3 is a blunder, but taking the bishop on h4 with your f3-knight would be better because it unveils an attack from your queen on the black g4-knight.",
+      "quip": "Want to look at that?",
+      "reasons": [
+        "king_safer"
+      ],
+      "suggestedMoveSan": "Nxh4",
+      "evalBeforeCp": 511,
+      "evalAfterCp": 162,
+      "evalLossCp": 349,
+      "lichessJudgment": "Blunder"
+    },
+    {
+      "ply": 20,
+      "san": "Be7",
+      "uci": "h4e7",
+      "color": "b",
+      "fenBefore": "rn1qk2r/pppb1ppp/8/4pP2/4P1nb/2N2NP1/PPP4P/R2QKBBR b KQkq - 0 10",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your h4-bishop to e7 is the strongest move because it saves your e7-bishop from capture.",
+      "quip": "That's the one.",
+      "reasons": [
+        "saves_piece"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 162,
+      "evalAfterCp": 160,
+      "evalLossCp": 0,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 21,
+      "san": "h3",
+      "uci": "h2h3",
+      "color": "w",
+      "fenBefore": "rn1qk2r/pppbbppp/8/4pP2/4P1n1/2N2NP1/PPP4P/R2QKBBR w KQkq - 1 11",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your pawn to h3 is the strongest move.",
+      "quip": "That's the one.",
+      "reasons": [],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 160,
+      "evalAfterCp": 149,
+      "evalLossCp": 11,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 22,
+      "san": "Nf6",
+      "uci": "g4f6",
+      "color": "b",
+      "fenBefore": "rn1qk2r/pppbbppp/8/4pP2/4P1n1/2N2NPP/PPP5/R2QKBBR b KQkq - 0 11",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your g4-knight to f6 is the strongest move because it saves your f6-knight from capture.",
+      "quip": "That's the one.",
+      "reasons": [
+        "hanging",
+        "saves_piece"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 149,
+      "evalAfterCp": 147,
+      "evalLossCp": 0,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 23,
+      "san": "Nxe5",
+      "uci": "f3e5",
+      "color": "w",
+      "fenBefore": "rn1qk2r/pppbbppp/5n2/4pP2/4P3/2N2NPP/PPP5/R2QKBBR w KQkq - 1 12",
+      "classification": "mistake",
+      "concept": "capture",
+      "explanation": "Taking the pawn on e5 with your f3-knight is a mistake because the pawn was undefended. A better move would have been moving your queen to d3 because you pin the bishop to the queen.",
+      "quip": "That was shaky.",
+      "reasons": [
+        "wins_material",
+        "capture"
+      ],
+      "suggestedMoveSan": "Qd3",
+      "evalBeforeCp": 147,
+      "evalAfterCp": 20,
+      "evalLossCp": 127,
+      "lichessJudgment": "Mistake"
+    },
+    {
+      "ply": 24,
+      "san": "Nc6",
+      "uci": "b8c6",
+      "color": "b",
+      "fenBefore": "rn1qk2r/pppbbppp/5n2/4NP2/4P3/2N3PP/PPP5/R2QKBBR b KQkq - 0 12",
+      "classification": "mistake",
+      "concept": "missed_improvement",
+      "explanation": "Moving your b8-knight to c6 is a mistake, but moving your e7-bishop to d6 would be better.",
+      "quip": "That was shaky.",
+      "reasons": [],
+      "suggestedMoveSan": "Bd6",
+      "evalBeforeCp": 20,
+      "evalAfterCp": 134,
+      "evalLossCp": 114,
+      "lichessJudgment": "Mistake"
+    },
+    {
+      "ply": 25,
+      "san": "Nxd7",
+      "uci": "e5d7",
+      "color": "w",
+      "fenBefore": "r2qk2r/pppbbppp/2n2n2/4NP2/4P3/2N3PP/PPP5/R2QKBBR w KQkq - 1 13",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Taking the bishop on d7 with your e5-knight is the strongest move.",
+      "quip": "That's the one.",
+      "reasons": [
+        "hanging",
+        "capture"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 134,
+      "evalAfterCp": 96,
+      "evalLossCp": 38,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 26,
+      "san": "Qxd7",
+      "uci": "d8d7",
+      "color": "b",
+      "fenBefore": "r2qk2r/pppNbppp/2n2n2/5P2/4P3/2N3PP/PPP5/R2QKBBR b KQkq - 0 13",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Taking the knight on d7 with your queen is the strongest move because the knight was undefended.",
+      "quip": "That's the one.",
+      "reasons": [
+        "wins_material",
+        "capture",
+        "king_safer"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 96,
+      "evalAfterCp": 98,
+      "evalLossCp": 2,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 27,
+      "san": "Qxd7+",
+      "uci": "d1d7",
+      "color": "w",
+      "fenBefore": "r3k2r/pppqbppp/2n2n2/5P2/4P3/2N3PP/PPP5/R2QKBBR w KQkq - 0 14",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Taking the queen on d7 with your queen is the strongest move because you fork the black king and the black bishop and you take the defender of the black pawn.",
+      "quip": "That's the one.",
+      "reasons": [
+        "hanging",
+        "fork",
+        "removed_defender",
+        "capture"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 98,
+      "evalAfterCp": 104,
+      "evalLossCp": 0,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 28,
+      "san": "Nxd7",
+      "uci": "f6d7",
+      "color": "b",
+      "fenBefore": "r3k2r/pppQbppp/2n2n2/5P2/4P3/2N3PP/PPP5/R3KBBR b KQkq - 0 14",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Taking the queen on d7 with your f6-knight is the strongest move because the queen was undefended.",
+      "quip": "That's the one.",
+      "reasons": [
+        "wins_material",
+        "capture",
+        "saves_piece"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 104,
+      "evalAfterCp": 94,
+      "evalLossCp": 0,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 29,
+      "san": "Bd3",
+      "uci": "f1d3",
+      "color": "w",
+      "fenBefore": "r3k2r/pppnbppp/2n5/5P2/4P3/2N3PP/PPP5/R3KBBR w KQkq - 0 15",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your f1-bishop to d3 is the strongest move.",
+      "quip": "That's the one.",
+      "reasons": [],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 94,
+      "evalAfterCp": 70,
+      "evalLossCp": 24,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 30,
+      "san": "O-O-O",
+      "uci": "e8c8",
+      "color": "b",
+      "fenBefore": "r3k2r/pppnbppp/2n5/5P2/4P3/2NB2PP/PPP5/R3K1BR b KQkq - 1 15",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Castling queenside is the strongest move because it gives your king shelter and brings your rook closer to the center and it gives your rook an open file.",
+      "quip": "That's the one.",
+      "reasons": [
+        "castle",
+        "open_file"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 70,
+      "evalAfterCp": 82,
+      "evalLossCp": 12,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 31,
+      "san": "O-O-O",
+      "uci": "e1c1",
+      "color": "w",
+      "fenBefore": "2kr3r/pppnbppp/2n5/5P2/4P3/2NB2PP/PPP5/R3K1BR w KQ - 2 16",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Castling queenside is the strongest move because it gives your king shelter and brings your rook closer to the center and it gives your rook an open file.",
+      "quip": "That's the one.",
+      "reasons": [
+        "castle",
+        "open_file"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 82,
+      "evalAfterCp": 82,
+      "evalLossCp": 0,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 32,
+      "san": "Nde5",
+      "uci": "d7e5",
+      "color": "b",
+      "fenBefore": "2kr3r/pppnbppp/2n5/5P2/4P3/2NB2PP/PPP5/2KR2BR b - - 3 16",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your d7-knight to e5 is the strongest move because it unveils an attack from your rook on the white d3-bishop.",
+      "quip": "That's the one.",
+      "reasons": [
+        "discovered_attack"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 82,
+      "evalAfterCp": 111,
+      "evalLossCp": 29,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 33,
+      "san": "Be2",
+      "uci": "d3e2",
+      "color": "w",
+      "fenBefore": "2kr3r/ppp1bppp/2n5/4nP2/4P3/2NB2PP/PPP5/2KR2BR w - - 4 17",
+      "classification": "inaccuracy",
+      "concept": "king_safety",
+      "explanation": "Moving your d3-bishop to e2 gives the opponent more access to your king. A better move would have been moving your g1-bishop to e3.",
+      "quip": "There's better.",
+      "reasons": [
+        "king_more_exposed",
+        "back_rank",
+        "discovered_attack"
+      ],
+      "suggestedMoveSan": "Be3",
+      "evalBeforeCp": 111,
+      "evalAfterCp": 18,
+      "evalLossCp": 93,
+      "lichessJudgment": "Inaccuracy"
+    },
+    {
+      "ply": 34,
+      "san": "Bg5+",
+      "uci": "e7g5",
+      "color": "b",
+      "fenBefore": "2kr3r/ppp1bppp/2n5/4nP2/4P3/2N3PP/PPP1B3/2KR2BR b - - 5 17",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your bishop to g5 is the strongest move because it puts the opponent in check.",
+      "quip": "That's the one.",
+      "reasons": [
+        "check"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 18,
+      "evalAfterCp": 16,
+      "evalLossCp": 0,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 35,
+      "san": "Kb1",
+      "uci": "c1b1",
+      "color": "w",
+      "fenBefore": "2kr3r/ppp2ppp/2n5/4nPb1/4P3/2N3PP/PPP1B3/2KR2BR w - - 6 18",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your king to b1 is the strongest move because your king is harder to attack.",
+      "quip": "That's the one.",
+      "reasons": [
+        "king_safer"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 16,
+      "evalAfterCp": 15,
+      "evalLossCp": 1,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 36,
+      "san": "Nd4",
+      "uci": "c6d4",
+      "color": "b",
+      "fenBefore": "2kr3r/ppp2ppp/2n5/4nPb1/4P3/2N3PP/PPP1B3/1K1R2BR b - - 7 18",
+      "classification": "blunder",
+      "concept": "piece_safety",
+      "explanation": "Moving your c6-knight to d4 puts it where the white d1-rook and g1-bishop can take and you lose a knight. A better move would have been taking the rook on d1 with your d8-rook because you fork the white king and the white g1-bishop and then pin the bishop to the rook.",
+      "quip": "Want to look at that?",
+      "reasons": [
+        "hanging",
+        "king_safer"
+      ],
+      "suggestedMoveSan": "Rxd1+",
+      "evalBeforeCp": 15,
+      "evalAfterCp": 549,
+      "evalLossCp": 534,
+      "lichessJudgment": "Blunder"
+    },
+    {
+      "ply": 37,
+      "san": "Bxd4",
+      "uci": "g1d4",
+      "color": "w",
+      "fenBefore": "2kr3r/ppp2ppp/8/4nPb1/3nP3/2N3PP/PPP1B3/1K1R2BR w - - 8 19",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Taking the knight on d4 with your g1-bishop is the strongest move because the knight was undefended.",
+      "quip": "That's the one.",
+      "reasons": [
+        "wins_material",
+        "capture",
+        "king_safer"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 549,
+      "evalAfterCp": 544,
+      "evalLossCp": 5,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 38,
+      "san": "f6",
+      "uci": "f7f6",
+      "color": "b",
+      "fenBefore": "2kr3r/ppp2ppp/8/4nPb1/3BP3/2N3PP/PPP1B3/1K1R3R b - - 0 19",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your pawn to f6 is the strongest move because it saves your knight from capture.",
+      "quip": "That's the one.",
+      "reasons": [
+        "ignored_threat",
+        "saves_piece",
+        "outpost"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 544,
+      "evalAfterCp": 557,
+      "evalLossCp": 13,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 39,
+      "san": "Bxe5",
+      "uci": "d4e5",
+      "color": "w",
+      "fenBefore": "2kr3r/ppp3pp/5p2/4nPb1/3BP3/2N3PP/PPP1B3/1K1R3R w - - 0 20",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Taking the knight on e5 with your d4-bishop is the strongest move because it unveils an attack from your rook on the black d8-rook.",
+      "quip": "That's the one.",
+      "reasons": [
+        "hanging",
+        "back_rank",
+        "discovered_attack",
+        "capture"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 557,
+      "evalAfterCp": 539,
+      "evalLossCp": 18,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 40,
+      "san": "fxe5",
+      "uci": "f6e5",
+      "color": "b",
+      "fenBefore": "2kr3r/ppp3pp/5p2/4BPb1/4P3/2N3PP/PPP1B3/1K1R3R b - - 0 20",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Taking the bishop on e5 with your f-pawn is the strongest move because the bishop was undefended.",
+      "quip": "That's the one.",
+      "reasons": [
+        "isolated_pawn",
+        "wins_material",
+        "capture",
+        "king_safer"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 539,
+      "evalAfterCp": 536,
+      "evalLossCp": 0,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 41,
+      "san": "Rxd8+",
+      "uci": "d1d8",
+      "color": "w",
+      "fenBefore": "2kr3r/ppp3pp/8/4pPb1/4P3/2N3PP/PPP1B3/1K1R3R w - - 0 21",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Taking the rook on d8 with your d1-rook is the strongest move because you fork the black king and the black h8-rook and you take the defender of the black h8-rook.",
+      "quip": "That's the one.",
+      "reasons": [
+        "hanging",
+        "fork",
+        "removed_defender",
+        "capture"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 536,
+      "evalAfterCp": 515,
+      "evalLossCp": 21,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 42,
+      "san": "Rxd8",
+      "uci": "h8d8",
+      "color": "b",
+      "fenBefore": "2kR3r/ppp3pp/8/4pPb1/4P3/2N3PP/PPP1B3/1K5R b - - 0 21",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Taking the rook on d8 with your rook is the strongest move because the rook was undefended.",
+      "quip": "That's the one.",
+      "reasons": [
+        "wins_material",
+        "capture",
+        "saves_piece"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 515,
+      "evalAfterCp": 522,
+      "evalLossCp": 7,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 43,
+      "san": "Rd1",
+      "uci": "h1d1",
+      "color": "w",
+      "fenBefore": "2kr4/ppp3pp/8/4pPb1/4P3/2N3PP/PPP1B3/1K5R w - - 0 22",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Moving your rook to d1 is the strongest move because it gives your rook an open file.",
+      "quip": "That's the one.",
+      "reasons": [
+        "open_file"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 522,
+      "evalAfterCp": 509,
+      "evalLossCp": 13,
+      "lichessJudgment": null
+    },
+    {
+      "ply": 44,
+      "san": "Rxd1+",
+      "uci": "d8d1",
+      "color": "b",
+      "fenBefore": "2kr4/ppp3pp/8/4pPb1/4P3/2N3PP/PPP1B3/1K1R4 b - - 1 22",
+      "classification": "best",
+      "concept": "best_move",
+      "explanation": "Taking the rook on d1 with your rook is the strongest move because it gives your king better protection and it puts the opponent in check.",
+      "quip": "That's the one.",
+      "reasons": [
+        "hanging",
+        "capture",
+        "king_safer",
+        "check"
+      ],
+      "suggestedMoveSan": null,
+      "evalBeforeCp": 509,
+      "evalAfterCp": 516,
+      "evalLossCp": 7,
+      "lichessJudgment": null
+    }
+  ]
+}

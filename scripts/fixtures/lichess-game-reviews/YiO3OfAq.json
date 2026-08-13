@@ -1,0 +1,272 @@
+{
+  "gameId": "YiO3OfAq",
+  "white": "tymsonek_jelonek (1164)",
+  "black": "Vicknesh26 (1650)",
+  "movesReviewed": 37,
+  "movesFlagged": 22,
+  "okShare": 0.405,
+  "flags": [
+    {
+      "ply": 3,
+      "san": "d4",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your pawn to d4 is the strongest move because you control more central squares.",
+      "critique": "I just put a pawn on d4 that Black can take for free. That is a pawn offer, not 'controlling more central squares.' If this is a Smith-Morra or even just 2.d4 in a Sicilian, tell me I am hanging d4 on purpose for development. Center-control boilerplate on a hanging pawn is how I learn the wrong idea."
+    },
+    {
+      "ply": 5,
+      "san": "Qxd4",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the pawn on d4 with your queen is the strongest move because you pin the pawn to the rook and then pin another pawn to the queen.",
+      "critique": "I recaptured a pawn with my queen. I did not play this move to pin g7 to the h8-rook and d7 to the queen — those are unmoved pawns on starting squares, and neither pin does anything. The real lesson is I got my pawn back and my queen is sitting in the middle of the board waiting to be kicked. Inventing two 'pins' as the because-clause is a lie."
+    },
+    {
+      "ply": 6,
+      "san": "Nc6",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your b8-knight to c6 is the strongest move because you claim more of the center.",
+      "critique": "Nc6 attacks the queen on d4. That is the entire point of this move in every 3.Qxd4 Sicilian I have ever been shown. 'Claim more of the center' is the same sentence you used for e4 and c5. I needed 'you develop and hit the queen, winning a tempo.'"
+    },
+    {
+      "ply": 8,
+      "san": "a6",
+      "severity": "medium",
+      "category": "generic",
+      "perspective": "both",
+      "quote": "Moving your pawn to a6 is playable, but moving your g8-knight to f6 would be better because you put more pressure on the center.",
+      "critique": "a6 is a normal Sicilian move and you still owe me why it is worse. Nf6 is better because it develops and hits e4, not because of generic 'pressure on the center.' Empty reasons array, empty lesson."
+    },
+    {
+      "ply": 9,
+      "san": "Nc3",
+      "severity": "medium",
+      "category": "generic",
+      "perspective": "aesthetic",
+      "quote": "Moving your b1-knight to c3 is the strongest move.",
+      "critique": "No because-clause. You even had a development reason and then said nothing. 'Strongest move' with no idea is a sticker, not coaching. At least tell me it develops toward d5/e4 and prepares to castle."
+    },
+    {
+      "ply": 10,
+      "san": "d6",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your pawn to d6 is the strongest move.",
+      "critique": "d6 is the Sicilian d-pawn: it stops e5, frees the bishop, and is the whole structure. You gave me a verdict and a quip. That is not a lesson."
+    },
+    {
+      "ply": 11,
+      "san": "Qg3",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your queen to g3 is the strongest move.",
+      "critique": "The queen leaves e3 and stares at g7. That is kingside pressure, not a mystery teleport. If you cannot say 'you aim at the black king / g7,' do not call it the strongest move and walk away."
+    },
+    {
+      "ply": 14,
+      "san": "g6",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your pawn to g6 is the strongest move.",
+      "critique": "White's queen is sitting on g3 looking at g7. g6 is the fianchetto that blunts that queen and prepares Bg7. You treated a pointed pawn move like I shuffled a random pawn. I would roll my eyes and skip the coach."
+    },
+    {
+      "ply": 19,
+      "san": "e5",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your pawn to e5 is a mistake, but moving your pawn to h3 would be better.",
+      "critique": "155 centipawns and you will not tell me why. e5 opens the d-file so ...dxe5 unveils my opponent's queen onto the d3-bishop — you even teach that discovery on the next ply. Suggesting h3 with no reason, while the played move's 'discovered attack' is a useless x-ray of Bd3 onto g6, is how I learn nothing from the critical mistake."
+    },
+    {
+      "ply": 21,
+      "san": "Nxe5",
+      "severity": "high",
+      "category": "overclaim",
+      "perspective": "technical",
+      "quote": "Taking the pawn on e5 with your f3-knight is the strongest move because the pawn was undefended.",
+      "critique": "The e5-pawn is defended by the knight on c6. It is under-defended because after ...Nxe5 your queen recaptures. Calling a defended pawn 'undefended' is a SEE shortcut I will notice the moment I count attackers. Teach the backup: take on e5; if they recapture, Qxe5."
+    },
+    {
+      "ply": 22,
+      "san": "Be6",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your c8-bishop to e6 is a mistake, but moving your f6-knight to h5 would be better because it unveils an attack from your bishop on the white e5-knight.",
+      "critique": "Nh5 also attacks the queen on g3. You only mentioned the discovered bishop on the knight. I missed a queen-hit plus a discovery and you sold me half a tactic. That is the same Nh5 idea you later describe as a fork — say it here too."
+    },
+    {
+      "ply": 23,
+      "san": "Nxc6",
+      "severity": "high",
+      "category": "overclaim",
+      "perspective": "technical",
+      "quote": "Taking the knight on c6 with your e5-knight is the strongest move because you take the defender of the black queen.",
+      "critique": "This is a knight trade. The queen on d8 still has two rooks looking at it. You make it sound like a removal-of-guard shot that wins the queen. I would play Nxc6 expecting to take a queen next and then get confused. Say you trade on c6 and mess up their pawns, not that you stripped the queen's only defender."
+    },
+    {
+      "ply": 24,
+      "san": "bxc6",
+      "severity": "medium",
+      "category": "tautology",
+      "perspective": "aesthetic",
+      "quote": "Taking the knight on c6 with your b-pawn is the strongest move because the knight was undefended.",
+      "critique": "You took my knight, so I take back. 'Strongest because it was undefended' is 'you recapture because you recapture.' If there is a lesson it is doubled c-pawns and the open b-file, not a gold star for knowing captures work."
+    },
+    {
+      "ply": 25,
+      "san": "Bf4",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your c1-bishop to f4 is a mistake, but moving your a1-rook to b1 would be better.",
+      "critique": "Bf4 puts the bishop on the same fork square as the queen: ...Nh5 hits Qg3 and Bf4 and opens Bg7 onto the knight. You name Rb1 with zero why and never mention the fork I just walked into. That is the same tactic you praise two moves later. Teach it when I blunder into it."
+    },
+    {
+      "ply": 26,
+      "san": "Qe8",
+      "severity": "medium",
+      "category": "classification",
+      "perspective": "both",
+      "quote": "Moving your queen to e8 is a mistake, but moving your knight to h5 would be better because you fork the white f4-bishop and the white queen and it unveils an attack from your bishop on the white knight.",
+      "critique": "The Nh5 line is actually a lesson, thank you — then you stamp a 175-centipawn miss of a winning fork as a 'mistake' and quip 'That was shaky.' Lichess called it a blunder because I left a piece-winning tactic on the table. Shaky is for a slightly worse pawn push, not missing the fork you just described."
+    },
+    {
+      "ply": 27,
+      "san": "Na4",
+      "severity": "medium",
+      "category": "generic",
+      "perspective": "both",
+      "quote": "Moving your knight to a4 is playable, but moving your f4-bishop to e5 would be better.",
+      "critique": "Better than what, and why? Na4 is a rim knight; Be5 would sit in the hole and maybe block the long diagonal. You gave me a SAN and a shrug. If you cannot say Be5 centralizes or kills ...Nh5 ideas, do not bother."
+    },
+    {
+      "ply": 28,
+      "san": "Nh5",
+      "severity": "medium",
+      "category": "generic",
+      "perspective": "aesthetic",
+      "quote": "Moving your knight to h5 is the strongest move because you fork the white f4-bishop and the white queen and it unveils an attack from your bishop on the white pawn.",
+      "critique": "The fork is the good part. Then 'the white pawn' — which pawn? It is b2, and you could say the square. Vague extra clauses after a real tactic make me stop trusting the sentence."
+    },
+    {
+      "ply": 31,
+      "san": "Qxf4",
+      "severity": "medium",
+      "category": "grammar",
+      "perspective": "both",
+      "quote": "Taking the knight on f4 with your queen is the strongest move because the knight was undefended and then pin the pawn to the rook.",
+      "critique": "That is not English: 'undefended and then pin the pawn.' I recaptured a knight. The incidental pin of f7 to the f8-rook is not why I took back. Broken grammar plus a fake second idea is worse than saying nothing."
+    },
+    {
+      "ply": 34,
+      "san": "Qa5",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your queen to a5 is the strongest move.",
+      "critique": "Qa5 attacks the knight on a4. That is the move. You had a chance to teach 'look at loose pieces on the rim' and instead printed the strongest-move stamp again. I cannot learn what I am supposed to look for."
+    },
+    {
+      "ply": 35,
+      "san": "Rfd1",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your f1-rook to d1 is the strongest move because it gives your rook an open file.",
+      "critique": "My knight on a4 is sitting under the queen, and you talk about an open file — with my own bishop still on d3 blocking it. The real idea is the knight is protected by Qf4, so ...Qxa4 loses the queen. You even stored ignored_threat and then surfaced the file. This is the poisoned-piece moment of the game and you missed it."
+    },
+    {
+      "ply": 36,
+      "san": "Qxa4",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "both",
+      "quote": "Taking the knight on a4 with your queen puts it at risk of attack from the white queen. A better move would have been taking the pawn on a2 with your e6-bishop because the pawn was undefended and you take the defender of the white b1-rook.",
+      "critique": "I hung my queen. 'At risk of attack' is what you say when a piece might get kicked, not when Qxa4 takes a free queen for 791 centipawns. And a2 does not defend the rook on b1 — Bxa2 takes a pawn and attacks the rook. You invented a removal-of-guard that is not on the board. I would not trust another sentence after this."
+    },
+    {
+      "ply": 37,
+      "san": "Qxa4",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "both",
+      "quote": "Taking the queen on a4 with your queen is the strongest move because the queen was undefended and then pin the pawn to the rook.",
+      "critique": "I took a free queen. Stop. Do not glue on 'and then pin the pawn to the rook' (a6 to a8) like that is the point, and fix the grammar while you are at it. This is the same broken 'undefended and then pin' template as Qxf4, now used on the most obvious recapture in the game."
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "gate-incidental-relative-pins",
+      "title": "Stop teaching recaptures as pawn pins",
+      "feasibility": "high",
+      "layer": "reasons",
+      "detail": "Relative pins of unmoved pawns (g7 to h8, d7 to d8, f7 to f8, a6 to a8) are beating the actual recapture in selectBecauseReasons because pin ranks above wins_material. Gate relative pins unless the pinned unit can legally move off the ray or the pin is immediately exploitable, and never follow up a recapture with 'and then pin the pawn to the rook.' A 1200 hears two tactics that are not why the move was played."
+    },
+    {
+      "id": "name-queen-hangs",
+      "title": "Say you hung the queen",
+      "feasibility": "high",
+      "layer": "templates",
+      "detail": "hangingLossCopy returns null when |seeCp| > 400, so a 900cp queen hang becomes 'puts it at risk of attack from the white queen.' Extend the band (or special-case Q/R) so the problem line is 'puts it where the queen can take and you lose a queen.' This is the ply-36 punchline a club player actually needs."
+    },
+    {
+      "id": "undefended-means-no-defenders",
+      "title": "Don't call defended pieces undefended",
+      "feasibility": "high",
+      "layer": "phrase-bank",
+      "detail": "wins_material copy uses 'the X was undefended' whenever SEE >= piece value − 50, even if namedAttackers shows a defender (e5 held by Nc6; recapture loses to Qxe5). Split the template: zero defenders → undefended; SEE win with defenders → 'it is under-defended' / 'you take and their recapture loses.' Same bug labels recaptures as winning material."
+    },
+    {
+      "id": "removed-defender-must-defend",
+      "title": "Require the captured unit to actually defend",
+      "feasibility": "high",
+      "layer": "facts",
+      "detail": "detectRemovedDefender fires when any opponent unit becomes hanging after a capture, including when defendersBefore.length === 1 even if the captured piece is not that defender. Bxa2 therefore 'takes the defender of the b1-rook' when the pawn never attacked b1 — the bishop is a new attacker. Also skip when the target still has other defenders (Nxc6 vs the d8-queen). Require the captured square to be in namedAttackers of the newly hanging unit."
+    },
+    {
+      "id": "surface-hits-on-queen",
+      "title": "Rank attacks on the queen over center control",
+      "feasibility": "high",
+      "layer": "discourse",
+      "detail": "Nc6 vs Qd4, Nh5 vs Qg3, and Qa5 vs Na4 all lost to center_control or an empty because. Add a cheap attacks_higher_piece fact (moved piece newly attacks Q/R) and let it win pickBenefitReasons over GENERIC_KINDS. A 1200 will notice immediately that Nc6 is a tempo on the queen, not a center claim."
+    },
+    {
+      "id": "keep-a-because-clause",
+      "title": "Never print strongest move with no because",
+      "feasibility": "high",
+      "layer": "discourse",
+      "detail": "dropTautologyReasons strips development when it restates the moved piece, then templates still say 'is the strongest move.' Nc3, d6, Qg3, g6, Bd3, Qa5 all die this way. If the because list is empty, keep a specific development/purpose line (prepares fianchetto, aims at g7, attacks the loose knight) or downgrade the verdict. Blank strongest-move stamps train people to ignore the coach."
+    },
+    {
+      "id": "explain-why-the-mistake-fails",
+      "title": "Name the refutation, not just a better SAN",
+      "feasibility": "high",
+      "layer": "templates",
+      "detail": "missedImprovementSentence for e5, Bf4, and Na4 is 'X is a mistake/playable, but Y would be better' with no suggestedBecause and no played problem. Prefer the next-ply discovery (dxe5 unveils Qd8 onto Bd3) or the fork you walked into (...Nh5). Empty better-move sentences are the worst thing you can show after a 125–155cp swing."
+    },
+    {
+      "id": "poisoned-piece-over-open-file",
+      "title": "Teach protected pieces before open files",
+      "feasibility": "medium",
+      "layer": "discourse",
+      "detail": "When a piece is attacked but SEE is 0 because the recapture hangs the taker (Na4 attacked by Qa5, defended by Qf4), rank that over open_file. Rfd1 is 'best' while ignored_threat sits unused and the d-file is blocked by Bd3. Detect 'taking this loses the queen' from SEE on the attacked square and surface it as the because so ply 35 sets up ply 36 instead of contradicting it."
+    }
+  ],
+  "whatWorked": [
+    "Castling copy on plies 17–18 actually says king safety plus rook activation instead of 'strongest move.'",
+    "dxe5 (ply 20) correctly names the discovered queen hit on Bd3 — the real idea behind White's e5 mistake.",
+    "Qe3 (ply 7 and 29) is honest: the queen is attacked, you save it.",
+    "The Nh5 fork of Bf4 and Qg3 on ply 26 (and again on 28) is the clearest tactic sentence in the dump."
+  ]
+}

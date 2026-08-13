@@ -1,0 +1,300 @@
+{
+  "gameId": "QcyjNE0W",
+  "white": "spdhirajvishvesh (1500)",
+  "black": "habibaram (1652)",
+  "movesReviewed": 50,
+  "movesFlagged": 25,
+  "okShare": 0.5,
+  "flags": [
+    {
+      "ply": 21,
+      "san": "Na4",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "both",
+      "quote": "Moving your knight to a4 creates a backward pawn to defend. A better move would have been moving your knight to e2.",
+      "critique": "This is the game. My knight on c3 is hanging to the d4 pawn, and Na4 dumps it on the rim where b5 hits knight and bishop together. You lectured me about a backward pawn that is not the story. Say: the knight is en prise, a4 is a trap, Ne2 just steps out of the pawn's way."
+    },
+    {
+      "ply": 22,
+      "san": "b5",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your pawn to b5 is the strongest move.",
+      "critique": "Empty sentence on the move that actually wins the game. b5 is a pawn fork: it attacks the bishop on c4 and the knight on a4 at the same time. If you cannot name a double attack here, I should not trust you on quieter moves either."
+    },
+    {
+      "ply": 26,
+      "san": "bxa4",
+      "severity": "high",
+      "category": "overclaim",
+      "perspective": "technical",
+      "quote": "Taking the knight on a4 with your b-pawn keeps you winning because the knight was undefended. A better move would have been moving your bishop to e7 because you can likely take a knight.",
+      "critique": "I just took the hanging knight the whole combination was built for, and you ding me, then invent a capture on Be7. Be7 develops and prepares to castle; it does not take a knight. Do not sell a later PV capture as the reason for a quiet developing move."
+    },
+    {
+      "ply": 40,
+      "san": "Bxe3",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the rook on e3 with your bishop is the strongest move because you pin the pawn to the king and you come out a bishop ahead.",
+      "critique": "I took a rook with a bishop. That is the exchange, not 'a bishop ahead,' and the pin on f2 is a leftover after the capture. Lead with: you win the rook, they recapture, you are up the exchange."
+    },
+    {
+      "ply": 16,
+      "san": "Bxf3",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the knight on f3 with your g4-bishop is the strongest move because you take the defender of the white queen.",
+      "critique": "The knight on f3 is not defending the queen. I traded a bishop for a knight that was sitting in a pin. Calling it removed-defender is a detector lie, and 'strongest' on a 34cp swing is extra cheese."
+    },
+    {
+      "ply": 9,
+      "san": "d3",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Moving your pawn to d3 is the strongest move because it unveils an attack from your bishop on the black pawn.",
+      "critique": "d3 supports e4 and lets the c1-bishop into the game. The 'discovered attack' is the undeveloped bishop staring at a perfectly defended h6 pawn. That is not a tactic. Teach the quiet Italian/Philidor setup, not a fake discovery."
+    },
+    {
+      "ply": 46,
+      "san": "Ree2",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your e8-rook to e2 is the strongest move.",
+      "critique": "Doubled rooks on the seventh. This is the textbook endgame picture 800–1400 players are told to dream about, and you gave me a blank verdict. Name the seventh rank. Name both rooks."
+    },
+    {
+      "ply": 18,
+      "san": "Nd4",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your c6-knight to d4 is a mistake, but moving your c6-knight to a5 would be better.",
+      "critique": "Tautology. Nd4 looks like an outpost and hits the queen, then Be3 just takes it and my center collapses. Na5 hits the c4-bishop. Tell me why the pretty knight hop loses and why the rim knight actually pressures something."
+    },
+    {
+      "ply": 6,
+      "san": "h6",
+      "severity": "high",
+      "category": "overclaim",
+      "perspective": "both",
+      "quote": "Moving your pawn to h6 is the strongest move.",
+      "critique": "No reason, 30cp worse for me, and you still say strongest. This is a beginner luft/prophylaxis pawn while my pieces sit at home. If you cannot say 'stops Bg5/Ng5' or 'this is slow, develop Nf6,' do not call it the one."
+    },
+    {
+      "ply": 15,
+      "san": "Qe2",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your queen to e2 is the strongest move.",
+      "critique": "Bg4 is pinning Nf3 to the queen on d1. Qe2 steps off the pin line. You filed it under development and said nothing. That is the whole point of the move."
+    },
+    {
+      "ply": 25,
+      "san": "exd5",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the knight on d5 with your e-pawn is the strongest move because the knight was undefended.",
+      "critique": "I am recapturing. That is not winning material, and the reason list still has ignored-threat and trapped from the previous blunder. Recapture, pawn takes knight, stop pretending I pocketed a piece."
+    },
+    {
+      "ply": 24,
+      "san": "Nxd5",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the bishop on d5 with your knight is the strongest move because it saves your a8-rook from capture.",
+      "critique": "I am taking a bishop they parked on d5. Yes the bishop also eyes a8, but the lesson is you hang a piece, I take it. Framing a winning capture as 'saving my rook' is backwards and makes me think the rook was the problem."
+    },
+    {
+      "ply": 49,
+      "san": "h4",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Moving your pawn to h4 is the strongest move.",
+      "critique": "I have doubled enemy rooks on the second rank and you praise h4 as a pawn-shield idea. Pushing h2–h4 thins the cover in front of my king; it does not build a shield. Do not stamp pawn_shield on a desperate h-pawn lunge."
+    },
+    {
+      "ply": 17,
+      "san": "Qxf3",
+      "severity": "medium",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the bishop on f3 with your queen is the strongest move because the bishop was undefended.",
+      "critique": "I recaptured the piece that just took my knight. That is an even trade, not 'the bishop was undefended' plus wins-material. Teach recapture with the queen so I do not wreck my kingside pawns with gxf3."
+    },
+    {
+      "ply": 28,
+      "san": "Be7",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your bishop to e7 is the strongest move because it keeps your king safer.",
+      "critique": "I am in check from the rook on e1. Be7 blocks the check. 'Keeps your king safer' is the king_safer leftover and sounds like a vague safety lecture. Say: you interpose, the check is gone, then you can castle."
+    },
+    {
+      "ply": 12,
+      "san": "a6",
+      "severity": "medium",
+      "category": "overclaim",
+      "perspective": "aesthetic",
+      "quote": "Moving your pawn to a6 is the strongest move.",
+      "critique": "Same empty strongest as h6. Another slow rook-pawn with no because-clause. Either say I am preparing b5 / stopping Nb5, or admit this is a nothing move. 'That's the one' is insulting."
+    },
+    {
+      "ply": 20,
+      "san": "exd4",
+      "severity": "medium",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the bishop on d4 with your e-pawn is the strongest move because the bishop was undefended and you take the defender of the white knight.",
+      "critique": "Recapture after Bxd4, then you bolt on doubled-pawns and wins-material. My e-pawn moving to d4 does not double my pawns. The removed-defender bit (Nc3 is now hanging) is the only useful clause, and you buried it in recapture-as-free-piece language."
+    },
+    {
+      "ply": 36,
+      "san": "Bf6",
+      "severity": "medium",
+      "category": "jargon",
+      "perspective": "both",
+      "quote": "Moving your bishop to f6 is the strongest move because you skewer the white queen, exposing the white pawn.",
+      "critique": "My bishop attacks the queen. Calling it a skewer of a pawn on b2 is technically a line, but it is not what I should learn, and back_rank in the reasons is junk. 'Your bishop hits the queen on the long diagonal' is the sentence."
+    },
+    {
+      "ply": 43,
+      "san": "Qg3",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your queen to g3 is the strongest move because you pin the pawn to the king.",
+      "critique": "Their rook just sat on the e-file looking at my queen. Qg3 gets off that file. The g7 pin is a side effect, and back_rank does not belong here. Teach: the queen was on the same open file as the rook, so move it."
+    },
+    {
+      "ply": 23,
+      "san": "Bd5",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your bishop to d5 leaves your knight hanging to the black pawn. A better move would have been moving your bishop to b3.",
+      "critique": "Half-right: Na4 is still hanging to bxa4. You skipped the other half: Bd5 also drops the bishop to Nxd5, which is why this is hundreds of centipawns worse than just losing the rim knight. And Bb3 still loses Na4, so 'better' needs that caveat."
+    },
+    {
+      "ply": 32,
+      "san": "Qd7",
+      "severity": "medium",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Moving your queen to d7 is the strongest move because it saves your pawn from capture.",
+      "critique": "Which pawn? a4 is hanging to the queen on d4 and Qd7 does not defend it. d6 is not hanging through White's own d5 pawn. Vague saves-piece copy that does not match the board."
+    },
+    {
+      "ply": 44,
+      "san": "Rxb2",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "aesthetic",
+      "quote": "Taking the pawn on b2 with your b8-rook is the strongest move because the pawn was undefended.",
+      "critique": "You already know this is a rook on the seventh (it is in the reason list) and you still led with the undefended-pawn template. Seventh rank is the lesson. A hanging b-pawn is the tactic that gets me there."
+    },
+    {
+      "ply": 42,
+      "san": "Rfe8",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your f8-rook to e8 is the strongest move because it gives your rook an open file.",
+      "critique": "Open file is the lazy half. The white queen is sitting on e3. I put a rook on her file. Teach the x-ray / alignment, not a structure buzzword."
+    },
+    {
+      "ply": 5,
+      "san": "Bc4",
+      "severity": "low",
+      "category": "generic",
+      "perspective": "aesthetic",
+      "quote": "Moving your f1-bishop to c4 is the strongest move.",
+      "critique": "Italian bishop vs Philidor, no because-clause, 25cp swing, 'That's the one.' At least say it aims at f7. Strongest with zero idea is the template farm."
+    },
+    {
+      "ply": 35,
+      "san": "Re3",
+      "severity": "low",
+      "category": "generic",
+      "perspective": "aesthetic",
+      "quote": "Moving your e1-rook to e3 is the strongest move.",
+      "critique": "Blank strongest on a rook lift that immediately gets skewered. If you have nothing to say, do not call it the strongest move and wink 'That's the one.'"
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "gate-recapture-wins-material",
+      "title": "Stop calling recaptures winning material",
+      "feasibility": "high",
+      "layer": "facts",
+      "detail": "wins_material fires when capturedSeeCp >= 80, so Qxf3, exd4, exd5, and Qxe3 all get 'the piece was undefended' / 'you come out ahead' on even recaptures. Suppress wins_material (and that template) when the capture is a recapture of the piece that just moved, or when net SEE is near zero. A 1200 knows they did not 'win' a bishop they just traded for."
+    },
+    {
+      "id": "detect-pawn-double-attack",
+      "title": "Detect pawn forks of two pieces",
+      "feasibility": "high",
+      "layer": "facts",
+      "detail": "detectForks only keeps forks if the forker is a knight or a target is king/queen, so b5 attacking Na4 and Bc4 emits nothing and the copy is empty. Count a pawn (or any piece) that newly attacks two unprotected pieces as a fork, or add a double_attack / kicked_by_pawn benefit. This is the move a club player needs named."
+    },
+    {
+      "id": "drop-pv-likely-capture-headline",
+      "title": "Do not headline later PV captures on quiet suggestions",
+      "feasibility": "high",
+      "layer": "discourse",
+      "detail": "Be7 as the improvement over bxa4 is explained with 'you can likely take a knight' because pickBenefitReasons copies later lineEvents captures with likely:true. verifyLikelyTactics already exists; do not let a likely capture be suggestedBecause unless the suggested move itself captures, or the capture is forced next ply. Invented captures destroy trust."
+    },
+    {
+      "id": "rank-rook-on-seventh",
+      "title": "Prefer seventh-rank ideas over hanging-pawn copy",
+      "feasibility": "high",
+      "layer": "discourse",
+      "detail": "rook_on_seventh is severity 55 vs wins_material ~138+, so Rxb2 only says the pawn was undefended, and Ree2 (second rook to the seventh) has no reason at all. Raise rook_on_seventh when the rook lands on rank 2/7, and add a doubled-rooks motif when both rooks are already there. Phrase-bank lines already exist; they never win the because-clause."
+    },
+    {
+      "id": "ban-empty-strongest",
+      "title": "Never say strongest with an empty because",
+      "feasibility": "high",
+      "layer": "templates",
+      "detail": "h6, a6, Bc4, b5, Qf4, c4, Re3, Ree2, Rc1, Qf3, h4 all render 'X is the strongest move.' with no playedBecause, plus the same 'That's the one.' quip. If rankReasons is empty, drop the strongest verdict (use solid_move / one of several) or require a fallback concept. Empty strongest is worse than silence."
+    },
+    {
+      "id": "see-gate-fake-tactics",
+      "title": "SEE-gate discovered attacks and removed-defenders",
+      "feasibility": "high",
+      "layer": "facts",
+      "detail": "d3 'unveils an attack' on a safe h6 pawn, and Bxf3 'takes the defender of the queen' when Nf3 does not defend the queen. Require discovered_attack targets to be SEE-positive (or hanging), and require removed_defender.newlyHanging to have actually lost a defender rather than merely being newly attacked by the capturing piece. False tactics crowd out real ones."
+    },
+    {
+      "id": "require-blunder-because",
+      "title": "Make miss/blunder copy name the tactic, not structure leftovers",
+      "feasibility": "high",
+      "layer": "discourse",
+      "detail": "Na4 leads with backward_pawn; Nd4 is 'X is a mistake but Y is better' with only outpost; Nxd5 'saves the rook'; Bd5 skips Nxd5. For missed_improvement / threat, require pickProblemReasons to prefer hanging, ignored_threat, kicked_by_pawn, or refutation_material over structure, and do not emit missedImprovementSentence with a null because. Structure phrases are fine as a second clause, not the headline of a 200cp swing."
+    },
+    {
+      "id": "label-exchange-not-bishop",
+      "title": "Label exchange gains as the exchange",
+      "feasibility": "high",
+      "layer": "templates",
+      "detail": "Bxe3 recaptured leaves SEE around a minor piece, so materialLabel says 'a bishop ahead' after taking a rook. If the captured unit is a rook and SEE is ~200, say you win the exchange (rook for bishop), not that you are a bishop up. Same helper is reused in refutation copy, so fixing materialLabel/wins_material copy helps every trade."
+    }
+  ],
+  "whatWorked": [
+    "Bg4: 'you pin the knight to the queen' is the right tactic in one clause.",
+    "Bg5: skewer of queen exposing the e3-rook is accurate and useful.",
+    "Kingside castling copy (shelter + rook) is one of the few times the phrase-bank teaches a real idea.",
+    "Rae1+: open file plus attacking the king actually describes the check.",
+    "Qxd4 / Qf4 / Qd4 saving or taking an undefended unit matches the board when the unit really is hanging."
+  ]
+}

@@ -1,0 +1,303 @@
+{
+  "gameId": "a96JciJx",
+  "white": "tymsonek_jelonek (1488)",
+  "black": "Trenek (1660)",
+  "movesReviewed": 77,
+  "movesFlagged": 25,
+  "okShare": 0.675,
+  "flags": [
+    {
+      "ply": 10,
+      "san": "Ng4",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your f6-knight to g4 is a blunder, but moving your pawn to d6 would be better.",
+      "critique": "You called my 230-centipawn lemon a blunder and then offered d6 with zero chess. Ng4 and Bc5 both hit f2; the point of the punishment is d4 (or not hanging f2), not a shrug that another pawn move exists. Empty reasons plus 'That's the one' cadence on every other ply makes this feel like a template with the lesson stripped out."
+    },
+    {
+      "ply": 11,
+      "san": "Qb3",
+      "severity": "high",
+      "category": "overclaim",
+      "perspective": "both",
+      "quote": "Moving your queen to b3 leaves your pawn hanging to the black c5-bishop and g4-knight. A better move would have been moving your pawn to d4 because you can likely take a pawn.",
+      "critique": "Name f2. Yes, Bc5 and Ng4 hit that pawn — then you invent 'you can likely take a pawn' as the reason for d4. d4 kicks the bishop and breaks the battery; the idea is not a speculative pawn grab. This is the same 'likely take' filler that shows up whenever the engine prefers a different move."
+    },
+    {
+      "ply": 12,
+      "san": "Bxf2+",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the pawn on f2 with your c5-bishop leaves your pawn hanging to the white c4-bishop. A better move would have been moving your queen to e7 because you can likely fork the white c4-bishop and the white queen.",
+      "critique": "White is in check. They cannot take a pawn with the c4-bishop this move — legal replies are king moves, and Kxf2 is illegal because Ng4 guards f2. Qe7 does not attack Bc4 or Qb3 at all; I checked. Qe7 is about covering f7, and you taught a fork that is not on the board."
+    },
+    {
+      "ply": 13,
+      "san": "Ke2",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your king to e2 is the strongest move.",
+      "critique": "The reason dump is king_more_exposed, which is a problem label glued onto a best move. Teach the actual rule: you cannot take on f2, the knight protects the bishop, so you step off the check. 'Strongest move' plus a silent contradiction is how you train me to ignore you."
+    },
+    {
+      "ply": 15,
+      "san": "Bg5",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your c1-bishop to g5 is the strongest move.",
+      "critique": "Bg5 stares at the queen on d8. Next ply you even praise Qe8 for saving the queen — so you knew. Development-only copy on the attacking move is how a coach misses the only thing a 1200 would use."
+    },
+    {
+      "ply": 17,
+      "san": "h3",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your pawn to h3 is the strongest move.",
+      "critique": "The knight has been sitting on g4 since the blunder on ply 10. h3 kicks it. Empty reasons, empty lesson, same quip as e4."
+    },
+    {
+      "ply": 20,
+      "san": "Nxc4",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "both",
+      "quote": "Taking the bishop on c4 with your a5-knight is the strongest move because your king is harder to attack.",
+      "critique": "I just cashed the Na5 fork and won a bishop. Do not tell me this is king safety. You had hanging and capture in the reasons and still led with king_safer — that is the phrase bank picking a vibe over the tactic."
+    },
+    {
+      "ply": 21,
+      "san": "Qxc4",
+      "severity": "high",
+      "category": "grammar",
+      "perspective": "both",
+      "quote": "Taking the knight on c4 with your queen is a mistake because the knight was undefended and then pin the pawn to the king.",
+      "critique": "That sentence is broken English, and it explains a mistake with the capture's benefits. Recapturing an undefended knight is not why this is wrong — hxg4 takes the other hanging knight. 'Unveils an attack from your rook on the black pawn' is a side effect, not the lesson of two hanging pieces."
+    },
+    {
+      "ply": 22,
+      "san": "d5",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your pawn to d5 is the strongest move because it gives your king better protection and your pieces control more squares.",
+      "critique": "d5 hits the queen on c4. That is the whole move. King protection and mobility are what you say when the detector missed a pawn attacking a queen."
+    },
+    {
+      "ply": 23,
+      "san": "Qxd5",
+      "severity": "high",
+      "category": "classification",
+      "perspective": "technical",
+      "quote": "Taking the pawn on d5 with your queen is the strongest move because you pin the pawn to the king and then pin another pawn to the rook.",
+      "critique": "You dropped 117 centipawns and still said strongest. The f7 pin is a relative pin a club player will never cash here, and 'then pin another pawn to the rook' does not match the board. Do not call a shrinking eval the best move and invent a second pin to sound busy."
+    },
+    {
+      "ply": 24,
+      "san": "Nf6",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Moving your knight to f6 leaves your f2-bishop where the white king can take, losing a knight. A better move would have been moving your c8-bishop to e6 because you skewer the white queen, exposing the white pawn.",
+      "critique": "The bishop has been hanging on f2 for a dozen plies; Nf6 also dumps the knight onto Bg5. Be6 attacks the queen on d5 — that is not a skewer, and nothing useful sits behind her. You mixed two hangings into one clause and misnamed the tactic on the improvement."
+    },
+    {
+      "ply": 26,
+      "san": "gxf6",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "You are still worse, but taking the bishop on f6 with your g-pawn leaves your f2-bishop hanging to the white king. A better move would have been moving your f2-bishop to b6 because you can likely skewer the white queen and the white pawn.",
+      "critique": "Bb6 is a retreat. From b6 the bishop does not even see Qd5, so it cannot skewer the queen and a pawn. Lichess called this a mistake; you said blunder. Save the hanging piece first is the lesson — stop minting skewers to justify the engine line."
+    },
+    {
+      "ply": 28,
+      "san": "c6",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your pawn to c6 is the strongest move.",
+      "critique": "Same hole as d5: c6 kicks the queen on d5, and you had nothing to say. Fifty-four centipawns of 'best' with empty reasons."
+    },
+    {
+      "ply": 34,
+      "san": "exd4",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the pawn on d4 with your e-pawn is the strongest move because you take the defender of the white queen.",
+      "critique": "A pawn on d4 does not defend the queen on e3. The queen defends the pawn. removed_defender is pointing the wrong way, and a 1200 will spend a minute staring at the board trying to make your sentence true."
+    },
+    {
+      "ply": 35,
+      "san": "cxd4",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the pawn on d4 with your c-pawn is the strongest move because the pawn was undefended.",
+      "critique": "After cxd4 I can recapture Qxd4. Undefended means I cannot take back. wins_material on a recapture of a defended pawn is a lie, and you used the same 'undefended' stamp on Nxe5 later."
+    },
+    {
+      "ply": 41,
+      "san": "Nxe5",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the pawn on e5 with your f3-knight is the strongest move because the pawn was undefended.",
+      "critique": "Qe6 recaptures on e5. You lost 136 centipawns, called it strongest, and said the pawn was hanging. If the engine still likes Nxe5, teach the follow-up — do not tell me a defended pawn is free."
+    },
+    {
+      "ply": 43,
+      "san": "Ke2",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "both",
+      "quote": "You are still winning, but moving your king to e2 gives the opponent more access to your king. A better move would have been moving your king to g1 because you can likely skewer the black queen and the black pawn.",
+      "critique": "Kings do not skewer queens. Kg1 tucks the king away from Qf5+. Lichess called this an inaccuracy; you said blunder, then justified the alternative with a tactic that cannot exist. I would laugh this off the board."
+    },
+    {
+      "ply": 44,
+      "san": "f6",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your pawn to f6 is the strongest move.",
+      "critique": "f6 hits the knight on e5. Empty copy, 109-centipawn 'best,' same as every other pawn kick you failed to name."
+    },
+    {
+      "ply": 50,
+      "san": "fxe5",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the knight on e5 with your f-pawn is the strongest move because you come out a bishop ahead.",
+      "critique": "I took a knight. Calling that a bishop is the materialLabel bucket (200–249cp = bishop, 250+ = knight) arguing with the piece I just captured. Say knight, or say the piece was hanging — do not change the species."
+    },
+    {
+      "ply": 61,
+      "san": "Qf4+",
+      "severity": "medium",
+      "category": "classification",
+      "perspective": "technical",
+      "quote": "Moving your queen to f4 is the strongest move because you skewer the black king, exposing the black f8-rook.",
+      "critique": "217 centipawns gone, still 'strongest,' and the 'skewer' is a check the king steps off so the rook hits the queen (Ke7 next). You taught a tactic that the reply immediately refutes and graded the drop as best."
+    },
+    {
+      "ply": 66,
+      "san": "Kc5",
+      "severity": "high",
+      "category": "classification",
+      "perspective": "both",
+      "quote": "Moving your king to c5 is the strongest move because it keeps your king safer.",
+      "critique": "The king ran into the open and you dropped 251 centipawns. king_safer is a lie. If this was the engine's first choice, say the checks continue — do not tell me the exposed king is safer."
+    },
+    {
+      "ply": 67,
+      "san": "Qe5+",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your queen to e5 is the strongest move because it saves your pawn from capture.",
+      "critique": "If I pass, Black has Qxe2 mate. You are checking because the knight hangs and the king is in a net, not because a pawn was about to fall. 265 centipawns as 'strongest' plus saves_piece is the pipeline grabbing the wrong hanging unit."
+    },
+    {
+      "ply": 72,
+      "san": "Kb5",
+      "severity": "high",
+      "category": "overclaim",
+      "perspective": "technical",
+      "quote": "Moving your king to b5 leaves your f8-rook hanging to the white queen. A better move would have been moving your king to a5 because you can likely take a queen.",
+      "critique": "The hanging rook is real; Ka5 does not win a queen — after Ka5 White still has Qxf8, and no black piece takes Qd6. Kb5 is the one that walks into Nc3+. 'You can likely take a queen' is the same overclaim as ply 11's pawn."
+    },
+    {
+      "ply": 76,
+      "san": "Kc4",
+      "severity": "high",
+      "category": "redundant",
+      "perspective": "aesthetic",
+      "quote": "Moving your king to c4 lets white force checkmate in 1 move. This lets white force checkmate in 1 move.",
+      "critique": "You printed the mate sentence twice. I noticed. Kb3 as the save because 'you can likely take a pawn' is filler on a mate-in-one position — name the mate, skip the echo, skip the imaginary pawn grab."
+    },
+    {
+      "ply": 77,
+      "san": "Qe6+",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "both",
+      "quote": "A better move would have been moving your queen to d5 because you pin the pawn to the rook.",
+      "critique": "Qd5 is checkmate. You had Qd5# in the suggestion and explained it as pinning a pawn to a rook. That is the worst sentence in the game: you missed mate in one on the board and then taught the wrong tactic for the mating move. Also the mate-in-four line is duplicated the same way as ply 76."
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "prefer-mate-because",
+      "title": "Explain mating moves as mate",
+      "feasibility": "high",
+      "layer": "discourse",
+      "detail": "pickMateBenefits already returns forces_mate, and suggested SAN already carries #, but rankReasons still lets a pin win the because-clause (ply 77 Qd5# → 'pin the pawn to the rook'). If suggestedMoveSan ends with # or forces_mate is present, that reason must beat pin/fork/skewer/saves_piece. A 1200 who just missed mate in one will never forgive a pin lecture."
+    },
+    {
+      "id": "dedupe-allows-mate",
+      "title": "Stop echoing the mate sentence",
+      "feasibility": "high",
+      "layer": "templates",
+      "detail": "describePlayedProblem and describeConsequence both emit allows_mate; containsIgnoreCase only tests the first 24 characters of the consequence, so 'this lets white force…' does not match 'lets white force…' (plies 76–77). Skip the consequence when both strings are the same mate, or strip a leading 'this ' before the contains check."
+    },
+    {
+      "id": "gate-likely-captures",
+      "title": "Ban likely-capture as the only why",
+      "feasibility": "high",
+      "layer": "reasons",
+      "detail": "capture.likely renders as 'you can likely take a pawn/queen' and keeps getting selected as suggestedBecause (plies 11, 12, 72, 76). Do not use a likely capture as the sole because unless the capture is ply 1 of the PV and SEE is clearly positive. Prefer the real idea: kick the piece, cover f7, step out of a fork."
+    },
+    {
+      "id": "verify-fork-skewer-geometry",
+      "title": "Require tactics to attack both targets",
+      "feasibility": "high",
+      "layer": "facts",
+      "detail": "Qe7 does not fork Bc4 and Qb3; Bb6 does not see Qd5; Kg1 cannot skewer a queen; Be6 attacks the queen, it does not skewer a pawn behind it. verifyLikelyTactics should drop fork/skewer unless the mover's piece actually attacks both named units after the move, and king moves must never generate skewer. False tactics are worse than silence."
+    },
+    {
+      "id": "pawn-hits-piece-reason",
+      "title": "Name it when a pawn hits a queen",
+      "feasibility": "high",
+      "layer": "facts",
+      "detail": "d5, c6, h3, and f6 are pawn kicks of Q/N with empty or king_safer copy. Add an attacks_piece (or reuse kicked_by_pawn in the opponent direction) in move-effects when the moved pawn newly attacks an enemy queen, rook, or knight, and let pickBenefitReasons prefer that over king_safer/mobility. This is the lesson a club player actually stores."
+    },
+    {
+      "id": "no-problem-reasons-on-best",
+      "title": "Do not praise a best move with a problem reason",
+      "feasibility": "high",
+      "layer": "discourse",
+      "detail": "Ke2 is 'strongest' with king_more_exposed; Kc5 is 'safer' down 251cp; Qe5+ 'saves a pawn' while Qxe2# is the threat. Drop king_more_exposed, problem pawn_shield, and random saves_piece from pickBenefitReasons when classification is best. If the recapture is illegal (Kxf2 here), emit a guarded-piece / cannot-recapture fact instead."
+    },
+    {
+      "id": "honest-mistake-because",
+      "title": "Explain lemons with problems, not leftover captures",
+      "feasibility": "high",
+      "layer": "templates",
+      "detail": "Ng4's missed_improvement template is 'blunder, but d6 would be better' with reasons=[]. Qxc4 is 'a mistake because the knight was undefended and then pin the pawn' — benefit concatenation on a lemon, plus broken grammar from followUp 'then pin'. For mistake/blunder, playedBecause must come from pickProblemReasons; if empty, fall back to a hanging/threat fact after the move, never wins_material+pin of the played capture."
+    },
+    {
+      "id": "honest-capture-labels",
+      "title": "Stop calling recaptures undefended or a bishop",
+      "feasibility": "high",
+      "layer": "templates",
+      "detail": "wins_material uses 'the X was undefended' when SEE ≈ piece value even if a recapture exists (cxd4, Nxe5 → Q takes back). materialLabel maps 200–249 to bishop and 250+ to knight, so fxe5 of a knight becomes 'a bishop ahead'. If you just captured, name captured.type; only say undefended when the captured unit has no legal recapture on that square."
+    }
+  ],
+  "whatWorked": [
+    "Qe8: actually named that Bg5 was taking the queen.",
+    "Na5: real fork of Qb3 and Bc4, and the copy matched the board.",
+    "Kxf2: 'the bishop was undefended' — the one hanging-piece line that was true and earned.",
+    "Qe6: pin of e4 to the queen plus the rook unveiled on d4 is a real two-idea lesson.",
+    "Qf5+: royal fork of king and Ne5, with the rook x-ray, is the kind of sentence I can replay.",
+    "Qg3+: 'leaves your e5-knight hanging to the queen and rook' is the right problem on a 560-centipawn check.",
+    "Ke7: king steps off the f-file and the rook hits the queen — discovered attack taught cleanly.",
+    "Qd6+: fork of king and rook is geometrically true, even if you still called a 250-centipawn drop strongest."
+  ]
+}

@@ -1,0 +1,301 @@
+{
+  "gameId": "3LXIF6Fz",
+  "white": "Elena5555 (1800)",
+  "black": "tymsonek_jelonek (1152)",
+  "movesReviewed": 48,
+  "movesFlagged": 25,
+  "okShare": 0.48,
+  "flags": [
+    {
+      "ply": 4,
+      "san": "Nf6",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your g8-knight to f6 is playable, but moving your pawn to e6 would be better.",
+      "critique": "The reason tag is development. I just developed a knight. e6 is a pawn move. The actual Marshall Defense lesson is: after Nf6, White takes on d5 and I have to recapture with the knight, then e4 kicks it with tempo. e6 would have let me recapture with a pawn and keep a stake in the center. You named the better SAN and taught the wrong subject."
+    },
+    {
+      "ply": 5,
+      "san": "cxd5",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the pawn on d5 with your c-pawn is the strongest move.",
+      "critique": "Reasons: hanging, doubled_pawns, backward_pawn. Black's d5 pawn is defended by the knight on f6. This is the Exchange capture that exploits Marshall, not a free pawn, and nobody is getting doubled or backward from this take. The sentence has no because, so the false tags are the whole lesson."
+    },
+    {
+      "ply": 6,
+      "san": "Nxd5",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the pawn on d5 with your f6-knight is the strongest move because the pawn was undefended.",
+      "critique": "White's d4 pawn defends d5. I recaptured. I did not win material. wins_material plus 'undefended' on an equal recapture is a lie, and I will not believe you the next time a piece is actually hanging."
+    },
+    {
+      "ply": 7,
+      "san": "e4",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your pawn to e4 is the strongest move because you claim more of the center.",
+      "critique": "e4 hits the knight on d5 with tempo. That is why cxd5 was played. 'Claim more of the center' is the same paste as ply 1. Teach the kick: the knight has to move and you grab the whole center for free."
+    },
+    {
+      "ply": 9,
+      "san": "e5",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your pawn to e5 is the strongest move because it saves your pawn from capture.",
+      "critique": "e5 does not defend d4. It attacks the knight on f6, so Qxd4 runs into exf6. That is a kick and a zwischenzug, not a panic save. You already have kicked_by_pawn. Use it and name the knight."
+    },
+    {
+      "ply": 10,
+      "san": "Nfd7",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Moving your f6-knight to d7 is the strongest move because it saves your d7-knight from capture.",
+      "critique": "There is no d7-knight. I am moving the f6-knight onto an empty square because e5 was eating it. Labeling the saved piece on the destination square is a bug, and backward_pawn in the reasons is leftover garbage."
+    },
+    {
+      "ply": 12,
+      "san": "e6",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your pawn to e6 is playable, but moving your b8-knight to c6 would be better.",
+      "critique": "Better how? Nc6 develops and hits d4/e5. e6 shuts in the bishop. 'Would be better' plus a SAN is a Stockfish whisper. The reason is center_control, which does not explain why the knight is the center and the pawn is not."
+    },
+    {
+      "ply": 16,
+      "san": "c6",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your pawn to c6 is the strongest move because it keeps your king safer.",
+      "critique": "c6 attacks the bishop on b5 and breaks the pin on the d7-knight that you just taught me. King-safer is a side effect. I needed 'kick the bishop, unpin the knight,' not a safety platitude I could paste on any pawn move."
+    },
+    {
+      "ply": 18,
+      "san": "b5",
+      "severity": "high",
+      "category": "jargon",
+      "perspective": "both",
+      "quote": "You are still worse, but moving your pawn to b5 creates a backward pawn to defend. A better move would have been moving your pawn to c5 because you put more pressure on the center.",
+      "critique": "266cp blunder and the diagnosis is phrase-bank sludge. Which pawn is backward, defend against what, why do I care? b5 is a slow queenside lunge while my king is in the center and c6 gets weak. c5 fighting d4 is the idea — 'pressure on the center' is the same generic line as every other pawn push."
+    },
+    {
+      "ply": 19,
+      "san": "a3",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your pawn to a3 is a mistake, but moving your f3-knight to g5 would be better.",
+      "critique": "Empty reasons. Ng5 at what — f7? e6? the uncastled king? Lichess called this an inaccuracy (116cp) and you said mistake, then gave me a SAN with no idea attached. I cannot practice a knight hop you will not name a target for."
+    },
+    {
+      "ply": 20,
+      "san": "Bxc3+",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Taking the knight on c3 with your b4-bishop is the strongest move because you pin the pawn to the rook.",
+      "critique": "The move is check. You tagged check and then buried it so you could lecture a pin of b2 to a1. I am taking a piece with check. Lead with that. 'Pin the pawn to the rook' never even says which pawn."
+    },
+    {
+      "ply": 21,
+      "san": "bxc3",
+      "severity": "medium",
+      "category": "overclaim",
+      "perspective": "technical",
+      "quote": "Taking the bishop on c3 with your b-pawn is the strongest move because the bishop was undefended.",
+      "critique": "I recaptured out of check. wins_material on a mandatory recapture is the same cry-wolf as ply 6. The real story is doubled c-pawns and an open b-file — you tagged isolated_pawn and backward_pawn and used neither."
+    },
+    {
+      "ply": 22,
+      "san": "f6",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your pawn to f6 is a mistake, but moving your pawn to h6 would be better.",
+      "critique": "f6 challenges e5 and also rips my king open while I have not castled. That is the lesson. h6 is dropped with zero purpose — stop Ng5? luft? Empty reasons, Lichess inaccuracy vs your mistake, and I still do not know what to do instead or why."
+    },
+    {
+      "ply": 23,
+      "san": "a4",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your pawn to a4 is the strongest move.",
+      "critique": "a4 hits the b5 pawn. Next move I take it and you tell me the pawn hangs to the queen and rook. Teach the attack on this ply, not a blank strongest-move toast. Empty reasons on the move that starts the tactic."
+    },
+    {
+      "ply": 25,
+      "san": "Qxa4",
+      "severity": "high",
+      "category": "eval_frame",
+      "perspective": "both",
+      "quote": "Taking the pawn on a4 with your queen keeps you winning because you pin the pawn to the rook and the pawn was undefended. A better move would have been taking the pawn on f6 with your e-pawn.",
+      "critique": "This is a 320cp blunder. You praised the recapture — pin, undefended pawn, still winning — and whispered exf6 at the end. Rip the king open with exf6 is the whole point of my f6 being a mistake. 'Keeps you winning' on a blunder plus 'Want to look at that?' is two coaches arguing."
+    },
+    {
+      "ply": 27,
+      "san": "Nxe5",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the pawn on e5 with your knight hands the opponent the advantage because the pawn was undefended and you take the defender of the black pawn.",
+      "critique": "748cp swing and you explained why the capture looks greedy, not why it loses. After Nxe5 I recapture, your bishop on d3 is undefended, and the queen discovers onto d4 — that is the next ply's copy, which you somehow cannot use here. 'Defender of the black pawn' is word salad. Qc2 unveiling a rook onto a7 might be the engine move; the lesson is you hung the bishop."
+    },
+    {
+      "ply": 29,
+      "san": "Be4",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your d3-bishop to e4 is the strongest move because you pin the pawn to the rook.",
+      "critique": "The bishop was hanging on d3. That is why it moves. You tagged saves_piece and then led with a pin of c6 to a8, unnamed. I needed 'your bishop was loose, step it to e4 and incidentally pin c6.'"
+    },
+    {
+      "ply": 30,
+      "san": "Ned7",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Moving your e5-knight to d7 is the strongest move because it saves your d7-knight from capture.",
+      "critique": "Same destination-square lie as ply 10. The knight is on e5, attacked by d4, running to an empty d7. There is no d7-knight to save. backward_pawn is noise again."
+    },
+    {
+      "ply": 31,
+      "san": "Bxc6",
+      "severity": "medium",
+      "category": "overclaim",
+      "perspective": "technical",
+      "quote": "Taking the pawn on c6 with your e4-bishop is the strongest move because you pin the knight to the king and the pawn was undefended.",
+      "critique": "c6 is defended by Nb8 and Nd7. I recapture with the b8-knight next. The pin of Nd7 to the king is real after the bishop lands, but 'undefended' is the recapture lie again. Call it a SEE win if the queen follow-up nets a pawn; do not tell me the pawn had no defenders."
+    },
+    {
+      "ply": 33,
+      "san": "Qxc6",
+      "severity": "high",
+      "category": "grammar",
+      "perspective": "both",
+      "quote": "Taking the knight on c6 with your queen is the strongest move because the knight was undefended and then pin another knight to the king.",
+      "critique": "Nd7 defends c6. And then pin another knight is broken English with no subject. The pin of d7 to the king is the idea; write 'and it pins the d7-knight to the king.' Undefended plus a grammar wreck on a recapture is the template farm I was promised we would not hear."
+    },
+    {
+      "ply": 34,
+      "san": "Rb8",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Moving your a8-rook to b8 is the strongest move because it saves your b8-rook from capture.",
+      "critique": "Third time. The rook is on a8, hanging to the queen on c6, and I slide it to empty b8. You labeled it as the b8-rook you just saved. I know which rook moved. Stop naming it after the destination."
+    },
+    {
+      "ply": 35,
+      "san": "O-O",
+      "severity": "high",
+      "category": "tautology",
+      "perspective": "both",
+      "quote": "You are still worse, but castling kingside gives your king too little room on the back rank. A better move would have been taking the pawn on e6 with your queen because you fork the black king and the black knight and then fork the black king and the black knight.",
+      "critique": "You said the same fork twice. I am not deaf. The lesson is Qxe6+ forks king and knight; the back-rank scare is a red herring for missing a check. Deduplicate the because-clause or I will assume the coach is a loop."
+    },
+    {
+      "ply": 36,
+      "san": "O-O",
+      "severity": "medium",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "You are still winning, but castling kingside leaves your pawn hanging to the white a1-rook. A better move would have been moving your b8-rook to b6 because it saves your pawn from capture.",
+      "critique": "a7 hanging to Ra1 is true. Rb6 does not defend a7. It attacks the queen on c6. 'Saves your pawn' is a fake causal link, and you listed ignored_threat twice like you were not sure you meant it."
+    },
+    {
+      "ply": 38,
+      "san": "Rf7",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Moving your f8-rook to f7 is the strongest move because you pin the pawn to the rook.",
+      "critique": "Qxe6+ is checking me along e6-f7-g8. Rf7 blocks the check. There is no f-pawn. Pin the pawn to the rook is a template firing on the wrong motif. Say I interpose on the checking diagonal."
+    },
+    {
+      "ply": 41,
+      "san": "Ba3",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your bishop to a3 is the strongest move.",
+      "critique": "Ba3 stares at the queen on f8. Empty reasons, empty because. Next ply I hang that queen to this bishop and you finally mention it. Name the attacked piece on the move that attacks it."
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "label-saved-piece-from-square",
+      "title": "Name saved pieces on the square they left",
+      "feasibility": "high",
+      "layer": "facts",
+      "detail": "saves_piece uses movedPiece with square: move.to, then labeledPiece prefixes d7/b8 when two identical pieces exist. Nfd7, Ned7, and Rb8 all became 'saves your d7-knight/b8-rook from capture' while running onto an empty square. Pass the from-square (or the pre-move unit) into NamedUnit for retreatedToSafety. A 1200 knows they did not have a piece on the destination."
+    },
+    {
+      "id": "recapture-not-win",
+      "title": "Stop calling recaptures undefended wins",
+      "feasibility": "high",
+      "layer": "facts",
+      "detail": "Nxd5, bxc3, Bxc6, and Qxc6 all got wins_material → 'the X was undefended' on equal or near-equal recaptures, sometimes of a unit that just arrived. Gate wins_material on net material versus the previous ply, or suppress it when the captured unit moved onto that square last move. False 'undefended' trains the learner to ignore later hanging-piece warnings that are actually true."
+    },
+    {
+      "id": "lead-with-check-and-kick",
+      "title": "Rank check and pawn kicks over pin and center",
+      "feasibility": "high",
+      "layer": "discourse",
+      "detail": "selectBecauseReasons prefers pin/capture over check, so Bxc3+ lectured a pin and skipped the check. e4 and e5 used center_control/saves_piece while kicking Nd5/Nf6. Be4 used pin and buried the hanging bishop. When a pawn attacks a piece, lead with kicked_by_pawn and name it. When the move is check, check outranks an incidental pin."
+    },
+    {
+      "id": "blunder-because-is-the-refutation",
+      "title": "Explain blunders by what they hang, not why the capture looks good",
+      "feasibility": "high",
+      "layer": "discourse",
+      "detail": "Qxa4 (320cp) was sold as pin plus undefended plus 'keeps you winning.' Nxe5 (748cp) was sold as taking an undefended pawn. Both suggested-move clauses had the real idea (exf6; don't leave Bd3 loose) and lost the lead. For blunder/mistake, lead with the problem/refutation, not the played move's tactical virtues. evalLead 'keeps you winning' should not head a blunder sentence."
+    },
+    {
+      "id": "name-quiet-attack-targets",
+      "title": "Name the piece a quiet move attacks",
+      "feasibility": "high",
+      "layer": "reasons",
+      "detail": "a4 hits b5, c6 hits Bb5 and unpins Nd7, Ba3 hits Qf8. All three were strongest-move with empty or king_safer copy. If move-effects already know the destination attacks an undefended or higher-value unit, emit an attacks_piece reason and surface it ahead of king_safer/center_control. Ba3 with no because is how the queen hang on the next ply feels unearned."
+    },
+    {
+      "id": "explain-suggested-move",
+      "title": "Never emit a better SAN without a because",
+      "feasibility": "high",
+      "layer": "discourse",
+      "detail": "Nf6→e6, e6→Nc6, a3→Ng5, f6→h6, Bd3→Ba4 all had empty or generic suggestedBecause. select-insight already has suggestedBenefits. Require a because from those benefits once evalLoss is in inaccuracy range. Name the idea: keep a pawn on d5, develop hitting d4, attack f7, keep the pin."
+    },
+    {
+      "id": "dedupe-because-clauses",
+      "title": "Do not concatenate the same tactic twice",
+      "feasibility": "high",
+      "layer": "templates",
+      "detail": "O-O ply 35 produced 'fork the black king and the black knight and then fork the black king and the black knight.' Duplicate ignored_threat and discovered_attack also appear in dumps. Deduplicate by kind+target before describeBecause followUp, and skip followUp when the second reason is the same fork/pin. Cheap, high eye-roll reduction."
+    },
+    {
+      "id": "pin-copy-names-squares",
+      "title": "Fix follow-up pin grammar and name the pinned unit",
+      "feasibility": "high",
+      "layer": "templates",
+      "detail": "Qxc6 said 'undefended and then pin another knight to the king' (followUp missing a subject, another-knight because two knights existed). Pin copy should always name square: 'and it pins the d7-knight to the king.' Same bug as 'pin the pawn to the rook' on Bxc3+, Be4, and Rf7 — without squares the pin template is interchangeable noise, and on Rf7 it fired when the move was a check-block."
+    }
+  ],
+  "whatWorked": [
+    "Nf6 (ply 8) correctly names the discovered queen hit on d4 after the knight steps off the file.",
+    "Bb5 (ply 15) actually teaches the pin of the knight to the king — the one opening idea that landed.",
+    "bxa4 (ply 24) warns that the new a-pawn hangs to queen and rook, and Nc5 (ply 26) as the alternative names the fork of queen and bishop.",
+    "Nxe5 (ply 28) is the best sentence in the dump: discovered queen attack plus taking the defender of Bd3.",
+    "Nxc6 (ply 32) saving the a8-rook, Rxa7 pinning Nd7 to Rf7, and Qb6 forking rook and queen are tactics a 1200 can reuse.",
+    "Nf6 (ply 42) and Ne4 (ply 48) finally call hanging queen and hanging rook without inventing a pin."
+  ]
+}

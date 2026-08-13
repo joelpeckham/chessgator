@@ -1,0 +1,302 @@
+{
+  "gameId": "LIL97Hpa",
+  "white": "FreightlinerDaimler (1225)",
+  "black": "habibaram (1248)",
+  "movesReviewed": 44,
+  "movesFlagged": 35,
+  "okShare": 0.2,
+  "flags": [
+    {
+      "ply": 14,
+      "san": "b6",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "A better move would have been moving your g8-knight to e7 because you can likely take a pawn.",
+      "critique": "Ne7 takes nothing. From e7 that knight stares at my own c6/g6 pawns and empty squares — White's pawns are all on a2, b2, c2, d4, e4, f2, g2, h3. You invented a capture, then used it as the reason I should finally develop. If the lesson was 'stop pushing pawns and get a knight out,' say that."
+    },
+    {
+      "ply": 35,
+      "san": "Bd4",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "moving your f3-knight to d4 would be better because you can likely pin the pawn to the queen and then pin another pawn to the rook.",
+      "critique": "Knights do not pin. I am 1200 and even I know that. Nd4 might be a good central hop, but stacking two imaginary pins onto it is a PV hallucination, not a lesson. Tell me what the knight actually attacks from d4."
+    },
+    {
+      "ply": 29,
+      "san": "axb6",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the pawn on b6 with your a-pawn is the strongest move because it gives you a passed pawn.",
+      "critique": "That b6 pawn is not passed. Black still has pawns on a6 and c6 — adjacent files, the whole definition. You just doubled my b-pawns and won a pawn. Call it a pawn win or an advanced couple, not a passer."
+    },
+    {
+      "ply": 43,
+      "san": "Be3",
+      "severity": "high",
+      "category": "grammar",
+      "perspective": "both",
+      "quote": "Moving your d4-bishop to e3 is the strongest move because it saves your e3-bishop from capture.",
+      "critique": "The bishop is on d4. c5 is about to eat it. Retreating to e3 saves the d4-bishop, not some ghost bishop already on e3. This is the destination-square bug and it makes the sentence nonsense."
+    },
+    {
+      "ply": 33,
+      "san": "dxe5",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the pawn on e5 with your d-pawn is the strongest move because the pawn was undefended and it unveils an attack from your bishop on the black b6-knight.",
+      "critique": "The e5 pawn was defended by d6. This is a recapture, not picking up a loose pawn. The discovered hit on Nb6 is the real idea — keep that, drop the 'undefended' lie. wins_material on a recapture taught me the wrong rule."
+    },
+    {
+      "ply": 22,
+      "san": "Nd7",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your b8-knight to d7 is a mistake, but moving your king to f7 would be better.",
+      "critique": "You want me to walk my king to f7 on move 11, give up castling, and you will not say why. Nd7 is the first developing move I have made with a piece. If the engine likes Kf7, that is engine noise in a closed mess — do not offer it to a human without a king-safety sentence."
+    },
+    {
+      "ply": 8,
+      "san": "f6",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your pawn to f6 leaves you with a backward pawn. A better move would have been moving your pawn to d5 because you put more pressure on the center.",
+      "critique": "f6 is not a backward-pawn lesson. I occupied the knight's square, punched holes around my king, and still have zero pieces out. d5 as an improvement is fine; 'backward pawn' as the problem is the wrong movie. Talk about king safety and development."
+    },
+    {
+      "ply": 44,
+      "san": "d4",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "You are still worse, but moving your pawn to d4 weakens the pawns in front of your king. A better move would have been moving your pawn to a5 because it creates a passed pawn.",
+      "critique": "d4 looks like a pawn fork of Nc3 and Be3. That is what I saw. Both pieces can take it, so it is a hanging pawn wearing a fork costume — teach that. Pawn-shield talk with my king already on d7 is a sideshow, and a5 'creates a passed pawn' is another passer you have not earned."
+    },
+    {
+      "ply": 42,
+      "san": "c5",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your pawn to c5 is the strongest move.",
+      "critique": "c5 hits the bishop on d4. That is the whole move. Empty 'strongest move' plus 'That's the one.' is what you say when you have no idea why I should be happy. Name the piece I am kicking."
+    },
+    {
+      "ply": 37,
+      "san": "Nh2",
+      "severity": "high",
+      "category": "overclaim",
+      "perspective": "technical",
+      "quote": "moving your queen to e3 would be better because you can likely take a knight.",
+      "critique": "Qe3 does not take a knight. The e3–b6 diagonal is blocked by my own bishop on d4. 'Likely take' is a later PV capture glued onto the first move. If Qe3 is better, tell me it centralizes or eyes a real square."
+    },
+    {
+      "ply": 27,
+      "san": "a5",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "You are still winning, but moving your pawn to a5 puts it at risk of attack from the black pawn. A better move would have been moving your pawn to d5 because it unveils an attack from your bishop on the black pawn.",
+      "critique": "a5 is attacked by b6 and defended by b4. That is a pawn trade, not a hang. And this is the third time you have sold me d5 as 'unveil the bishop on the black pawn' without naming g6 or b6. I cannot study a ghost pawn."
+    },
+    {
+      "ply": 18,
+      "san": "Ra7",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "both",
+      "quote": "Moving your a8-rook to a7 is the strongest move.",
+      "critique": "I have not developed a single minor piece and you are praising a rook shuffle onto a closed file as 'the strongest move' with a development reason. Ra7 is a circus move. If the engine likes it, say it is engine-best and still tell me to get the knights out."
+    },
+    {
+      "ply": 23,
+      "san": "O-O",
+      "severity": "medium",
+      "category": "overclaim",
+      "perspective": "both",
+      "quote": "A better move would have been moving your pawn to d5 because it unveils an attack from your bishop on the black pawn and then take a pawn.",
+      "critique": "Castling is the human move and you even explain it well, then you trip over 'the black pawn and then take a pawn.' Which pawn? Take with what? This is the same unnamed discovered-attack plus likely-capture chain you recycle on 17, 23, 25, and 27."
+    },
+    {
+      "ply": 25,
+      "san": "a4",
+      "severity": "medium",
+      "category": "redundant",
+      "perspective": "technical",
+      "quote": "moving your pawn to a4 creates a backward pawn to defend. A better move would have been moving your pawn to d5 because it unveils an attack from your bishop on the black pawn and then take a pawn.",
+      "critique": "c2 was already backward after b4. a4 did not create it. Then you paste the identical d5 unveiling speech. I am not learning; I am hearing a loop."
+    },
+    {
+      "ply": 41,
+      "san": "b5",
+      "severity": "medium",
+      "category": "grammar",
+      "perspective": "aesthetic",
+      "quote": "moving your pawn to b5 puts it at risk of attack from the black pawn and pawn.",
+      "critique": "'The black pawn and pawn' is broken English. a6 and c6 both take b5 — name the squares. The Na4-hits-the-a7-rook idea underneath is actually good; the sentence makes me not trust it."
+    },
+    {
+      "ply": 20,
+      "san": "Be7",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your f8-bishop to e7 is a mistake, but moving your f8-bishop to g7 would be better.",
+      "critique": "I spent tempos on g6 so I could fianchetto, then I parked the bishop on e7 instead. That is the lesson. 'Would be better' with no because-clause is a shrug."
+    },
+    {
+      "ply": 36,
+      "san": "g5",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your pawn to g5 is a mistake, but moving your a7-rook to a8 would be better.",
+      "critique": "g5 hangs more kingside air. Ra8 is sending the rook back to the square it left. Engine shuffle as the 'better move' with zero why teaches me to undo my last weird rook move, not why g5 is bad."
+    },
+    {
+      "ply": 16,
+      "san": "a6",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your pawn to a6 is playable, but moving your g8-knight to e7 would be better.",
+      "critique": "Eighth pawn move, still no pieces. Ne7 again, still no why. The sentence I needed was 'develop something.' Playable-but-better with an empty reasons list is a template with the stuffing removed."
+    },
+    {
+      "ply": 4,
+      "san": "e6",
+      "severity": "medium",
+      "category": "overclaim",
+      "perspective": "technical",
+      "quote": "Moving your pawn to e6 is the strongest move because you claim more of the center.",
+      "critique": "e6 plus d6 is the Small Center — I am not claiming the center, I am hiding from it. Same 'strongest move because center' stamp you put on e4. Eval already dropped 27 centipawns. Stop calling every pawn step a takeover."
+    },
+    {
+      "ply": 2,
+      "san": "d6",
+      "severity": "medium",
+      "category": "overclaim",
+      "perspective": "technical",
+      "quote": "Moving your pawn to d6 is the strongest move because you control more central squares.",
+      "critique": "d6 is a waiting/Pirc-ish pawn. It does not 'control more central squares' the way e4 does. Plenty of first moves are equal. Calling it strongest plus the identical center because-clause is opening theory replaced by a slogan."
+    },
+    {
+      "ply": 10,
+      "san": "h6",
+      "severity": "medium",
+      "category": "generic",
+      "perspective": "aesthetic",
+      "quote": "Moving your pawn to h6 is the strongest move.",
+      "critique": "Another wing pawn, 52 centipawns dumped, no reason, 'That's the one.' If this is engine-best in a rotten position, say so. Otherwise you are training me to love h6."
+    },
+    {
+      "ply": 38,
+      "san": "Bc8",
+      "severity": "medium",
+      "category": "generic",
+      "perspective": "both",
+      "quote": "Moving your b7-bishop to c8 is the strongest move.",
+      "critique": "I undeveloped the bishop back to c8 and you threw a parade. Strongest according to whom, for what? This is how I learn that 'best' means 'the engine liked a retreat.'"
+    },
+    {
+      "ply": 39,
+      "san": "Qh5+",
+      "severity": "medium",
+      "category": "tautology",
+      "perspective": "aesthetic",
+      "quote": "Moving your queen to h5 is the strongest move because it puts the opponent in check.",
+      "critique": "Check is strongest because it is check. Why this check? It drags the king off e8 and kills castling. That sentence would teach. This one is a dictionary."
+    },
+    {
+      "ply": 40,
+      "san": "Kd7",
+      "severity": "medium",
+      "category": "overclaim",
+      "perspective": "technical",
+      "quote": "Moving your king to d7 is the strongest move because it gives your king better protection.",
+      "critique": "My king is running into the center after Qh5+. That is not 'better protection.' It is the legal way to step out of check. king_safer copy does not belong on a king flight."
+    },
+    {
+      "ply": 7,
+      "san": "h3",
+      "severity": "low",
+      "category": "generic",
+      "perspective": "aesthetic",
+      "quote": "Moving your pawn to h3 is the strongest move.",
+      "critique": "Move 4, one knight developed, and h3 is 'the strongest move' with an empty reasons list. A club player wants to know why not Nc3, Bd3, or c4. 'That's the one.' is not a coach."
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "name-pawn-squares",
+      "title": "Always name pawn squares",
+      "feasibility": "high",
+      "layer": "templates",
+      "detail": "labeledPiece skips squares for pawns, so copy becomes 'the black pawn' and 'the black pawn and pawn'. A 1200 cannot study an unnamed pawn. Include the square for every pawn in ownedPhrase/attackerPhrase. Fixes the recycled d5 unveiling lines and the b5 blunder sentence in one change."
+    },
+    {
+      "id": "gate-likely-tactics-to-ply-one",
+      "title": "Only claim tactics the suggested move creates",
+      "feasibility": "high",
+      "layer": "reasons",
+      "detail": "verifyLikelyTactics is attaching PV follow-ups to the first move: Ne7 'takes a pawn', Qe3 'takes a knight', Nd4 'pins', d5 'then take a pawn'. Require the capture/pin/fork to exist in the position after the suggested ply, or name it as a follow-up with the actual piece. Invented captures destroy trust."
+    },
+    {
+      "id": "rank-visible-tactics-over-structure",
+      "title": "Prefer the tactic the learner can see",
+      "feasibility": "high",
+      "layer": "discourse",
+      "detail": "f6 became backward-pawn, d4 became pawn-shield, c5 got no reason, a4 inherited an old backward pawn. Rank kicked_by_pawn, hanging, fork, and discovered_attack above backward_pawn/pawn_shield when both fire. Club players notice the hit on a piece first."
+    },
+    {
+      "id": "fix-passed-pawn-adjacent-files",
+      "title": "Require adjacent files empty for passers",
+      "feasibility": "high",
+      "layer": "facts",
+      "detail": "axb6 was called a passed pawn with Black still on a6 and c6. createdPassedPawn must treat enemy pawns on neighboring files as stopping it. Phrase-bank lines like 'it gives you a passed pawn' are fine once the detector is true."
+    },
+    {
+      "id": "label-saves-piece-from-origin",
+      "title": "Name the piece where it stood",
+      "feasibility": "high",
+      "layer": "reasons",
+      "detail": "retreatedToSafety builds NamedUnit with move.to, so Be3 'saves your e3-bishop'. Use the from-square (or drop the square and say 'your bishop'). Same bug will fire on every retreat."
+    },
+    {
+      "id": "stop-undefended-on-recaptures",
+      "title": "Do not call recaptures undefended wins",
+      "feasibility": "high",
+      "layer": "reasons",
+      "detail": "wins_material with capturedSeeCp >= 80 renders 'the pawn was undefended' even when the capture is a recapture of a pawn d6 still defends. Gate that phrase on SEE of a truly hanging unit, not on winning a sequence. Keep the discovered-attack clause when it is real."
+    },
+    {
+      "id": "ban-empty-strongest-and-better",
+      "title": "Require a because-clause or drop the praise",
+      "feasibility": "high",
+      "layer": "discourse",
+      "detail": "h3, h6, a3, a6, Ra7, Qe2, Bc8, c5 all got 'strongest' or 'would be better' with nothing after. If reasons are empty, pick development/opening or say it is the engine move without 'That's the one.' Empty verdicts are the default voice of this game."
+    },
+    {
+      "id": "opening-undeveloped-minors",
+      "title": "Coach development when minors are still home",
+      "feasibility": "medium",
+      "layer": "facts",
+      "detail": "Black made eight pawn moves before a piece left the back rank; the coach kept stamping center_control and backward_pawn and even suggested Kf7. Add a simple undeveloped-minors fact and, in the opening, prefer it over structure slogans and over king walks that lose castling. A 1200 would actually improve."
+    }
+  ],
+  "whatWorked": [
+    "e4 and d4: center-control copy actually matches those moves.",
+    "Nf3, Bd3, Nc3: development as the reason is honest even when thin.",
+    "Nxb6: 'the pawn was undefended' is true here (pawns do not defend forward).",
+    "fxe5 → Nd5: named fork of the c3-knight and e3-bishop — the one sentence in the game that taught a tactic.",
+    "d5 unveiling the bishop: the discovered-attack idea is right.",
+    "b5 as a blunder plus Na4 hitting the a7 rook: real shot, right severity.",
+    "Eval frames ('still winning' / 'still worse') on the bigger swings kept the score honest."
+  ]
+}

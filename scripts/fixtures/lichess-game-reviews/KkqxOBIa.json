@@ -1,0 +1,302 @@
+{
+  "gameId": "KkqxOBIa",
+  "white": "tymsonek_jelonek (1131)",
+  "black": "rushingrussian00 (1185)",
+  "movesReviewed": 44,
+  "movesFlagged": 25,
+  "okShare": 0.43,
+  "flags": [
+    {
+      "ply": 8,
+      "san": "g6",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Moving your pawn to g6 is playable, but moving your pawn to e5 would be better because you can likely fork the white a3-knight and the white king and it unveils an attack from your bishop on the white a3-knight.",
+      "critique": "e5 does not fork the a3-knight and the king. A pawn on e5 attacks d4 and f4, full stop. You stole that 'fork' from some later PV knight hop to c2 and sold it as the reason to push a pawn. The bishop-unveiling bit is real; the fork is a lie. I now think e5 is a royal fork. It isn't."
+    },
+    {
+      "ply": 34,
+      "san": "Nd5",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "both",
+      "quote": "Moving your b4-knight to d5 is a blunder, but moving your pawn to f5 would be better because it keeps your king safer.",
+      "critique": "I just put a knight on b4 attacking the queen, then ran it back to d5 for nothing. That is the lesson: I abandoned the attack. You said f5 is better because 'it keeps your king safer.' f5 kicks the queen on e4. King safety is a decoy. You missed the only idea a 1200 can actually use here."
+    },
+    {
+      "ply": 5,
+      "san": "c4",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your pawn to c4 is a blunder, but moving your g1-knight to f3 would be better because you can likely take a pawn.",
+      "critique": "I played 2.d4, they took it, and I pushed c4 instead of taking back. That is the whole game: I hung the d-pawn in a Sicilian. Nf3 does not 'likely take a pawn' — it prepares Nxd4 next move. Smith-Morra is 3.c3. You never said I left a captured pawn unanswered. Hedge verbs do not teach recapture."
+    },
+    {
+      "ply": 37,
+      "san": "Ng1",
+      "severity": "high",
+      "category": "jargon",
+      "perspective": "both",
+      "quote": "You are still worse, but moving your f3-knight to g1 creates a backward pawn to defend. A better move would have been moving your f3-knight to g5.",
+      "critique": "g4 is attacking my knight. I tucked it onto g1, the worst square on the board. You said I 'create a backward pawn to defend,' which is not English and not the tactic. The knight got kicked; retreating to the back rank is the crime. Structure jargon on a 600-centipawn piece retreat is how you train me to ignore hanging pieces."
+    },
+    {
+      "ply": 32,
+      "san": "Ndb4",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your d5-knight to b4 is the strongest move.",
+      "critique": "Nb4 hits the queen on c2. That is a one-sentence lesson. You gave me a verdict and a quip. If you cannot name 'attacks the queen,' do not call yourself a coach."
+    },
+    {
+      "ply": 26,
+      "san": "Kh8",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "You are still winning, but moving your king to h8 weakens the pawns in front of your king. A better move would have been moving your pawn to f5.",
+      "critique": "Kh8 does not move a pawn. The shield is the same. I wasted a tempo tucking the king; that is slow, not a pawn-structure crime. You also wanted f5 again without saying it hits anything. Wrong detector, wrong lesson, Lichess only called this an inaccuracy."
+    },
+    {
+      "ply": 12,
+      "san": "e5",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your pawn to e5 is the strongest move because you claim more of the center.",
+      "critique": "You begged for e5 on plies 8 and 10 because it unveils a bishop onto a3. I finally play it — and now it 'claims more of the center.' It also kicks the bishop you just put on f4. Tempo on a piece, not a geography slogan. You cannot recommend a move for a tactic then grade the same move as center control."
+    },
+    {
+      "ply": 13,
+      "san": "Bg5",
+      "severity": "high",
+      "category": "tautology",
+      "perspective": "aesthetic",
+      "quote": "Moving your f4-bishop to g5 is the strongest move because it saves your g5-bishop from capture.",
+      "critique": "The bishop is hanging on f4. It runs to g5. You told me I saved 'your g5-bishop,' the square it just arrived on. That is a destination-square bug wearing a because-clause. Say the bishop on f4 was attacked by e5. I already know it is currently on g5; I put it there."
+    },
+    {
+      "ply": 16,
+      "san": "g5",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your pawn to g5 is the strongest move.",
+      "critique": "g5 kicks the bishop that is pinning my f-pawn to the queen — the pin you named one ply ago. Zero because. You taught the pin, then ghosted the break. Reasons array is empty. Strongest-move-with-no-idea is a slot machine."
+    },
+    {
+      "ply": 23,
+      "san": "Be2",
+      "severity": "high",
+      "category": "classification",
+      "perspective": "both",
+      "quote": "Moving your f1-bishop to e2 is a blunder, but moving your f3-knight to d2 would be better.",
+      "critique": "Lichess: Mistake. You: Blunder. And Nd2 gets no idea at all — not 'the knight is about to get kicked by g4,' not 'vacate f3,' nothing. A 225-centipawn swing with an empty better-clause is just naming the engine's first move. I cannot practice Nd2 if I do not know what it does."
+    },
+    {
+      "ply": 11,
+      "san": "Bf4",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your c1-bishop to f4 is a mistake, but moving your a3-knight to b5 would be better.",
+      "critique": "Na3 only makes sense if it goes to b5 and bothers c7. That is why the knight sat on the rim. You never said Nb5 threatens c7 or a fork. 'Would be better' is not a lesson. This is the one moment the ugly Na3 pays rent, and you shrugged."
+    },
+    {
+      "ply": 28,
+      "san": "d5",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your pawn to d5 is the strongest move.",
+      "critique": "After White's c5, ...d5 is the central break that opens the position I have been cramped in. No structure, no tension, no 'this challenges e4.' Strongest-move period. If you skip the thematic break, what are the opening plies even for?"
+    },
+    {
+      "ply": 36,
+      "san": "g4",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Moving your pawn to g4 is a mistake, but moving your pawn to f5 would be better because your king is harder to attack.",
+      "critique": "Same lie as ply 34. Queen is still on e4. f5 still hits the queen. 'Your king is harder to attack' is phrase-bank king_safer, not chess. You have now missed the pawn-kick twice in a row with two different king-safety slogans."
+    },
+    {
+      "ply": 38,
+      "san": "h5",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "You are still winning, but moving your pawn to h5 leaves your king with less pawn cover. A better move would have been moving your pawn to f5 because it unveils an attack from your queen on the white pawn.",
+      "critique": "641 centipawns and you lead with pawn cover on an h-pawn push. f5 is the fourth time you have named that move. The real punch is still kicking Qe4. 'Unveils your queen on the white pawn' is a discovered-attack sideshow on h4. I am not here to snipe a wing pawn while a queen sits on e4."
+    },
+    {
+      "ply": 17,
+      "san": "Bg3",
+      "severity": "high",
+      "category": "tautology",
+      "perspective": "aesthetic",
+      "quote": "Moving your h4-bishop to g3 is the strongest move because it saves your g3-bishop from capture.",
+      "critique": "Identical destination-square gag as Bg5. g5 attacked the bishop on h4; it fled to g3; you saved 'the g3-bishop.' I can write this template in my sleep. Two bishop retreats, two fake squares, zero 'the pawn is kicking you.'"
+    },
+    {
+      "ply": 31,
+      "san": "Nc4",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your a3-knight to c4 is a blunder, but moving your queen to d2 would be better.",
+      "critique": "Lichess: Mistake. You: Blunder. Next move their knight lands on b4 and eats the queen's square. You did not say the queen on c2 is loose, or that Nc4 does not cover b4. Qd2 is an engine SAN. I needed 'your queen is a target.'"
+    },
+    {
+      "ply": 3,
+      "san": "d4",
+      "severity": "medium",
+      "category": "generic",
+      "perspective": "both",
+      "quote": "Moving your pawn to d4 is the strongest move because you put more pressure on the center.",
+      "critique": "This is the Open Sicilian / Smith-Morra fork in the road, and you gave me the same e4 center sentence with a different square. 2.d4 against ...c5 is an opening choice, not 'more pressure on the center.' If you cannot name the opening on the opening's defining ply, the phrase bank has captured you."
+    },
+    {
+      "ply": 24,
+      "san": "a6",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your pawn to a6 is a mistake, but moving your pawn to f5 would be better.",
+      "critique": "Empty again. a6 is a prophylaxis vs Nb5; f5 is a kingside break that hits the center. You named neither idea. Lichess called it an inaccuracy; you upgraded to mistake and still refused to teach. Third f5 recommendation, still no target."
+    },
+    {
+      "ply": 33,
+      "san": "Qe4",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your queen to e4 is a blunder, but moving your queen to b3 would be better.",
+      "critique": "The queen is running from Nb4. saves_piece is in the reasons and never made the sentence. Why is e4 a 341-centipawn lemon vs b3 — hanging, centralizing into f5, walking onto a bishop diagonal? You said none of it. Lichess: Inaccuracy. You: Blunder. Stop yelling and start pointing."
+    },
+    {
+      "ply": 29,
+      "san": "exd5",
+      "severity": "medium",
+      "category": "overclaim",
+      "perspective": "both",
+      "quote": "You are still worse, but taking the pawn on d5 with your e-pawn puts it at risk of attack from the black queen and e7-knight. A better move would have been moving your f3-knight to d2.",
+      "critique": "The pawn on d5 is hanging to two pieces. 'At risk of attack' is weasel copy for a free take. Then you prescribe Nd2 for the third time with no idea. If the capture hangs the pawn, say the pawn can be taken. Do not grade a hanging pawn as 'risk' and a mystery knight hop as the fix."
+    },
+    {
+      "ply": 7,
+      "san": "Na3",
+      "severity": "medium",
+      "category": "overclaim",
+      "perspective": "both",
+      "quote": "Moving your b1-knight to a3 is the strongest move.",
+      "critique": "Sixty centipawns dumped, knight on the rim, and you still say strongest because 'development.' Development to a3 is a plan toward b5, not a gold star. Calling every engine-first move the strongest move trains me to copy Na3 in my next Sicilian."
+    },
+    {
+      "ply": 4,
+      "san": "cxd4",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Taking the pawn on d4 with your c-pawn is the strongest move.",
+      "critique": "You stuffed hanging, doubled_pawns, backward_pawn, and capture into the reasons, then taught none of them. I took a hanging center pawn. Say that. Doubled and backward on this capture is detector noise. Strongest-move-period on the recapture that defines the opening is lazy."
+    },
+    {
+      "ply": 35,
+      "san": "h4",
+      "severity": "medium",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Moving your pawn to h4 is a mistake, but moving your c4-knight to d6 would be better because it unveils an attack from your bishop on the black pawn.",
+      "critique": "Nd6 is an octopus: b7, c8, e8, f7. You sold it as a discovered bishop hit on 'the black pawn' — which pawn? a6? That is a sideshow. If the better move is a knight outpost, say outpost. Vague unveiled pawns make me scan the wrong diagonal."
+    },
+    {
+      "ply": 30,
+      "san": "Nxd5",
+      "severity": "medium",
+      "category": "classification",
+      "perspective": "both",
+      "quote": "Taking the pawn on d5 with your e7-knight keeps you winning because the pawn was undefended. A better move would have been moving your c8-bishop to f5 because you pin the queen to the king.",
+      "critique": "The Bf5 pin is the first tactic you explained that I actually wanted. Then you stamped BLUNDER on taking a hanging pawn while I am still −4. Lichess: Inaccuracy. You cannot say 'keeps you winning' and 'blunder' in the same breath without me ignoring both words."
+    },
+    {
+      "ply": 27,
+      "san": "c5",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your pawn to c5 is a mistake, but moving your f3-knight to d2 would be better.",
+      "critique": "Nd2 is becoming a personality. Ply 23, 27, 29 — same SAN, never a reason. discovered_attack sits in the reasons and never reaches the sentence. c5 releases the center; tell me what it hangs or what it blocks. Engine-move-as-a-service."
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "gate-pv-likely-tactics",
+      "title": "Only attach likely tactics the suggested move itself creates",
+      "feasibility": "high",
+      "layer": "reasons",
+      "detail": "Ply 8's 'likely fork the a3-knight and the king' is a later PV knight-on-c2, not e5. verifyLikelyTactics currently lets likely fork/pin/capture through on evalDelta ≥ 40 from improvement.events. Restrict likely tactics to effects of the first suggested ply (the piece that moved), or require the forker square to equal the suggested to-square. A 1200 treats 'because you can likely fork' as a property of the pawn push."
+    },
+    {
+      "id": "attacks-piece-beats-king-safer",
+      "title": "Rank pawn-kicks of a queen above king-safety slogans",
+      "feasibility": "high",
+      "layer": "facts",
+      "detail": "f5 was suggested on plies 24, 26, 34, 36, and 38. Three times the because-clause was king_safer / pawn cover, never 'it kicks the queen on e4.' Add a threatens/kicks_piece fact when the suggested move attacks a higher-value unit (especially Q) and rank it over king_safer (90) and pawn_shield. kicked_by_pawn already exists for the victim; the attacker side has no copy. This is the single highest-frequency miss in the middlegame."
+    },
+    {
+      "id": "ban-empty-better-clause",
+      "title": "Do not emit SAN-only 'would be better' lines",
+      "feasibility": "high",
+      "layer": "discourse",
+      "detail": "Plies 11, 23, 24, 27, 31, 33, 39 are missed_improvement with empty reasons and suggestedBecause null, so templates.ts falls through to 'X is a mistake, but Y would be better.' Skip the alternative, or require a non-generic benefit (threat, recapture, outpost) before naming SAN. Naming Nd2 three times with no idea is worse than 'there's better' plus a hint. Cheap win: if suggestedBenefits is empty after contrast, do not render suggestedPhrase."
+    },
+    {
+      "id": "saves-piece-origin-not-destination",
+      "title": "Describe saved pieces from the origin square",
+      "feasibility": "high",
+      "layer": "templates",
+      "detail": "retreatedToSafety pushes saves_piece with movedPiece on the to-square, so Bg5 'saves your g5-bishop' and Bg3 'saves your g3-bishop.' ownedPhrase should use move.from for retreats, or drop the square ('saves your bishop from capture'). Two identical tautologies in one bishop tour. A 1200 laughs, then stops trusting 'because.'"
+    },
+    {
+      "id": "unanswered-capture",
+      "title": "Detect leaving a captured pawn unrecaptured",
+      "feasibility": "medium",
+      "layer": "facts",
+      "detail": "3.c4 after 2.d4 cxd4 is the game. Coach said Nf3 is better because 'you can likely take a pawn' — a PV capture, not 'you left the d-pawn hanging.' Add an unanswered-capture / recapture-available fact when the opponent just took on a central square and the played move neither recaptures nor attacks that unit. Same hole on ply 4 (cxd4 taught as strongest with no hanging-pawn because) and ply 29 (hanging d5 pawn hedged as 'at risk of attack' because hangingLossCopy is empty for a pawn)."
+    },
+    {
+      "id": "structure-must-not-lead-piece-safety",
+      "title": "Gate pawn_shield and backward_pawn behind piece safety",
+      "feasibility": "high",
+      "layer": "reasons",
+      "detail": "Kh8 triggered pawn_shield ('weakens the pawns in front of your king') on a king move. Ng1, fleeing g4, led with 'creates a backward pawn to defend.' pickProblemReasons already has hanging/kicked_by_pawn; rank them strictly above structure, and only emit pawn_shield when the moved piece is a pawn in the king's shield (the opening-phase gate is not enough). Structure as the headline of a 600cp knight retreat is how jargon kills trust."
+    },
+    {
+      "id": "blunder-while-winning",
+      "title": "Do not stamp blunder on still-winning recaptures",
+      "feasibility": "high",
+      "layer": "classification",
+      "detail": "mistakeMaxLossCp 200 plus classifyPlayedMove makes ply 23/30/31/33 'blunders' where Lichess says mistake or inaccuracy. Ply 30 is the tell: taking a hanging pawn, eval still −4, copy says 'keeps you winning,' label says blunder. Either raise the blunder floor when evalFrame is still_winning, or forbid blunder when the played concept is a winning recapture. Learners treat 'blunder' as 'you hung a piece,' then bounce off the pin lesson that was actually good."
+    },
+    {
+      "id": "drop-center-when-a-kick-exists",
+      "title": "Suppress center_control when a piece is kicked or pinned",
+      "feasibility": "high",
+      "layer": "discourse",
+      "detail": "e5 vs Bf4 became 'claim more of the center.' Qc2 before O-O-O became center pressure. d4 in a Sicilian became center pressure. dropGenericReasons exists; it is not applied when center_control is the only because. Prefer capture/pin/saves_piece/discovered_attack, and if those exist on the position (Bf4 is attacked), do not fall through to the center phrase bank. Opening ply 3 should be allowed to say nothing rather than recycle the e4 sentence."
+    }
+  ],
+  "whatWorked": [
+    "Ply 14 f6: actually saves the queen from Bg5 on the open diagonal — rare true hanging-queen lesson.",
+    "Ply 15 Bh4: 'you pin the pawn to the queen' is concrete and matches the board.",
+    "Ply 21 O-O-O: semi-open d-file after the d-pawn vanished is a real rook lesson, not just 'king shelter.'",
+    "Ply 6 Nc6: defending the d4 pawn is the right beginner idea.",
+    "Ply 30's Bf5 pin of queen to king is the correct tactic, even though the blunder label fights it.",
+    "Ply 40–41: hanging Nd5, then Nxf5 sitting on a rook-and-bishop take — specific squares, I can see it.",
+    "Ply 44 Rxf5: queen was undefended. Short and true."
+  ]
+}

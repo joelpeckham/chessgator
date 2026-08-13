@@ -1,0 +1,303 @@
+{
+  "gameId": "bfQ6ggvb",
+  "white": "Trenek (1683)",
+  "black": "tymsonek_jelonek (1452)",
+  "movesReviewed": 44,
+  "movesFlagged": 25,
+  "okShare": 0.43,
+  "flags": [
+    {
+      "ply": 4,
+      "san": "d5",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "both",
+      "quote": "Moving your pawn to d5 leaves your pawn hanging to the white f3-knight. A better move would have been moving your b8-knight to c6 because it saves your pawn from capture.",
+      "critique": "The f3-knight attacks e5, not d5, and e5 was already hanging after Nf3 — that is why everyone plays Nc6. This is the Elephant Gambit, a known (shaky) try, not a random hung pawn. Teach me that I refused to defend e5 and opened the center, not that I just dangled 'a pawn' to a knight that cannot even take d5."
+    },
+    {
+      "ply": 8,
+      "san": "Qxd5",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the pawn on d5 with your queen is the strongest move because you pin the pawn to the rook and then pin another pawn to the queen.",
+      "critique": "I recaptured the gambit pawn and my queen hits the knight on e5. Instead I get two relative pins of White's g2/d2 pawns that nobody would ever 'exploit.' If the because-clause is a ghost pin on a starting-square pawn, it is not a lesson — it is the pin detector talking to itself."
+    },
+    {
+      "ply": 9,
+      "san": "Qe2",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "aesthetic",
+      "quote": "Moving your queen to e2 is a mistake, but moving your e5-knight to f3 would be better.",
+      "critique": "A 134-centipawn mistake and the coach just shrugs 'Nf3 would be better' with zero why. Tell me the queen on e2 is a clumsy way to babysit a hanging knight, blocks the bishop, and sits on the e-file. 'X is a mistake, but Y would be better' is a template, not teaching."
+    },
+    {
+      "ply": 10,
+      "san": "Be6",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Moving your c8-bishop to e6 is a mistake, but moving your g8-knight to e7 would be better because you can likely pin the knight to the queen.",
+      "critique": "Ne7 does not pin Ne5 to Qe2. 'You can likely pin' is a hedged hallucination from a follow-up line, and the listed reasons are just development and center. If you want Ne7, say it develops toward the center and keeps the c8-bishop flexible — do not invent a pin I cannot find on the board."
+    },
+    {
+      "ply": 11,
+      "san": "Nc3",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your b1-knight to c3 is the strongest move because you put more pressure on the center.",
+      "critique": "Nc3 develops with tempo on the queen sitting on d5. That is the whole move. Lecturing me about 'the center' while I am attacking a queen is how you train people to ignore hanging pieces in the opening."
+    },
+    {
+      "ply": 12,
+      "san": "Qd6",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your queen to d6 is the strongest move because it unveils an attack from your bishop on the white pawn.",
+      "critique": "The queen was hanging to Nc3. I moved it out of take. The coach had saves_piece in the reasons and still led with a discovered attack on some pawn. If my queen is en prise, that is the sentence. The pawn tease is trivia."
+    },
+    {
+      "ply": 13,
+      "san": "Qb5+",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your queen to b5 leaves your e5-knight where the black queen can take, losing a knight.",
+      "critique": "This is a check that hangs a knight — the amateur special. The copy never says it is check, never says I went pawn-grabbing with a check, and the 'because' for Nd3 is another unveiled attack on a bishop. Teach: do not check if your piece falls."
+    },
+    {
+      "ply": 14,
+      "san": "c6",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Moving your pawn to c6 is the strongest move because it gives your king better protection.",
+      "critique": "c6 interposes on a check and kicks the queen. That is not a pawn shield. Calling a block 'king protection' is the same lie as calling Kd1/Kb1 'harder to attack' every time I step out of check. Name the check."
+    },
+    {
+      "ply": 17,
+      "san": "Ne2",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your knight to e2 is the strongest move because your king is harder to attack.",
+      "critique": "I am in check on the e-file and the knight on c3 is hanging to the queen. Ne2 blocks the check and pulls the knight off the fork. 'King is harder to attack' is the king_safer phrase-bank on autopilot. Also 55cp of loss is not 'the strongest move' in any language a learner trusts."
+    },
+    {
+      "ply": 19,
+      "san": "Qxa8",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "both",
+      "quote": "Taking the rook on a8 with your queen doesn't ease a difficult position because the rook was undefended and then pin the knight to the king.",
+      "critique": "This sentence is broken English and inverted chess. Grabbing the corner rook is the mistake because my queen abandons the center while my king is stuck on e1 — not 'because the rook was free and also I pinned a knight.' You praised the blunder's SEE as the reason it fails. I cannot learn from that."
+    },
+    {
+      "ply": 20,
+      "san": "Ng4",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your f6-knight to g4 is a blunder.",
+      "critique": "I dumped a −3.00 position to 0.00 and the coach gives me six words, no because, no better move, empty reasons. A blunder this size needs: what it hangs or allows (f3 kicking the knight, the attack fizzling), and what I should have played instead. Silence is worse than a wrong pin."
+    },
+    {
+      "ply": 22,
+      "san": "Bxd4",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Taking the pawn on d4 with your c5-bishop is the strongest move because you pin the pawn to the rook and the pawn was undefended.",
+      "critique": "One ply ago you said this pawn was attacked by my queen and bishop. Now it is 'undefended,' plus another phantom pin-the-pawn-to-the-rook. The lesson is take the pawn that is double-attacked. Stop contradicting yourself with relative-pin spam."
+    },
+    {
+      "ply": 23,
+      "san": "Bf4",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "You are still worse, but moving your c1-bishop to f4 leaves your pawn hanging to the black d4-bishop. A better move would have been moving your c1-bishop to e3 because your king is harder to attack.",
+      "critique": "Bf4 attacks the queen on e5. That is the idea, even if it is a mistake. You talked about some hanging pawn and recommended Be3 as king safety. Be3 fights the monster bishop on d4 — say that. Hitting a queen is not a hanging pawn."
+    },
+    {
+      "ply": 24,
+      "san": "Bxf2+",
+      "severity": "medium",
+      "category": "classification",
+      "perspective": "both",
+      "quote": "You are still winning, but taking the pawn on f2 with your d4-bishop leaves your queen hanging to the white f4-bishop. A better move would have been moving your queen to a5 because you pin the pawn to the rook.",
+      "critique": "The hanging-queen punchline is the first honest tactic in a while — then you stamp 'blunder' on a move that stays −4.8 and Lichess called an inaccuracy, and the improvement is Qa5+ because... pin the pawn to the rook. The real alt is check with the queen and keep it. Do not bury a good hanging-piece lesson under a fake pin and a scare label."
+    },
+    {
+      "ply": 26,
+      "san": "Qd5+",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Moving your queen to d5 is the strongest move because you pin the pawn to the rook.",
+      "critique": "My queen was hanging to Bf4. Qd5+ saves it with check. There is no d-pawn left to pin to a rook. This is the pin template eating the actual 'get your queen out of take' lesson, again."
+    },
+    {
+      "ply": 28,
+      "san": "O-O",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Castling kingside is the strongest move because it saves your b8-knight from capture.",
+      "critique": "After O-O the knight is still sitting on b8 next to the queen on a8. Castling unpins it so it can move; it does not save it from capture. You had a perfectly good castle phrase ('king out of danger, rook in the game') and overrode it with a false saves_piece. I would look at the board, see Qxa8 still taking the knight, and stop trusting you."
+    },
+    {
+      "ply": 29,
+      "san": "Qb7",
+      "severity": "medium",
+      "category": "jargon",
+      "perspective": "aesthetic",
+      "quote": "Moving your queen to b7 is a blunder, but moving your knight to f4 would be better because you fork the black e6-bishop and the black queen and then fork the black rook and the black queen.",
+      "critique": "Nf4 forking queen and bishop is a real move. 'And then fork the rook and the queen' is PV-babble stacked on a pin reason that never appears in the sentence. One fork. Stop chaining imaginary second forks. Also Lichess called this an inaccuracy; if you are going to scream blunder, show the −4 swing as 'you let Ne3+ land,' not a fork novella."
+    },
+    {
+      "ply": 32,
+      "san": "Qe4",
+      "severity": "high",
+      "category": "generic",
+      "perspective": "both",
+      "quote": "Moving your queen to e4 is the strongest move because you pin the pawn to the rook and it unveils an attack from your bishop on the white pawn.",
+      "critique": "Same two leftovers as always: pawn-to-rook pin and a discovered attack on a pawn. Qe4 centralizes, stares at the king, and keeps the squeeze on. If every queen move 'pins a pawn to a rook,' the phrase means nothing."
+    },
+    {
+      "ply": 33,
+      "san": "Bxe3",
+      "severity": "high",
+      "category": "eval_frame",
+      "perspective": "both",
+      "quote": "Taking the knight on e3 with your d2-bishop is the strongest move because it saves your pawn from capture.",
+      "critique": "I am taking the knight that just forked my king and bishop, then Black recaptures with check and the eval drops 361cp — and you call it the strongest move because it saves a pawn. Dropping the capture as tautology left a pawn-save leftover. Say: you have to take the forking knight, and it still hurts because they recapture with check."
+    },
+    {
+      "ply": 35,
+      "san": "Kb1",
+      "severity": "medium",
+      "category": "redundant",
+      "perspective": "aesthetic",
+      "quote": "Moving your king to b1 is the strongest move because your king is harder to attack.",
+      "critique": "Third or fourth 'king is harder to attack' on a king flight from check this game (c6, Ne2, Kd1, Bd2, Kc1, Kb1). I am not safer in some deep sense — I am moving out of check. Repeat this phrase enough and I start skipping the coach."
+    },
+    {
+      "ply": 36,
+      "san": "Bf5",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your e6-bishop to f5 is a blunder, but moving your e3-bishop to b6 would be better because you can likely pin the bishop to the rook and then pin the knight to the king.",
+      "critique": "585 centipawns, empty reasons, and the improvement is a 'likely pin then pin' fairy tale. Why is Bf5 a blunder — does it abandon e3, walk into Qb3, dump the attack? I need that. I do not need two hypothetical pins in a line I cannot calculate in blitz."
+    },
+    {
+      "ply": 39,
+      "san": "a3",
+      "severity": "high",
+      "category": "missing_lesson",
+      "perspective": "both",
+      "quote": "Moving your pawn to a3 is a blunder, but moving your knight to c3 would be better.",
+      "critique": "Another 600cp hole with no because and no idea. The d-file is open and a rook is coming. a3 is a nothing move on a burning back rank. Nc3 at least develops into the mess. 'Would be better.' is not a lesson."
+    },
+    {
+      "ply": 40,
+      "san": "Rd1+",
+      "severity": "high",
+      "category": "wrong_chess",
+      "perspective": "technical",
+      "quote": "Moving your rook to d1 leaves your knight where the white queen can take, losing a knight. A better move would have been moving your f5-bishop to e6 because it keeps your king safer.",
+      "critique": "This is a double check (rook on d1 and queen on e4). The king must walk, then the rook dies to the uncovered a1-rook. The knight on b8 has been hanging for ten moves — that is not why I just threw a full rook and the game (+11). Suggesting Be6 'to keep your king safer' for a 1172cp blunder is malpractice. Teach: flashy check, king steps aside, your rook is toast."
+    },
+    {
+      "ply": 42,
+      "san": "Be6",
+      "severity": "medium",
+      "category": "missing_lesson",
+      "perspective": "technical",
+      "quote": "Moving your f5-bishop to e6 is the strongest move because you pin the queen to the king.",
+      "critique": "The a2–b3 pin is real, rare honesty from the pin detector. You still do not mention the rook sitting en prise on d1. Pinning the queen while a rook hangs is a desperation idea, not a triumph. Say both."
+    },
+    {
+      "ply": 44,
+      "san": "Bxc4",
+      "severity": "medium",
+      "category": "eval_frame",
+      "perspective": "both",
+      "quote": "You are still winning, but taking the pawn on c4 with your e6-bishop leaves your rook hanging to the white queen and a1-rook. A better move would have been taking the pawn on c4 with your queen.",
+      "critique": "The hanging rook has been on d1 for four plies. Repeating 'your rook hangs' without 'you have left it there since the check' makes me think it just became hanging. Qxc4 is the right recapture idea; also Lichess says mistake and you say blunder while claiming I am still winning. Pick a story."
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "demote-pawn-relative-pins",
+      "title": "Stop leading with pawn-to-rook pins",
+      "feasibility": "high",
+      "layer": "reasons",
+      "detail": "Relative pins of pawns to undeveloped rooks/queens dominated Qxd5, Bxd4, Qd5+, Qe4, and half the suggested-move becauses. In pickBenefitReasons / reasonSeverity, drop relative pins where pinned.type is pawn unless the pin is immediately exploitable (SEE capture of the pinned unit, or the pinner can take it next). A 1200 hears 'you pin the pawn to the rook' on every queen move and learns to ignore the coach."
+    },
+    {
+      "id": "name-check-escapes",
+      "title": "Call getting out of check what it is",
+      "feasibility": "high",
+      "layer": "facts",
+      "detail": "c6, Ne2, Kd1, Bd2, Kc1, Kb1 all used king_safer phrase-bank ('harder to attack' / 'better protection') for blocking or fleeing check. Add an escapes_check fact (block / capture / flee) in move-effects when fenBefore is check, and do not emit king_safer for merely resolving check. Checks given (Qb5+, Qxe5+, Bxe3+, Qd5+, Rd1+, Ne3+) should beat relative pins in selectBecauseReasons so the copy actually says check."
+    },
+    {
+      "id": "no-benefit-because-on-mistakes",
+      "title": "Do not praise a bad capture",
+      "feasibility": "high",
+      "layer": "discourse",
+      "detail": "Qxa8 is a mistake with concept capture, so explainPlayedAsBenefit is true and the template becomes 'doesn't ease a difficult position because the rook was undefended and then pin…' — inverted logic plus broken grammar. In select-insight, explainPlayedAsBenefit must be false for inaccuracy/mistake/blunder even when the concept is capture, check, or development. Use problemReasons for the because-clause."
+    },
+    {
+      "id": "rank-saves-over-pawn-noise",
+      "title": "Prefer saving a queen to discovering a pawn",
+      "feasibility": "high",
+      "layer": "discourse",
+      "detail": "selectBecauseReasons prefers any tactical action, so Qd6 lectures about a discovered attack on a pawn while saves_piece of the queen is sitting in the reason list; O-O prefers a false saves_piece over the castle phrase-bank. Rank saves_piece of Q/R/N and castle above discovered_attack on a pawn and relative pins. When dropTautologyReasons strips a recapture, do not let a leftover 'saves a pawn' become the whole lesson (Bxe3)."
+    },
+    {
+      "id": "never-empty-blunder",
+      "title": "Never emit a naked blunder sentence",
+      "feasibility": "high",
+      "layer": "templates",
+      "detail": "Ng4, a3, and Bf5 are 300–600cp holes that rendered as 'X is a blunder' or 'Y would be better' with empty reasons. If classification is mistake/blunder and both playedBecause and suggestedBecause are missing, fall back to eval-loss copy ('this drops about N pawns') plus the suggested SAN. A 1200 who just threw the game needs a what and a why, not a quip."
+    },
+    {
+      "id": "detect-tempo-on-queen",
+      "title": "Detect developing with tempo",
+      "feasibility": "medium",
+      "layer": "facts",
+      "detail": "Nc3 attacking the queen on d5, and Nf3 attacking e5, both got center_control. Add a hits_piece / gains_tempo effect when the moved piece newly attacks an opponent Q/R (or an undefended piece). Rank it above center_control in pickBenefitReasons. Opening moves would finally say the real idea instead of 'you claim more of the center.'"
+    },
+    {
+      "id": "hanging-must-be-new-or-saveable",
+      "title": "Attribute the hanging piece that actually changed",
+      "feasibility": "high",
+      "layer": "facts",
+      "detail": "Rd1+ was tagged for the long-hanging Nb8 instead of the rook that just double-checked onto a death square. ignored_threat / leftPieceHanging should be pieces that became hanging this ply, or that this move could have saved. Pre-existing hanging pieces are not 'left hanging' by a check-sacrifice. Prefer the moved piece when it is newly en prise."
+    },
+    {
+      "id": "strip-likely-followup-pins",
+      "title": "Ban likely-then-pin suggestion copy",
+      "feasibility": "high",
+      "layer": "reasons",
+      "detail": "Ne7, Bb6, Qa5, and Nf4 all explained the engine move with 'you can likely pin… and then pin/fork…' from PV follow-ups. verifyLikelyTactics still lets likely pins through as suggestedBecause. If a tactic is likely or a follow-up, do not use it as the lead because; use the immediate point (develop, kick, recapture, get out of take). 1200s cannot use a pin they cannot see on this ply."
+    }
+  ],
+  "whatWorked": [
+    "Nxe5: 'the pawn was undefended' is short and true.",
+    "Qxe5+: actually named the fork of king and knight (grammar is a run-on, but the tactic is right).",
+    "Qxb7 / Nxe5 hanging-knight thread: the coach did keep pointing at the e5-knight you refused to save.",
+    "Bxf2+: correctly said the queen hangs to Bf4 — the rare time piece-safety copy matched the board.",
+    "Ne3+: fork of king and f1-bishop is the real idea, named clearly.",
+    "Ka2: unveiling the a1-rook onto d1 is the right discovered-attack lesson.",
+    "Be6: pin of queen to king on the a2–e6 diagonal is a real pin, not a g2-pawn ghost.",
+    "c4: taking the free rook on d1 vs pushing a double-attacked pawn is the correct alternative."
+  ]
+}
