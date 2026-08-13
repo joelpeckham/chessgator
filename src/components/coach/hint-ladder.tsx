@@ -9,8 +9,6 @@ export type HintLadderProps = {
   fen?: string | null;
   disabled?: boolean;
   onRequestHint: () => void;
-  /** Compact mode: button only, no body (for the idle mascot). */
-  compact?: boolean;
 };
 
 function nextHintLabel(level: number): string {
@@ -29,28 +27,11 @@ export function HintLadder({
   fen = null,
   disabled = false,
   onRequestHint,
-  compact = false,
 }: HintLadderProps) {
   const level = hint?.level ?? -1;
   const nextLabel = nextHintLabel(level);
   const lineSan =
     hint && hint.level >= 3 ? lineUciToSan(fen, hint.lineUci) : "";
-
-  if (compact) {
-    return (
-      <Button
-        type="button"
-        size="sm"
-        variant="outline"
-        className="shrink-0"
-        disabled={disabled || level >= 3}
-        onClick={onRequestHint}
-        data-testid="hint-button"
-      >
-        {level < 0 ? "Hint" : nextLabel}
-      </Button>
-    );
-  }
 
   return (
     <div

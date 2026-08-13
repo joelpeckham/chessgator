@@ -251,7 +251,7 @@ export function selectTeachingInsight(
     classification: evidence.classification,
     quip:
       playedBecause || suggestedBecause || problem
-        ? renderQuip(evidence.classification)
+        ? renderQuip(evidence.classification, evidence.gameNodeId)
         : "",
     nudge: shouldNudge(evidence.classification),
   };

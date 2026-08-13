@@ -1,5 +1,6 @@
 import { styleBoardAnnotations } from "@/components/board/annotation-style";
 import { lastMoveSquares } from "@/components/board/move-utils";
+import { isIdleHintEligible } from "@/components/coach/teaser-timing";
 import type { SettingsEngineStatus } from "@/components/game/settings-sheet";
 import {
   buildBranchGraph,
@@ -71,6 +72,7 @@ export type ShellView = {
     hintDisabled: boolean;
     hintFen: string;
     showTutorLaneHint: boolean;
+    idleHintEligible: boolean;
   };
   timeline: {
     tree: GameTree;
@@ -268,6 +270,12 @@ export function buildShellView(args: {
       hintDisabled: !interactive || Boolean(runtime.coachUnavailable),
       hintFen: liveFen,
       showTutorLaneHint: Boolean(tutorLine),
+      idleHintEligible: isIdleHintEligible({
+        ply: getCurrentNode(tree).ply,
+        playerTurn: interactive,
+        hasInsight: Boolean(visibleInsight),
+        hasHint: Boolean(runtime.coaching.hint),
+      }),
     },
     timeline: {
       tree,

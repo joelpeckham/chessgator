@@ -14,9 +14,12 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
 
     await expect(page.getByTestId("coach-mascot")).toBeVisible();
     await expectCoachCollapsed(page);
+    await expect(
+      page.getByTestId("coach-mascot").getByTestId("hint-button"),
+    ).toHaveCount(0);
 
     // Progressive hint ladder opens the balloon.
-    await page.getByTestId("coach-mascot").getByTestId("hint-button").click();
+    await page.getByTestId("coach-gator").click();
     await expect(page.getByTestId("coach-balloon")).toBeVisible();
     await expect(page.getByTestId("hint-ladder")).toHaveAttribute(
       "data-hint-level",

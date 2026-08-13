@@ -150,6 +150,7 @@ export function GameShellLayout({
               showTutorLaneHint={view.coach.showTutorLaneHint}
               onRequestHint={ui.handleRequestHint}
               compact={view.mascotBelow}
+              idleHintEligible={view.coach.idleHintEligible}
             />
           </div>
           <div

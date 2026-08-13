@@ -3,6 +3,7 @@ import type {
   EvalFrame,
   MoveMargin,
 } from "@/domain/analysis/explanation-reasons";
+import { pickQuip } from "@/domain/teaching/quip-bank";
 import type { TeachingConcept } from "@/domain/teaching/types";
 
 export type TemplateContext = {
@@ -33,17 +34,11 @@ export function classificationLabel(
   return CLASSIFICATION_LABEL[classification];
 }
 
-const CLASSIFICATION_QUIP: Record<MoveClassification, string> = {
-  best: "That's the one.",
-  excellent: "Nice.",
-  good: "Solid.",
-  inaccuracy: "There's better.",
-  mistake: "That was shaky.",
-  blunder: "Want to look at that?",
-};
-
-export function renderQuip(classification: MoveClassification): string {
-  return CLASSIFICATION_QUIP[classification];
+export function renderQuip(
+  classification: MoveClassification,
+  seed?: string,
+): string {
+  return pickQuip(classification, seed);
 }
 
 export function renderExplanation(ctx: TemplateContext): string {

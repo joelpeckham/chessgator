@@ -2,15 +2,19 @@
 
 import { RiCloseLine } from "@remixicon/react";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CoachBalloon } from "@/components/coach/coach-balloon";
 import {
   type GatorMood,
   gatorExpressionFor,
   gatorSrc,
 } from "@/components/coach/gator-expression";
-import { HintLadder } from "@/components/coach/hint-ladder";
 import { TeachingCard } from "@/components/coach/teaching-card";
+import {
+  IDLE_HINT_QUIP,
+  scheduleIdleHint,
+  scheduleTeaserExpiry,
+} from "@/components/coach/teaser-timing";
 import { Button } from "@/components/ui/button";
 import {
   classificationLabel,
@@ -39,9 +43,12 @@ export type CoachMascotProps = {
   onRequestHint: () => void;
   showTutorLaneHint?: boolean;
   compact?: boolean;
+  idleHintEligible?: boolean;
 };
 
 type MascotMode = "idle" | "analyzing" | "feedback" | "hints";
+
+type TeaserKind = "praise" | "nudge" | "idle";
 
 function deriveMode(args: {
   analyzing: boolean;
@@ -102,17 +109,53 @@ export function CoachMascot({
   onRequestHint,
   showTutorLaneHint = false,
   compact = false,
+  idleHintEligible = false,
 }: CoachMascotProps) {
   const gatorButtonRef = useRef<HTMLButtonElement>(null);
+  const [idlePromptVisible, setIdlePromptVisible] = useState(false);
+  const [expiredTeaserKey, setExpiredTeaserKey] = useState<string | null>(null);
+  if (!idleHintEligible && idlePromptVisible) {
+    setIdlePromptVisible(false);
+  }
 
   const mode = deriveMode({ analyzing, insight, hint });
   const expression = gatorExpressionFor(deriveMood({ mode, insight }));
-  const showNudgeTeaser =
-    !expanded && Boolean(insight?.nudge) && mode === "feedback";
+  const showNudgeTeaser = Boolean(insight?.nudge) && mode === "feedback";
   const showPraiseTeaser =
+    insight?.classification === "best" ||
+    insight?.classification === "excellent";
+  const showIdleTeaser = idlePromptVisible && idleHintEligible;
+
+  const teaserKind: TeaserKind | null = showNudgeTeaser
+    ? "nudge"
+    : showPraiseTeaser
+      ? "praise"
+      : showIdleTeaser
+        ? "idle"
+        : null;
+  const teaserText =
+    teaserKind === "idle" ? IDLE_HINT_QUIP : (insight?.quip ?? null);
+  const teaserKey =
+    teaserKind === "idle"
+      ? "idle"
+      : teaserKind && teaserText
+        ? `${teaserKind}:${insight?.classification ?? ""}:${insight?.explanation ?? ""}:${teaserText}`
+        : null;
+  const teaserVisible =
     !expanded &&
-    (insight?.classification === "best" ||
-      insight?.classification === "excellent");
+    Boolean(teaserKind && teaserText && expiredTeaserKey !== teaserKey);
+
+  useEffect(() => {
+    if (!idleHintEligible) return;
+    return scheduleIdleHint(true, () => setIdlePromptVisible(true));
+  }, [idleHintEligible]);
+
+  useEffect(() => {
+    if (!teaserKey || expiredTeaserKey === teaserKey) return;
+    return scheduleTeaserExpiry(teaserKey, () =>
+      setExpiredTeaserKey(teaserKey),
+    );
+  }, [teaserKey, expiredTeaserKey]);
 
   useEffect(() => {
     if (!expanded) return;
@@ -143,10 +186,13 @@ export function CoachMascot({
       collapse();
       return;
     }
+    if ((mode === "idle" || mode === "hints") && !hint && !hintDisabled) {
+      requestHintAndExpand();
+      return;
+    }
     onExpandedChange(true);
   }
 
-  const teaserText = insight?.quip ?? null;
   const nudgeMotion =
     insight?.classification === "blunder"
       ? "coach-mascot-pulse"
@@ -184,15 +230,15 @@ export function CoachMascot({
         </div>
       ) : null}
 
-      {(showNudgeTeaser || showPraiseTeaser) && teaserText ? (
+      {teaserVisible && teaserKind && teaserText ? (
         <div
           className="coach-teaser pointer-events-auto"
           data-testid="coach-teaser"
-          data-kind={showNudgeTeaser ? "nudge" : "praise"}
-          aria-hidden={showPraiseTeaser && !showNudgeTeaser ? true : undefined}
+          data-kind={teaserKind}
+          aria-hidden={teaserKind === "praise" ? true : undefined}
         >
-          <p className="min-w-0 flex-1 text-xs font-medium">{teaserText}</p>
-          {showNudgeTeaser ? (
+          <p className="text-xs font-medium text-pretty">{teaserText}</p>
+          {teaserKind === "nudge" ? (
             <Button
               type="button"
               size="icon-xs"
@@ -220,7 +266,7 @@ export function CoachMascot({
           className={cn(
             "rounded-md outline-offset-2 focus-visible:outline-2 focus-visible:outline-dashed focus-visible:outline-foreground",
             analyzing && "cursor-default opacity-90",
-            insight?.nudge && !expanded && nudgeMotion,
+            insight?.nudge && !expanded && teaserVisible && nudgeMotion,
           )}
           aria-label={mascotAriaLabel({ expanded, mode, insight })}
           aria-expanded={expanded}
@@ -242,16 +288,6 @@ export function CoachMascot({
             loading="eager"
           />
         </button>
-
-        {!expanded && (mode === "idle" || mode === "hints") ? (
-          <HintLadder
-            hint={hint}
-            fen={hintFen}
-            disabled={hintDisabled}
-            onRequestHint={requestHintAndExpand}
-            compact
-          />
-        ) : null}
       </div>
     </div>
   );
