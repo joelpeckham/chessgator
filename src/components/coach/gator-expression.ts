@@ -2,10 +2,12 @@ import type { MoveClassification } from "@/domain/analysis/classification";
 
 export type GatorExpression =
   | "neutral-happy"
-  | "really-happy"
-  | "intrigued"
-  | "surprised"
-  | "afraid";
+  | "sad"
+  | "mischievous"
+  | "shocked"
+  | "angry"
+  | "confused"
+  | "scared";
 
 export type GatorMood = MoveClassification | "idle" | "analyzing" | "hint";
 
@@ -14,14 +16,14 @@ export function gatorExpressionFor(mood: GatorMood): GatorExpression {
     case "analyzing":
     case "hint":
     case "inaccuracy":
-      return "intrigued";
+      return "confused";
     case "best":
     case "excellent":
-      return "really-happy";
+      return "mischievous";
     case "mistake":
-      return "surprised";
+      return "shocked";
     case "blunder":
-      return "afraid";
+      return "scared";
     default:
       return "neutral-happy";
   }

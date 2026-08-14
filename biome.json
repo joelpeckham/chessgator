@@ -19,7 +19,8 @@
       "!**/bun.lock",
       "!**/package-lock.json",
       "!**/assets.lock.json",
-      "!**/scripts/fixtures"
+      "!**/scripts/fixtures",
+      "!**/assets"
     ]
   },
   "formatter": {

@@ -52,7 +52,7 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
     await expectCoachCollapsed(page);
     await expect(page.getByTestId("coach-mascot")).toHaveAttribute(
       "data-expression",
-      "really-happy",
+      "mischievous",
     );
 
     const boardAfterBest = await page.getByTestId("board-frame").boundingBox();
@@ -139,7 +139,7 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
     await expectCoachCollapsed(page);
     await expect(page.getByTestId("coach-mascot")).toHaveAttribute(
       "data-expression",
-      "surprised",
+      "shocked",
     );
     await expect(page.getByTestId("coach-teaser")).toBeVisible();
 

@@ -9,6 +9,12 @@ import {
   gatorExpressionFor,
   gatorSrc,
 } from "@/components/coach/gator-expression";
+import {
+  CLAWS_DISPLAY,
+  CLAWS_SRC,
+  GATOR_LEDGE_OVERLAP_PX,
+  gatorDisplaySize,
+} from "@/components/coach/gator-layout";
 import { TeachingCard } from "@/components/coach/teaching-card";
 import {
   IDLE_HINT_QUIP,
@@ -23,11 +29,6 @@ import {
 } from "@/domain/teaching";
 import { cn } from "@/lib/utils";
 
-/** Reserved left column: gator + gap before the board. */
-export const MASCOT_DOCK_WIDTH_PX = 120;
-/** Reserved bottom strip when the board snaps above the mascot. */
-export const MASCOT_DOCK_HEIGHT_PX = 96;
-
 export type CoachMascotProps = {
   expanded: boolean;
   onExpandedChange: (expanded: boolean) => void;
@@ -40,7 +41,6 @@ export type CoachMascotProps = {
   hintFen?: string | null;
   onRequestHint: () => void;
   showTutorLaneHint?: boolean;
-  compact?: boolean;
   idleHintEligible?: boolean;
 };
 
@@ -89,7 +89,7 @@ function mascotAriaLabel(args: {
 }
 
 /**
- * Clippy-style coach mascot in leftover main space. Face always reacts;
+ * Coach mascot tucked behind the timeline ledge. Face always reacts;
  * the lesson balloon never auto-opens.
  */
 export function CoachMascot({
@@ -104,7 +104,6 @@ export function CoachMascot({
   hintFen = null,
   onRequestHint,
   showTutorLaneHint = false,
-  compact = false,
   idleHintEligible = false,
 }: CoachMascotProps) {
   const gatorButtonRef = useRef<HTMLButtonElement>(null);
@@ -196,9 +195,12 @@ export function CoachMascot({
         ? "coach-mascot-nudge"
         : undefined;
 
+  const head = gatorDisplaySize(expression);
+
   return (
     <div
-      className="relative z-20"
+      className="absolute left-2 z-30"
+      style={{ bottom: `calc(100% - ${GATOR_LEDGE_OVERLAP_PX}px)` }}
       data-testid="coach-mascot"
       data-mode={mode}
       data-expression={expression}
@@ -248,17 +250,12 @@ export function CoachMascot({
         </div>
       ) : null}
 
-      <div
-        className={cn(
-          "pointer-events-auto flex gap-1.5",
-          compact ? "flex-row items-end" : "flex-col-reverse items-center",
-        )}
-      >
+      <div className="pointer-events-auto">
         <button
           ref={gatorButtonRef}
           type="button"
           className={cn(
-            "rounded-md outline-offset-2 focus-visible:outline-2 focus-visible:outline-dashed focus-visible:outline-foreground",
+            "block p-0 leading-none rounded-md outline-offset-2 focus-visible:outline-2 focus-visible:outline-dashed focus-visible:outline-foreground",
             analyzing && "cursor-default opacity-90",
             insight?.nudge && !expanded && teaserVisible && nudgeMotion,
           )}
@@ -269,18 +266,34 @@ export function CoachMascot({
           disabled={analyzing}
           onClick={toggle}
         >
-          <Image
-            src={gatorSrc(expression)}
-            alt=""
-            width={246}
-            height={409}
-            className={cn(
-              "w-auto select-none object-contain",
-              compact ? "h-[72px]" : "h-[100px]",
-            )}
-            draggable={false}
-            loading="eager"
-          />
+          <span
+            className="relative block"
+            style={{ width: head.width, height: head.height }}
+          >
+            <Image
+              src={gatorSrc(expression)}
+              alt=""
+              width={Math.round(head.width)}
+              height={Math.round(head.height)}
+              className="block h-full w-full select-none"
+              draggable={false}
+              loading="eager"
+            />
+            <Image
+              src={CLAWS_SRC}
+              alt=""
+              width={Math.round(CLAWS_DISPLAY.width)}
+              height={Math.round(CLAWS_DISPLAY.height)}
+              className="pointer-events-none absolute left-1/2 max-w-none -translate-x-1/2 select-none"
+              style={{
+                top: head.height - CLAWS_DISPLAY.cutoutFromTop,
+                width: CLAWS_DISPLAY.width,
+                height: CLAWS_DISPLAY.height,
+              }}
+              draggable={false}
+              loading="eager"
+            />
+          </span>
         </button>
       </div>
     </div>

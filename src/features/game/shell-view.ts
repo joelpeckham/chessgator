@@ -64,7 +64,6 @@ export type ShellView = {
   hydrated: boolean;
   resumed: boolean;
   boardSize: number;
-  compact: boolean;
   mascotBelow: boolean;
   boardLeft: number;
   liveFen: string;
@@ -171,7 +170,6 @@ export function buildShellView(args: {
   resumed: boolean;
   lastError: string | null;
   boardSize: number;
-  compact: boolean;
   mascotBelow: boolean;
   boardLeft: number;
   runtime: GameRuntime;
@@ -440,7 +438,6 @@ export function buildShellView(args: {
     hydrated: args.hydrated,
     resumed: args.resumed,
     boardSize: args.boardSize,
-    compact: args.compact,
     mascotBelow: args.mascotBelow,
     boardLeft: args.boardLeft,
     liveFen,

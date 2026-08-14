@@ -4,12 +4,9 @@ import { RiSettings3Line } from "@remixicon/react";
 import { BoardPreviewVeil } from "@/components/board/board-preview-veil";
 import { ChessboardAdapter } from "@/components/board/chessboard-adapter";
 import { ChessgatorWordmark } from "@/components/brand/chessgator-wordmark";
-import {
-  CoachMascot,
-  MASCOT_DOCK_HEIGHT_PX,
-  MASCOT_DOCK_WIDTH_PX,
-} from "@/components/coach/coach-mascot";
+import { CoachMascot } from "@/components/coach/coach-mascot";
 import { FeedbackStack } from "@/components/coach/feedback-stack";
+import { MASCOT_PEEK_HEIGHT_PX } from "@/components/coach/gator-layout";
 import { PromotionDialog } from "@/components/game/promotion-dialog";
 import { SettingsSheet } from "@/components/game/settings-sheet";
 import { ShellFrame } from "@/components/game/shell-frame";
@@ -92,59 +89,7 @@ export function GameShellLayout({
           </>
         }
         footer={
-          <MoveTimeline
-            graph={view.timeline.graph}
-            focusedNodeId={view.timeline.focusedNodeId}
-            startNodeId={view.timeline.startNodeId}
-            liveNodeId={view.timeline.liveNodeId}
-            mode={view.timeline.mode}
-            statusText={view.timeline.statusText}
-            canGoPrev={view.timeline.canGoPrev}
-            canGoNext={view.timeline.canGoNext}
-            prevNodeId={view.timeline.prevNodeId}
-            nextNodeId={view.timeline.nextNodeId}
-            canPracticeUndo={view.timeline.canPracticeUndo}
-            canPracticeRedo={view.timeline.canPracticeRedo}
-            canCommitPractice={view.timeline.canCommitPractice}
-            canTakeBackLive={view.timeline.canTakeBackLive}
-            disabled={view.timeline.disabled}
-            orientation={view.timeline.orientation}
-            onSelectDecision={ui.handleSelectDecision}
-            onSelectNode={ui.handleSelectTimelineNode}
-            onPreviewNode={ui.setPreviewNodeId}
-            onReturnLive={ui.handleReturnLive}
-            onOpenCoach={ui.handleOpenCoach}
-            onPracticeUndo={ui.handlePracticeUndo}
-            onPracticeRedo={ui.handlePracticeRedo}
-            onCommitPractice={ui.handleCommitPractice}
-            onCancelPractice={ui.handleCancelPractice}
-            onTakeBackLive={ui.handleUndoHumanMove}
-            className="rounded-none border-0 bg-transparent shadow-none ring-0"
-          />
-        }
-      >
-        <div
-          className={
-            view.mascotBelow
-              ? "flex min-h-0 flex-1 flex-col"
-              : "relative min-h-0 flex-1"
-          }
-        >
-          <div
-            className={
-              view.mascotBelow
-                ? "order-2 flex min-h-0 shrink-0 items-end overflow-visible pl-6 pr-3 pb-3 pt-1"
-                : "absolute bottom-0 left-0 z-20 flex flex-col justify-end pl-6 pr-5 pb-3 pt-2"
-            }
-            style={
-              view.mascotBelow
-                ? {
-                    height: MASCOT_DOCK_HEIGHT_PX,
-                    maxHeight: MASCOT_DOCK_HEIGHT_PX,
-                  }
-                : { width: MASCOT_DOCK_WIDTH_PX }
-            }
-          >
+          <>
             <CoachMascot
               expanded={view.coach.expanded}
               onExpandedChange={ui.handleCoachExpandedChange}
@@ -162,10 +107,47 @@ export function GameShellLayout({
               hintFen={view.coach.hintFen}
               showTutorLaneHint={view.coach.showTutorLaneHint}
               onRequestHint={ui.handleRequestHint}
-              compact={view.mascotBelow}
               idleHintEligible={view.coach.idleHintEligible}
             />
-          </div>
+            <MoveTimeline
+              graph={view.timeline.graph}
+              focusedNodeId={view.timeline.focusedNodeId}
+              startNodeId={view.timeline.startNodeId}
+              liveNodeId={view.timeline.liveNodeId}
+              mode={view.timeline.mode}
+              statusText={view.timeline.statusText}
+              canGoPrev={view.timeline.canGoPrev}
+              canGoNext={view.timeline.canGoNext}
+              prevNodeId={view.timeline.prevNodeId}
+              nextNodeId={view.timeline.nextNodeId}
+              canPracticeUndo={view.timeline.canPracticeUndo}
+              canPracticeRedo={view.timeline.canPracticeRedo}
+              canCommitPractice={view.timeline.canCommitPractice}
+              canTakeBackLive={view.timeline.canTakeBackLive}
+              disabled={view.timeline.disabled}
+              orientation={view.timeline.orientation}
+              onSelectDecision={ui.handleSelectDecision}
+              onSelectNode={ui.handleSelectTimelineNode}
+              onPreviewNode={ui.setPreviewNodeId}
+              onReturnLive={ui.handleReturnLive}
+              onOpenCoach={ui.handleOpenCoach}
+              onPracticeUndo={ui.handlePracticeUndo}
+              onPracticeRedo={ui.handlePracticeRedo}
+              onCommitPractice={ui.handleCommitPractice}
+              onCancelPractice={ui.handleCancelPractice}
+              onTakeBackLive={ui.handleUndoHumanMove}
+              className="rounded-none border-0 bg-transparent shadow-none ring-0"
+            />
+          </>
+        }
+      >
+        <div
+          className={
+            view.mascotBelow
+              ? "flex min-h-0 flex-1 flex-col"
+              : "relative min-h-0 flex-1"
+          }
+        >
           <div
             className={
               view.mascotBelow
@@ -219,6 +201,13 @@ export function GameShellLayout({
               />
             </div>
           </div>
+          {view.mascotBelow ? (
+            <div
+              className="shrink-0"
+              style={{ height: MASCOT_PEEK_HEIGHT_PX }}
+              aria-hidden
+            />
+          ) : null}
         </div>
 
         <FeedbackStack
