@@ -44,9 +44,6 @@ export {
   jumpToNode,
   listMainlineChild,
   playMoveOnTree,
-  promoteVariation,
-  pruneSubtree,
-  pruneVariationChildren,
   takebackOne,
 } from "@/domain/game/tree";
 export type {
@@ -69,12 +66,3 @@ export {
   isHumanTurn,
   opponentColor,
 } from "@/domain/game/types";
-export type { VariationExplorerState } from "@/domain/game/variation";
-export {
-  createVariationExplorer,
-  exitVariationExplorer,
-  stepVariationBack,
-  stepVariationForward,
-  tryInsteadFromExplorer,
-  validateVariationLine,
-} from "@/domain/game/variation";

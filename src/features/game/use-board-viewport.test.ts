@@ -38,6 +38,12 @@ describe("computeViewportLayout", () => {
     expect(squeezed.boardSize).toBeLessThan(wide.boardSize);
   });
 
+  it("shrinks the board when the timeline is expanded", () => {
+    const collapsed = computeViewportLayout(1280, 900, false);
+    const expanded = computeViewportLayout(1280, 900, true);
+    expect(expanded.boardSize).toBeLessThan(collapsed.boardSize);
+  });
+
   it("snaps the board above the mascot when that leftover is larger", () => {
     const beside = computeViewportLayout(700, 800);
     const stacked = computeViewportLayout(480, 800);

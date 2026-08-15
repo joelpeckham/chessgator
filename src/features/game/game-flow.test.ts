@@ -11,8 +11,7 @@ import type { GameTree } from "@/domain/game/types";
 import { createCoachingController } from "@/features/game/coaching-controller";
 import {
   buildTutorLine,
-  commitPracticeMove,
-  firstHumanUciFromDraft,
+  realizeTutorLine,
   requestOpponentMove,
   runPostMoveCoaching,
   undoHumanMove,
@@ -27,50 +26,36 @@ function play(tree: GameTree, uci: string): GameTree {
   return result.tree;
 }
 
-describe("commitPracticeMove", () => {
-  beforeEach(() => {
-    useGameStore.setState({
-      ...useGameStore.getInitialState(),
-    });
-  });
-
-  it("commits the first draft ply and keeps the abandoned live line", () => {
-    useGameStore.getState().startGame();
-    let tree = useGameStore.getState().tree;
+describe("realizeTutorLine", () => {
+  it("replays a prefix onto the live tree and reuses matching children", () => {
+    let tree = createInitialTree();
     tree = play(tree, "d2d4");
     const d4Id = tree.currentNodeId;
-    tree = play(tree, "d7d5");
-    useGameStore.setState({ tree });
-
-    const result = commitPracticeMove({
-      liveTree: tree,
+    const result = realizeTutorLine({
+      tree,
       originNodeId: tree.rootId,
-      commitUci: "e2e4",
+      uciPath: ["e2e4", "e7e5"],
     });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.needsOpponent).toBe(true);
-    expect(result.tree.nodes[result.tree.currentNodeId]?.move?.uci).toBe(
-      "e2e4",
-    );
+    expect(result.tree.nodes[result.nodeId]?.move?.uci).toBe("e7e5");
     const origin = getNode(result.tree, result.tree.rootId);
     expect(origin?.childIds).toContain(d4Id);
-    expect(origin?.childIds[0]).toBe(result.tree.currentNodeId);
-    expect(result.tree.nodes[d4Id]?.move?.uci).toBe("d2d4");
-  });
+    expect(origin?.childIds).toContain(
+      result.tree.nodes[result.nodeId]?.parentId,
+    );
 
-  it("promotes only the first practiced human ply from a longer draft", () => {
-    let draft = createInitialTree();
-    draft = play(draft, "e2e4");
-    draft = play(draft, "e7e5");
-    draft = play(draft, "d2d4");
-    expect(
-      firstHumanUciFromDraft({
-        draft,
-        originId: draft.rootId,
-        humanColor: "w",
-      }),
-    ).toBe("e2e4");
+    const again = realizeTutorLine({
+      tree: result.tree,
+      originNodeId: result.tree.rootId,
+      uciPath: ["e2e4"],
+    });
+    expect(again.ok).toBe(true);
+    if (!again.ok) return;
+    expect(again.tree.nodes[again.nodeId]?.move?.uci).toBe("e2e4");
+    expect(Object.keys(again.tree.nodes).length).toBe(
+      Object.keys(result.tree.nodes).length,
+    );
   });
 });
 

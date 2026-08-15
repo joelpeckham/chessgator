@@ -166,6 +166,19 @@ describe("game store adapter", () => {
     );
   });
 
+  it("goToNode jumps the pointer and syncs the side to move", () => {
+    useGameStore.getState().startGame();
+    useGameStore.getState().playMove("e2e4");
+    const e4 = useGameStore.getState().tree.currentNodeId;
+    useGameStore.getState().playMove("e7e5");
+    expect(useGameStore.getState().goToNode(e4)).toBe(true);
+    expect(useGameStore.getState().tree.currentNodeId).toBe(e4);
+    expect(useGameStore.getState().session.mode).toBe("opponentThinking");
+
+    useGameStore.getState().goToNode(useGameStore.getState().tree.rootId);
+    expect(useGameStore.getState().session.mode).toBe("playerTurn");
+  });
+
   it("surfaces persist failures in lastError", async () => {
     const repo = createLocalStorageGameRepository({
       storage: {

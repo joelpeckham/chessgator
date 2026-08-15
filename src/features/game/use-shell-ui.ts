@@ -1,42 +1,18 @@
 "use client";
 
-import {
-  useEffect,
-  useLayoutEffect,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useRef, useState } from "react";
 import type { BoardMove } from "@/components/board/move-utils";
-import { parseVirtualTimelineId } from "@/components/timeline/branch-graph-virtual";
+import { parseVirtualTimelineId } from "@/components/timeline/virtual-id";
+import { type Color, type GameMove, getCurrentNode } from "@/domain/game";
 import {
-  type Color,
-  type GameMove,
-  getCurrentNode,
-  getNode,
-} from "@/domain/game";
-import {
-  commitPracticeMove,
-  firstHumanUciFromDraft,
   playHumanMove,
+  realizeTutorLine,
   requestOpponentMove,
   runPostMoveCoaching,
   undoHumanMove,
 } from "@/features/game/game-flow";
 import { useGameStore } from "@/features/game/game-store";
-import {
-  analyzedNodeIdForFocus,
-  lastHumanDecisionId,
-} from "@/features/game/player-decisions";
-import {
-  graphCursorId,
-  INITIAL_TIMELINE_SESSION,
-  isReviewingNonLive,
-  practiceDraft,
-  reduceTimelineSession,
-  type TimelineSessionState,
-  viewedNodeId,
-} from "@/features/game/timeline-session";
+import { analyzedNodeIdForFocus } from "@/features/game/tree-graph";
 import {
   deriveBoardInteractivity,
   deriveOpponentTarget,
@@ -45,27 +21,31 @@ import {
 import type { GameRuntime } from "@/features/game/use-game-runtime";
 
 export type ShellChrome = {
-  timeline: TimelineSessionState;
   promotion: { from: string; to: string } | null;
   settingsOpen: boolean;
   coachExpanded: boolean;
+  timelineExpanded: boolean;
   navMessage: string | null;
   dismissedNotices: ReadonlySet<string>;
   pendingHumanColor: Color;
   gameOverDismissed: boolean;
 };
 
-export type TimelineNodeMeta = {
-  branchId: string;
-  decisionId: string | null;
-};
+function analyzedFocusId(): string | null {
+  const { tree, humanColor } = useGameStore.getState();
+  return analyzedNodeIdForFocus({
+    tree,
+    focusNodeId: tree.currentNodeId,
+    humanColor,
+  });
+}
 
 export type ShellUi = ShellChrome & {
   queueNav: (message: string | null) => void;
-  setPreviewNodeId: (id: string | null) => void;
   setPromotion: (value: { from: string; to: string } | null) => void;
   setSettingsOpen: (open: boolean) => void;
   setCoachExpanded: (expanded: boolean) => void;
+  setTimelineExpanded: (expanded: boolean) => void;
   dismissNotice: (id: string) => void;
   applyPlayerMove: (move: BoardMove | GameMove) => boolean;
   handleTrySuggested: () => void;
@@ -74,18 +54,12 @@ export type ShellUi = ShellChrome & {
   handleRestart: () => void;
   setPendingHumanColor: (color: Color) => void;
   handleRetryEngines: () => Promise<void>;
-  handleSelectTimelineNode: (nodeId: string, meta?: TimelineNodeMeta) => void;
-  handleSelectDecision: (decisionId: string, meta?: TimelineNodeMeta) => void;
-  handleReturnLive: () => void;
+  handleSelectTimelineNode: (nodeId: string) => void;
   handleCoachExpandedChange: (next: boolean) => void;
   handleDismissCoach: () => void;
   handleRequestHint: () => void;
   handleOpenCoach: () => void;
   handleSettingsOpenChange: (open: boolean) => void;
-  handlePracticeUndo: () => void;
-  handlePracticeRedo: () => void;
-  handleCommitPractice: () => void;
-  handleCancelPractice: () => void;
   dismissGameOver: () => void;
 };
 
@@ -95,11 +69,8 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     to: string;
   } | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [timeline, dispatchTimeline] = useReducer(
-    reduceTimelineSession,
-    INITIAL_TIMELINE_SESSION,
-  );
   const [coachExpanded, setCoachExpanded] = useState(false);
+  const [timelineExpanded, setTimelineExpanded] = useState(false);
   const [navMessage, setNavMessage] = useState<string | null>(null);
   const [dismissedNotices, setDismissedNotices] = useState<Set<string>>(
     () => new Set(),
@@ -113,8 +84,8 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
   const startGame = useGameStore((s) => s.startGame);
   const resumePlay = useGameStore((s) => s.resumePlay);
   const resign = useGameStore((s) => s.resign);
+  const goToNode = useGameStore((s) => s.goToNode);
   const replaceTree = useGameStore((s) => s.replaceTree);
-  const setMode = useGameStore((s) => s.setMode);
   const hydrated = useGameStore((s) => s.hydrated);
   const liveMode = useGameStore((s) => s.session.mode);
   const liveCurrentId = useGameStore((s) => s.tree.currentNodeId);
@@ -122,11 +93,6 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
   const requestSeq = useRef(0);
   const bootstrappedRef = useRef(false);
   const flowGen = useRef(0);
-  const timelineRef = useRef(timeline);
-
-  useLayoutEffect(() => {
-    timelineRef.current = timeline;
-  });
 
   function nextRequestId(prefix: string): string {
     requestSeq.current += 1;
@@ -149,15 +115,10 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     if (options?.clearCoach) {
       runtime.coach.clearFeedback();
     }
-    dispatchTimeline({ type: "reset" });
     setCoachExpanded(false);
   }
 
-  const draft = practiceDraft(timeline);
   const opponentTarget = deriveOpponentTarget({
-    timelineMode: timeline.mode,
-    practicePhase: draft?.phase ?? null,
-    draftTree: draft?.tree ?? null,
     liveMode,
     liveTree: useGameStore.getState().tree,
   });
@@ -197,38 +158,14 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
       requestId,
       target: { nodeId: captured.nodeId, fen: captured.fen },
       isCurrent: (nodeId) => {
-        const latestSession = timelineRef.current;
-        const latestDraft = practiceDraft(latestSession);
         const latest = deriveOpponentTarget({
-          timelineMode: latestSession.mode,
-          practicePhase: latestDraft?.phase ?? null,
-          draftTree: latestDraft?.tree ?? null,
           liveMode: useGameStore.getState().session.mode,
           liveTree: useGameStore.getState().tree,
         });
-        return latest?.scope === captured.scope && latest.nodeId === nodeId;
+        return latest?.nodeId === nodeId;
       },
-      applyMove: (uci) => {
-        if (captured.scope === "practice") {
-          const session = timelineRef.current;
-          const sessionDraft = practiceDraft(session);
-          if (
-            session.mode !== "practice" ||
-            sessionDraft?.phase !== "opponentThinking"
-          ) {
-            return false;
-          }
-          if (sessionDraft.tree.currentNodeId !== captured.nodeId) return false;
-          dispatchTimeline({ type: "practiceOpponentMove", input: uci });
-          return true;
-        }
-        return useGameStore.getState().playMove(uci);
-      },
+      applyMove: (uci) => useGameStore.getState().playMove(uci),
       onFailure: (message) => {
-        if (captured.scope === "practice") {
-          dispatchTimeline({ type: "practiceError", message });
-          return;
-        }
         useGameStore.getState().setMode("error", message);
       },
     });
@@ -241,37 +178,16 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
 
   function isBoardInteractive(): boolean {
     const { tree, session, humanColor } = useGameStore.getState();
-    const liveFen = getCurrentNode(tree).fen;
-    const currentDraft = practiceDraft(timeline);
     return deriveBoardInteractivity({
-      timelineMode: timeline.mode,
-      practicePhase: currentDraft?.phase ?? null,
-      draftTree: currentDraft?.tree ?? null,
-      playCursorId: graphCursorId(timeline, tree.currentNodeId),
       liveMode: session.mode,
-      liveFen,
+      liveFen: getCurrentNode(tree).fen,
       humanColor,
-      isViewingNonLive: isReviewingNonLive(timeline, tree.currentNodeId),
       maiaFailed: runtime.maia.phase === "failed",
     });
   }
 
   function applyPlayerMove(move: BoardMove | GameMove): boolean {
     if (!isBoardInteractive()) return false;
-    const humanColor = useGameStore.getState().humanColor;
-    if (timeline.mode === "practice") {
-      dispatchTimeline({
-        type: "practiceMove",
-        humanColor,
-        input: {
-          from: move.from,
-          to: move.to,
-          promotion: "promotion" in move ? move.promotion : undefined,
-        },
-      });
-      setPromotion(null);
-      return true;
-    }
     const played = playHumanMove({
       from: move.from,
       to: move.to,
@@ -279,7 +195,6 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     });
     if (!played.ok) return false;
     setPromotion(null);
-    dispatchTimeline({ type: "reset" });
     setCoachExpanded(false);
     runtime.coach.resetHints();
 
@@ -309,54 +224,36 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     return true;
   }
 
-  function analyzedFocusId(): string | null {
-    const { tree, humanColor } = useGameStore.getState();
-    const current = viewedNodeId(timeline, tree.currentNodeId);
-    const virtual = parseVirtualTimelineId(current);
-    return analyzedNodeIdForFocus({
-      tree,
-      focusNodeId: current,
-      tutorRootId: virtual?.kind === "tutor" ? virtual.rootNodeId : null,
-      humanColor,
-    });
-  }
-
-  function originForPractice(): string | null {
-    const { tree } = useGameStore.getState();
-    const analyzedId = analyzedFocusId();
-    if (analyzedId) {
-      return getNode(tree, analyzedId)?.parentId ?? tree.rootId;
-    }
-    const humanId = lastHumanDecisionId(
-      tree,
-      useGameStore.getState().humanColor,
-    );
-    if (!humanId) return null;
-    return getNode(tree, humanId)?.parentId ?? tree.rootId;
-  }
-
-  function handleTrySuggested(): void {
-    const originId = originForPractice();
-    if (!originId) {
-      queueNav("Could not start practice from here");
+  function applyRealizedTree(tree: ReturnType<typeof realizeTutorLine>): void {
+    if (!tree.ok) {
+      queueNav(tree.message);
       return;
     }
     runtime.maiaSession.cancelPending();
     runtime.coach.cancelPending();
     bumpScheduler();
-    if (useGameStore.getState().session.mode === "analyzing") {
-      resumePlay();
+    replaceTree(tree.tree);
+    goToNode(tree.nodeId);
+    setCoachExpanded(true);
+  }
+
+  function handleTrySuggested(): void {
+    const { tree, lessons } = useGameStore.getState();
+    const analyzedId = analyzedFocusId();
+    const insight = analyzedId ? (lessons[analyzedId] ?? null) : null;
+    const firstUci = insight?.suggestedMoveUci ?? insight?.lineUci[0];
+    if (!analyzedId || !firstUci) {
+      queueNav("No suggested move to play");
+      return;
     }
-    const expandedId = analyzedFocusId();
-    dispatchTimeline({
-      type: "startPractice",
-      originId,
-      liveTree: useGameStore.getState().tree,
-      humanColor: useGameStore.getState().humanColor,
-      expandedDecisionId: expandedId,
-    });
-    setCoachExpanded(false);
-    queueNav("Practice this position — the live game is unchanged");
+    const originId = tree.nodes[analyzedId]?.parentId ?? tree.rootId;
+    applyRealizedTree(
+      realizeTutorLine({
+        tree,
+        originNodeId: originId,
+        uciPath: [firstUci],
+      }),
+    );
   }
 
   function handleUndoHumanMove(): void {
@@ -389,35 +286,25 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     bumpScheduler();
   }
 
-  function handleSelectTimelineNode(
-    nodeId: string,
-    meta?: TimelineNodeMeta,
-  ): void {
-    const currentId = useGameStore.getState().tree.currentNodeId;
-    dispatchTimeline({
-      type: "selectNode",
-      nodeId,
-      liveId: currentId,
-      pinnedBranchId: meta?.branchId,
-      expandedDecisionId: meta?.decisionId,
-    });
+  function handleSelectTimelineNode(nodeId: string): void {
     const virtual = parseVirtualTimelineId(nodeId);
+    if (virtual?.kind === "projected") return;
     if (virtual?.kind === "tutor") {
-      setCoachExpanded(true);
+      applyRealizedTree(
+        realizeTutorLine({
+          tree: useGameStore.getState().tree,
+          originNodeId: virtual.rootNodeId,
+          uciPath: virtual.uciPath,
+        }),
+      );
+      return;
     }
-  }
-
-  function handleSelectDecision(
-    decisionId: string,
-    meta?: TimelineNodeMeta,
-  ): void {
-    handleSelectTimelineNode(decisionId, meta);
-    const lesson = useGameStore.getState().lessons[decisionId];
+    runtime.maiaSession.cancelPending();
+    runtime.coach.cancelPending();
+    bumpScheduler();
+    if (!goToNode(nodeId)) return;
+    const lesson = useGameStore.getState().lessons[nodeId];
     if (lesson) setCoachExpanded(true);
-  }
-
-  function handleReturnLive(): void {
-    dispatchTimeline({ type: "returnLive" });
   }
 
   function handleCoachExpandedChange(next: boolean): void {
@@ -431,7 +318,6 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
   function handleDismissCoach(): void {
     runtime.coach.dismissInsight();
     setCoachExpanded(false);
-    dispatchTimeline({ type: "returnLive" });
   }
 
   function handleRequestHint(): void {
@@ -460,79 +346,23 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     }
   }
 
-  function handlePracticeUndo(): void {
-    runtime.maiaSession.cancelPending();
-    bumpScheduler();
-    dispatchTimeline({ type: "practiceUndo" });
-  }
-
-  function handlePracticeRedo(): void {
-    dispatchTimeline({
-      type: "practiceRedo",
-      humanColor: useGameStore.getState().humanColor,
-    });
-  }
-
-  function handleCommitPractice(): void {
-    const { tree, humanColor } = useGameStore.getState();
-    const commitDraft = practiceDraft(timeline);
-    if (!commitDraft) return;
-    const originId = commitDraft.originId;
-    const fromDraft = firstHumanUciFromDraft({
-      draft: commitDraft.tree,
-      originId,
-      humanColor,
-    });
-    if (!fromDraft) {
-      queueNav("Play a move first");
-      return;
-    }
-    const result = commitPracticeMove({
-      liveTree: tree,
-      originNodeId: originId,
-      commitUci: fromDraft,
-    });
-    if (!result.ok) {
-      queueNav(result.message);
-      return;
-    }
-    runtime.maiaSession.cancelPending();
-    runtime.coach.clearFeedback();
-    bumpScheduler();
-    replaceTree(result.tree);
-    dispatchTimeline({ type: "reset" });
-    setCoachExpanded(false);
-    setMode(result.mode);
-    queueNav(result.message);
-  }
-
-  function handleCancelPractice(): void {
-    runtime.maiaSession.cancelPending();
-    bumpScheduler();
-    dispatchTimeline({ type: "cancelPractice" });
-  }
-
   function dismissNotice(id: string): void {
     setDismissedNotices((prev) => new Set(prev).add(id));
     if (id === "nav") queueNav(null);
   }
 
-  function setPreviewNodeId(id: string | null): void {
-    dispatchTimeline({ type: "preview", nodeId: id });
-  }
-
   return {
-    timeline,
     promotion,
     settingsOpen,
     coachExpanded,
+    timelineExpanded,
     navMessage,
     dismissedNotices,
     queueNav,
-    setPreviewNodeId,
     setPromotion,
     setSettingsOpen,
     setCoachExpanded,
+    setTimelineExpanded,
     dismissNotice,
     applyPlayerMove,
     handleTrySuggested,
@@ -545,16 +375,10 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     dismissGameOver,
     handleRetryEngines,
     handleSelectTimelineNode,
-    handleSelectDecision,
-    handleReturnLive,
     handleCoachExpandedChange,
     handleDismissCoach,
     handleRequestHint,
     handleOpenCoach,
     handleSettingsOpenChange,
-    handlePracticeUndo,
-    handlePracticeRedo,
-    handleCommitPractice,
-    handleCancelPractice,
   };
 }

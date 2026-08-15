@@ -1,7 +1,6 @@
 "use client";
 
 import { RiSettings3Line } from "@remixicon/react";
-import { BoardPreviewVeil } from "@/components/board/board-preview-veil";
 import { ChessboardAdapter } from "@/components/board/chessboard-adapter";
 import { ChessgatorWordmark } from "@/components/brand/chessgator-wordmark";
 import { CoachMascot } from "@/components/coach/coach-mascot";
@@ -128,35 +127,24 @@ export function GameShellLayout({
         footer={
           <>
             {coach}
-            <div className="relative z-10 border-t border-border bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/80">
+            <div className="relative z-10">
               <MoveTimeline
                 graph={view.timeline.graph}
                 focusedNodeId={view.timeline.focusedNodeId}
                 startNodeId={view.timeline.startNodeId}
-                liveNodeId={view.timeline.liveNodeId}
-                mode={view.timeline.mode}
                 statusText={view.timeline.statusText}
                 canGoPrev={view.timeline.canGoPrev}
                 canGoNext={view.timeline.canGoNext}
                 prevNodeId={view.timeline.prevNodeId}
                 nextNodeId={view.timeline.nextNodeId}
-                canPracticeUndo={view.timeline.canPracticeUndo}
-                canPracticeRedo={view.timeline.canPracticeRedo}
-                canCommitPractice={view.timeline.canCommitPractice}
-                canTakeBackLive={view.timeline.canTakeBackLive}
+                canTakeBack={view.timeline.canTakeBack}
                 disabled={view.timeline.disabled}
-                orientation={view.timeline.orientation}
-                onSelectDecision={ui.handleSelectDecision}
                 onSelectNode={ui.handleSelectTimelineNode}
-                onPreviewNode={ui.setPreviewNodeId}
-                onReturnLive={ui.handleReturnLive}
                 onOpenCoach={ui.handleOpenCoach}
-                onPracticeUndo={ui.handlePracticeUndo}
-                onPracticeRedo={ui.handlePracticeRedo}
-                onCommitPractice={ui.handleCommitPractice}
-                onCancelPractice={ui.handleCancelPractice}
-                onTakeBackLive={ui.handleUndoHumanMove}
-                className="rounded-none border-0 bg-transparent shadow-none ring-0"
+                onTakeBack={ui.handleUndoHumanMove}
+                expanded={ui.timelineExpanded}
+                onExpandedChange={ui.setTimelineExpanded}
+                className="rounded-none shadow-none ring-0"
               />
             </div>
           </>
@@ -231,22 +219,6 @@ export function GameShellLayout({
                 onPromotionNeeded={(from, to) => ui.setPromotion({ from, to })}
                 className="h-full w-full"
               />
-              <BoardPreviewVeil
-                active={view.isViewingNonLive || view.isBoardPreview}
-              />
-              {view.isViewingNonLive ? (
-                <div className="pointer-events-none absolute inset-x-0 top-2 z-10 flex justify-center px-2">
-                  <Button
-                    type="button"
-                    size="sm"
-                    className="pointer-events-auto shadow-md"
-                    data-testid="review-pill"
-                    onClick={ui.handleReturnLive}
-                  >
-                    Reviewing — Back to live
-                  </Button>
-                </div>
-              ) : null}
               {view.gameOver.visible ? (
                 <GameOverCard
                   headline={view.gameOver.headline}

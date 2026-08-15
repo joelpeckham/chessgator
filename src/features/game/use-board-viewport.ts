@@ -6,13 +6,23 @@ import {
   MASCOT_PEEK_HEIGHT_PX,
   MASCOT_PEEK_WIDTH_PX,
 } from "@/components/coach/gator-layout";
-import { TIMELINE_GRAPH_HEIGHT_PX } from "@/components/timeline/move-timeline";
+import {
+  TIMELINE_EXPANDED_HEIGHT_PX,
+  TIMELINE_GRAPH_HEIGHT_PX,
+} from "@/components/timeline/move-timeline";
 
 /** Reserved chrome so board size ignores floating coach/toasts. */
 const HEADER_RESERVE_PX = 48;
-/** Timeline status row + fixed graph. */
-const TIMELINE_CHROME_PX = TIMELINE_GRAPH_HEIGHT_PX + 36;
-const FOOTER_CHROME_PX = TIMELINE_CHROME_PX;
+/** Extra footer chrome around the timeline (mascot ledge, padding). */
+const TIMELINE_EXTRA_CHROME_PX = 36;
+
+function footerChromePx(timelineExpanded: boolean): number {
+  return (
+    (timelineExpanded
+      ? TIMELINE_EXPANDED_HEIGHT_PX
+      : TIMELINE_GRAPH_HEIGHT_PX) + TIMELINE_EXTRA_CHROME_PX
+  );
+}
 /** Gap between the docked coach lane and the board. */
 const BESIDE_PAD_X_PX = 16;
 /** px-4 around the stacked board. */
@@ -60,9 +70,13 @@ function clampBoard(size: number): number {
 export function computeViewportLayout(
   innerWidth: number,
   innerHeight: number,
+  timelineExpanded = false,
 ): ViewportLayout {
   const availH =
-    innerHeight - HEADER_RESERVE_PX - FOOTER_CHROME_PX - VIEWPORT_PAD_Y_PX;
+    innerHeight -
+    HEADER_RESERVE_PX -
+    footerChromePx(timelineExpanded) -
+    VIEWPORT_PAD_Y_PX;
   const sizeDocked = clampBoard(
     Math.min(innerWidth - COACH_COLUMN_WIDTH_PX - BESIDE_PAD_X_PX, availH),
   );
@@ -96,8 +110,12 @@ export function computeViewportLayout(
   };
 }
 
-function readViewportLayout(): ViewportLayout {
-  return computeViewportLayout(window.innerWidth, window.innerHeight);
+function readWidth(): number {
+  return window.innerWidth;
+}
+
+function readHeight(): number {
+  return window.innerHeight;
 }
 
 const SSR_LAYOUT: ViewportLayout = {
@@ -108,31 +126,17 @@ const SSR_LAYOUT: ViewportLayout = {
   coachLaneLeft: 0,
 };
 
-export function useBoardViewport(): ViewportLayout {
-  const boardSize = useSyncExternalStore(
+export function useBoardViewport(timelineExpanded = false): ViewportLayout {
+  const innerWidth = useSyncExternalStore(
     subscribeViewport,
-    () => readViewportLayout().boardSize,
-    () => SSR_LAYOUT.boardSize,
+    readWidth,
+    () => 0,
   );
-  const mascotBelow = useSyncExternalStore(
+  const innerHeight = useSyncExternalStore(
     subscribeViewport,
-    () => readViewportLayout().mascotBelow,
-    () => SSR_LAYOUT.mascotBelow,
+    readHeight,
+    () => 0,
   );
-  const boardLeft = useSyncExternalStore(
-    subscribeViewport,
-    () => readViewportLayout().boardLeft,
-    () => SSR_LAYOUT.boardLeft,
-  );
-  const coachDocked = useSyncExternalStore(
-    subscribeViewport,
-    () => readViewportLayout().coachDocked,
-    () => SSR_LAYOUT.coachDocked,
-  );
-  const coachLaneLeft = useSyncExternalStore(
-    subscribeViewport,
-    () => readViewportLayout().coachLaneLeft,
-    () => SSR_LAYOUT.coachLaneLeft,
-  );
-  return { boardSize, mascotBelow, boardLeft, coachDocked, coachLaneLeft };
+  if (innerWidth === 0 || innerHeight === 0) return SSR_LAYOUT;
+  return computeViewportLayout(innerWidth, innerHeight, timelineExpanded);
 }

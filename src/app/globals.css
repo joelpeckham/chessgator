@@ -259,26 +259,3 @@
     animation: none;
   }
 }
-
-/* Keep piece SVGs above the preview veil; square fills go transparent so
-   discarded dither cells show the page background. */
-[data-testid="board-frame"]:has(
-  [data-testid="board-preview-veil"][data-active="true"]
-) {
-  isolation: isolate;
-}
-
-[data-testid="board-frame"]:has(
-    [data-testid="board-preview-veil"][data-active="true"]
-  )
-  [data-piece] {
-  position: relative;
-  z-index: 2;
-}
-
-[data-testid="board-frame"]:has(
-    [data-testid="board-preview-veil"][data-active="true"][data-ready="true"]
-  )
-  [data-column] {
-  background: transparent !important;
-}

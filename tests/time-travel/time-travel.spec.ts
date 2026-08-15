@@ -7,7 +7,7 @@ import {
 } from "../shared/playwright-helpers";
 
 test.describe("time travel + branching timeline", () => {
-  test("practice sandbox, explicit commit, saved tries, timeline review", async ({
+  test("realizing the gator line branches the tree and keeps the old move", async ({
     page,
   }) => {
     await startCoachGame(page);
@@ -28,7 +28,7 @@ test.describe("time travel + branching timeline", () => {
     );
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
-      /playerTurn|reviewing/,
+      "playerTurn",
       { timeout: 10_000 },
     );
 
@@ -36,22 +36,19 @@ test.describe("time travel + branching timeline", () => {
     await expect(
       page.locator('[data-testid="move-timeline"] [data-kind="tutor"]').first(),
     ).toBeVisible({ timeout: 10_000 });
-    await expect(
-      page.locator('[data-testid="move-timeline"] [data-lane="1"]').first(),
-    ).toBeVisible();
 
     const boardBefore = await page.getByTestId("board-frame").boundingBox();
 
     await page.getByTestId("explore-line-button").click();
+    await expect(page.getByTestId("move-list")).toContainText("e4");
+    await expect(page.getByTestId("move-list")).toContainText("d4");
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
-      "practicing",
+      "playerTurn",
+      { timeout: 10_000 },
     );
-    await expect(page.getByTestId("practice-controls")).toBeVisible();
-    await expect(page.getByTestId("practice-cancel")).toBeVisible();
-    await expect(page.getByTestId("play-this-move-button")).toBeDisabled();
+    await expect(page.getByTestId("practice-controls")).toHaveCount(0);
     await expect(page.getByTestId("variation-explorer")).toHaveCount(0);
-    await expect(page.getByTestId("timeline-live")).toHaveCount(0);
 
     const boardAfterTry = await page.getByTestId("board-frame").boundingBox();
     expect(boardBefore).toBeTruthy();
@@ -60,38 +57,15 @@ test.describe("time travel + branching timeline", () => {
       Math.abs((boardAfterTry!.width ?? 0) - (boardBefore!.width ?? 0)),
     ).toBeLessThanOrEqual(1);
 
-    await chooseLegalMove(page, "e4");
-    await expect(page.getByTestId("play-this-move-button")).toBeEnabled();
-    await page.getByTestId("play-this-move-button").click();
-    await expect(page.getByTestId("move-list")).toContainText("e4");
-    await expect(page.getByTestId("status-badge")).not.toHaveAttribute(
-      "data-mode",
-      "practicing",
-    );
-    await expect(page.getByTestId("status-badge")).toHaveAttribute(
-      "data-mode",
-      "playerTurn",
-      { timeout: 10_000 },
-    );
-
-    // d4 remains as a local saved-try rail, not a permanent extra lane.
-    const savedTry = page
-      .locator('[data-testid="move-timeline"] [data-kind="variation"]')
+    const d4Node = page
+      .locator(
+        '[data-testid="move-timeline"] button[data-kind="committed"][aria-label*="d4"]',
+      )
       .first();
-    await expect(savedTry).toBeVisible();
-    await savedTry.click();
-    await expect(page.getByTestId("timeline-status")).toContainText(
-      /Reviewing|d4/i,
-    );
-    await expect(page.getByTestId("board-preview-veil")).toHaveAttribute(
-      "data-active",
-      "true",
-    );
-    await expect(page.getByTestId("board-preview-veil")).toHaveAttribute(
-      "data-ready",
-      "true",
-    );
-    await page.mouse.move(0, 0);
+    await expect(d4Node).toBeVisible();
+    await d4Node.click();
+    await expect(page.getByTestId("timeline-status")).toContainText(/d4/i);
+
     const timeline = page.getByTestId("move-list");
     await timeline.focus();
     await page.keyboard.press("ArrowDown");
@@ -101,9 +75,7 @@ test.describe("time travel + branching timeline", () => {
         .first(),
     ).toBeVisible();
     await page.keyboard.press("ArrowLeft");
-    await expect(page.getByTestId("timeline-status")).toContainText(
-      /start|Reviewing/i,
-    );
+    await expect(page.getByTestId("timeline-status")).toContainText(/start/i);
   });
 
   test("timeline jump keeps earlier lines", async ({ page }) => {
@@ -118,32 +90,18 @@ test.describe("time travel + branching timeline", () => {
     const timeline = page.getByTestId("move-list");
     await timeline.focus();
     await page.keyboard.press("Home");
-    await expect(page.getByTestId("timeline-status")).toContainText(
-      /Reviewing|start/i,
-    );
-    await expect(page.getByTestId("board-preview-veil")).toHaveAttribute(
-      "data-active",
-      "true",
-    );
-    await expect(page.getByTestId("board-preview-veil")).toHaveAttribute(
-      "data-ready",
-      "true",
-    );
+    await expect(page.getByTestId("timeline-status")).toContainText(/start/i);
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
-      "reviewing",
+      "playerTurn",
     );
     await expect(page.getByTestId("move-list")).toContainText("e4");
 
-    await page.getByTestId("timeline-live").click();
-    await expect(page.getByTestId("timeline-status")).toContainText(/Live/i);
-    await expect(page.getByTestId("board-preview-veil")).toHaveAttribute(
-      "data-active",
-      "false",
-    );
+    await page.keyboard.press("End");
+    await expect(page.getByTestId("timeline-status")).toContainText(/e4/i);
   });
 
-  test("take back from practice clears coaching so Try from here cannot target old node", async ({
+  test("take back clears coaching so Try from here cannot target old node", async ({
     page,
   }) => {
     await startCoachGame(page);
@@ -156,17 +114,11 @@ test.describe("time travel + branching timeline", () => {
     await expandCoach(page);
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
-      /playerTurn|reviewing/,
+      "playerTurn",
       { timeout: 10_000 },
     );
 
     await expect(page.getByTestId("explore-line-button")).toBeVisible();
-    await page.getByTestId("explore-line-button").click();
-    await expect(page.getByTestId("status-badge")).toHaveAttribute(
-      "data-mode",
-      "practicing",
-    );
-
     await page.getByTestId("undo-human-move-button").click();
     await expect(page.getByTestId("live-region")).toContainText(/undo|try/i);
     await expect(page.getByTestId("explore-line-button")).toHaveCount(0);

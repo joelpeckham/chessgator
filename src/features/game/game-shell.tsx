@@ -26,9 +26,9 @@ export function GameShell(props: GameRuntimeOptions = {}) {
   const setMaiaElo = useGameStore((s) => s.setMaiaElo);
 
   const runtime = useGameRuntime(props);
-  const { boardSize, mascotBelow, boardLeft, coachDocked, coachLaneLeft } =
-    useBoardViewport();
   const ui = useShellUi(runtime);
+  const { boardSize, mascotBelow, boardLeft, coachDocked, coachLaneLeft } =
+    useBoardViewport(ui.timelineExpanded);
   const view = buildShellView({
     tree,
     session,

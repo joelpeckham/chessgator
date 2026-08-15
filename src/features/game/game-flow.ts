@@ -1,7 +1,6 @@
 import type { ProjectedLine } from "@/domain/analysis";
 import { projectUciLine } from "@/domain/analysis";
 import {
-  type Color,
   type GameMove,
   type GameNode,
   type GameTree,
@@ -9,11 +8,8 @@ import {
   getMoveHistory,
   getNode,
   getStatusAtNode,
-  isHumanTurn,
   type PieceSymbol,
   playMoveOnTree,
-  type SessionMode,
-  sessionModeForTurn,
 } from "@/domain/game";
 import type { TeachingInsight } from "@/domain/teaching";
 import type { CoachingController } from "@/features/game/coaching-controller";
@@ -210,63 +206,33 @@ export function playHumanMove(args: {
   };
 }
 
-export type TrySuggestedResult =
+export type RealizeTutorResult =
   | { ok: false; message: string }
-  | {
-      ok: true;
-      tree: GameTree;
-      mode: SessionMode;
-      needsOpponent: boolean;
-      message: string;
-    };
+  | { ok: true; tree: GameTree; nodeId: string };
 
-export function firstHumanUciFromDraft(args: {
-  draft: GameTree;
-  originId: string;
-  humanColor: Color;
-}): string | null {
-  const chain: Array<{ uci: string; color: Color }> = [];
-  let cursor: string | null = args.draft.currentNodeId;
-  const seen = new Set<string>();
-  while (cursor && cursor !== args.originId && !seen.has(cursor)) {
-    seen.add(cursor);
-    const node = getNode(args.draft, cursor);
-    if (!node?.move) break;
-    chain.push({ uci: node.move.uci, color: node.move.color });
-    cursor = node.parentId;
-  }
-  chain.reverse();
-  return chain.find((move) => move.color === args.humanColor)?.uci ?? null;
-}
-
-export function commitPracticeMove(args: {
-  liveTree: GameTree;
+/** Replay a UCI prefix onto the live tree, reusing matching children. */
+export function realizeTutorLine(args: {
+  tree: GameTree;
   originNodeId: string;
-  commitUci: string;
-}): TrySuggestedResult {
-  const played = playMoveOnTree(
-    args.liveTree,
-    args.originNodeId,
-    args.commitUci,
-    {
-      asVariation: false,
-    },
-  );
-  if (!played) {
-    return { ok: false, message: "Could not play that try-instead move" };
+  uciPath: readonly string[];
+}): RealizeTutorResult {
+  if (args.uciPath.length === 0) {
+    return { ok: false, message: "No suggested move to play" };
   }
-  const humanColor = useGameStore.getState().humanColor;
-  const status = getStatusAtNode(played.tree, played.tree.currentNodeId);
-  const mode: SessionMode = status.isGameOver
-    ? "gameOver"
-    : sessionModeForTurn(status.turn, humanColor);
-  return {
-    ok: true,
-    tree: played.tree,
-    mode,
-    needsOpponent: !status.isGameOver && !isHumanTurn(status.turn, humanColor),
-    message: `Trying ${played.node.move?.san ?? "alternate"} instead — prior line kept as a branch`,
-  };
+  if (!getNode(args.tree, args.originNodeId)) {
+    return { ok: false, message: "Could not play that suggested line" };
+  }
+  let tree = args.tree;
+  let fromId = args.originNodeId;
+  for (const uci of args.uciPath) {
+    const played = playMoveOnTree(tree, fromId, uci);
+    if (!played) {
+      return { ok: false, message: "Could not play that suggested line" };
+    }
+    tree = played.tree;
+    fromId = played.node.id;
+  }
+  return { ok: true, tree, nodeId: fromId };
 }
 
 export function undoHumanMove(): void {

@@ -12,6 +12,7 @@ import {
   getCurrentNode,
   getStatusAtNode,
   getTurn,
+  jumpToNode,
   type MoveInput,
   normalizeSessionForResume,
   playMoveOnTree,
@@ -54,6 +55,8 @@ export type GameStoreState = {
   /** Continue a hydrated game without wiping the tree. */
   resumePlay: () => void;
   replaceTree: (tree: GameTree) => void;
+  /** Jump the live pointer to an existing node and sync session mode. */
+  goToNode: (nodeId: string) => boolean;
   playMove: (
     input: MoveInput,
     options?: { afterMode?: SessionMode; asVariation?: boolean },
@@ -153,6 +156,40 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
   replaceTree: (tree) => {
     set({ tree, lastError: null });
+  },
+
+  goToNode: (nodeId) => {
+    const { tree, session, humanColor } = get();
+    const next = jumpToNode(tree, nodeId);
+    if (!next) {
+      set({ lastError: "Unknown position" });
+      return false;
+    }
+
+    if (
+      session.mode === "gameOver" &&
+      session.terminalReason === "resignation"
+    ) {
+      set({ tree: next, lastError: null });
+      return true;
+    }
+
+    const status = getStatusAtNode(next, next.currentNodeId);
+    if (status.isGameOver) {
+      set({
+        tree: next,
+        session: sessionState("gameOver", status.reason),
+        lastError: null,
+      });
+      return true;
+    }
+
+    set({
+      tree: next,
+      session: sessionState(sessionModeForTurn(status.turn, humanColor)),
+      lastError: null,
+    });
+    return true;
   },
 
   playMove: (input, options) => {
