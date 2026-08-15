@@ -12,6 +12,9 @@ import {
 import {
   CLAWS_DISPLAY,
   CLAWS_SRC,
+  clawsLayerStyle,
+  GATOR_CLAWS,
+  GATOR_LEDGE_INSET_PX,
   GATOR_LEDGE_OVERLAP_PX,
   gatorDisplaySize,
 } from "@/components/coach/gator-layout";
@@ -199,11 +202,15 @@ export function CoachMascot({
 
   return (
     <div
-      className="absolute left-2 z-30"
-      style={{ bottom: `calc(100% - ${GATOR_LEDGE_OVERLAP_PX}px)` }}
+      className="absolute z-30"
+      style={{
+        left: GATOR_LEDGE_INSET_PX,
+        bottom: `calc(100% - ${GATOR_LEDGE_OVERLAP_PX}px)`,
+      }}
       data-testid="coach-mascot"
       data-mode={mode}
       data-expression={expression}
+      data-hands={GATOR_CLAWS[expression].hands}
       data-expanded={expanded ? "true" : "false"}
       data-hint-level={hint?.level ?? "none"}
       role="region"
@@ -284,12 +291,8 @@ export function CoachMascot({
               alt=""
               width={Math.round(CLAWS_DISPLAY.width)}
               height={Math.round(CLAWS_DISPLAY.height)}
-              className="pointer-events-none absolute left-1/2 max-w-none -translate-x-1/2 select-none"
-              style={{
-                top: head.height - CLAWS_DISPLAY.cutoutFromTop,
-                width: CLAWS_DISPLAY.width,
-                height: CLAWS_DISPLAY.height,
-              }}
+              className="pointer-events-none absolute left-1/2 max-w-none select-none"
+              style={clawsLayerStyle(expression, head.height)}
               draggable={false}
               loading="eager"
             />

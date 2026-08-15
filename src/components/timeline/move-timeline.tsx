@@ -159,29 +159,6 @@ export function MoveTimeline({
       aria-label="Move timeline"
       style={{ height: TIMELINE_GRAPH_HEIGHT_PX }}
     >
-      <div
-        className="flex shrink-0 items-center justify-between gap-2 border-b border-border/60 px-2 sm:px-3"
-        data-testid="timeline-status"
-        style={{ height: STATUS_ROW_H }}
-      >
-        <p className="truncate text-xs text-muted-foreground">{statusText}</p>
-        <div className="flex shrink-0 items-center gap-2">
-          {!viewingLive && mode !== "practice" ? (
-            <Button
-              type="button"
-              size="xs"
-              variant="ghost"
-              disabled={disabled}
-              aria-label="Return to live position"
-              data-testid="timeline-live"
-              onClick={onReturnLive}
-            >
-              Back to game
-            </Button>
-          ) : null}
-        </div>
-      </div>
-
       <div className="flex min-h-0 flex-1 items-center gap-1 px-1 sm:px-2">
         <Button
           type="button"
@@ -243,6 +220,29 @@ export function MoveTimeline({
         >
           ›
         </Button>
+      </div>
+
+      <div
+        className="flex shrink-0 items-center justify-between gap-2 border-t border-border/60 px-2 sm:px-3"
+        data-testid="timeline-status"
+        style={{ height: STATUS_ROW_H }}
+      >
+        <p className="truncate text-xs text-muted-foreground">{statusText}</p>
+        <div className="flex shrink-0 items-center gap-2">
+          {!viewingLive && mode !== "practice" ? (
+            <Button
+              type="button"
+              size="xs"
+              variant="ghost"
+              disabled={disabled}
+              aria-label="Return to live position"
+              data-testid="timeline-live"
+              onClick={onReturnLive}
+            >
+              Back to game
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       {mode === "practice" ? (

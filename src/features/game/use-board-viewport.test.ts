@@ -6,13 +6,13 @@ describe("computeViewportLayout", () => {
     const layout = computeViewportLayout(1280, 800);
     expect(layout.mascotBelow).toBe(false);
     expect(layout.boardLeft).toBe(Math.floor((1280 - layout.boardSize) / 2));
-    expect(layout.boardLeft).toBeGreaterThan(120);
+    expect(layout.boardLeft).toBeGreaterThan(128);
   });
 
   it("clamps the board to the peek when true center would overlap the mascot", () => {
     const layout = computeViewportLayout(584, 800);
     expect(layout.mascotBelow).toBe(false);
-    expect(layout.boardLeft).toBe(120);
+    expect(layout.boardLeft).toBe(128);
   });
 
   it("shrinks the board beside the mascot once width is the constraint", () => {
