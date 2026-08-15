@@ -36,7 +36,6 @@ import {
 import {
   analyzedNodeIdForFocus,
   buildTreeGraph,
-  formatMoveLabel,
 } from "@/features/game/tree-graph";
 import { deriveBoardInteractivity } from "@/features/game/turn-controller";
 import type { GameRuntime } from "@/features/game/use-game-runtime";
@@ -92,7 +91,6 @@ export type ShellView = {
     graph: DecisionGraph;
     focusedNodeId: string;
     startNodeId: string;
-    statusText: string;
     canGoPrev: boolean;
     canGoNext: boolean;
     disabled: boolean;
@@ -115,16 +113,6 @@ export type ShellView = {
     to: string;
   };
 };
-
-function timelineStatusText(args: {
-  focusedLabel: string | null;
-  ply: number;
-}): string {
-  if (args.ply === 0) return "Start";
-  return (
-    args.focusedLabel ?? `Move ${Math.max(0, Math.floor((args.ply + 1) / 2))}`
-  );
-}
 
 export function buildShellView(args: {
   tree: GameTree;
@@ -241,13 +229,6 @@ export function buildShellView(args: {
     navMessage: ui.navMessage,
   });
 
-  const graphCursorNode = graph.nodes.find(
-    (node) => node.id === tree.currentNodeId,
-  );
-  const focusedLabel =
-    graphCursorNode?.moveLabel ||
-    formatMoveLabel(currentNode.ply, currentNode.move?.san ?? null);
-
   const prevNodeId = transportStep(graph, tree.currentNodeId, -1);
   const nextNodeId = transportStep(graph, tree.currentNodeId, 1);
 
@@ -332,10 +313,6 @@ export function buildShellView(args: {
       graph,
       focusedNodeId: tree.currentNodeId,
       startNodeId: tree.rootId,
-      statusText: timelineStatusText({
-        focusedLabel,
-        ply: currentNode.ply,
-      }),
       canGoPrev: prevNodeId != null,
       canGoNext: nextNodeId != null,
       disabled: mode === "error",

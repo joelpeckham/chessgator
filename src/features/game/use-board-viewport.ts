@@ -6,6 +6,7 @@ import {
   MASCOT_PEEK_HEIGHT_PX,
   MASCOT_PEEK_WIDTH_PX,
 } from "@/components/coach/gator-layout";
+import { SITE_FOOTER_H } from "@/components/site-footer";
 import {
   TIMELINE_EXPANDED_HEIGHT_PX,
   TIMELINE_GRAPH_HEIGHT_PX,
@@ -20,7 +21,9 @@ function footerChromePx(timelineExpanded: boolean): number {
   return (
     (timelineExpanded
       ? TIMELINE_EXPANDED_HEIGHT_PX
-      : TIMELINE_GRAPH_HEIGHT_PX) + TIMELINE_EXTRA_CHROME_PX
+      : TIMELINE_GRAPH_HEIGHT_PX) +
+    TIMELINE_EXTRA_CHROME_PX +
+    SITE_FOOTER_H
   );
 }
 /** Gap between the docked coach lane and the board. */

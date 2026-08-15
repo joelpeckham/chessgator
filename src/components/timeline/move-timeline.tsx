@@ -14,7 +14,6 @@ import type { DecisionGraph } from "@/components/timeline/decision-types";
 import {
   EXPANDED_GRAPH_H,
   graphNodeCenter,
-  STATUS_ROW_H,
   STRIP_GRAPH_H,
   TIMELINE_EXPANDED_HEIGHT_PX,
   TIMELINE_GRAPH_HEIGHT_PX,
@@ -33,7 +32,6 @@ export type MoveTimelineProps = {
   graph: DecisionGraph;
   focusedNodeId: string;
   startNodeId: string;
-  statusText: string;
   canGoPrev: boolean;
   canGoNext: boolean;
   prevNodeId: string | null;
@@ -59,7 +57,6 @@ export function MoveTimeline({
   graph,
   focusedNodeId,
   startNodeId,
-  statusText,
   canGoPrev,
   canGoNext,
   prevNodeId,
@@ -204,7 +201,7 @@ export function MoveTimeline({
   return (
     <section
       className={cn(
-        "flex w-full flex-col overflow-hidden border-t border-border bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/80",
+        "relative flex w-full flex-col overflow-hidden border-t border-border bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/80",
         className,
       )}
       data-testid="move-timeline"
@@ -216,11 +213,15 @@ export function MoveTimeline({
           : TIMELINE_GRAPH_HEIGHT_PX,
       }}
     >
-      <div className="flex min-h-0 flex-1 items-stretch gap-1 px-1 sm:px-2">
+      <div
+        className="absolute top-2 right-2 z-10 flex items-center gap-1.5"
+        data-testid="timeline-controls"
+      >
         <Button
           type="button"
           size="icon-xs"
-          variant="ghost"
+          variant="secondary"
+          className="rounded-full shadow-sm"
           disabled={disabled || !canGoPrev || !prevNodeId}
           aria-label="Previous position"
           data-testid="timeline-prev"
@@ -230,52 +231,11 @@ export function MoveTimeline({
         >
           ‹
         </Button>
-        <div
-          ref={scrollRef}
-          role="listbox"
-          aria-label="Game moves"
-          aria-activedescendant={`timeline-node-${focusedNodeId}`}
-          tabIndex={0}
-          className={cn(
-            "min-h-0 min-w-0 flex-1 cursor-grab overflow-x-auto overflow-y-hidden select-none scrollbar-thin active:cursor-grabbing focus-visible:ring-2 focus-visible:ring-ring",
-            !expanded && "scroll-fade-x",
-          )}
-          data-testid="move-list"
-          onKeyDown={onKeyDown}
-          onWheel={onWheel}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerCancel={onPointerUp}
-        >
-          <p className="sr-only">
-            Arrow keys move along the selected branch. Up and down switch
-            branches at a fork. Home goes to the start. End goes to the end of
-            this branch.
-          </p>
-          {hasMoves ? null : <p className="sr-only">No moves yet</p>}
-          <div
-            style={{
-              transform: `translateY(${panY}px)`,
-              transition:
-                prefersReducedMotion() || userPanning
-                  ? undefined
-                  : "transform 280ms ease-out",
-            }}
-          >
-            <DecisionGraphView
-              graph={graph}
-              focusedNodeId={focusedNodeId}
-              disabled={disabled}
-              onSelectNode={onSelectNode}
-              onOpenCoach={onOpenCoach}
-            />
-          </div>
-        </div>
         <Button
           type="button"
           size="icon-xs"
-          variant="ghost"
+          variant="secondary"
+          className="rounded-full shadow-sm"
           disabled={disabled || !canGoNext || !nextNodeId}
           aria-label="Next position"
           data-testid="timeline-next"
@@ -285,29 +245,61 @@ export function MoveTimeline({
         >
           ›
         </Button>
+        <Button
+          type="button"
+          size="icon-xs"
+          variant="secondary"
+          className="rounded-full shadow-sm"
+          aria-label={expanded ? "Collapse timeline" : "Expand timeline"}
+          aria-pressed={expanded}
+          data-testid="timeline-expand"
+          onClick={() => {
+            onExpandedChange(!expanded);
+            requestAnimationFrame(() => centerFocused(false));
+          }}
+        >
+          {expanded ? <RiContractUpDownLine /> : <RiExpandUpDownLine />}
+        </Button>
       </div>
-
       <div
-        className="flex shrink-0 items-center justify-between gap-2 border-t border-border/60 px-2 sm:px-3"
-        data-testid="timeline-status"
-        style={{ height: STATUS_ROW_H }}
+        ref={scrollRef}
+        role="listbox"
+        aria-label="Game moves"
+        aria-activedescendant={`timeline-node-${focusedNodeId}`}
+        tabIndex={0}
+        className={cn(
+          "min-h-0 min-w-0 flex-1 cursor-grab overflow-x-auto overflow-y-hidden pr-24 select-none scrollbar-thin active:cursor-grabbing focus-visible:ring-2 focus-visible:ring-ring",
+          !expanded && "scroll-fade-x",
+        )}
+        data-testid="move-list"
+        onKeyDown={onKeyDown}
+        onWheel={onWheel}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
       >
-        <p className="truncate text-xs text-muted-foreground">{statusText}</p>
-        <div className="flex shrink-0 items-center gap-1">
-          <Button
-            type="button"
-            size="icon-xs"
-            variant="ghost"
-            aria-label={expanded ? "Collapse timeline" : "Expand timeline"}
-            aria-pressed={expanded}
-            data-testid="timeline-expand"
-            onClick={() => {
-              onExpandedChange(!expanded);
-              requestAnimationFrame(() => centerFocused(false));
-            }}
-          >
-            {expanded ? <RiContractUpDownLine /> : <RiExpandUpDownLine />}
-          </Button>
+        <p className="sr-only">
+          Arrow keys move along the selected branch. Up and down switch branches
+          at a fork. Home goes to the start. End goes to the end of this branch.
+        </p>
+        {hasMoves ? null : <p className="sr-only">No moves yet</p>}
+        <div
+          style={{
+            transform: `translateY(${panY}px)`,
+            transition:
+              prefersReducedMotion() || userPanning
+                ? undefined
+                : "transform 280ms ease-out",
+          }}
+        >
+          <DecisionGraphView
+            graph={graph}
+            focusedNodeId={focusedNodeId}
+            disabled={disabled}
+            onSelectNode={onSelectNode}
+            onOpenCoach={onOpenCoach}
+          />
         </div>
       </div>
     </section>

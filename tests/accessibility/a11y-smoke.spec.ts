@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import {
   chooseLegalMove,
   expandCoach,
+  selectedTimelineNode,
   startStubGame,
 } from "../shared/playwright-helpers";
 
@@ -31,13 +32,23 @@ test.describe("accessibility + responsive smoke", () => {
     const timeline = page.getByTestId("move-list");
     await timeline.focus();
     await page.keyboard.press("Home");
-    await expect(page.getByTestId("timeline-status")).toContainText(/start/i);
+    await expect(selectedTimelineNode(page)).toHaveAttribute(
+      "aria-label",
+      /start/i,
+    );
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
       "playerTurn",
     );
     await page.keyboard.press("End");
-    await expect(page.getByTestId("timeline-status")).toContainText(/e4/i);
+    await expect(selectedTimelineNode(page)).toHaveAttribute(
+      "aria-label",
+      /current position/i,
+    );
+    await expect(selectedTimelineNode(page)).not.toHaveAttribute(
+      "aria-label",
+      /start/i,
+    );
     const selected = page
       .locator('[data-testid="move-timeline"] [aria-selected="true"]')
       .first();

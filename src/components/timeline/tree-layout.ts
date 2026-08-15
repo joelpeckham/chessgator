@@ -12,11 +12,10 @@ export const STRIP_GRAPH_H =
   GRAPH_PAD_TOP + NODE_CAPTION_H + STRIP_LANE_COUNT * LANE_H + NODE_LABEL_H;
 export const EXPANDED_GRAPH_H =
   GRAPH_PAD_TOP + NODE_CAPTION_H + 8 * LANE_H + NODE_LABEL_H;
-export const STATUS_ROW_H = 24;
-/** Collapsed strip: status row + three visible lanes. */
-export const TIMELINE_GRAPH_HEIGHT_PX = STATUS_ROW_H + STRIP_GRAPH_H;
-/** Tall mode: status row + eight visible lanes. */
-export const TIMELINE_EXPANDED_HEIGHT_PX = STATUS_ROW_H + EXPANDED_GRAPH_H;
+/** Collapsed strip: three visible lanes. */
+export const TIMELINE_GRAPH_HEIGHT_PX = STRIP_GRAPH_H;
+/** Tall mode: eight visible lanes. */
+export const TIMELINE_EXPANDED_HEIGHT_PX = EXPANDED_GRAPH_H;
 
 /** Mobile hit target (`size-11`); desktop buttons use `sm:size-9` (36px). */
 export const NODE_HIT_PX = 44;

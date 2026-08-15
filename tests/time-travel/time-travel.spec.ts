@@ -3,6 +3,7 @@ import {
   chooseLegalMove,
   expandCoach,
   expectCoachCollapsed,
+  selectedTimelineNode,
   startCoachGame,
 } from "../shared/playwright-helpers";
 
@@ -66,7 +67,10 @@ test.describe("time travel + branching timeline", () => {
       .first();
     await expect(d4Node).toBeVisible();
     await d4Node.click();
-    await expect(page.getByTestId("timeline-status")).toContainText(/d4/i);
+    await expect(selectedTimelineNode(page)).toHaveAttribute(
+      "aria-label",
+      /d4/i,
+    );
 
     const timeline = page.getByTestId("move-list");
     await timeline.focus();
@@ -77,7 +81,10 @@ test.describe("time travel + branching timeline", () => {
         .first(),
     ).toBeVisible();
     await page.keyboard.press("ArrowLeft");
-    await expect(page.getByTestId("timeline-status")).toContainText(/start/i);
+    await expect(selectedTimelineNode(page)).toHaveAttribute(
+      "aria-label",
+      /start/i,
+    );
   });
 
   test("timeline jump keeps earlier lines", async ({ page }) => {
@@ -92,7 +99,10 @@ test.describe("time travel + branching timeline", () => {
     const timeline = page.getByTestId("move-list");
     await timeline.focus();
     await page.keyboard.press("Home");
-    await expect(page.getByTestId("timeline-status")).toContainText(/start/i);
+    await expect(selectedTimelineNode(page)).toHaveAttribute(
+      "aria-label",
+      /start/i,
+    );
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
       "playerTurn",
@@ -100,7 +110,14 @@ test.describe("time travel + branching timeline", () => {
     await expect(page.getByTestId("move-list")).toContainText("e4");
 
     await page.keyboard.press("End");
-    await expect(page.getByTestId("timeline-status")).toContainText(/e4/i);
+    await expect(selectedTimelineNode(page)).toHaveAttribute(
+      "aria-label",
+      /current position/i,
+    );
+    await expect(selectedTimelineNode(page)).not.toHaveAttribute(
+      "aria-label",
+      /start/i,
+    );
   });
 
   test("jumping to start hides Try from here for the old node", async ({
@@ -124,7 +141,10 @@ test.describe("time travel + branching timeline", () => {
     const timeline = page.getByTestId("move-list");
     await timeline.focus();
     await page.keyboard.press("Home");
-    await expect(page.getByTestId("timeline-status")).toContainText(/start/i);
+    await expect(selectedTimelineNode(page)).toHaveAttribute(
+      "aria-label",
+      /start/i,
+    );
     await expect(page.getByTestId("explore-line-button")).toHaveCount(0);
     await expect(page.getByTestId("variation-explorer")).toHaveCount(0);
     await expect(page.getByTestId("practice-controls")).toHaveCount(0);

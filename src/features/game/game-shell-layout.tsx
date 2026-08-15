@@ -13,6 +13,7 @@ import { GameOverCard } from "@/components/game/game-over-card";
 import { PromotionDialog } from "@/components/game/promotion-dialog";
 import { SettingsSheet } from "@/components/game/settings-sheet";
 import { ShellFrame } from "@/components/game/shell-frame";
+import { SiteFooter } from "@/components/site-footer";
 import { MoveTimeline } from "@/components/timeline/move-timeline";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -132,7 +133,6 @@ export function GameShellLayout({
                 graph={view.timeline.graph}
                 focusedNodeId={view.timeline.focusedNodeId}
                 startNodeId={view.timeline.startNodeId}
-                statusText={view.timeline.statusText}
                 canGoPrev={view.timeline.canGoPrev}
                 canGoNext={view.timeline.canGoNext}
                 prevNodeId={view.timeline.prevNodeId}
@@ -144,6 +144,7 @@ export function GameShellLayout({
                 onExpandedChange={ui.setTimelineExpanded}
                 className="rounded-none shadow-none ring-0"
               />
+              <SiteFooter />
             </div>
           </>
         }

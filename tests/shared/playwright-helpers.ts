@@ -39,6 +39,15 @@ export async function expectCoachCollapsed(page: Page): Promise<void> {
   await expect(page.getByTestId("coach-balloon")).toHaveCount(0);
 }
 
+/** Focused node in the move timeline graph. */
+export function selectedTimelineNode(page: Page) {
+  return page
+    .locator(
+      '[data-testid="move-timeline"] [data-timeline-node][aria-selected="true"]',
+    )
+    .first();
+}
+
 /** Wait for an auto-started stubbed playable game (`?e2eStub=1`). */
 export async function startStubGame(page: Page): Promise<void> {
   await page.goto("/?e2eStub=1");

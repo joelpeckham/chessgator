@@ -3,6 +3,7 @@ import {
   chooseLegalMove,
   expandCoach,
   expectCoachCollapsed,
+  selectedTimelineNode,
   startCoachGame,
 } from "../shared/playwright-helpers";
 
@@ -106,13 +107,16 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
     const timeline = page.getByTestId("move-list");
     await timeline.focus();
     await page.keyboard.press("Home");
-    await expect(page.getByTestId("timeline-status")).toContainText(/start/i);
+    await expect(selectedTimelineNode(page)).toHaveAttribute(
+      "aria-label",
+      /start/i,
+    );
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
       "playerTurn",
     );
     await expect(page.getByTestId("explore-line-button")).toHaveCount(0);
-    await expect(page.getByTestId("move-list")).toContainText("No moves yet");
+    await expect(page.getByTestId("move-list")).toContainText("e4");
 
     await expandCoach(page);
     await expect(page.getByTestId("teaching-card")).toHaveAttribute(
