@@ -1,7 +1,9 @@
 "use client";
 
+import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { popSpring } from "@/lib/motion-presets";
 
 export type CopyPgnButtonProps = {
   pgn: string;
@@ -47,7 +49,15 @@ export function CopyPgnButton({
       }}
       data-testid="copy-pgn-button"
     >
-      {copied ? "Copied" : "Copy PGN"}
+      <motion.span
+        key={copied ? "copied" : "copy"}
+        className="inline-block"
+        initial={{ scale: 0.7, opacity: 0.4 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={popSpring}
+      >
+        {copied ? "Copied" : "Copy PGN"}
+      </motion.span>
     </Button>
   );
 }

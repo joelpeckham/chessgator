@@ -22,7 +22,7 @@ export default function NotFound() {
           alt=""
           width={sadWidth}
           height={sadHeight}
-          className="select-none"
+          className="gator-wiggle select-none"
           priority
         />
         <h1 className="font-heading text-2xl font-semibold tracking-tight text-pretty">

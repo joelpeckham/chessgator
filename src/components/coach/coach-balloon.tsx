@@ -1,8 +1,10 @@
 "use client";
 
 import { RiCloseLine } from "@remixicon/react";
+import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { popSpring } from "@/lib/motion-presets";
 
 export type CoachBalloonProps = {
   children: ReactNode;
@@ -18,10 +20,20 @@ function focusCloseOnMount(node: HTMLButtonElement | null): void {
  */
 export function CoachBalloon({ children, onCollapse }: CoachBalloonProps) {
   return (
-    <div
+    <motion.div
       id="coach-balloon"
       className="coach-balloon"
       data-testid="coach-balloon"
+      style={{ originX: 0, originY: 1 }}
+      initial={{ opacity: 0, scale: 0.88, y: 8 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{
+        opacity: 0,
+        scale: 0.92,
+        y: 6,
+        transition: { duration: 0.16, ease: "easeIn" },
+      }}
+      transition={popSpring}
     >
       <div className="coach-balloon-body relative px-3 py-3 sm:px-4">
         <Button
@@ -38,6 +50,6 @@ export function CoachBalloon({ children, onCollapse }: CoachBalloonProps) {
         </Button>
         {children}
       </div>
-    </div>
+    </motion.div>
   );
 }

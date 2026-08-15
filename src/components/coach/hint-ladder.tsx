@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { lineUciToSan } from "@/domain/game";
 import type { HintStep } from "@/domain/teaching";
@@ -56,7 +57,11 @@ export function HintLadder({
         </Button>
       </div>
       {hint ? (
-        <div
+        <motion.div
+          key={hint.level}
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
           className="rounded-lg bg-muted/50 px-2.5 py-1.5 text-sm"
           data-testid="hint-content"
           data-hint-level={hint.level}
@@ -84,7 +89,7 @@ export function HintLadder({
               Line: {lineSan}
             </p>
           ) : null}
-        </div>
+        </motion.div>
       ) : (
         <p className="text-xs text-muted-foreground">
           Progressive hints: question, squares, candidate, then a short line.

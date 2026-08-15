@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import type { DecisionGraph } from "@/components/timeline/decision-types";
 import {
@@ -17,6 +18,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { PruneScope } from "@/domain/game";
+import { popSpring, settleSpring } from "@/lib/motion-presets";
 import { cn } from "@/lib/utils";
 
 export type DecisionGraphViewProps = {
@@ -33,6 +35,12 @@ export type DecisionGraphViewProps = {
     san: string,
   ) => void;
 };
+
+/** Vertical offsets from a node center (positions are relative per node). */
+const CAPTION_OFFSET_Y = graphCaptionTop(0);
+const LABEL_OFFSET_Y = graphLabelTop(0);
+/** Half the `size-5` glyph ring so the focus puck centers on the node. */
+const FOCUS_RING_HALF = 10;
 
 function moverLabel(node: DecisionGraph["nodes"][number]): string | null {
   if (node.moveColor === "w") return `White: ${node.san || node.moveLabel}`;
@@ -158,6 +166,10 @@ export function DecisionGraphView({
     : new Set<string>();
   const width = Math.max(graph.columns, 1) * COL_W;
   const height = graphContentHeight(graph.minLane, graph.maxLane);
+  const focusedNode = nodeById.get(focusedNodeId);
+  const focusedCenter = focusedNode
+    ? graphNodeCenter(focusedNode.column, focusedNode.lane, graph.maxLane)
+    : null;
 
   return (
     <div
@@ -172,195 +184,247 @@ export function DecisionGraphView({
         height={height}
         aria-hidden
       >
-        {graph.edges.map((edge) => {
-          const from = nodeById.get(edge.fromId);
-          const to = nodeById.get(edge.toId);
-          if (!from || !to) return null;
-          const a = graphNodeCenter(from.column, from.lane, graph.maxLane);
-          const b = graphNodeCenter(to.column, to.lane, graph.maxLane);
-          const midX = (a.cx + b.cx) / 2;
-          const suggested = edge.kind === "suggested";
-          const marked = highlighted.has(edge.toId);
-          const d = `M ${a.cx} ${a.cy} C ${midX} ${a.cy}, ${midX} ${b.cy}, ${b.cx} ${b.cy}`;
-          return (
-            <g key={`${edge.fromId}->${edge.toId}`}>
-              <path
-                d={d}
-                fill="none"
-                stroke="var(--border)"
-                strokeWidth={suggested ? 1.75 : 1.5}
-                strokeDasharray={suggested ? "4 3" : undefined}
-                className={
-                  marked
-                    ? "stroke-destructive"
-                    : suggested
-                      ? "stroke-primary/70"
-                      : undefined
-                }
-                data-prune-target={marked ? "true" : undefined}
-              />
-              {pruneMode && !suggested ? (
-                <path
+        <AnimatePresence initial={false}>
+          {graph.edges.map((edge) => {
+            const from = nodeById.get(edge.fromId);
+            const to = nodeById.get(edge.toId);
+            if (!from || !to) return null;
+            const a = graphNodeCenter(from.column, from.lane, graph.maxLane);
+            const b = graphNodeCenter(to.column, to.lane, graph.maxLane);
+            const midX = (a.cx + b.cx) / 2;
+            const suggested = edge.kind === "suggested";
+            const marked = highlighted.has(edge.toId);
+            const d = `M ${a.cx} ${a.cy} C ${midX} ${a.cy}, ${midX} ${b.cy}, ${b.cx} ${b.cy}`;
+            return (
+              <g key={`${edge.fromId}->${edge.toId}`}>
+                <motion.path
                   d={d}
                   fill="none"
-                  stroke="transparent"
-                  strokeWidth={10}
-                  className="pointer-events-auto cursor-crosshair"
-                  data-timeline-edge="true"
-                  data-from-id={edge.fromId}
-                  data-to-id={edge.toId}
-                  data-testid={`timeline-edge-${edge.fromId}-${edge.toId}`}
-                  onPointerEnter={() => {
-                    setHoverTarget({ nodeId: edge.toId, scope: "branch" });
+                  stroke="var(--border)"
+                  strokeWidth={suggested ? 1.75 : 1.5}
+                  strokeDasharray={suggested ? "4 3" : undefined}
+                  initial={
+                    suggested ? { opacity: 0 } : { pathLength: 0, opacity: 0 }
+                  }
+                  animate={
+                    suggested
+                      ? { opacity: 1, d }
+                      : { pathLength: 1, opacity: 1, d }
+                  }
+                  exit={{ opacity: 0 }}
+                  transition={{
+                    d: settleSpring,
+                    pathLength: { duration: 0.45, ease: "easeOut" },
+                    opacity: { duration: 0.2 },
                   }}
-                  onPointerLeave={() => {
-                    setHoverTarget(null);
-                  }}
-                  onClick={() => {
-                    const count = 1 + descendantIds(children, edge.toId).length;
-                    onPruneTarget?.(edge.toId, "branch", count, pruneSan(from));
-                  }}
+                  className={
+                    marked
+                      ? "stroke-destructive"
+                      : suggested
+                        ? "stroke-primary/70"
+                        : undefined
+                  }
+                  data-prune-target={marked ? "true" : undefined}
                 />
-              ) : null}
-            </g>
-          );
-        })}
+                {pruneMode && !suggested ? (
+                  <path
+                    d={d}
+                    fill="none"
+                    stroke="transparent"
+                    strokeWidth={10}
+                    className="pointer-events-auto cursor-crosshair"
+                    data-timeline-edge="true"
+                    data-from-id={edge.fromId}
+                    data-to-id={edge.toId}
+                    data-testid={`timeline-edge-${edge.fromId}-${edge.toId}`}
+                    onPointerEnter={() => {
+                      setHoverTarget({ nodeId: edge.toId, scope: "branch" });
+                    }}
+                    onPointerLeave={() => {
+                      setHoverTarget(null);
+                    }}
+                    onClick={() => {
+                      const count =
+                        1 + descendantIds(children, edge.toId).length;
+                      onPruneTarget?.(
+                        edge.toId,
+                        "branch",
+                        count,
+                        pruneSan(from),
+                      );
+                    }}
+                  />
+                ) : null}
+              </g>
+            );
+          })}
+        </AnimatePresence>
       </svg>
 
-      {graph.nodes.map((node) => {
-        const { cx, cy } = graphNodeCenter(
-          node.column,
-          node.lane,
-          graph.maxLane,
-        );
-        const selected = node.id === focusedNodeId;
-        const caption = node.caption;
-        const childCount = descendantIds(children, node.id).length;
-        const canPrune =
-          pruneMode && node.kind === "committed" && childCount > 0;
-        const marked = highlighted.has(node.id);
-        return (
-          <div key={node.id}>
-            {caption ? (
+      {focusedCenter && !pruneMode ? (
+        <motion.div
+          className="pointer-events-none absolute top-0 left-0 size-5 rounded-full ring-2 ring-primary"
+          initial={false}
+          animate={{
+            x: focusedCenter.cx - FOCUS_RING_HALF,
+            y: focusedCenter.cy - FOCUS_RING_HALF,
+          }}
+          transition={settleSpring}
+          aria-hidden
+          data-testid="timeline-focus-ring"
+        />
+      ) : null}
+
+      <AnimatePresence initial={false}>
+        {graph.nodes.map((node) => {
+          const { cx, cy } = graphNodeCenter(
+            node.column,
+            node.lane,
+            graph.maxLane,
+          );
+          const selected = node.id === focusedNodeId;
+          const caption = node.caption;
+          const childCount = descendantIds(children, node.id).length;
+          const canPrune =
+            pruneMode && node.kind === "committed" && childCount > 0;
+          const marked = highlighted.has(node.id);
+          return (
+            <motion.div
+              key={node.id}
+              className="absolute top-0 left-0"
+              initial={{ x: cx, y: cy, scale: 0, opacity: 0 }}
+              animate={{ x: cx, y: cy, scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{
+                x: settleSpring,
+                y: settleSpring,
+                scale: popSpring,
+                opacity: { duration: 0.16 },
+              }}
+            >
+              {caption ? (
+                <span
+                  className={cn(
+                    "pointer-events-none absolute truncate text-center text-[0.6rem] leading-none",
+                    node.kind === "suggested"
+                      ? "text-primary"
+                      : "text-muted-foreground",
+                    marked && "text-destructive",
+                  )}
+                  style={{
+                    left: -COL_W / 2 + 2,
+                    top: CAPTION_OFFSET_Y,
+                    width: COL_W - 4,
+                    height: NODE_CAPTION_H,
+                  }}
+                >
+                  {caption}
+                </span>
+              ) : null}
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <button
+                      type="button"
+                      id={`timeline-node-${node.id}`}
+                      role="option"
+                      tabIndex={-1}
+                      aria-selected={selected}
+                      aria-label={ariaLabelFor(node)}
+                      data-timeline-node="true"
+                      data-node-id={node.id}
+                      data-kind={node.kind}
+                      data-lane={node.lane}
+                      data-testid={`timeline-node-${node.id}`}
+                      data-prune-target={marked ? "true" : undefined}
+                      disabled={disabled}
+                      className={cn(
+                        "group absolute flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full sm:size-9",
+                        "bg-transparent",
+                        "outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        "touch-manipulation",
+                        pruneMode &&
+                          (canPrune
+                            ? "cursor-crosshair"
+                            : "cursor-not-allowed"),
+                      )}
+                      style={{ left: 0, top: 0 }}
+                      onPointerEnter={() => {
+                        if (!canPrune) return;
+                        setHoverTarget({
+                          nodeId: node.id,
+                          scope: "descendants",
+                        });
+                      }}
+                      onPointerLeave={() => {
+                        if (pruneMode) setHoverTarget(null);
+                      }}
+                      onClick={() => {
+                        if (pruneMode) {
+                          if (!canPrune) return;
+                          onPruneTarget?.(
+                            node.id,
+                            "descendants",
+                            childCount,
+                            pruneSan(node),
+                          );
+                          return;
+                        }
+                        onSelectNode(node.id);
+                        if (node.kind === "suggested") {
+                          onOpenCoach?.();
+                        }
+                      }}
+                    />
+                  }
+                >
+                  <span
+                    className={cn(
+                      "flex size-5 items-center justify-center rounded-full",
+                      "transition-transform duration-150 ease-out group-hover:scale-125 group-active:scale-90",
+                      marked && "ring-2 ring-destructive opacity-50",
+                      !marked &&
+                        node.isCurrent &&
+                        !selected &&
+                        "ring-2 ring-primary/55",
+                      !marked &&
+                        !selected &&
+                        !pruneMode &&
+                        "group-hover:ring-1 group-hover:ring-foreground/30",
+                    )}
+                  >
+                    <NodeGlyph node={node} />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  {pruneMode
+                    ? canPrune
+                      ? `Remove ${childCount} ${childCount === 1 ? "move" : "moves"} after ${pruneSan(node)}`
+                      : node.kind === "suggested"
+                        ? "Suggested moves cannot be pruned"
+                        : "Nothing to prune here"
+                    : tooltipFor(node)}
+                </TooltipContent>
+              </Tooltip>
               <span
                 className={cn(
-                  "pointer-events-none absolute truncate text-center text-[0.6rem] leading-none",
-                  node.kind === "suggested"
-                    ? "text-primary"
-                    : "text-muted-foreground",
+                  "pointer-events-none absolute truncate text-center font-mono text-[0.65rem] leading-none tabular-nums text-muted-foreground",
+                  node.kind === "suggested" && "text-primary",
                   marked && "text-destructive",
                 )}
                 style={{
-                  left: node.column * COL_W + 2,
-                  top: graphCaptionTop(cy),
-                  width: COL_W - 4,
-                  height: NODE_CAPTION_H,
+                  left: -COL_W / 2 + 4,
+                  top: LABEL_OFFSET_Y,
+                  width: COL_W - 8,
+                  height: NODE_LABEL_H,
                 }}
               >
-                {caption}
+                {nodeSan(node)}
               </span>
-            ) : null}
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <button
-                    type="button"
-                    id={`timeline-node-${node.id}`}
-                    role="option"
-                    tabIndex={-1}
-                    aria-selected={selected}
-                    aria-label={ariaLabelFor(node)}
-                    data-timeline-node="true"
-                    data-node-id={node.id}
-                    data-kind={node.kind}
-                    data-lane={node.lane}
-                    data-testid={`timeline-node-${node.id}`}
-                    data-prune-target={marked ? "true" : undefined}
-                    disabled={disabled}
-                    className={cn(
-                      "group absolute flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full sm:size-9",
-                      "bg-transparent",
-                      "outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                      "touch-manipulation",
-                      pruneMode &&
-                        (canPrune ? "cursor-crosshair" : "cursor-not-allowed"),
-                    )}
-                    style={{ left: cx, top: cy }}
-                    onPointerEnter={() => {
-                      if (!canPrune) return;
-                      setHoverTarget({
-                        nodeId: node.id,
-                        scope: "descendants",
-                      });
-                    }}
-                    onPointerLeave={() => {
-                      if (pruneMode) setHoverTarget(null);
-                    }}
-                    onClick={() => {
-                      if (pruneMode) {
-                        if (!canPrune) return;
-                        onPruneTarget?.(
-                          node.id,
-                          "descendants",
-                          childCount,
-                          pruneSan(node),
-                        );
-                        return;
-                      }
-                      onSelectNode(node.id);
-                      if (node.kind === "suggested") {
-                        onOpenCoach?.();
-                      }
-                    }}
-                  />
-                }
-              >
-                <span
-                  className={cn(
-                    "flex size-5 items-center justify-center rounded-full",
-                    marked && "ring-2 ring-destructive opacity-50",
-                    !marked && selected && "ring-2 ring-primary",
-                    !marked &&
-                      node.isCurrent &&
-                      !selected &&
-                      "ring-2 ring-primary/55",
-                    !marked &&
-                      !selected &&
-                      !pruneMode &&
-                      "group-hover:ring-1 group-hover:ring-foreground/30",
-                  )}
-                >
-                  <NodeGlyph node={node} />
-                </span>
-              </TooltipTrigger>
-              <TooltipContent side="top">
-                {pruneMode
-                  ? canPrune
-                    ? `Remove ${childCount} ${childCount === 1 ? "move" : "moves"} after ${pruneSan(node)}`
-                    : node.kind === "suggested"
-                      ? "Suggested moves cannot be pruned"
-                      : "Nothing to prune here"
-                  : tooltipFor(node)}
-              </TooltipContent>
-            </Tooltip>
-            <span
-              className={cn(
-                "pointer-events-none absolute truncate text-center font-mono text-[0.65rem] leading-none tabular-nums text-muted-foreground",
-                node.kind === "suggested" && "text-primary",
-                marked && "text-destructive",
-              )}
-              style={{
-                left: node.column * COL_W + 4,
-                top: graphLabelTop(cy),
-                width: COL_W - 8,
-                height: NODE_LABEL_H,
-              }}
-            >
-              {nodeSan(node)}
-            </span>
-          </div>
-        );
-      })}
+            </motion.div>
+          );
+        })}
+      </AnimatePresence>
     </div>
   );
 }

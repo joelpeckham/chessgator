@@ -5,6 +5,7 @@ import {
   RiExpandUpDownLine,
   RiScissorsCutLine,
 } from "@remixicon/react";
+import { motion } from "motion/react";
 import {
   type KeyboardEvent,
   type PointerEvent,
@@ -18,6 +19,7 @@ import type { DecisionGraph } from "@/components/timeline/decision-types";
 import {
   EXPANDED_GRAPH_H,
   graphNodeCenter,
+  horizontalCenterOffset,
   STRIP_GRAPH_H,
   TIMELINE_EXPANDED_HEIGHT_PX,
   TIMELINE_GRAPH_HEIGHT_PX,
@@ -40,6 +42,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import type { PruneScope } from "@/domain/game";
+import { settleSpring } from "@/lib/motion-presets";
 import { prefersReducedMotion } from "@/lib/prefers-reduced-motion";
 import { cn } from "@/lib/utils";
 
@@ -125,27 +128,37 @@ export function MoveTimeline({
     return Math.min(maxY, Math.max(minY, y));
   }
 
+  // Scroll horizontally only; vertical centering is the pan transform's
+  // job. scrollIntoView would race the pan spring and leave a stray
+  // scrollTop on the overflow-hidden container.
   function centerFocused(smooth: boolean): void {
-    const selected = scrollRef.current?.querySelector<HTMLElement>(
-      `[data-node-id="${CSS.escape(focusedNodeId)}"]`,
-    );
-    selected?.scrollIntoView({
-      block: "nearest",
-      inline: "center",
+    const list = scrollRef.current;
+    if (!list) return;
+    list.scrollTo({
+      left: -horizontalCenterOffset(
+        currentCenter.cx,
+        list.scrollWidth,
+        list.clientWidth,
+      ),
+      top: 0,
       behavior: smooth && !prefersReducedMotion() ? "smooth" : "auto",
     });
   }
 
+  const currentCx = currentCenter.cx;
   useEffect(() => {
-    const selected = scrollRef.current?.querySelector<HTMLElement>(
-      `[data-node-id="${CSS.escape(focusedNodeId)}"]`,
-    );
-    selected?.scrollIntoView({
-      block: "nearest",
-      inline: "center",
+    const list = scrollRef.current;
+    if (!list) return;
+    list.scrollTo({
+      left: -horizontalCenterOffset(
+        currentCx,
+        list.scrollWidth,
+        list.clientWidth,
+      ),
+      top: 0,
       behavior: prefersReducedMotion() ? "auto" : "smooth",
     });
-  }, [focusedNodeId, graph.nodes.length]);
+  }, [currentCx, focusedNodeId, graph.nodes.length]);
 
   function selectId(nodeId: string): void {
     onSelectNode(nodeId);
@@ -234,7 +247,7 @@ export function MoveTimeline({
   );
 
   return (
-    <section
+    <motion.section
       className={cn(
         "relative flex w-full flex-col overflow-hidden border-t border-border bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/80",
         className,
@@ -243,11 +256,13 @@ export function MoveTimeline({
       data-expanded={expanded ? "true" : "false"}
       data-prune-mode={pruneMode ? "true" : "false"}
       aria-label="Move timeline"
-      style={{
+      initial={false}
+      animate={{
         height: expanded
           ? TIMELINE_EXPANDED_HEIGHT_PX
           : TIMELINE_GRAPH_HEIGHT_PX,
       }}
+      transition={settleSpring}
     >
       <div
         className="absolute top-2 right-2 z-10 flex items-center gap-1.5"
@@ -339,14 +354,10 @@ export function MoveTimeline({
           at a fork. Home goes to the start. End goes to the end of this branch.
         </p>
         {hasMoves ? null : <p className="sr-only">No moves yet</p>}
-        <div
-          style={{
-            transform: `translateY(${panY}px)`,
-            transition:
-              prefersReducedMotion() || userPanning
-                ? undefined
-                : "transform 280ms ease-out",
-          }}
+        <motion.div
+          initial={false}
+          animate={{ y: panY }}
+          transition={userPanning ? { duration: 0 } : settleSpring}
         >
           <DecisionGraphView
             graph={graph}
@@ -359,7 +370,7 @@ export function MoveTimeline({
               setPendingPrune({ nodeId, scope, count, san });
             }}
           />
-        </div>
+        </motion.div>
       </div>
       <AlertDialog
         open={pendingPrune != null}
@@ -398,6 +409,6 @@ export function MoveTimeline({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </section>
+    </motion.section>
   );
 }

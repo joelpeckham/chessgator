@@ -1,10 +1,17 @@
 "use client";
 
+import { motion } from "motion/react";
 import { ClassificationBadge } from "@/components/coach/classification-badge";
 import { HintLadder } from "@/components/coach/hint-ladder";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import type { HintStep, TeachingInsight } from "@/domain/teaching";
+
+const STATE_FADE = {
+  initial: { opacity: 0, y: 5 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.2, ease: "easeOut" },
+} as const;
 
 export type TeachingCardProps = {
   insight: TeachingInsight | null;
@@ -46,7 +53,9 @@ export function TeachingCard({
 
   if (analyzing) {
     return (
-      <div
+      <motion.div
+        key="analyzing"
+        {...STATE_FADE}
         className="flex items-start gap-2"
         data-testid="teaching-card"
         data-state="analyzing"
@@ -60,13 +69,15 @@ export function TeachingCard({
           </h3>
           <p className="text-sm text-muted-foreground">Analyzing your move…</p>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   if (!insight) {
     return (
-      <div
+      <motion.div
+        key="empty"
+        {...STATE_FADE}
         className="flex flex-col gap-2"
         data-testid="teaching-card"
         data-state="empty"
@@ -84,12 +95,14 @@ export function TeachingCard({
           </div>
         </div>
         {hintLadder}
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div
+    <motion.div
+      key={`feedback:${insight.classification}:${insight.explanation}`}
+      {...STATE_FADE}
       className="flex flex-col gap-2"
       data-testid="teaching-card"
       data-state="feedback"
@@ -136,6 +149,6 @@ export function TeachingCard({
           </Button>
         ) : null}
       </div>
-    </div>
+    </motion.div>
   );
 }

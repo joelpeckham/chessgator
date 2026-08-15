@@ -141,7 +141,7 @@ export function BoardSquare({
           aria-hidden
           className="pointer-events-none absolute inset-0 flex items-center justify-center"
         >
-          <span className="size-2.5 rounded-full bg-foreground/50 ring-1 ring-background/80" />
+          <span className="board-target-dot size-2.5 rounded-full bg-foreground/50 ring-1 ring-background/80" />
         </span>
       ) : null}
       {annotation ? (

@@ -1,6 +1,7 @@
 "use client";
 
 import { RiCloseLine } from "@remixicon/react";
+import { AnimatePresence, motion, type Variants } from "motion/react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { CoachBalloon } from "@/components/coach/coach-balloon";
@@ -31,7 +32,61 @@ import {
   type HintStep,
   type TeachingInsight,
 } from "@/domain/teaching";
+import { bouncySpring, popSpring } from "@/lib/motion-presets";
 import { cn } from "@/lib/utils";
+
+/**
+ * Head motion states: a slow breathing loop when idle, a thinking sway
+ * while analyzing, one bounce for mistakes, bounce + worry pulse for
+ * blunders.
+ */
+const HEAD_VARIANTS: Variants = {
+  idle: {
+    y: 0,
+    rotate: 0,
+    opacity: 1,
+    scale: [1, 1.025, 1],
+    transition: {
+      scale: { duration: 3.8, repeat: Infinity, ease: "easeInOut" },
+    },
+  },
+  analyzing: {
+    y: 0,
+    opacity: 1,
+    scale: 1,
+    rotate: [-1.8, 1.8],
+    transition: {
+      rotate: {
+        duration: 1.1,
+        repeat: Infinity,
+        repeatType: "mirror",
+        ease: "easeInOut",
+      },
+    },
+  },
+  nudge: {
+    rotate: 0,
+    opacity: 1,
+    scale: 1,
+    y: [0, -7, -2, 0],
+    transition: { y: { duration: 0.6, ease: "easeOut" } },
+  },
+  alarmed: {
+    rotate: 0,
+    scale: 1,
+    y: [0, -7, -2, 0],
+    opacity: [1, 0.72, 1],
+    transition: {
+      y: { duration: 0.6, ease: "easeOut" },
+      opacity: {
+        duration: 1.8,
+        repeat: Infinity,
+        ease: "easeInOut",
+        delay: 0.6,
+      },
+    },
+  },
+};
 
 export type CoachMascotProps = {
   expanded: boolean;
@@ -251,12 +306,15 @@ export function CoachMascot({
     onExpandedChange(true);
   }
 
-  const nudgeMotion =
-    insight?.classification === "blunder"
-      ? "coach-mascot-pulse"
-      : insight?.classification === "mistake"
-        ? "coach-mascot-nudge"
-        : undefined;
+  const nudging = Boolean(insight?.nudge && !expanded && shownTeaser);
+  const headState =
+    mode === "analyzing"
+      ? "analyzing"
+      : nudging && insight?.classification === "blunder"
+        ? "alarmed"
+        : nudging && insight?.classification === "mistake"
+          ? "nudge"
+          : "idle";
 
   const head = gatorDisplaySize(expression);
   const claws = clawsLayerStyle(expression, head.height);
@@ -291,44 +349,60 @@ export function CoachMascot({
       role="region"
       aria-label="Coach feedback"
     >
-      {!docked && expanded ? (
-        <div className="pointer-events-auto">
-          <CoachBalloon onCollapse={collapse}>{teachingCard}</CoachBalloon>
-        </div>
-      ) : null}
+      <AnimatePresence>
+        {!docked && expanded ? (
+          <div className="pointer-events-auto" key="coach-balloon">
+            <CoachBalloon onCollapse={collapse}>{teachingCard}</CoachBalloon>
+          </div>
+        ) : null}
+      </AnimatePresence>
 
-      {shownTeaser ? (
-        <div
-          className="coach-teaser pointer-events-auto"
-          data-testid="coach-teaser"
-          data-kind={shownTeaser.kind}
-          aria-hidden={shownTeaser.kind === "praise" ? true : undefined}
-        >
-          <p className="text-xs font-medium text-pretty">{shownTeaser.text}</p>
-          {shownTeaser.kind === "nudge" ? (
-            <Button
-              type="button"
-              size="icon-xs"
-              variant="ghost"
-              className="size-6 shrink-0"
-              aria-label="Dismiss coach feedback"
-              data-testid="dismiss-teaching-card"
-              onClick={onDismiss}
-            >
-              <RiCloseLine />
-            </Button>
-          ) : null}
-        </div>
-      ) : null}
+      <AnimatePresence>
+        {shownTeaser ? (
+          <motion.div
+            key={shownTeaser.key}
+            className="coach-teaser pointer-events-auto"
+            data-testid="coach-teaser"
+            data-kind={shownTeaser.kind}
+            aria-hidden={shownTeaser.kind === "praise" ? true : undefined}
+            style={{ originX: 0, originY: 1 }}
+            initial={{ opacity: 0, scale: 0.85, y: 6 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{
+              opacity: 0,
+              scale: 0.92,
+              y: 4,
+              transition: { duration: 0.18, ease: "easeIn" },
+            }}
+            transition={popSpring}
+          >
+            <p className="text-xs font-medium text-pretty">
+              {shownTeaser.text}
+            </p>
+            {shownTeaser.kind === "nudge" ? (
+              <Button
+                type="button"
+                size="icon-xs"
+                variant="ghost"
+                className="size-6 shrink-0"
+                aria-label="Dismiss coach feedback"
+                data-testid="dismiss-teaching-card"
+                onClick={onDismiss}
+              >
+                <RiCloseLine />
+              </Button>
+            ) : null}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
 
       <div className="pointer-events-auto relative">
-        <button
+        <motion.button
           ref={gatorButtonRef}
           type="button"
           className={cn(
             "block p-0 leading-none rounded-md outline-offset-2 focus-visible:outline-2 focus-visible:outline-dashed focus-visible:outline-foreground",
             analyzing && "cursor-default opacity-90",
-            insight?.nudge && !expanded && shownTeaser && nudgeMotion,
           )}
           aria-label={mascotAriaLabel({ expanded, mode, insight })}
           aria-expanded={expanded}
@@ -336,22 +410,36 @@ export function CoachMascot({
           data-testid="coach-gator"
           disabled={analyzing}
           onClick={toggle}
+          whileHover={{ y: -5, rotate: -2, scale: 1.04 }}
+          whileTap={{ y: 1, scaleX: 1.06, scaleY: 0.92 }}
+          transition={bouncySpring}
         >
-          <span
+          <motion.span
             className="relative block"
             style={{ width: head.width, height: head.height }}
+            variants={HEAD_VARIANTS}
+            animate={headState}
+            data-head-state={headState}
           >
-            <Image
-              src={gatorSrc(expression)}
-              alt=""
-              width={Math.round(head.width)}
-              height={Math.round(head.height)}
-              className="block h-full w-full select-none"
-              draggable={false}
-              loading="eager"
-            />
-          </span>
-        </button>
+            <motion.span
+              key={expression}
+              className="block h-full w-full"
+              initial={{ scale: 0.82, opacity: 0.4 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={popSpring}
+            >
+              <Image
+                src={gatorSrc(expression)}
+                alt=""
+                width={Math.round(head.width)}
+                height={Math.round(head.height)}
+                className="block h-full w-full select-none"
+                draggable={false}
+                loading="eager"
+              />
+            </motion.span>
+          </motion.span>
+        </motion.button>
         <Image
           src={CLAWS_SRC}
           alt=""
