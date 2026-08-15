@@ -44,12 +44,7 @@ if (!result.success) {
 }
 
 // Stage ORT WASM / JS sidecars used by the worker at runtime.
-const ortFiles = [
-  "ort-wasm-simd-threaded.wasm",
-  "ort-wasm-simd-threaded.mjs",
-  "ort-wasm-simd-threaded.jsep.wasm",
-  "ort-wasm-simd-threaded.jsep.mjs",
-];
+const ortFiles = ["ort-wasm-simd-threaded.wasm", "ort-wasm-simd-threaded.mjs"];
 
 for (const file of ortFiles) {
   await cp(path.join(ortSrc, file), path.join(ortOut, file));

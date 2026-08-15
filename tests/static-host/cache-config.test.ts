@@ -32,6 +32,39 @@ describe("static host cache configuration", () => {
     expect(netlify).toMatch(/max-age=31536000,\s*immutable/);
   });
 
+  it("ships matching security and isolation headers on Vercel and Netlify", () => {
+    const vercel = JSON.parse(
+      readFileSync(path.join(ROOT, "vercel.json"), "utf8"),
+    ) as {
+      headers: Array<{
+        source: string;
+        headers: Array<{ key: string; value: string }>;
+      }>;
+    };
+    const netlify = readFileSync(path.join(ROOT, "public/_headers"), "utf8");
+
+    const required = {
+      "Content-Security-Policy":
+        "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Cross-Origin-Embedder-Policy": "require-corp",
+      "X-Content-Type-Options": "nosniff",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+    } as const;
+
+    const catchAll = vercel.headers.find((rule) => rule.source === "/(.*)");
+    expect(catchAll).toBeDefined();
+    for (const [key, value] of Object.entries(required)) {
+      expect(
+        catchAll?.headers.some(
+          (entry) => entry.key === key && entry.value === value,
+        ),
+      ).toBe(true);
+      expect(netlify).toContain(`${key}: ${value}`);
+    }
+  });
+
   it("production out/ includes versioned engine, model, ORT, and headers", () => {
     const outEngine = path.join(ROOT, "out/engine");
     const outOrt = path.join(ROOT, "out/ort/1.27.0");

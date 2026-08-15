@@ -52,32 +52,6 @@
       "sourceUrl": "https://github.com/microsoft/onnxruntime"
     },
     {
-      "id": "onnxruntime-web-jsep-wasm",
-      "kind": "copy",
-      "description": "ONNX Runtime Web JSEP WASM (MIT)",
-      "sourcePackage": "onnxruntime-web",
-      "sourcePackageVersion": "1.27.0",
-      "sourcePath": "node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.jsep.wasm",
-      "destination": "public/ort/1.27.0/ort-wasm-simd-threaded.jsep.wasm",
-      "sha256": "78feeeb3d08f6bcee94d938ed322f69073bb8076b5f9d34697a574ffba8deb48",
-      "bytes": 26827543,
-      "license": "MIT",
-      "sourceUrl": "https://github.com/microsoft/onnxruntime"
-    },
-    {
-      "id": "onnxruntime-web-jsep-mjs",
-      "kind": "copy",
-      "description": "ONNX Runtime Web JSEP loader (MIT)",
-      "sourcePackage": "onnxruntime-web",
-      "sourcePackageVersion": "1.27.0",
-      "sourcePath": "node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.jsep.mjs",
-      "destination": "public/ort/1.27.0/ort-wasm-simd-threaded.jsep.mjs",
-      "sha256": "3ee381d20a80f51a788a1c4a5872f6f1d047538dd4342f4af00062de5f9ea4c6",
-      "bytes": 46614,
-      "license": "MIT",
-      "sourceUrl": "https://github.com/microsoft/onnxruntime"
-    },
-    {
       "id": "maia3-5m-fp16-onnx",
       "kind": "download",
       "description": "Maia3 5M fp16 browser ONNX export (AGPL-3.0)",

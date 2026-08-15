@@ -1,9 +1,10 @@
 /**
  * Typed Maia worker entry.
- * Loads onnxruntime-web ONLY here (never on the main thread), runs the pinned
+ * Loads the WASM-only onnxruntime-web entry here (never on the main thread) so
+ * the JSEP/WebGPU binaries stay out of the static export. Runs the pinned
  * Maia3 5M fp16 browser export, and speaks `src/engines/maia/protocol.ts`.
  */
-import * as ort from "onnxruntime-web";
+import * as ort from "onnxruntime-web/wasm";
 import type {
   MaiaWorkerRequest,
   MaiaWorkerResponse,

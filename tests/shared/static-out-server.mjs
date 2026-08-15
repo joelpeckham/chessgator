@@ -12,6 +12,16 @@ const ROOT = path.resolve(__dirname, "../..");
 const OUT = path.join(ROOT, "out");
 const PORT = Number(process.env.E2E_PORT || 4175);
 
+const SECURITY_HEADERS = {
+  "content-security-policy":
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-embedder-policy": "require-corp",
+  "x-content-type-options": "nosniff",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "permissions-policy": "camera=(), microphone=(), geolocation=()",
+};
+
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
@@ -57,7 +67,7 @@ const server = createServer(async (req, res) => {
   try {
     const filePath = await resolveFile(req.url || "/");
     if (!filePath) {
-      res.writeHead(404);
+      res.writeHead(404, SECURITY_HEADERS);
       res.end("not found");
       return;
     }
@@ -66,10 +76,11 @@ const server = createServer(async (req, res) => {
     res.writeHead(200, {
       "content-type": MIME[ext] || "application/octet-stream",
       "cache-control": "no-store",
+      ...SECURITY_HEADERS,
     });
     res.end(data);
   } catch (err) {
-    res.writeHead(500);
+    res.writeHead(500, SECURITY_HEADERS);
     res.end(String(err));
   }
 });

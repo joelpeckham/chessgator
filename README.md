@@ -89,6 +89,11 @@ on staged files; VS Code settings recommend Biome + ESLint + Oxc.
 Serve the `out/` directory with any static host after a production build.
 `next start` is not used — there is no Node server in production.
 
+Playwright suites that run against the production export use a URL contract:
+`?e2eStub=1` (scripted opponent), `?e2eStub=coach` (scripted reply plus stub
+coaching), or `?e2eStub=fallback` (real Maia, stub analysis). Those query
+values stay in the shipped build so CI can exercise the static `out/` tree.
+
 Browser CI gates currently use Chromium. Firefox/WebKit and physical-tablet
 coverage are nonblocking v1 limits.
 
