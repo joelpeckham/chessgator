@@ -12,6 +12,7 @@ function createFakeClient(
     initDelayMs?: number;
     moveDelayMs?: number;
     failInfer?: boolean;
+    failInferTimes?: number;
     scriptedMoves?: string[];
   } = {},
 ): MaiaClientLike {
@@ -50,6 +51,10 @@ function createFakeClient(
         throw new Error(`Cancelled ${input.requestId}`);
       }
       if (options.failInfer) {
+        throw new Error("inference crashed");
+      }
+      if (options.failInferTimes && options.failInferTimes > 0) {
+        options.failInferTimes -= 1;
         throw new Error("inference crashed");
       }
       const scripted = scriptedMoves[scriptIndex];
@@ -159,6 +164,25 @@ describe("maia session", () => {
     expect(result).toBeNull();
     expect(session.getState().phase).toBe("failed");
     expect(session.getState().message).toMatch(/inference crashed/i);
+    await session.dispose();
+  });
+
+  it("retries a transient inference failure once", async () => {
+    const session = createMaiaSession({
+      createClient: () => createFakeClient({ failInferTimes: 1 }),
+    });
+    await session.start();
+
+    const result = await session.chooseMove({
+      requestId: "r3-retry",
+      gameNodeId: "n3",
+      fen: DEFAULT_POSITION,
+      selfElo: 1500,
+      oppoElo: 1500,
+    });
+
+    expect(result).not.toBeNull();
+    expect(session.getState().phase).toBe("ready");
     await session.dispose();
   });
 

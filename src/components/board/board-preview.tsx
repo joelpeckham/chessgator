@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 
 export type BoardPreviewProps = {
   fen: string;
+  nodeId: string;
   san?: string | null;
   orientation?: "white" | "black";
   className?: string;
@@ -14,12 +15,13 @@ export type BoardPreviewProps = {
 /** Small non-interactive board for timeline overflow popovers. */
 export function BoardPreview({
   fen,
+  nodeId,
   san = null,
   orientation = "white",
   className,
 }: BoardPreviewProps) {
   const options = {
-    id: `preview-${fen.slice(0, 24)}`,
+    id: `preview-${nodeId}`,
     position: fen,
     boardOrientation: orientation,
     allowDragging: false,

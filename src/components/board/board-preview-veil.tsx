@@ -2,15 +2,14 @@
 
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import { veilGridSize } from "@/components/board/veil-grid";
+import { loadBlueNoise } from "@/components/board/blue-noise";
 import {
-  createNoiseTexture,
-  createVeilProgram,
   paintVeil,
-  prefersReducedMotion,
   readCssVarRgb,
   VEIL_DURATION_MS,
-} from "@/components/board/veil-webgl";
+} from "@/components/board/veil-canvas";
+import { veilGridSize } from "@/components/board/veil-grid";
+import { prefersReducedMotion } from "@/lib/prefers-reduced-motion";
 
 function subscribeBoardHost(onChange: () => void): () => void {
   let cancelled = false;
@@ -41,50 +40,15 @@ export function BoardPreviewVeil({ active }: { active: boolean }) {
   );
 
   useEffect(() => {
+    void loadBlueNoise().then(() => kickRef.current());
+  }, []);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !host) return;
 
-    const gl = canvas.getContext("webgl", {
-      alpha: true,
-      antialias: false,
-      premultipliedAlpha: false,
-    });
-    if (!gl || gl.isContextLost()) return;
-
-    const program = createVeilProgram(gl);
-    if (!program) return;
-    const texture = createNoiseTexture(gl);
-
-    const buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array([-1, -1, 3, -1, -1, 3]),
-      gl.STATIC_DRAW,
-    );
-    const positionLoc = gl.getAttribLocation(program, "aPosition");
-    gl.enableVertexAttribArray(positionLoc);
-    gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
-
-    const lightLoc = gl.getUniformLocation(program, "uLight");
-    const darkLoc = gl.getUniformLocation(program, "uDark");
-    const gridLoc = gl.getUniformLocation(program, "uGrid");
-    const noiseSizeLoc = gl.getUniformLocation(program, "uNoiseSize");
-    const noiseLoc = gl.getUniformLocation(program, "uNoise");
-    const progressLoc = gl.getUniformLocation(program, "uProgress");
-    if (
-      !lightLoc ||
-      !darkLoc ||
-      !gridLoc ||
-      !noiseSizeLoc ||
-      !noiseLoc ||
-      !progressLoc
-    ) {
-      gl.deleteBuffer(buffer);
-      gl.deleteTexture(texture);
-      gl.deleteProgram(program);
-      return;
-    }
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
 
     let grid = 0;
     let progress = 0;
@@ -92,7 +56,7 @@ export function BoardPreviewVeil({ active }: { active: boolean }) {
     let to = 0;
     let startTime = 0;
     let raf = 0;
-    let light: [number, number, number] = [1, 1, 1];
+    let light: [number, number, number] = [255, 255, 255];
     let dark: [number, number, number] = [0, 0, 0];
 
     const veilEl = () => canvas.parentElement;
@@ -107,28 +71,13 @@ export function BoardPreviewVeil({ active }: { active: boolean }) {
     };
 
     const paint = (nextProgress: number) => {
-      if (gl.isContextLost()) return;
       const next = veilGridSize(host.getBoundingClientRect().width);
       if (next !== grid) {
         grid = next;
         canvas.width = grid;
         canvas.height = grid;
       }
-      paintVeil(
-        gl,
-        program,
-        texture,
-        lightLoc,
-        darkLoc,
-        gridLoc,
-        noiseSizeLoc,
-        noiseLoc,
-        progressLoc,
-        grid,
-        nextProgress,
-        light,
-        dark,
-      );
+      paintVeil(ctx, grid, nextProgress, light, dark);
     };
 
     const tick = (now: number) => {
@@ -195,24 +144,13 @@ export function BoardPreviewVeil({ active }: { active: boolean }) {
     });
     resize.observe(host);
 
-    const onLost = (event: Event) => {
-      event.preventDefault();
-      canvas.parentElement?.setAttribute("data-ready", "false");
-      setCovering(false);
-    };
-    canvas.addEventListener("webglcontextlost", onLost);
-
     return () => {
       kickRef.current = () => {};
-      canvas.removeEventListener("webglcontextlost", onLost);
       theme.disconnect();
       resize.disconnect();
       if (raf) cancelAnimationFrame(raf);
       canvas.parentElement?.setAttribute("data-ready", "false");
       setCovering(false);
-      gl.deleteBuffer(buffer);
-      gl.deleteTexture(texture);
-      gl.deleteProgram(program);
     };
   }, [host]);
 

@@ -56,6 +56,52 @@ type MascotMode = "idle" | "analyzing" | "feedback" | "hints";
 
 type TeaserKind = "praise" | "nudge" | "idle";
 
+type CoachTeaser = {
+  kind: TeaserKind;
+  text: string;
+  key: string;
+};
+
+function deriveTeaser(args: {
+  insight: TeachingInsight | null;
+  mode: MascotMode;
+  orientationTeaser: string | null;
+  docked: boolean;
+  idlePromptVisible: boolean;
+  idleHintEligible: boolean;
+}): CoachTeaser | null {
+  const quip = args.insight?.quip ?? null;
+  if (args.insight?.nudge && args.mode === "feedback" && quip) {
+    return {
+      kind: "nudge",
+      text: quip,
+      key: `nudge:${args.insight.classification}:${args.insight.explanation}:${quip}`,
+    };
+  }
+  if (
+    (args.insight?.classification === "best" ||
+      args.insight?.classification === "excellent") &&
+    quip
+  ) {
+    return {
+      kind: "praise",
+      text: quip,
+      key: `praise:${args.insight.classification}:${args.insight.explanation}:${quip}`,
+    };
+  }
+  if (args.orientationTeaser && !args.docked) {
+    return {
+      kind: "idle",
+      text: args.orientationTeaser,
+      key: "orientation",
+    };
+  }
+  if (args.idlePromptVisible && args.idleHintEligible) {
+    return { kind: "idle", text: IDLE_HINT_QUIP, key: "idle" };
+  }
+  return null;
+}
+
 function deriveMode(args: {
   analyzing: boolean;
   insight: TeachingInsight | null;
@@ -129,40 +175,22 @@ export function CoachMascot({
 
   const mode = deriveMode({ analyzing, insight, hint });
   const expression = gatorExpressionFor(deriveMood({ mode, insight, mood }));
-  const showNudgeTeaser = Boolean(insight?.nudge) && mode === "feedback";
-  const showPraiseTeaser =
-    insight?.classification === "best" ||
-    insight?.classification === "excellent";
-  const showIdleTeaser = idlePromptVisible && idleHintEligible;
-  const showOrientationTeaser = Boolean(orientationTeaser) && !docked;
-
-  const teaserKind: TeaserKind | null = showNudgeTeaser
-    ? "nudge"
-    : showPraiseTeaser
-      ? "praise"
-      : showOrientationTeaser
-        ? "idle"
-        : showIdleTeaser
-          ? "idle"
-          : null;
-  const teaserText =
-    teaserKind === "idle" && showOrientationTeaser
-      ? orientationTeaser
-      : teaserKind === "idle"
-        ? IDLE_HINT_QUIP
-        : (insight?.quip ?? null);
-  const teaserKey =
-    teaserKind === "idle" && showOrientationTeaser
-      ? "orientation"
-      : teaserKind === "idle"
-        ? "idle"
-        : teaserKind && teaserText
-          ? `${teaserKind}:${insight?.classification ?? ""}:${insight?.explanation ?? ""}:${teaserText}`
-          : null;
-  const teaserVisible =
+  const teaser = deriveTeaser({
+    insight,
+    mode,
+    orientationTeaser,
+    docked,
+    idlePromptVisible,
+    idleHintEligible,
+  });
+  const teaserKey = teaser?.key ?? null;
+  const showOrientationTeaser = teaserKey === "orientation";
+  const shownTeaser =
     !expanded &&
-    Boolean(teaserKind && teaserText) &&
-    (showOrientationTeaser || expiredTeaserKey !== teaserKey);
+    teaser &&
+    (showOrientationTeaser || expiredTeaserKey !== teaserKey)
+      ? teaser
+      : null;
 
   useEffect(() => {
     if (!idleHintEligible) return;
@@ -269,15 +297,15 @@ export function CoachMascot({
         </div>
       ) : null}
 
-      {teaserVisible && teaserKind && teaserText ? (
+      {shownTeaser ? (
         <div
           className="coach-teaser pointer-events-auto"
           data-testid="coach-teaser"
-          data-kind={teaserKind}
-          aria-hidden={teaserKind === "praise" ? true : undefined}
+          data-kind={shownTeaser.kind}
+          aria-hidden={shownTeaser.kind === "praise" ? true : undefined}
         >
-          <p className="text-xs font-medium text-pretty">{teaserText}</p>
-          {teaserKind === "nudge" ? (
+          <p className="text-xs font-medium text-pretty">{shownTeaser.text}</p>
+          {shownTeaser.kind === "nudge" ? (
             <Button
               type="button"
               size="icon-xs"
@@ -300,7 +328,7 @@ export function CoachMascot({
           className={cn(
             "block p-0 leading-none rounded-md outline-offset-2 focus-visible:outline-2 focus-visible:outline-dashed focus-visible:outline-foreground",
             analyzing && "cursor-default opacity-90",
-            insight?.nudge && !expanded && teaserVisible && nudgeMotion,
+            insight?.nudge && !expanded && shownTeaser && nudgeMotion,
           )}
           aria-label={mascotAriaLabel({ expanded, mode, insight })}
           aria-expanded={expanded}

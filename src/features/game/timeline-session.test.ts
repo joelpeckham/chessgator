@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { createInitialTree, playMoveOnTree } from "@/domain/game";
 import {
-  firstDraftUci,
   graphCursorId,
   INITIAL_TIMELINE_SESSION,
   isReviewingNonLive,
+  practiceDraft,
   reduceTimelineSession,
   viewedNodeId,
 } from "@/features/game/timeline-session";
@@ -43,7 +43,7 @@ describe("reduceTimelineSession", () => {
       input: "e2e4",
       humanColor: "w",
     });
-    const practiceId = session.draftTree!.currentNodeId;
+    const practiceId = practiceDraft(session)!.tree.currentNodeId;
     session = reduceTimelineSession(session, {
       type: "preview",
       nodeId: d4Id,
@@ -70,7 +70,7 @@ describe("reduceTimelineSession", () => {
       input: "e2e4",
       humanColor: "w",
     });
-    const practiceId = session.draftTree!.currentNodeId;
+    const practiceId = practiceDraft(session)!.tree.currentNodeId;
     session = reduceTimelineSession(session, {
       type: "selectNode",
       nodeId: d4Id,
@@ -79,7 +79,7 @@ describe("reduceTimelineSession", () => {
     });
     expect(session.mode).toBe("practice");
     expect(session.focusNodeId).toBe(d4Id);
-    expect(session.draftTree?.currentNodeId).toBe(practiceId);
+    expect(practiceDraft(session)?.tree.currentNodeId).toBe(practiceId);
   });
 
   it("returns to live from review", () => {
@@ -104,33 +104,31 @@ describe("reduceTimelineSession", () => {
       humanColor: "w",
     });
     expect(session.mode).toBe("practice");
-    expect(session.practicePhase).toBe("playerTurn");
-    expect(session.draftTree?.currentNodeId).toBe(tree.rootId);
+    expect(practiceDraft(session)?.phase).toBe("playerTurn");
+    expect(practiceDraft(session)?.tree.currentNodeId).toBe(tree.rootId);
 
     session = reduceTimelineSession(session, {
       type: "practiceMove",
       input: "e2e4",
       humanColor: "w",
     });
-    expect(
-      session.draftTree?.nodes[session.draftTree.currentNodeId]?.move?.uci,
-    ).toBe("e2e4");
-    expect(session.practicePhase).toBe("opponentThinking");
-    expect(firstDraftUci(session.draftTree!, tree.rootId)).toBe("e2e4");
+    const afterHuman = practiceDraft(session)!.tree;
+    expect(afterHuman.nodes[afterHuman.currentNodeId]?.move?.uci).toBe("e2e4");
+    expect(practiceDraft(session)?.phase).toBe("opponentThinking");
     expect(tree.currentNodeId).toBe(liveId);
 
     session = reduceTimelineSession(session, {
       type: "practiceOpponentMove",
       input: "e7e5",
     });
-    expect(session.practicePhase).toBe("playerTurn");
-    expect(session.practiceTurns).toEqual([
+    expect(practiceDraft(session)?.phase).toBe("playerTurn");
+    expect(practiceDraft(session)?.turns).toEqual([
       { humanUci: "e2e4", replyUci: "e7e5" },
     ]);
 
     session = reduceTimelineSession(session, { type: "practiceUndo" });
-    expect(session.draftTree?.currentNodeId).toBe(tree.rootId);
-    expect(session.practiceRedo).toEqual([
+    expect(practiceDraft(session)?.tree.currentNodeId).toBe(tree.rootId);
+    expect(practiceDraft(session)?.redo).toEqual([
       { humanUci: "e2e4", replyUci: "e7e5" },
     ]);
 
@@ -138,13 +136,12 @@ describe("reduceTimelineSession", () => {
       type: "practiceRedo",
       humanColor: "w",
     });
-    expect(
-      session.draftTree?.nodes[session.draftTree.currentNodeId]?.move?.uci,
-    ).toBe("e7e5");
+    const afterRedo = practiceDraft(session)!.tree;
+    expect(afterRedo.nodes[afterRedo.currentNodeId]?.move?.uci).toBe("e7e5");
 
     session = reduceTimelineSession(session, { type: "cancelPractice" });
     expect(session.mode).toBe("live");
-    expect(session.draftTree).toBeNull();
+    expect(practiceDraft(session)).toBeNull();
     expect(tree.currentNodeId).toBe(liveId);
   });
 
@@ -162,12 +159,12 @@ describe("reduceTimelineSession", () => {
       input: "e2e4",
       humanColor: "w",
     });
-    expect(session.practicePhase).toBe("opponentThinking");
+    expect(practiceDraft(session)?.phase).toBe("opponentThinking");
     session = reduceTimelineSession(session, { type: "practiceUndo" });
-    expect(session.draftTree?.currentNodeId).toBe(tree.rootId);
-    expect(session.practicePhase).toBe("playerTurn");
-    expect(session.practiceTurns).toEqual([]);
-    expect(session.practiceRedo).toEqual([]);
+    expect(practiceDraft(session)?.tree.currentNodeId).toBe(tree.rootId);
+    expect(practiceDraft(session)?.phase).toBe("playerTurn");
+    expect(practiceDraft(session)?.turns).toEqual([]);
+    expect(practiceDraft(session)?.redo).toEqual([]);
   });
 
   it("rejects opponent-side moves on the practice board", () => {
@@ -184,12 +181,12 @@ describe("reduceTimelineSession", () => {
       input: "e2e4",
       humanColor: "w",
     });
-    const afterHuman = session.draftTree!.currentNodeId;
+    const afterHuman = practiceDraft(session)!.tree.currentNodeId;
     session = reduceTimelineSession(session, {
       type: "practiceMove",
       input: "e7e5",
       humanColor: "w",
     });
-    expect(session.draftTree?.currentNodeId).toBe(afterHuman);
+    expect(practiceDraft(session)?.tree.currentNodeId).toBe(afterHuman);
   });
 });

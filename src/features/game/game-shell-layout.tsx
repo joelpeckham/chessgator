@@ -20,7 +20,6 @@ import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import type { PieceSymbol } from "@/domain/game";
 import type { ShellView } from "@/features/game/shell-view";
-import { getStatusPresentation } from "@/features/game/status-copy";
 import { useLiveAnnouncements } from "@/features/game/use-live-announcements";
 import type { ShellUi } from "@/features/game/use-shell-ui";
 
@@ -43,11 +42,14 @@ export function GameShellLayout({
     onNavMessageExpire: () => ui.queueNav(null),
   });
 
-  const status = getStatusPresentation({
-    ...view.statusInput,
-    coachAnnouncement: announcements.coachAnnouncement,
-    hintAnnouncement: announcements.hintAnnouncement,
-  });
+  const status = {
+    ...view.status,
+    announcement:
+      ui.navMessage ||
+      announcements.coachAnnouncement ||
+      announcements.hintAnnouncement ||
+      view.status.announcement,
+  };
 
   const coach = (
     <CoachMascot
@@ -223,7 +225,6 @@ export function GameShellLayout({
                 isCheck={view.board.isCheck}
                 checkSquare={view.board.checkSquare}
                 highlightSquares={view.board.highlightSquares}
-                ghostSquares={[]}
                 squareLabels={view.board.labels}
                 arrows={view.board.arrows}
                 onMove={ui.applyPlayerMove}

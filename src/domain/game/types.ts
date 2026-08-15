@@ -72,6 +72,8 @@ export type GameNode = {
    * Not part of the committed main line unless promoted via "Try instead".
    */
   isVariation: boolean;
+  /** Set when the node is created; undefined on reconstructed snapshots. */
+  threefold?: boolean;
 };
 
 export type GameTree = {

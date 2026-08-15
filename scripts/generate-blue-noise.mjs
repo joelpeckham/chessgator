@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 /**
  * Offline void-and-cluster blue-noise generator (Ulichney).
- * Writes src/components/board/blue-noise.ts
+ * Writes public/board/blue-noise-128.bin
  *
  * Incremental Gaussian updates keep 128×128 generation practical.
  */
@@ -138,23 +138,6 @@ function generate(size) {
   return out;
 }
 
-function toBase64(bytes) {
-  let binary = "";
-  const chunk = 0x8000;
-  for (let i = 0; i < bytes.length; i += chunk) {
-    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
-  }
-  return btoa(binary);
-}
-
-function wrapBase64(b64, width = 76) {
-  const lines = [];
-  for (let i = 0; i < b64.length; i += width) {
-    lines.push(`  "${b64.slice(i, i + width)}"`);
-  }
-  return `[\n${lines.join(",\n")}\n].join("")`;
-}
-
 const bytes = generate(SIZE);
 const mean = bytes.reduce((s, v) => s + v, 0) / bytes.length;
 const min = bytes.reduce((m, v) => Math.min(m, v), 255);
@@ -165,27 +148,8 @@ console.log(
 
 const dest = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
-  "../src/components/board/blue-noise.ts",
+  "../public/board/blue-noise-128.bin",
 );
 
-const source = `/**
- * 128×128 void-and-cluster blue-noise thresholds (Ulichney).
- * Generated offline by scripts/generate-blue-noise.mjs (seed 0xc0ffee, σ=1.5).
- * Values are 0–255 and tile seamlessly.
- */
-export const BLUE_NOISE_SIZE = ${SIZE};
-
-const BLUE_NOISE_B64 = ${wrapBase64(toBase64(bytes))};
-
-function decodeBlueNoise(b64: string): Uint8Array {
-  const bin = atob(b64);
-  const out = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
-  return out;
-}
-
-export const BLUE_NOISE = decodeBlueNoise(BLUE_NOISE_B64);
-`;
-
-await writeFile(dest, source);
+await writeFile(dest, Buffer.from(bytes));
 console.log(`wrote ${dest}`);

@@ -1,4 +1,5 @@
 import type { Color, Square } from "chess.js";
+import { oppositeColor } from "@/domain/analysis/board-units";
 import { scoreToCpWhite } from "@/domain/analysis/classification";
 import type {
   LineEvent,
@@ -55,18 +56,15 @@ export type ExplanationReason =
       pinned: NamedUnit;
       target: NamedUnit;
       pinner: NamedUnit;
-      likely: boolean;
     }
   | {
       kind: "fork";
       targets: NamedUnit[];
-      likely: boolean;
     }
   | {
       kind: "skewer";
       front: NamedUnit;
       back: NamedUnit;
-      likely: boolean;
     }
   | {
       kind: "discovered_attack";
@@ -184,21 +182,17 @@ export function reasonSeverity(reason: ExplanationReason): number {
     case "blocks_check":
       return 178;
     case "fork":
-      return reason.likely ? 160 : 175;
+      return 175;
     case "skewer":
-      return reason.likely ? 155 : 170;
+      return 170;
     case "kicks_piece":
     case "hits_queen":
       return 168;
     case "pin":
-      if (
-        !reason.likely &&
-        reason.pinned.type === "p" &&
-        reason.target.type === "r"
-      ) {
+      if (reason.pinned.type === "p" && reason.target.type === "r") {
         return 48;
       }
-      return reason.likely ? 150 : 165;
+      return 165;
     case "discovered_check":
       return 160;
     case "zwischenzug":
@@ -293,13 +287,7 @@ export function verifyLikelyTactics(
 ): ExplanationReason[] {
   if (evalDeltaCp >= 80) return reasons;
   return reasons.filter((reason) => {
-    if (
-      (reason.kind === "capture" ||
-        reason.kind === "pin" ||
-        reason.kind === "fork" ||
-        reason.kind === "skewer") &&
-      reason.likely
-    ) {
+    if (reason.kind === "capture" && reason.likely) {
       return evalDeltaCp >= 40;
     }
     return true;
@@ -317,7 +305,7 @@ export function pickProblemReasons(
   const reasons: ExplanationReason[] = [];
   const mover = effects.move.color;
 
-  const mateAgainst = mateInAgainst(extras.evalAfter, mover);
+  const mateAgainst = mateInFor(extras.evalAfter, oppositeColor(mover));
   if (mateAgainst !== null) {
     reasons.push({ kind: "allows_mate", mateIn: mateAgainst });
   }
@@ -481,7 +469,6 @@ export function pickBenefitReasons(
       pinned: pin.pinned,
       target: pin.target,
       pinner: pin.pinner,
-      likely: false,
     });
   }
   for (const pin of effects.relativePinsCreated) {
@@ -490,14 +477,12 @@ export function pickBenefitReasons(
       pinned: pin.pinned,
       target: pin.target,
       pinner: pin.pinner,
-      likely: false,
     });
   }
   for (const fork of effects.forksCreated) {
     reasons.push({
       kind: "fork",
       targets: fork.targets,
-      likely: false,
     });
   }
   for (const skewer of effects.skewersCreated) {
@@ -505,7 +490,6 @@ export function pickBenefitReasons(
       kind: "skewer",
       front: skewer.front,
       back: skewer.back,
-      likely: false,
     });
   }
   for (const discovered of effects.discoveredAttacks) {
@@ -787,18 +771,6 @@ function mateInFor(
   return null;
 }
 
-function mateInAgainst(
-  score: EvaluationScore | undefined,
-  mover: Color,
-): number | null {
-  if (!score) return null;
-  const primary = pickPrimaryScore(score);
-  if (primary.mate === undefined) return null;
-  if (mover === "w" && primary.mate < 0) return Math.abs(primary.mate);
-  if (mover === "b" && primary.mate > 0) return primary.mate;
-  return null;
-}
-
 function contrastKey(reason: ExplanationReason): string {
   switch (reason.kind) {
     case "capture":
@@ -809,22 +781,8 @@ function contrastKey(reason: ExplanationReason): string {
       return `pin:${reason.pinned.type}`;
     case "fork":
       return `fork:${reason.targets.map((t) => t.type).join(",")}`;
-    case "castle":
-      return "castle";
-    case "development":
-      return "development";
-    case "center_control":
-      return "center_control";
-    case "king_safer":
-      return "king_safer";
     case "kicks_piece":
       return `kicks:${reason.piece.type}`;
-    case "hits_queen":
-      return "hits_queen";
-    case "pawn_break":
-      return "pawn_break";
-    case "fianchetto":
-      return "fianchetto";
     default:
       return reason.kind;
   }
@@ -854,11 +812,11 @@ function reasonKey(reason: ExplanationReason): string {
     case "wins_material":
       return `winsmat:${reason.captured.square}:${reason.seeCp}`;
     case "pin":
-      return `pin:${reason.pinned.square}:${reason.likely ? "l" : "i"}`;
+      return `pin:${reason.pinned.square}`;
     case "fork":
-      return `fork:${reason.targets.map((t) => t.square).join(",")}:${reason.likely ? "l" : "i"}`;
+      return `fork:${reason.targets.map((t) => t.square).join(",")}`;
     case "skewer":
-      return `skewer:${reason.front.square}:${reason.likely ? "l" : "i"}`;
+      return `skewer:${reason.front.square}`;
     case "saves_piece":
       return `saves:${reason.piece.square}:${reason.origin ?? ""}`;
     case "kicks_piece":

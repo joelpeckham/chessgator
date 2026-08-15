@@ -70,15 +70,10 @@ const KNIGHT_DELTAS: ReadonlyArray<readonly [number, number]> = [
   [-2, -1],
 ];
 
-export function detectPins(
+function* sliderRayPairs(
   chess: Chess,
-  defender: Color,
-  opts: { relative?: boolean } = {},
-): PinFact[] {
-  const attacker = oppositeColor(defender);
-  const kingSq = findKingOnChess(chess, defender);
-  const pins: PinFact[] = [];
-
+  attacker: Color,
+): Generator<{ slider: NamedUnit; first: NamedUnit; second: NamedUnit }> {
   for (const slider of allPieces(chess)) {
     if (slider.color !== attacker) continue;
     if (slider.type !== "b" && slider.type !== "r" && slider.type !== "q") {
@@ -89,22 +84,35 @@ export function detectPins(
       if (hits.length < 2) continue;
       const [first, second] = hits;
       if (!first || !second) continue;
-      if (first.color !== defender || second.color !== defender) continue;
-
-      const absolute = second.type === "k" && second.square === kingSq;
-      const relative =
-        Boolean(opts.relative) &&
-        !absolute &&
-        PIECE_VALUE_CP[second.type] > PIECE_VALUE_CP[first.type] &&
-        (second.type === "q" || second.type === "r");
-      if (!absolute && !relative) continue;
-      pins.push({
-        pinner: slider,
-        pinned: first,
-        target: second,
-        absolute,
-      });
+      yield { slider, first, second };
     }
+  }
+}
+
+export function detectPins(
+  chess: Chess,
+  defender: Color,
+  opts: { relative?: boolean } = {},
+): PinFact[] {
+  const attacker = oppositeColor(defender);
+  const kingSq = findKingOnChess(chess, defender);
+  const pins: PinFact[] = [];
+
+  for (const { slider, first, second } of sliderRayPairs(chess, attacker)) {
+    if (first.color !== defender || second.color !== defender) continue;
+    const absolute = second.type === "k" && second.square === kingSq;
+    const relative =
+      Boolean(opts.relative) &&
+      !absolute &&
+      PIECE_VALUE_CP[second.type] > PIECE_VALUE_CP[first.type] &&
+      (second.type === "q" || second.type === "r");
+    if (!absolute && !relative) continue;
+    pins.push({
+      pinner: slider,
+      pinned: first,
+      target: second,
+      absolute,
+    });
   }
   return pins;
 }
@@ -112,25 +120,18 @@ export function detectPins(
 export function detectSkewers(chess: Chess, defender: Color): SkewerFact[] {
   const attacker = oppositeColor(defender);
   const skewers: SkewerFact[] = [];
-  for (const slider of allPieces(chess)) {
-    if (slider.color !== attacker) continue;
-    if (slider.type !== "b" && slider.type !== "r" && slider.type !== "q") {
+  for (const { slider, first: front, second: back } of sliderRayPairs(
+    chess,
+    attacker,
+  )) {
+    if (front.color !== defender || back.color !== defender) continue;
+    if (PIECE_VALUE_CP[front.type] <= PIECE_VALUE_CP[back.type]) continue;
+    if (front.type !== "k" && front.type !== "q" && front.type !== "r") {
       continue;
     }
-    for (const dir of SLIDER_DIRS[slider.type]) {
-      const hits = walkRay(chess, slider.square, dir, 2);
-      if (hits.length < 2) continue;
-      const [front, back] = hits;
-      if (!front || !back) continue;
-      if (front.color !== defender || back.color !== defender) continue;
-      if (PIECE_VALUE_CP[front.type] <= PIECE_VALUE_CP[back.type]) continue;
-      if (front.type !== "k" && front.type !== "q" && front.type !== "r") {
-        continue;
-      }
-      const fact: SkewerFact = { skewer: slider, front, back };
-      if (!skewerWinsRear(chess, fact)) continue;
-      skewers.push(fact);
-    }
+    const fact: SkewerFact = { skewer: slider, front, back };
+    if (!skewerWinsRear(chess, fact)) continue;
+    skewers.push(fact);
   }
   return skewers;
 }

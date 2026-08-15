@@ -1,10 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { namedAttackers, namedUnitAt } from "@/domain/analysis/board-units";
+import { detectForks, detectPins } from "@/domain/analysis/motifs";
 import {
   collectMoveEffects,
-  detectForks,
-  detectPins,
-  namedAttackers,
-  namedUnitAt,
   walkLineEvents,
 } from "@/domain/analysis/move-effects";
 import { createChess, tryApplyMove } from "@/domain/game/rules";

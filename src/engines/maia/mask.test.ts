@@ -1,19 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_POSITION, getLegalMoves } from "@/domain/game/rules";
 import { fromVocabUci } from "@/engines/maia/encode";
-import {
-  applyLegalMask,
-  countLegal,
-  legalMovesMask,
-} from "@/engines/maia/mask";
+import { applyLegalMask, legalMovesMask } from "@/engines/maia/mask";
 import { indexToMove, MOVE_VOCAB_SIZE } from "@/engines/maia/vocabulary";
 
 describe("Maia legal masking", () => {
   it("masks exactly the chess.js legal move count at startpos", () => {
     const mask = legalMovesMask(DEFAULT_POSITION);
     expect(mask).toHaveLength(MOVE_VOCAB_SIZE);
-    expect(countLegal(mask)).toBe(getLegalMoves(DEFAULT_POSITION).length);
-    expect(countLegal(mask)).toBe(20);
+    const legalCount = mask.reduce((n, bit) => n + bit, 0);
+    expect(legalCount).toBe(getLegalMoves(DEFAULT_POSITION).length);
+    expect(legalCount).toBe(20);
   });
 
   it("never marks illegal vocabulary entries", () => {

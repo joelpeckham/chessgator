@@ -1,12 +1,25 @@
+function errorEventMessage(event: Event): string | undefined {
+  if (
+    "message" in event &&
+    typeof event.message === "string" &&
+    event.message
+  ) {
+    return event.message;
+  }
+  return undefined;
+}
+
+export type WorkerEventType = "message" | "error" | "messageerror";
+
 export type WorkerLike = {
   postMessage(message: unknown): void;
   addEventListener(
-    type: "message",
-    listener: (event: MessageEvent<unknown>) => void,
+    type: WorkerEventType,
+    listener: (event: Event) => void,
   ): void;
   removeEventListener(
-    type: "message",
-    listener: (event: MessageEvent<unknown>) => void,
+    type: WorkerEventType,
+    listener: (event: Event) => void,
   ): void;
   terminate(): void;
 };
@@ -22,11 +35,28 @@ export function createBrowserWorkerTransport<TReq, TRes>(
   isResponse: (data: unknown) => data is TRes,
 ): WorkerTransport<TReq, TRes> {
   const listeners = new Set<(message: TRes) => void>();
-  const onMessage = (event: MessageEvent<unknown>) => {
-    if (!isResponse(event.data)) return;
-    for (const listener of listeners) listener(event.data);
+
+  const emit = (data: unknown): void => {
+    if (!isResponse(data)) return;
+    for (const listener of listeners) listener(data);
   };
+
+  const onMessage = (event: Event) => {
+    emit((event as MessageEvent<unknown>).data);
+  };
+
+  const onFatal = (event: Event) => {
+    const message = errorEventMessage(event) ?? "Worker crashed";
+    emit({
+      type: "error",
+      requestId: "worker",
+      message,
+    });
+  };
+
   worker.addEventListener("message", onMessage);
+  worker.addEventListener("error", onFatal);
+  worker.addEventListener("messageerror", onFatal);
   return {
     postMessage(message) {
       worker.postMessage(message);
@@ -39,6 +69,8 @@ export function createBrowserWorkerTransport<TReq, TRes>(
     },
     terminate() {
       worker.removeEventListener("message", onMessage);
+      worker.removeEventListener("error", onFatal);
+      worker.removeEventListener("messageerror", onFatal);
       listeners.clear();
       worker.terminate();
     },

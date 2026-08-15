@@ -310,14 +310,21 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   },
 
   persist: async (repository = defaultRepository()) => {
-    const state = get();
-    const snapshot: SavedGameV2 = toPersistedGame(state.tree, {
-      maiaElo: state.preferences.maiaElo,
-      humanColor: state.humanColor,
-      resigned: state.session.terminalReason === "resignation",
-      lessons: lessonsToSaved(state.lessons),
-    });
-    await repository.save(snapshot);
+    try {
+      const state = get();
+      const snapshot: SavedGameV2 = toPersistedGame(state.tree, {
+        maiaElo: state.preferences.maiaElo,
+        humanColor: state.humanColor,
+        resigned: state.session.terminalReason === "resignation",
+        lessons: lessonsToSaved(state.lessons),
+      });
+      await repository.save(snapshot);
+    } catch (err) {
+      set({
+        lastError:
+          err instanceof Error ? err.message : "Could not save the game",
+      });
+    }
   },
 
   clearPersisted: async (repository = defaultRepository()) => {

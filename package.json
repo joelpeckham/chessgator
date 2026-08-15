@@ -19,12 +19,12 @@
     "test": "vitest run",
     "test:stockfish": "bun run prepare:assets && bun tests/stockfish/build-smoke.mjs && bunx playwright test -c tests/stockfish/playwright.config.ts",
     "test:maia": "bun run prepare:assets && bun tests/maia/build-smoke.mjs && bunx playwright test -c tests/maia/playwright.config.ts",
-    "test:game": "bun run build && bunx playwright test -c tests/game/playwright.config.ts",
-    "test:coaching": "bun run build && bunx playwright test -c tests/coaching/playwright.config.ts",
-    "test:time-travel": "bun run build && bunx playwright test -c tests/time-travel/playwright.config.ts",
-    "test:persistence": "bun run build && bunx playwright test -c tests/persistence/playwright.config.ts",
-    "test:accessibility": "bun run build && bunx playwright test -c tests/accessibility/playwright.config.ts",
-    "test:composed": "bun run build && bunx playwright test -c tests/composed/playwright.config.ts",
+    "test:game": "NEXT_PUBLIC_E2E=1 bun run build && bunx playwright test -c tests/game/playwright.config.ts",
+    "test:coaching": "NEXT_PUBLIC_E2E=1 bun run build && bunx playwright test -c tests/coaching/playwright.config.ts",
+    "test:time-travel": "NEXT_PUBLIC_E2E=1 bun run build && bunx playwright test -c tests/time-travel/playwright.config.ts",
+    "test:persistence": "NEXT_PUBLIC_E2E=1 bun run build && bunx playwright test -c tests/persistence/playwright.config.ts",
+    "test:accessibility": "NEXT_PUBLIC_E2E=1 bun run build && bunx playwright test -c tests/accessibility/playwright.config.ts",
+    "test:composed": "NEXT_PUBLIC_E2E=1 bun run build && bunx playwright test -c tests/composed/playwright.config.ts",
     "test:static-host": "REQUIRE_STATIC_OUT=1 vitest run tests/static-host/cache-config.test.ts"
   },
   "dependencies": {

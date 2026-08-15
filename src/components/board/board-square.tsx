@@ -3,6 +3,37 @@
 import { type KeyboardEvent, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
+export type SquareState = {
+  isSelected: boolean;
+  isTarget: boolean;
+  lastMove: "from" | "to" | null;
+  inCheck: boolean;
+  isHint: boolean;
+};
+
+export function squareState(args: {
+  square: string;
+  selectedSquare: string | null;
+  destinations: ReadonlySet<string>;
+  lastMove: { from: string; to: string } | null;
+  isCheck: boolean;
+  checkSquare: string | null;
+  highlightSquares: ReadonlySet<string>;
+}): SquareState {
+  return {
+    isSelected: args.selectedSquare === args.square,
+    isTarget: args.destinations.has(args.square),
+    lastMove:
+      args.lastMove?.from === args.square
+        ? "from"
+        : args.lastMove?.to === args.square
+          ? "to"
+          : null,
+    inCheck: args.isCheck && args.checkSquare === args.square,
+    isHint: args.highlightSquares.has(args.square),
+  };
+}
+
 function describeSquare(args: {
   square: string;
   isSelected: boolean;
@@ -10,7 +41,6 @@ function describeSquare(args: {
   isLast: boolean;
   inCheck: boolean;
   isHint: boolean;
-  isGhost: boolean;
   annotation: string | null;
 }): string {
   const flags: string[] = [];
@@ -19,7 +49,6 @@ function describeSquare(args: {
   if (args.isLast) flags.push("last move");
   if (args.inCheck) flags.push("check");
   if (args.isHint) flags.push("hint focus");
-  if (args.isGhost) flags.push("variation ghost");
   if (args.annotation) flags.push(args.annotation);
   return flags.length > 0 ? `${args.square}, ${flags.join(", ")}` : args.square;
 }
@@ -34,7 +63,6 @@ export function BoardSquare({
   isCheck,
   checkSquare,
   highlightSquares,
-  ghostSquares,
   annotation,
   onActivate,
   onClearSelection,
@@ -48,18 +76,26 @@ export function BoardSquare({
   isCheck: boolean;
   checkSquare: string | null;
   highlightSquares: ReadonlySet<string>;
-  ghostSquares: ReadonlySet<string>;
   annotation: string | null;
   onActivate: (square: string) => void;
   onClearSelection: () => void;
 }) {
-  const isSelected = selectedSquare === square;
-  const isTarget = destinations.has(square);
-  const isLast =
-    lastMove != null && (lastMove.from === square || lastMove.to === square);
-  const inCheck = isCheck && checkSquare === square;
-  const isHint = highlightSquares.has(square);
-  const isGhost = ghostSquares.has(square);
+  const {
+    isSelected,
+    isTarget,
+    lastMove: lastMoveRole,
+    inCheck,
+    isHint,
+  } = squareState({
+    square,
+    selectedSquare,
+    destinations,
+    lastMove,
+    isCheck,
+    checkSquare,
+    highlightSquares,
+  });
+  const isLast = lastMoveRole != null;
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (!interactive) return;
@@ -83,7 +119,6 @@ export function BoardSquare({
         isLast,
         inCheck,
         isHint,
-        isGhost,
         annotation,
       })}
       aria-pressed={isSelected}
@@ -91,7 +126,8 @@ export function BoardSquare({
       data-selected={isSelected ? "true" : "false"}
       data-legal-target={isTarget ? "true" : "false"}
       data-hint-square={isHint ? "true" : "false"}
-      data-ghost-square={isGhost ? "true" : "false"}
+      data-last-move={lastMoveRole ?? "false"}
+      data-check={inCheck ? "true" : "false"}
       className={cn(
         "relative h-full w-full outline-none",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",

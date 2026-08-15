@@ -85,6 +85,40 @@
   outline-offset: 2px;
 }
 
+[data-board-square="true"][data-last-move="from"] {
+  background: color-mix(in oklch, var(--primary) 18%, transparent);
+  outline: 2px solid color-mix(in oklch, var(--primary) 55%, transparent);
+  outline-offset: -2px;
+}
+
+[data-board-square="true"][data-last-move="to"] {
+  background: color-mix(in oklch, var(--primary) 28%, transparent);
+  outline: 2px solid color-mix(in oklch, var(--primary) 70%, transparent);
+  outline-offset: -2px;
+}
+
+[data-board-square="true"][data-hint-square="true"] {
+  outline: 2px dashed var(--foreground);
+  outline-offset: -3px;
+  background: color-mix(in oklch, var(--accent) 22%, transparent);
+}
+
+[data-board-square="true"][data-selected="true"] {
+  outline: 2px dashed var(--foreground);
+  outline-offset: -4px;
+}
+
+[data-board-square="true"][data-legal-target="true"] {
+  outline: 2px solid color-mix(in oklch, var(--foreground) 35%, transparent);
+  outline-offset: -2px;
+}
+
+[data-board-square="true"][data-check="true"] {
+  background: color-mix(in oklch, var(--destructive) 35%, transparent);
+  outline: 2px solid var(--destructive);
+  outline-offset: -2px;
+}
+
 /* Clippy-style coach balloon + teaser (out of document flow). */
 .coach-balloon {
   position: absolute;

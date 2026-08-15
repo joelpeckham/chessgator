@@ -161,28 +161,6 @@ export function projectOpeningPlies(
   return plies;
 }
 
-/**
- * Coach alternate at this origin, only when it differs from the live human ply.
- */
-export function suggestedAlternateUci(args: {
-  tree: GameTree;
-  originId: string;
-  humanColor: Color;
-  lessons: Readonly<Record<string, TeachingInsight>>;
-}): string | null {
-  const origin = getNode(args.tree, args.originId);
-  if (!origin) return null;
-  for (const childId of origin.childIds) {
-    const child = getNode(args.tree, childId);
-    if (child?.move?.color !== args.humanColor) continue;
-    const suggested = args.lessons[child.id]?.suggestedMoveUci;
-    if (suggested && suggested.toLowerCase() !== child.move.uci.toLowerCase()) {
-      return suggested;
-    }
-  }
-  return null;
-}
-
 export function lastHumanDecisionId(
   tree: GameTree,
   humanColor: Color,
@@ -663,13 +641,4 @@ export function buildDecisionGraph(args: {
 
   const lastColumn = nodes.reduce((max, node) => Math.max(max, node.column), 0);
   return { nodes, edges, columns: lastColumn + 1 };
-}
-
-export function graphHasCursor(
-  graph: DecisionGraph,
-  cursorId: string,
-): boolean {
-  return graph.nodes.some(
-    (node) => node.id === cursorId && node.kind !== "overflow",
-  );
 }

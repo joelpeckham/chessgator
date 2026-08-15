@@ -1,6 +1,7 @@
 import { BOOTSTRAP_ROOT_ID, createNodeId } from "@/domain/game/id";
 import {
   DEFAULT_POSITION,
+  getStatus,
   getStatusAlongPath,
   tryApplyMove,
 } from "@/domain/game/rules";
@@ -31,6 +32,7 @@ function createTreeWithRootId(fen: string, rootId: string): GameTree {
     move: null,
     ply: 0,
     isVariation: false,
+    threefold: false,
   };
   return {
     nodes: { [rootId]: root },
@@ -74,6 +76,22 @@ export function getMoveHistory(tree: GameTree, nodeId: string): GameMove[] {
 }
 
 export function getStatusAtNode(tree: GameTree, nodeId: string): GameStatus {
+  const node = tree.nodes[nodeId];
+  if (!node) {
+    throw new Error(`Missing node: ${nodeId}`);
+  }
+  if (node.threefold !== undefined) {
+    const status = getStatus(node.fen);
+    if (!node.threefold) return status;
+    return {
+      ...status,
+      isThreefoldRepetition: true,
+      isDraw: true,
+      isGameOver: true,
+      result: "draw",
+      reason: status.reason === "ongoing" ? "threefold" : status.reason,
+    };
+  }
   const root = tree.nodes[tree.rootId];
   if (!root) {
     throw new Error(`Missing root node: ${tree.rootId}`);
@@ -165,6 +183,7 @@ export function playMoveOnTree(
     move: applied.move,
     ply: fromNode.ply + 1,
     isVariation: asVariation,
+    threefold: status.isThreefoldRepetition,
   };
 
   const nodes = cloneNodes(tree.nodes);

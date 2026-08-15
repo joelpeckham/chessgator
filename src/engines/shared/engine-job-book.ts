@@ -16,6 +16,9 @@ export type EngineJobBookHooks<TResult, TJob extends EngineJob<TResult>> = {
   cancelMessage: (requestId: string) => string;
   timeoutMessage: (job: TJob) => string;
   staleMessage: (gameNodeId: string, current: string) => string;
+  /** How long to wait for a worker cancel/result ack before freeing the slot. */
+  cancelAckTimeoutMs?: number;
+  onUnresponsive?: (requestId: string) => void;
 };
 
 /**
@@ -29,6 +32,7 @@ export class EngineJobBook<TResult, TJob extends EngineJob<TResult>> {
   generation = 0;
 
   private readonly timeoutHandles = new Map<string, unknown>();
+  private readonly cancelAckHandles = new Map<string, unknown>();
 
   constructor(private readonly hooks: EngineJobBookHooks<TResult, TJob>) {}
 
@@ -50,15 +54,7 @@ export class EngineJobBook<TResult, TJob extends EngineJob<TResult>> {
   cancel(requestId: string): void {
     const job = this.pending.get(requestId);
     if (!job || job.cancelled) return;
-    job.cancelled = true;
-    this.hooks.removeFromQueue(requestId);
-    const isActive = this.active?.requestId === requestId;
-    if (isActive) {
-      this.hooks.postCancel(requestId);
-    }
-    this.fail(job, new Error(this.hooks.cancelMessage(requestId)), {
-      releaseActive: !isActive,
-    });
+    this.abort(job, new Error(this.hooks.cancelMessage(requestId)));
   }
 
   cancelAll(): void {
@@ -132,26 +128,49 @@ export class EngineJobBook<TResult, TJob extends EngineJob<TResult>> {
   }
 
   releaseActive(requestId: string): void {
+    this.clearCancelAck(requestId);
     if (this.active?.requestId === requestId) {
       this.active = null;
       this.hooks.afterReleaseActive();
     }
   }
 
+  private abort(job: TJob, error: Error): void {
+    job.cancelled = true;
+    this.hooks.removeFromQueue(job.requestId);
+    const isActive = this.active?.requestId === job.requestId;
+    if (isActive) {
+      this.hooks.postCancel(job.requestId);
+      this.armCancelAck(job.requestId);
+    }
+    this.fail(job, error, { releaseActive: !isActive });
+  }
+
   private armTimeout(job: TJob): void {
     const handle = this.hooks.setTimer(() => {
       if (!this.pending.has(job.requestId) || job.cancelled) return;
-      job.cancelled = true;
-      this.hooks.removeFromQueue(job.requestId);
-      const isActive = this.active?.requestId === job.requestId;
-      if (isActive) {
-        this.hooks.postCancel(job.requestId);
-      }
-      this.fail(job, new Error(this.hooks.timeoutMessage(job)), {
-        releaseActive: !isActive,
-      });
+      this.abort(job, new Error(this.hooks.timeoutMessage(job)));
     }, job.timeoutMs);
     this.timeoutHandles.set(job.requestId, handle);
+  }
+
+  private armCancelAck(requestId: string): void {
+    this.clearCancelAck(requestId);
+    const timeoutMs = this.hooks.cancelAckTimeoutMs ?? 5_000;
+    const handle = this.hooks.setTimer(() => {
+      this.cancelAckHandles.delete(requestId);
+      if (this.active?.requestId !== requestId) return;
+      this.releaseActive(requestId);
+      this.hooks.onUnresponsive?.(requestId);
+    }, timeoutMs);
+    this.cancelAckHandles.set(requestId, handle);
+  }
+
+  private clearCancelAck(requestId: string): void {
+    const handle = this.cancelAckHandles.get(requestId);
+    if (handle === undefined) return;
+    this.hooks.clearTimer(handle);
+    this.cancelAckHandles.delete(requestId);
   }
 
   private clearTimeout(requestId: string): void {

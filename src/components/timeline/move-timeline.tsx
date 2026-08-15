@@ -13,6 +13,7 @@ import {
   TIMELINE_GRAPH_HEIGHT_PX,
 } from "@/components/timeline/timeline-layout";
 import { Button } from "@/components/ui/button";
+import { prefersReducedMotion } from "@/lib/prefers-reduced-motion";
 import { cn } from "@/lib/utils";
 
 export type TimelineSelectMeta = {
@@ -104,9 +105,7 @@ export function MoveTimeline({
     const selected = scrollRef.current?.querySelector<HTMLElement>(
       `[data-node-id="${CSS.escape(focusedNodeId)}"]`,
     );
-    const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
+    const reduceMotion = prefersReducedMotion();
     selected?.scrollIntoView({
       block: "nearest",
       inline: "center",

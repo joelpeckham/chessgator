@@ -6,7 +6,6 @@ export type GatorExpression =
   | "sad"
   | "mischievous"
   | "shocked"
-  | "angry"
   | "confused"
   | "scared";
 

@@ -8,7 +8,11 @@ import type {
   AnalysisEvidence,
   EvaluationScore,
 } from "@/domain/analysis/types";
-import { createChess, tryApplyMove } from "@/domain/game/rules";
+import {
+  createChess,
+  sideToMoveFromFen,
+  tryApplyMove,
+} from "@/domain/game/rules";
 import { selectTeachingInsight } from "@/domain/teaching/select-insight";
 import type { TeachingInsight } from "@/domain/teaching/types";
 
@@ -74,7 +78,7 @@ export function puzzleToScenarios(puzzle: {
   if (!tryApplyMove(puzzle.fen, solution)) return [];
   const fen = puzzle.fen;
   const mate = puzzle.themes.some((theme) => /mate/i.test(theme));
-  const side = fen.split(" ")[1] === "b" ? "b" : "w";
+  const side = sideToMoveFromFen(fen);
   const win: EvaluationScore = mate
     ? { mate: side === "w" ? 2 : -2 }
     : { cp: side === "w" ? 280 : -280 };
@@ -143,7 +147,7 @@ function evidence(
     requestId: "dump",
     gameNodeId: "dump",
     fen,
-    sideToMove: fen.split(" ")[1] === "b" ? "b" : "w",
+    sideToMove: sideToMoveFromFen(fen),
     score: partial.score,
     bestMoveUci: partial.bestMoveUci,
     lines: partial.lines,

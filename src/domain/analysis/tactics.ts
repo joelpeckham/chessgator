@@ -1,6 +1,7 @@
 import { Chess, type Color, type Square } from "chess.js";
+import type { MoveEffects } from "@/domain/analysis/move-effects";
 import { isHangingBySee } from "@/domain/analysis/see";
-import { createChess, findKingOnChess } from "@/domain/game";
+import { findKingOnChess } from "@/domain/game";
 import type { GameMove } from "@/domain/game/types";
 
 /**
@@ -33,52 +34,28 @@ export type TacticalFactsInput = {
   fenAfter: string;
 };
 
-export function collectTacticalFacts(input: TacticalFactsInput): TacticalFacts {
-  const { fenBefore, move, fenAfter } = input;
-  const before = createChess(fenBefore);
-  const after = createChess(fenAfter);
-  const mover = move.color;
-
-  const gaveCheck = after.isCheck();
-  const isCapture = Boolean(move.captured);
-  const isPromotion = Boolean(move.promotion);
-
-  const hangingBefore = hangingSquaresFor(before, mover);
-  const hangingAfter = hangingSquaresFor(after, mover);
-
-  const movedPieceHanging = hangingAfter.includes(move.to);
-  const leftPieceHanging = hangingAfter.some(
-    (sq) => sq !== move.to && !hangingBefore.includes(sq),
-  );
-
-  let capturedHangingPiece = false;
-  if (isCapture && hangingBefore.includes(move.to)) {
-    capturedHangingPiece = true;
-  }
-
-  // Threat ignored: a hanging own piece from before is still hanging after,
-  // and we did not capture with this move on a threatening square / resolve it.
-  const ignoredThreat = hangingBefore.some(
-    (sq) => sq !== move.from && hangingAfter.includes(sq),
-  );
-
-  const developedPiece = isDevelopingMove(move);
-  const castlingRightsLost = lostCastlingRights(before, after, mover);
-  const kingMoreExposed =
-    kingExposure(after, mover) > kingExposure(before, mover);
-
+export function tacticalFactsFromEffects(effects: MoveEffects): TacticalFacts {
+  const hangingSquares = [
+    ...(effects.movedPieceHanging
+      ? [effects.movedPieceHanging.piece.square]
+      : []),
+    ...effects.newlyHanging.map((unit) => unit.piece.square),
+    ...effects.ignoredThreats.map((unit) => unit.piece.square),
+  ];
   return {
-    gaveCheck,
-    isCapture,
-    isPromotion,
-    movedPieceHanging,
-    leftPieceHanging,
-    capturedHangingPiece,
-    ignoredThreat,
-    developedPiece,
-    castlingRightsLost,
-    kingMoreExposed,
-    hangingSquares: hangingAfter,
+    gaveCheck: effects.gaveCheck,
+    isCapture: Boolean(effects.captured),
+    isPromotion: Boolean(effects.move.promotion),
+    movedPieceHanging: effects.movedPieceHanging != null,
+    leftPieceHanging: effects.newlyHanging.length > 0,
+    capturedHangingPiece: Boolean(
+      effects.captured && effects.capturedSeeCp > 0,
+    ),
+    ignoredThreat: effects.ignoredThreats.length > 0,
+    developedPiece: effects.developedPiece,
+    castlingRightsLost: effects.castlingRightsLost,
+    kingMoreExposed: effects.kingMoreExposed,
+    hangingSquares: [...new Set(hangingSquares)],
   };
 }
 
@@ -110,26 +87,6 @@ export function isHangingOn(
   owner: Color,
 ): boolean {
   return isHangingBySee(chess, square, owner);
-}
-
-function isDevelopingMove(move: GameMove): boolean {
-  if (move.piece === "p" || move.piece === "k") return false;
-  const backRank = move.color === "w" ? "1" : "8";
-  if (!move.from.endsWith(backRank)) return false;
-  // Knights/bishops/queen/rook leaving the home rank.
-  return !move.to.endsWith(backRank);
-}
-
-function lostCastlingRights(
-  before: Chess,
-  after: Chess,
-  mover: Color,
-): boolean {
-  const b = before.getCastlingRights(mover);
-  const a = after.getCastlingRights(mover);
-  const beforeAny = b.k || b.q;
-  const afterAny = a.k || a.q;
-  return beforeAny && !afterAny;
 }
 
 /** Count enemy attacks on squares adjacent to the king (including the king sq). */

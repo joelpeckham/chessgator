@@ -1,8 +1,7 @@
-import type { MoveAnalysisEvidence, ProjectedLine } from "@/domain/analysis";
+import type { ProjectedLine } from "@/domain/analysis";
 import { projectUciLine } from "@/domain/analysis";
 import {
   type Color,
-  createVariationExplorer,
   type GameMove,
   type GameNode,
   type GameTree,
@@ -15,36 +14,11 @@ import {
   playMoveOnTree,
   type SessionMode,
   sessionModeForTurn,
-  tryInsteadFromExplorer,
 } from "@/domain/game";
 import type { TeachingInsight } from "@/domain/teaching";
 import type { CoachingController } from "@/features/game/coaching-controller";
 import { useGameStore } from "@/features/game/game-store";
 import type { MaiaSession } from "@/features/game/maia-session";
-
-/**
- * Commit the coach's suggested first ply as a real alternate, pruning ghost
- * siblings under the origin. Uses the variation explorer so Try instead never
- * leaves exploration debris on the tree.
- */
-export function commitTryInstead(args: {
-  tree: GameTree;
-  originNodeId: string;
-  lineUci: readonly string[];
-  suggestedMoveUci: string;
-}): { tree: GameTree; node: GameNode } | null {
-  const explorerLine =
-    args.lineUci.length > 0 ? args.lineUci : [args.suggestedMoveUci];
-  const started =
-    createVariationExplorer(args.tree, args.originNodeId, explorerLine) ??
-    createVariationExplorer(args.tree, args.originNodeId, [
-      args.suggestedMoveUci,
-    ]);
-  if (!started) return null;
-  return tryInsteadFromExplorer(started.tree, started.explorer, {
-    commitUci: args.suggestedMoveUci,
-  });
-}
 
 export function buildTutorLine(
   tree: GameTree,
@@ -245,41 +219,6 @@ export type TrySuggestedResult =
       needsOpponent: boolean;
       message: string;
     };
-
-export function trySuggestedMove(args: {
-  tree: GameTree;
-  insight: TeachingInsight | null;
-  evidence: MoveAnalysisEvidence | null;
-}): TrySuggestedResult {
-  if (!args.insight?.suggestedMoveUci || !args.evidence) {
-    return { ok: false, message: "Could not play that try-instead move" };
-  }
-
-  const analyzed = getNode(args.tree, args.evidence.gameNodeId);
-  const originId = analyzed?.parentId ?? args.tree.rootId;
-  const played = commitTryInstead({
-    tree: args.tree,
-    originNodeId: originId,
-    lineUci: args.insight.lineUci,
-    suggestedMoveUci: args.insight.suggestedMoveUci,
-  });
-  if (!played) {
-    return { ok: false, message: "Could not play that try-instead move" };
-  }
-
-  const humanColor = useGameStore.getState().humanColor;
-  const status = getStatusAtNode(played.tree, played.tree.currentNodeId);
-  const mode: SessionMode = status.isGameOver
-    ? "gameOver"
-    : sessionModeForTurn(status.turn, humanColor);
-  return {
-    ok: true,
-    tree: played.tree,
-    mode,
-    needsOpponent: !status.isGameOver && !isHumanTurn(status.turn, humanColor),
-    message: `Trying ${played.node.move?.san ?? "alternate"} instead — prior line kept as a branch`,
-  };
-}
 
 export function firstHumanUciFromDraft(args: {
   draft: GameTree;

@@ -1,4 +1,7 @@
-import type { MoveClassification } from "@/domain/analysis/classification";
+import {
+  isTeachable,
+  type MoveClassification,
+} from "@/domain/analysis/classification";
 import type {
   EvalFrame,
   MoveMargin,
@@ -123,10 +126,7 @@ function verdictClause(ctx: TemplateContext): string {
   if (ctx.concept === "solid_move") {
     return `is a solid ${CLASSIFICATION_LABEL[ctx.classification].toLowerCase()} move`;
   }
-  const teachable =
-    ctx.classification === "inaccuracy" ||
-    ctx.classification === "mistake" ||
-    ctx.classification === "blunder";
+  const teachable = isTeachable(ctx.classification);
   if (!teachable && ctx.evalFrame === "still_winning") {
     return "keeps you winning";
   }

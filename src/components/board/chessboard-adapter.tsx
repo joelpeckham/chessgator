@@ -1,13 +1,12 @@
 "use client";
 
-import { type ReactNode, useState, useSyncExternalStore } from "react";
+import { type ReactNode, useState } from "react";
 import { Chessboard, type SquareHandlerArgs } from "react-chessboard";
 import {
   type BoardArrow,
   dedupeBoardArrows,
 } from "@/components/board/arrow-utils";
 import { BoardSquare } from "@/components/board/board-square";
-import { buildSquareStyles } from "@/components/board/board-square-styles";
 import { boardSurfaceOptions } from "@/components/board/board-surface";
 import {
   type BoardMove,
@@ -16,6 +15,7 @@ import {
   moveRequiresPromotion,
 } from "@/components/board/move-utils";
 import type { PieceSymbol } from "@/domain/game";
+import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
 import { cn } from "@/lib/utils";
 
 export type { BoardArrow } from "@/components/board/arrow-utils";
@@ -34,8 +34,6 @@ export type ChessboardAdapterProps = {
   checkSquare?: string | null;
   /** Coaching / hint highlights (paired with labels — not color-only). */
   highlightSquares?: string[];
-  /** Ghost / variation squares (pattern + label, not color-only). */
-  ghostSquares?: string[];
   squareLabels?: BoardSquareLabel[];
   arrows?: BoardArrow[];
   onMove: (move: BoardMove) => boolean;
@@ -43,24 +41,6 @@ export type ChessboardAdapterProps = {
   className?: string;
   id?: string;
 };
-
-function subscribeReducedMotion(onChange: () => void): () => void {
-  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-  mq.addEventListener("change", onChange);
-  return () => mq.removeEventListener("change", onChange);
-}
-
-function getReducedMotion(): boolean {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
-
-function usePrefersReducedMotion(): boolean {
-  return useSyncExternalStore(
-    subscribeReducedMotion,
-    getReducedMotion,
-    () => false,
-  );
-}
 
 /**
  * Thin adapter around react-chessboard v5 so game logic never depends on
@@ -74,7 +54,6 @@ export function ChessboardAdapter({
   isCheck = false,
   checkSquare = null,
   highlightSquares = [],
-  ghostSquares = [],
   squareLabels = [],
   arrows = [],
   onMove,
@@ -93,7 +72,6 @@ export function ChessboardAdapter({
     squareLabels.map((entry) => [entry.square, entry.text] as const),
   );
   const highlightSet = new Set(highlightSquares);
-  const ghostSet = new Set(ghostSquares);
   const destinations =
     selectedSquare && interactive
       ? new Set(legalDestinations(fen, selectedSquare))
@@ -103,15 +81,6 @@ export function ChessboardAdapter({
     endSquare: arrow.to,
     color: arrow.color ?? "var(--foreground)",
   }));
-  const squareStyles = buildSquareStyles({
-    lastMove,
-    highlightSquares: highlightSet,
-    ghostSquares: ghostSet,
-    selectedSquare,
-    destinations,
-    isCheck,
-    checkSquare,
-  });
 
   function attemptMove(
     from: string,
@@ -168,7 +137,6 @@ export function ChessboardAdapter({
     arrows: boardArrows,
     showNotation: true,
     ...boardSurfaceOptions({ transparent: true }),
-    squareStyles,
     canDragPiece: ({ square }: { square: string | null }) => {
       if (!interactive || !square) return false;
       return legalDestinations(fen, square).length > 0;
@@ -202,7 +170,6 @@ export function ChessboardAdapter({
         isCheck={isCheck}
         checkSquare={checkSquare}
         highlightSquares={highlightSet}
-        ghostSquares={ghostSet}
         annotation={labelBySquare.get(square) ?? null}
         onActivate={activateSquare}
         onClearSelection={() => setSelection({ fen, square: null })}

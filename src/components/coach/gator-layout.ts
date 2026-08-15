@@ -11,7 +11,6 @@ export const GATOR_ART: Record<
   sad: { width: 200.917, height: 291.95 },
   mischievous: { width: 212.842, height: 290.435 },
   shocked: { width: 214.027, height: 307.993 },
-  angry: { width: 209.005, height: 301.419 },
   confused: { width: 261.119, height: 301.264 },
   scared: { width: 222.396, height: 307.113 },
 };
@@ -62,7 +61,6 @@ export const GATOR_CLAWS: Record<GatorExpression, GatorClawsConfig> = {
   sad: BOTH_HANDS,
   mischievous: { hands: "both", offsetX: 0 },
   shocked: BOTH_HANDS,
-  angry: BOTH_HANDS,
   confused: { hands: "right", offsetX: 17 },
   scared: BOTH_HANDS,
 };

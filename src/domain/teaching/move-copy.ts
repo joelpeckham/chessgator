@@ -2,6 +2,7 @@ import type { Color, PieceSymbol } from "chess.js";
 import {
   materialLabel,
   type NamedUnit,
+  PIECE_NAME,
   PIECE_VALUE_CP,
 } from "@/domain/analysis/board-units";
 import type { ExplanationReason } from "@/domain/analysis/explanation-reasons";
@@ -9,15 +10,7 @@ import { castleSideOf, type LineEvent } from "@/domain/analysis/move-effects";
 import { createChess } from "@/domain/game";
 import type { GameMove } from "@/domain/game/types";
 import { PHRASE_BANK, type PhraseBankKey } from "@/domain/teaching/phrase-bank";
-
-const PIECE_NAME: Record<PieceSymbol, string> = {
-  p: "pawn",
-  n: "knight",
-  b: "bishop",
-  r: "rook",
-  q: "queen",
-  k: "king",
-};
+import { pickSeededVariant } from "@/domain/teaching/seeded-variant";
 
 const COLOR_NAME: Record<Color, string> = {
   w: "white",
@@ -37,29 +30,8 @@ function colorName(color: Color): string {
   return COLOR_NAME[color];
 }
 
-function hashSeed(text: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < text.length; i += 1) {
-    h ^= text.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
-}
-
-function pickVariant(
-  variants: readonly string[],
-  seed: string | undefined,
-  key: string,
-): string {
-  const first = variants[0];
-  if (!first) return "";
-  if (!seed || variants.length === 1) return first;
-  const index = hashSeed(`${seed}:${key}`) % variants.length;
-  return variants[index] ?? first;
-}
-
 function bankPhrase(key: PhraseBankKey, seed: string | undefined): string {
-  return pickVariant(PHRASE_BANK[key], seed, key);
+  return pickSeededVariant(PHRASE_BANK[key], seed, key);
 }
 
 function sameTypeCount(fen: string, unit: NamedUnit): number {
@@ -357,24 +329,17 @@ function describeReason(
         ? `another ${pieceName(reason.pinned.type)}`
         : `the ${pieceName(reason.pinned.type)}`;
       const target = pieceName(reason.target.type);
-      if (reason.likely && opts.lead && !opts.followUp) {
-        return `you can likely pin ${pinned} to the ${target}`;
-      }
       if (opts.followUp) return `${then}pin ${pinned} to the ${target}`;
       return `you pin ${pinned} to the ${target}`;
     }
     case "fork": {
       const targets = listUnits(reason.targets, mover, opts.fen);
-      if (reason.likely && opts.lead && !opts.followUp) {
-        return `you can likely fork ${targets}`;
-      }
       if (opts.followUp) return `${then}fork ${targets}`;
       return `you fork ${targets}`;
     }
     case "skewer": {
       const front = ownedPhrase(reason.front, mover, opts.fen);
       const back = ownedPhrase(reason.back, mover, opts.fen);
-      if (reason.likely) return `you can likely skewer ${front} and ${back}`;
       return `you skewer ${front}, exposing ${back}`;
     }
     case "discovered_attack":

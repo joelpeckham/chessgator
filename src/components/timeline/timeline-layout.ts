@@ -15,7 +15,7 @@ export const STATUS_ROW_H = 24;
 /** Fixed footer so board size never shifts with coach/practice chrome. */
 export const TIMELINE_GRAPH_HEIGHT_PX = STATUS_ROW_H + GRAPH_H + PRACTICE_BAR_H;
 
-/** Mobile touch target; visual glyph stays much smaller. */
+/** Mobile hit target (`size-11`); desktop buttons use `sm:size-9` (36px). */
 export const NODE_HIT_PX = 44;
 const LABEL_FROM_CENTER = 12;
 const CAPTION_FROM_CENTER = 18;

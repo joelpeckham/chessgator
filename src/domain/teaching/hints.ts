@@ -1,3 +1,4 @@
+import { PIECE_NAME } from "@/domain/analysis/board-units";
 import {
   pickBenefitReasons,
   rankReasons,
@@ -7,7 +8,7 @@ import { collectMoveEffects } from "@/domain/analysis/move-effects";
 import { hangingSquaresFor } from "@/domain/analysis/tactics";
 import type { AnalysisEvidence } from "@/domain/analysis/types";
 import { createChess, tryApplyMove, uciToSan } from "@/domain/game/rules";
-import type { Square } from "@/domain/game/types";
+import type { PieceSymbol, Square } from "@/domain/game/types";
 import { hintQuestionForPosition } from "@/domain/teaching/templates";
 import type { HintLevel, HintStep } from "@/domain/teaching/types";
 
@@ -149,23 +150,8 @@ function hangingQuestion(
   };
 }
 
-function pieceName(type: string): string {
-  switch (type) {
-    case "p":
-      return "pawn";
-    case "n":
-      return "knight";
-    case "b":
-      return "bishop";
-    case "r":
-      return "rook";
-    case "q":
-      return "queen";
-    case "k":
-      return "king";
-    default:
-      return "piece";
-  }
+function pieceName(type: PieceSymbol): string {
+  return PIECE_NAME[type];
 }
 
 function squaresForHint(input: {

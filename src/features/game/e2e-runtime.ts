@@ -5,6 +5,7 @@ import type { GameRuntimeOptions } from "@/features/game/use-game-runtime";
 
 /** Playwright URL contract: `?e2eStub=1|coach|fallback`. */
 export function resolveGameRuntimeOptions(): GameRuntimeOptions {
+  if (process.env.NEXT_PUBLIC_E2E !== "1") return {};
   if (typeof window === "undefined") return {};
   const stub = new URLSearchParams(window.location.search).get("e2eStub");
   if (stub !== "1" && stub !== "coach" && stub !== "fallback") {

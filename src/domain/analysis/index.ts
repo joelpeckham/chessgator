@@ -16,6 +16,7 @@ export {
   buildMoveAnalysisEvidence,
   SHORT_PV_MAX_PLIES,
 } from "@/domain/analysis/move-analysis";
+export { collectTacticalFacts } from "@/domain/analysis/move-effects";
 export type {
   ProjectedLine,
   ProjectedPly,
@@ -37,10 +38,10 @@ export type {
   TacticalFactsInput,
 } from "@/domain/analysis/tactics";
 export {
-  collectTacticalFacts,
   hangingSquaresFor,
   isHangingOn,
   kingExposure,
+  tacticalFactsFromEffects,
 } from "@/domain/analysis/tactics";
 export type {
   AnalysisEvidence,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 export type CopyPgnButtonProps = {
@@ -15,12 +15,23 @@ export function CopyPgnButton({
   variant = "outline",
 }: CopyPgnButtonProps) {
   const [copied, setCopied] = useState(false);
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (resetTimer.current) clearTimeout(resetTimer.current);
+    };
+  }, []);
 
   async function copy(): Promise<void> {
     try {
       await navigator.clipboard.writeText(pgn);
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
+      if (resetTimer.current) clearTimeout(resetTimer.current);
+      resetTimer.current = setTimeout(() => {
+        resetTimer.current = null;
+        setCopied(false);
+      }, 1500);
     } catch {
       setCopied(false);
     }

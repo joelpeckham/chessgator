@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildMoveAnalysisEvidence } from "@/domain/analysis/move-analysis";
 import type { AnalysisEvidence } from "@/domain/analysis/types";
-import { tryApplyMove } from "@/domain/game/rules";
+import { sideToMoveFromFen, tryApplyMove } from "@/domain/game/rules";
 import {
   chooseConcept,
   selectTeachingInsight,
@@ -18,7 +18,7 @@ function evidence(
     requestId: "t",
     gameNodeId: "n",
     fen,
-    sideToMove: fen.split(" ")[1] === "b" ? "b" : "w",
+    sideToMove: sideToMoveFromFen(fen),
     score,
     bestMoveUci,
     lines: [{ multipv: 1, score, pvUci: pv }],

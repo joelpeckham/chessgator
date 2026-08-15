@@ -1,8 +1,11 @@
 import type { AnalysisEvidence } from "@/domain/analysis/types";
 import {
+  disposeEngineClient,
+  startEngineHandshake,
+} from "@/engines/shared/engine-init";
+import {
   type EngineJob,
   EngineJobBook,
-  handshakeDispose,
 } from "@/engines/shared/engine-job-book";
 import { stockfishAssetWorkerUrl } from "@/engines/stockfish/assets";
 import { type AnalyzeOptions } from "@/engines/stockfish/ports";
@@ -92,6 +95,9 @@ export class StockfishClient {
       timeoutMessage: (job) => `Analysis timed out after ${job.timeoutMs}ms`,
       staleMessage: (gameNodeId, current) =>
         `Stale analysis ignored for node ${gameNodeId} (current ${current})`,
+      onUnresponsive: () => {
+        this.failWorker("Stockfish worker unresponsive");
+      },
     });
   }
 
@@ -112,60 +118,40 @@ export class StockfishClient {
     if (this.initPromise) return this.initPromise;
 
     this.statusValue = "initializing";
-    this.initPromise = new Promise<void>((resolve, reject) => {
-      const requestId = `init-${this.jobs.nextGeneration()}`;
-      const resources: {
-        timer?: unknown;
-        unsubscribe: (() => void) | null;
-      } = { unsubscribe: null };
-      let settled = false;
-
-      const cleanup = (): boolean => {
-        if (settled) return false;
-        settled = true;
-        if (resources.timer !== undefined) {
-          this.clearTimer(resources.timer);
+    const requestId = `init-${this.jobs.nextGeneration()}`;
+    const handshake = startEngineHandshake<StockfishWorkerResponse>({
+      subscribe: (listener) => this.transport.subscribe(listener),
+      post: () => {
+        this.post({ type: "init", requestId, engineUrl: this.engineUrl });
+      },
+      setTimer: this.setTimer,
+      clearTimer: this.clearTimer,
+      timeoutMs: 30_000,
+      timeoutMessage: "Stockfish init timed out",
+      onMessage: (msg, settle) => {
+        if (msg.type === "ready" && msg.requestId === requestId) {
+          this.statusValue = "ready";
+          settle.resolve();
+        } else if (msg.type === "error" && msg.requestId === requestId) {
+          this.statusValue = "failed";
+          settle.fail(new Error(msg.message));
         }
-        resources.unsubscribe?.();
-        if (this.cancelInitialization === cancel) {
+      },
+    });
+    this.cancelInitialization = handshake.cancel;
+    this.initPromise = handshake.promise
+      .catch((err: unknown) => {
+        if (this.statusValue !== "disposed" && this.statusValue !== "ready") {
+          this.statusValue = "failed";
+        }
+        throw err;
+      })
+      .finally(() => {
+        this.initPromise = null;
+        if (this.cancelInitialization === handshake.cancel) {
           this.cancelInitialization = null;
         }
-        return true;
-      };
-      const cancel = (error: Error): void => {
-        if (!cleanup()) return;
-        reject(error);
-      };
-      const fail = (error: Error): void => {
-        if (!cleanup()) return;
-        this.statusValue = "failed";
-        reject(error);
-      };
-
-      resources.unsubscribe = this.transport.subscribe((msg) => {
-        if (msg.type === "ready" && msg.requestId === requestId) {
-          if (!cleanup()) return;
-          this.statusValue = "ready";
-          resolve();
-        } else if (msg.type === "error" && msg.requestId === requestId) {
-          fail(new Error(msg.message));
-        }
       });
-
-      this.cancelInitialization = cancel;
-      resources.timer = this.setTimer(
-        () => fail(new Error("Stockfish init timed out")),
-        30_000,
-      );
-
-      try {
-        this.post({ type: "init", requestId, engineUrl: this.engineUrl });
-      } catch (error) {
-        fail(error instanceof Error ? error : new Error(String(error)));
-      }
-    }).finally(() => {
-      this.initPromise = null;
-    });
 
     return this.initPromise;
   }
@@ -234,7 +220,7 @@ export class StockfishClient {
       ),
     );
     const requestId = `dispose-${this.jobs.nextGeneration()}`;
-    await handshakeDispose({
+    await disposeEngineClient({
       requestId,
       postDispose: () => {
         this.post({ type: "dispose", requestId });
@@ -245,11 +231,12 @@ export class StockfishClient {
         }),
       setTimer: this.setTimer,
       clearTimer: this.clearTimer,
+      unsubscribe: this.unsubscribe,
+      terminate: () => {
+        this.transport.terminate();
+      },
     });
-    this.unsubscribe?.();
     this.unsubscribe = null;
-    this.transport.terminate();
-    this.statusValue = "disposed";
   }
 
   /** Test helper: queue order of request ids. */
@@ -292,7 +279,25 @@ export class StockfishClient {
       return;
     }
     if (msg.type === "error") {
-      this.jobs.handleError(msg.requestId, msg.message);
+      const handled = this.jobs.handleError(msg.requestId, msg.message);
+      if (msg.requestId === "worker") {
+        this.failWorker(msg.message);
+        return;
+      }
+      if (
+        !handled &&
+        this.statusValue !== "ready" &&
+        this.statusValue !== "disposed"
+      ) {
+        this.statusValue = "failed";
+      }
     }
+  }
+
+  private failWorker(message: string): void {
+    if (this.statusValue === "disposed") return;
+    this.statusValue = "failed";
+    this.cancelInitialization?.(new Error(message));
+    this.jobs.cancelAll();
   }
 }

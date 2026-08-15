@@ -38,14 +38,19 @@ import {
   type GamePhase,
   type StructureDelta,
 } from "@/domain/analysis/structure";
-import { hangingSquaresFor, kingExposure } from "@/domain/analysis/tactics";
+import {
+  hangingSquaresFor,
+  kingExposure,
+  type TacticalFacts,
+  type TacticalFactsInput,
+  tacticalFactsFromEffects,
+} from "@/domain/analysis/tactics";
 import { createChess } from "@/domain/game";
-import { tryApplyMove } from "@/domain/game/rules";
+import { sideToMoveFromFen, tryApplyMove } from "@/domain/game/rules";
 import type { GameMove } from "@/domain/game/types";
 
 export type { NamedUnit } from "@/domain/analysis/board-units";
 export type { ForkFact, PinFact } from "@/domain/analysis/motifs";
-export { detectForks, detectPins, namedAttackers, namedUnitAt };
 
 export type CastleSide = "kingside" | "queenside";
 
@@ -184,6 +189,10 @@ function isRecaptureOf(
 ): boolean {
   if (!move.captured || !previousMove?.captured) return false;
   return move.to === previousMove.to;
+}
+
+export function collectTacticalFacts(input: TacticalFactsInput): TacticalFacts {
+  return tacticalFactsFromEffects(collectMoveEffects(input));
 }
 
 export function collectMoveEffects(input: {
@@ -448,7 +457,7 @@ export function summarizeLine(
   let cursor = fen;
   let netMaterialCp = 0;
   let forcing = true;
-  const moverColor = fen.split(" ")[1] === "b" ? "b" : "w";
+  const moverColor = sideToMoveFromFen(fen);
 
   for (let ply = 0; ply < pvUci.length && ply < cap; ply += 1) {
     const uci = pvUci[ply];

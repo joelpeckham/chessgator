@@ -20,6 +20,7 @@ export {
   moveToUci,
   parseUci,
   sanToUci,
+  sideToMoveFromFen,
   toGameMove,
   tryApplyMove,
   uciToSan,

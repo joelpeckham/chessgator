@@ -1,26 +1,20 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import type { MoveAnalysisEvidence } from "@/domain/analysis";
 import {
   createInitialTree,
-  createVariationExplorer,
   DEFAULT_POSITION,
   getCurrentNode,
   getMoveHistory,
   getNode,
   playMoveOnTree,
-  stepVariationForward,
 } from "@/domain/game";
 import type { GameTree } from "@/domain/game/types";
-import type { TeachingInsight } from "@/domain/teaching";
 import { createCoachingController } from "@/features/game/coaching-controller";
 import {
   buildTutorLine,
   commitPracticeMove,
-  commitTryInstead,
   firstHumanUciFromDraft,
   requestOpponentMove,
   runPostMoveCoaching,
-  trySuggestedMove,
   undoHumanMove,
 } from "@/features/game/game-flow";
 import { useGameStore } from "@/features/game/game-store";
@@ -32,138 +26,6 @@ function play(tree: GameTree, uci: string): GameTree {
   if (!result) throw new Error(`Illegal move ${uci}`);
   return result.tree;
 }
-
-describe("commitTryInstead", () => {
-  it("commits the suggested ply and prunes ghost siblings under the origin", () => {
-    let tree = createInitialTree();
-    tree = play(tree, "e2e4");
-    tree = play(tree, "e7e5");
-    const originId = tree.currentNodeId;
-    tree = play(tree, "a2a4");
-
-    const started = createVariationExplorer(tree, originId, ["g1f3", "b8c6"]);
-    expect(started).not.toBeNull();
-    tree = started!.tree;
-    const stepped = stepVariationForward(tree, started!.explorer);
-    expect(stepped).not.toBeNull();
-    tree = stepped!.tree;
-
-    const committed = commitTryInstead({
-      tree,
-      originNodeId: originId,
-      lineUci: ["g1f3", "b8c6"],
-      suggestedMoveUci: "g1f3",
-    });
-    expect(committed).not.toBeNull();
-    expect(committed!.node.move?.uci).toBe("g1f3");
-    expect(committed!.node.isVariation).toBe(false);
-    expect(committed!.tree.currentNodeId).toBe(committed!.node.id);
-
-    const origin = getNode(committed!.tree, originId);
-    expect(origin?.childIds).toContain(committed!.node.id);
-    const ghosts = origin?.childIds.filter(
-      (id) => committed!.tree.nodes[id]?.isVariation,
-    );
-    expect(ghosts).toEqual([]);
-  });
-
-  it("still commits when the coach line is empty by using the suggested move", () => {
-    let tree = createInitialTree();
-    tree = play(tree, "e2e4");
-    tree = play(tree, "e7e5");
-    const originId = tree.currentNodeId;
-    tree = play(tree, "a2a4");
-
-    const committed = commitTryInstead({
-      tree,
-      originNodeId: originId,
-      lineUci: [],
-      suggestedMoveUci: "g1f3",
-    });
-    expect(committed).not.toBeNull();
-    expect(committed!.node.move?.uci).toBe("g1f3");
-  });
-});
-
-describe("trySuggestedMove", () => {
-  it("commits the suggested ply and reports opponent-to-move", () => {
-    let tree = createInitialTree();
-    tree = play(tree, "e2e4");
-    tree = play(tree, "e7e5");
-    tree = play(tree, "a2a4");
-    const playedNode = getNode(tree, tree.currentNodeId);
-    expect(playedNode?.move).toBeDefined();
-    if (!playedNode?.move) return;
-
-    const result = trySuggestedMove({
-      tree,
-      insight: {
-        concept: "missed_improvement",
-        confidence: 0.8,
-        explanation: "Develop the knight.",
-        suggestedMoveUci: "g1f3",
-        suggestedMoveSan: "Nf3",
-        lineUci: ["g1f3", "b8c6"],
-        refutationUci: [],
-        classification: "inaccuracy",
-        quip: "There's better.",
-        nudge: false,
-      } satisfies TeachingInsight,
-      evidence: {
-        gameNodeId: tree.currentNodeId,
-        playedMove: playedNode.move,
-      } as MoveAnalysisEvidence,
-    });
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.needsOpponent).toBe(true);
-    expect(result.mode).toBe("opponentThinking");
-    expect(result.tree.nodes[result.tree.currentNodeId]?.move?.uci).toBe(
-      "g1f3",
-    );
-  });
-
-  it("reports opponent-to-move after a Black try-instead", () => {
-    useGameStore.setState({
-      ...useGameStore.getInitialState(),
-    });
-    useGameStore.getState().startGame({ humanColor: "b" });
-    let tree = useGameStore.getState().tree;
-    tree = play(tree, "e2e4");
-    tree = play(tree, "e7e5");
-    const playedNode = getNode(tree, tree.currentNodeId);
-    expect(playedNode?.move).toBeDefined();
-    if (!playedNode?.move) return;
-
-    useGameStore.setState({ tree, humanColor: "b" });
-    const result = trySuggestedMove({
-      tree,
-      insight: {
-        concept: "missed_improvement",
-        confidence: 0.8,
-        explanation: "Strike the center.",
-        suggestedMoveUci: "d7d5",
-        suggestedMoveSan: "d5",
-        lineUci: ["d7d5", "e4d5"],
-        refutationUci: [],
-        classification: "inaccuracy",
-        quip: "There's better.",
-        nudge: false,
-      } satisfies TeachingInsight,
-      evidence: {
-        gameNodeId: tree.currentNodeId,
-        playedMove: playedNode.move,
-      } as MoveAnalysisEvidence,
-    });
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.needsOpponent).toBe(true);
-    expect(result.mode).toBe("opponentThinking");
-    expect(result.tree.nodes[result.tree.currentNodeId]?.move?.uci).toBe(
-      "d7d5",
-    );
-  });
-});
 
 describe("commitPracticeMove", () => {
   beforeEach(() => {

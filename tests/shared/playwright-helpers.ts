@@ -3,12 +3,16 @@ import { expect, type Page } from "@playwright/test";
 /** Open settings sheet so keyboard move select is available. */
 export async function openSettings(page: Page): Promise<void> {
   const sheet = page.getByTestId("settings-sheet");
-  if (await sheet.count()) {
-    const visible = await sheet.isVisible().catch(() => false);
-    if (visible) return;
+  if (await sheet.isVisible().catch(() => false)) {
+    const closing = await sheet.evaluate((el) =>
+      el.hasAttribute("data-ending-style"),
+    );
+    if (!closing) return;
+    await expect(sheet).toBeHidden();
   }
   await page.getByTestId("settings-button").click();
-  await expect(page.getByTestId("settings-sheet")).toBeVisible();
+  await expect(sheet).toBeVisible();
+  await expect(sheet).not.toHaveAttribute("data-starting-style");
 }
 
 /** Choose a legal move via the accessible move select in settings. */

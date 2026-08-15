@@ -30,8 +30,7 @@ describe("explanation reasons", () => {
     const reasons = pickBenefitReasons(effects, events);
     expect(
       reasons.some(
-        (reason) =>
-          reason.kind === "pin" && reason.likely && reason.pinned.type === "n",
+        (reason) => reason.kind === "pin" && reason.pinned.type === "n",
       ),
     ).toBe(false);
     expect(
@@ -251,7 +250,6 @@ describe("explanation reasons", () => {
         pinned: { type: "p", color: "b", square: "e5" },
         target: { type: "r", color: "b", square: "e8" },
         pinner: { type: "b", color: "w", square: "a1" },
-        likely: false,
       }),
     );
   });

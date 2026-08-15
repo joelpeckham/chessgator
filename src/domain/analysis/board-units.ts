@@ -6,6 +6,15 @@ export type NamedUnit = {
   square: Square;
 };
 
+export const PIECE_NAME: Record<PieceSymbol, string> = {
+  p: "pawn",
+  n: "knight",
+  b: "bishop",
+  r: "rook",
+  q: "queen",
+  k: "king",
+};
+
 export const PIECE_VALUE_CP: Record<PieceSymbol, number> = {
   p: 100,
   n: 300,

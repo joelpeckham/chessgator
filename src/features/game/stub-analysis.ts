@@ -1,4 +1,5 @@
 import type { AnalysisEvidence } from "@/domain/analysis/types";
+import { sideToMoveFromFen } from "@/domain/game";
 import type { StockfishClientLike } from "@/engines/stockfish/ports";
 
 export type {
@@ -67,7 +68,7 @@ export function createStubAnalysisEngine(options?: {
       const script = scripts.find(
         (s) => opts.fen === s.fen || opts.fen.startsWith(s.fen),
       );
-      const side: "w" | "b" = opts.fen.split(" ")[1] === "b" ? "b" : "w";
+      const side = sideToMoveFromFen(opts.fen);
       const base = script?.evidence ?? {
         score: { cp: side === "w" ? 20 : -20 },
         bestMoveUci: side === "w" ? "e2e4" : "e7e5",

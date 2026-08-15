@@ -3,10 +3,8 @@ import {
   evalLossForMover,
   type MoveClassification,
 } from "@/domain/analysis/classification";
-import {
-  collectTacticalFacts,
-  type TacticalFacts,
-} from "@/domain/analysis/tactics";
+import { collectTacticalFacts } from "@/domain/analysis/move-effects";
+import type { TacticalFacts } from "@/domain/analysis/tactics";
 import type {
   AnalysisEvidence,
   EvaluationScore,

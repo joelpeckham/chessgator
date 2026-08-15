@@ -1,13 +1,16 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { BLUE_NOISE, BLUE_NOISE_SIZE } from "@/components/board/blue-noise";
+import { BLUE_NOISE_SIZE } from "@/components/board/blue-noise";
 import {
-  VEIL_COVERAGE_CENTER,
-  VEIL_COVERAGE_EDGE,
   VEIL_GRID_MAX,
   VEIL_GRID_MIN,
-  veilCoverage,
   veilGridSize,
 } from "@/components/board/veil-grid";
+
+const BLUE_NOISE = new Uint8Array(
+  readFileSync(resolve(process.cwd(), "public/board/blue-noise-128.bin")),
+);
 
 function stats(bytes: Uint8Array): { min: number; max: number; mean: number } {
   let min = 255;
@@ -50,23 +53,6 @@ describe("blue-noise threshold map", () => {
   it("does not repeat on an 8-cell Bayer period", () => {
     expect(meanAbsLag(8, 0)).toBeGreaterThan(50);
     expect(meanAbsLag(0, 8)).toBeGreaterThan(50);
-  });
-});
-
-describe("veilCoverage", () => {
-  it("is fully solid at progress 0 and matches the radial target at progress 1", () => {
-    expect(veilCoverage(0, 0)).toBe(1);
-    expect(veilCoverage(0, 1)).toBe(1);
-    expect(veilCoverage(1, 0)).toBeCloseTo(VEIL_COVERAGE_CENTER);
-    expect(veilCoverage(1, 1)).toBeCloseTo(VEIL_COVERAGE_EDGE);
-  });
-
-  it("opens holes at the rim before the center", () => {
-    const midCenter = veilCoverage(0.5, 0);
-    const midEdge = veilCoverage(0.5, 1);
-    expect(midEdge).toBeLessThan(midCenter);
-    expect(midCenter).toBeGreaterThan(VEIL_COVERAGE_CENTER);
-    expect(midEdge).toBeGreaterThan(VEIL_COVERAGE_EDGE);
   });
 });
 

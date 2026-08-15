@@ -1,5 +1,4 @@
 import {
-  GAME_SCHEMA_VERSION,
   GAME_STORAGE_KEY,
   type GameRepository,
   LEGACY_GAME_STORAGE_KEY,
@@ -59,18 +58,12 @@ export function createLocalStorageGameRepository(options?: {
 
     async save(game: SavedGameV2): Promise<void> {
       if (!storage) return;
-      if ((game.version as number) !== GAME_SCHEMA_VERSION) {
-        throw new Error(
-          `Refusing to save unsupported schema version ${String(game.version)}`,
-        );
+      try {
+        storage.setItem(key, JSON.stringify(game));
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : String(err);
+        throw new Error(`Could not save the game: ${detail}`, { cause: err });
       }
-      const validated = parseSavedGame(game);
-      if (!validated) {
-        throw new Error("Refusing to save invalid game snapshot");
-      }
-      // Re-validate by ensuring reconstruct would succeed is left to callers;
-      // structural parse is enough to refuse obvious corruption.
-      storage.setItem(key, JSON.stringify(validated));
     },
 
     async clear(): Promise<void> {

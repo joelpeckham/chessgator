@@ -7,11 +7,13 @@ function createHarness() {
   const posted: StockfishWorkerResponse[] = [];
   const commands: string[] = [];
   let terminated = false;
+  let onError: ((message: string) => void) | null = null;
   const runtime = createStockfishWorkerRuntime({
     post: (message) => {
       posted.push(message);
     },
-    createEngine(_url, _onLine, _onError) {
+    createEngine(_url, _onLine, errorCb) {
+      onError = errorCb;
       return {
         postMessage(command) {
           commands.push(command);
@@ -22,7 +24,15 @@ function createHarness() {
       };
     },
   });
-  return { runtime, posted, commands, isTerminated: () => terminated };
+  return {
+    runtime,
+    posted,
+    commands,
+    isTerminated: () => terminated,
+    triggerError: (message: string) => {
+      onError?.(message);
+    },
+  };
 }
 
 async function readyEngine() {
@@ -114,6 +124,37 @@ describe("createStockfishWorkerRuntime", () => {
     expect(
       posted.some((m) => m.type === "cancelled" && m.requestId === "a1"),
     ).toBe(true);
+  });
+
+  it("clears a failed nested-engine load so a later init can succeed", async () => {
+    const harness = createHarness();
+    harness.runtime.handleRequest({
+      type: "init",
+      requestId: "init-1",
+      engineUrl: "/engine.js",
+    });
+    harness.triggerError("asset 404");
+    await Promise.resolve();
+    expect(harness.posted).toEqual([
+      {
+        type: "error",
+        requestId: "init-1",
+        message: "Stockfish worker error: asset 404",
+      },
+    ]);
+    expect(harness.isTerminated()).toBe(true);
+
+    harness.runtime.handleRequest({
+      type: "init",
+      requestId: "init-2",
+      engineUrl: "/engine.js",
+    });
+    harness.runtime.handleEngineLine("uciok");
+    harness.runtime.handleEngineLine("readyok");
+    expect(harness.posted.at(-1)).toEqual({
+      type: "ready",
+      requestId: "init-2",
+    });
   });
 
   it("disposes the nested engine", async () => {

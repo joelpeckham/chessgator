@@ -104,6 +104,7 @@ export function BranchPicker({
               >
                 <BoardPreview
                   fen={branch.fen}
+                  nodeId={branch.nodeId}
                   san={branch.san}
                   orientation={orientation}
                   className="w-16 shrink-0"

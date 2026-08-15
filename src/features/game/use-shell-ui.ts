@@ -31,6 +31,8 @@ import {
 import {
   graphCursorId,
   INITIAL_TIMELINE_SESSION,
+  isReviewingNonLive,
+  practiceDraft,
   reduceTimelineSession,
   type TimelineSessionState,
   viewedNodeId,
@@ -151,10 +153,11 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     setCoachExpanded(false);
   }
 
+  const draft = practiceDraft(timeline);
   const opponentTarget = deriveOpponentTarget({
     timelineMode: timeline.mode,
-    practicePhase: timeline.practicePhase,
-    draftTree: timeline.draftTree,
+    practicePhase: draft?.phase ?? null,
+    draftTree: draft?.tree ?? null,
     liveMode,
     liveTree: useGameStore.getState().tree,
   });
@@ -194,10 +197,12 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
       requestId,
       target: { nodeId: captured.nodeId, fen: captured.fen },
       isCurrent: (nodeId) => {
+        const latestSession = timelineRef.current;
+        const latestDraft = practiceDraft(latestSession);
         const latest = deriveOpponentTarget({
-          timelineMode: timelineRef.current.mode,
-          practicePhase: timelineRef.current.practicePhase,
-          draftTree: timelineRef.current.draftTree,
+          timelineMode: latestSession.mode,
+          practicePhase: latestDraft?.phase ?? null,
+          draftTree: latestDraft?.tree ?? null,
           liveMode: useGameStore.getState().session.mode,
           liveTree: useGameStore.getState().tree,
         });
@@ -206,14 +211,14 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
       applyMove: (uci) => {
         if (captured.scope === "practice") {
           const session = timelineRef.current;
+          const sessionDraft = practiceDraft(session);
           if (
             session.mode !== "practice" ||
-            session.practicePhase !== "opponentThinking"
+            sessionDraft?.phase !== "opponentThinking"
           ) {
             return false;
           }
-          if (session.draftTree?.currentNodeId !== captured.nodeId)
-            return false;
+          if (sessionDraft.tree.currentNodeId !== captured.nodeId) return false;
           dispatchTimeline({ type: "practiceOpponentMove", input: uci });
           return true;
         }
@@ -237,17 +242,16 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
   function isBoardInteractive(): boolean {
     const { tree, session, humanColor } = useGameStore.getState();
     const liveFen = getCurrentNode(tree).fen;
-    const viewed = viewedNodeId(timeline, tree.currentNodeId);
+    const currentDraft = practiceDraft(timeline);
     return deriveBoardInteractivity({
       timelineMode: timeline.mode,
-      practicePhase: timeline.practicePhase,
-      draftTree: timeline.draftTree,
+      practicePhase: currentDraft?.phase ?? null,
+      draftTree: currentDraft?.tree ?? null,
       playCursorId: graphCursorId(timeline, tree.currentNodeId),
       liveMode: session.mode,
       liveFen,
       humanColor,
-      isViewingNonLive:
-        viewed !== tree.currentNodeId && timeline.mode !== "practice",
+      isViewingNonLive: isReviewingNonLive(timeline, tree.currentNodeId),
       maiaFailed: runtime.maia.phase === "failed",
     });
   }
@@ -471,10 +475,11 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
 
   function handleCommitPractice(): void {
     const { tree, humanColor } = useGameStore.getState();
-    if (timeline.mode !== "practice" || !timeline.draftTree) return;
-    const originId = timeline.practiceOriginId ?? tree.rootId;
+    const commitDraft = practiceDraft(timeline);
+    if (!commitDraft) return;
+    const originId = commitDraft.originId;
     const fromDraft = firstHumanUciFromDraft({
-      draft: timeline.draftTree,
+      draft: commitDraft.tree,
       originId,
       humanColor,
     });

@@ -1,3 +1,5 @@
+import { pickSeededVariant } from "@/domain/teaching/seeded-variant";
+
 /**
  * Classification teaser lines for the mascot. Index 0 is the canonical
  * phrasing; later entries are hashed by game node id via `pickQuip`.
@@ -620,22 +622,9 @@ export const QUIP_BANK = {
 
 export type QuipBankKey = keyof typeof QUIP_BANK;
 
-function hashSeed(text: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < text.length; i += 1) {
-    h ^= text.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
-}
-
 export function pickQuip(
   classification: QuipBankKey,
   seed: string | undefined,
 ): string {
-  const variants = QUIP_BANK[classification];
-  const first = variants[0];
-  if (!seed) return first;
-  const index = hashSeed(`${seed}:${classification}`) % variants.length;
-  return variants[index] ?? first;
+  return pickSeededVariant(QUIP_BANK[classification], seed, classification);
 }

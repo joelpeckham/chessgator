@@ -19,15 +19,7 @@ export function scoreFromSideToMove(
 }
 
 /** Convert White's-perspective score into side-to-move perspective. */
-export function scoreToSideToMove(
-  score: EvaluationScore,
-  sideToMove: SideToMove,
-): EvaluationScore {
-  if (sideToMove === "w") {
-    return { ...score };
-  }
-  return negateScore(score);
-}
+export const scoreToSideToMove = scoreFromSideToMove;
 
 export function negateScore(score: EvaluationScore): EvaluationScore {
   const next: EvaluationScore = {};

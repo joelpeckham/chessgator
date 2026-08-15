@@ -7,7 +7,12 @@ import {
 
 type Job = EngineJob<string>;
 
-function createBook() {
+function createBook(
+  extras: {
+    cancelAckTimeoutMs?: number;
+    onUnresponsive?: (requestId: string) => void;
+  } = {},
+) {
   const cancelled: string[] = [];
   const timers = new Map<string, () => void>();
   const book = new EngineJobBook<string, Job>({
@@ -28,6 +33,8 @@ function createBook() {
     timeoutMessage: (job) => `timed out ${job.requestId}`,
     staleMessage: (gameNodeId, current) =>
       `stale ${gameNodeId} (current ${current})`,
+    cancelAckTimeoutMs: extras.cancelAckTimeoutMs,
+    onUnresponsive: extras.onUnresponsive,
   });
   return { book, cancelled, timers };
 }
@@ -81,6 +88,26 @@ describe("EngineJobBook", () => {
 
     book.handleCancelled("a1");
     expect(book.active).toBeNull();
+  });
+
+  it("releases the active slot if the worker never acks a cancel", async () => {
+    const unresponsive: string[] = [];
+    const { book, timers } = createBook({
+      cancelAckTimeoutMs: 1,
+      onUnresponsive: (requestId) => {
+        unresponsive.push(requestId);
+      },
+    });
+    const { job, result } = pendingJob("a1");
+    book.track(job);
+    book.active = job;
+    book.cancel("a1");
+    await expect(result).rejects.toThrow(/cancelled a1/);
+    expect(book.active.requestId).toBe("a1");
+
+    for (const fn of Array.from(timers.values())) fn();
+    expect(book.active).toBeNull();
+    expect(unresponsive).toEqual(["a1"]);
   });
 
   it("filters stale results by current game node", async () => {

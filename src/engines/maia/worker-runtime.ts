@@ -18,7 +18,10 @@ import {
   topKFromLogits,
 } from "@/engines/maia/sample";
 import { indexToMove } from "@/engines/maia/vocabulary";
-import { createWaitUntilReady } from "@/engines/shared/wait-until-ready";
+import {
+  createWaitUntilReady,
+  joinOrStartWorkerInit,
+} from "@/engines/shared/wait-until-ready";
 
 export type MaiaRunFeeds = {
   tokens: Float32Array;
@@ -76,18 +79,20 @@ export function createMaiaWorkerRuntime(
     modelUrl: string,
     wasmPaths: string,
   ): Promise<void> {
-    const alreadyReady = model;
-    if (alreadyReady) {
-      deps.post({
-        type: "ready",
-        requestId,
-        executionProvider: alreadyReady.provider,
-      });
-      return;
-    }
-    if (initInFlight) {
-      try {
-        await ready.wait();
+    const shouldStart = await joinOrStartWorkerInit({
+      isReady: Boolean(model),
+      initInFlight,
+      wait: () => ready.wait(),
+      onAlreadyReady: () => {
+        const loaded = model;
+        if (!loaded) return;
+        deps.post({
+          type: "ready",
+          requestId,
+          executionProvider: loaded.provider,
+        });
+      },
+      onJoinedReady: () => {
         const loaded = model;
         if (!loaded) {
           deps.post({
@@ -102,16 +107,12 @@ export function createMaiaWorkerRuntime(
           requestId,
           executionProvider: loaded.provider,
         });
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : String(err);
-        deps.post({
-          type: "error",
-          requestId,
-          message,
-        });
-      }
-      return;
-    }
+      },
+      onJoinError: (message) => {
+        deps.post({ type: "error", requestId, message });
+      },
+    });
+    if (!shouldStart) return;
 
     initInFlight = requestId;
     try {
@@ -197,29 +198,16 @@ export function createMaiaWorkerRuntime(
         throw new Error(`Invalid move index from sampler: ${chosenIdx}`);
       }
       const boardUci = fromVocabUci(request.fen, vocabUci);
-      const moveUci = validateLegalUci(request.fen, boardUci);
-      const value = readValue(output.logitsValue);
-
+      let moveUci = validateLegalUci(request.fen, boardUci);
       if (!moveUci) {
-        const fallbackIdx = argmax(masked);
-        const fallbackVocab = indexToMove(fallbackIdx);
+        const fallbackVocab = indexToMove(argmax(masked));
         const fallbackBoard = fallbackVocab
           ? fromVocabUci(request.fen, fallbackVocab)
           : null;
-        const legal = validateLegalUci(request.fen, fallbackBoard);
-        if (!legal) {
-          throw new Error(`Maia produced no legal move for ${request.fen}`);
-        }
-        activeRequestId = null;
-        deps.post({
-          type: "result",
-          requestId: request.requestId,
-          gameNodeId: request.gameNodeId,
-          moveUci: legal,
-          candidates: topCandidates(masked, request.fen),
-          value,
-        });
-        return;
+        moveUci = validateLegalUci(request.fen, fallbackBoard);
+      }
+      if (!moveUci) {
+        throw new Error(`Maia produced no legal move for ${request.fen}`);
       }
 
       activeRequestId = null;
@@ -229,7 +217,7 @@ export function createMaiaWorkerRuntime(
         gameNodeId: request.gameNodeId,
         moveUci,
         candidates: topCandidates(masked, request.fen),
-        value,
+        value: readValue(output.logitsValue),
       });
     } catch (err) {
       activeRequestId = null;

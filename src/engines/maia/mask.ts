@@ -30,9 +30,3 @@ export function applyLegalMask(
   }
   return out;
 }
-
-export function countLegal(mask: Uint8Array): number {
-  let n = 0;
-  for (let i = 0; i < mask.length; i++) if (mask[i]) n++;
-  return n;
-}

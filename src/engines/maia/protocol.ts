@@ -48,8 +48,6 @@ export type MaiaStatusResponse = {
   requestId: string;
   phase: MaiaStatusPhase;
   detail?: string;
-  /** Execution provider selected after init (`webgpu` or `wasm`). */
-  executionProvider?: "webgpu" | "wasm";
 };
 
 export type MaiaReadyResponse = {

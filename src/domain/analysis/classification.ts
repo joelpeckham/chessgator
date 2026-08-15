@@ -103,3 +103,11 @@ export function classifyPlayedMove(input: {
 export function shouldNudge(classification: MoveClassification): boolean {
   return NUDGE_CLASSIFICATIONS.has(classification);
 }
+
+export function isTeachable(classification: MoveClassification): boolean {
+  return (
+    classification === "inaccuracy" ||
+    classification === "mistake" ||
+    classification === "blunder"
+  );
+}

@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { buildMoveAnalysisEvidence } from "@/domain/analysis/move-analysis";
 import type { AnalysisEvidence } from "@/domain/analysis/types";
-import { tryApplyMove } from "@/domain/game/rules";
+import { sideToMoveFromFen, tryApplyMove } from "@/domain/game/rules";
 import type { GameMove } from "@/domain/game/types";
 import { selectTeachingInsight } from "@/domain/teaching/select-insight";
 
@@ -48,7 +48,7 @@ function evidenceFor(
     requestId: "replay",
     gameNodeId: "replay",
     fen,
-    sideToMove: fen.split(" ")[1] === "b" ? "b" : "w",
+    sideToMove: sideToMoveFromFen(fen),
     score: score(cp),
     bestMoveUci,
     lines: [{ multipv: 1, score: score(cp), pvUci: [bestMoveUci] }],

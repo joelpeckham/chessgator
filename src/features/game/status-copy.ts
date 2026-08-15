@@ -17,10 +17,6 @@ export type StatusPresentationInput = {
   coachMessage?: string | null;
   lastMove?: GameMove | null;
   navigationMessage?: string | null;
-  /** Polite coach classification / explanation announcement. */
-  coachAnnouncement?: string | null;
-  /** Polite hint escalation announcement. */
-  hintAnnouncement?: string | null;
   enginesWarming?: boolean;
   humanColor?: Color;
   timelineMode?: "live" | "review" | "practice";
@@ -81,10 +77,6 @@ export function getStatusPresentation(
   let announcement: string;
   if (args.navigationMessage) {
     announcement = args.navigationMessage;
-  } else if (args.coachAnnouncement) {
-    announcement = args.coachAnnouncement;
-  } else if (args.hintAnnouncement) {
-    announcement = args.hintAnnouncement;
   } else if (mode === "gameOver") {
     announcement = detail ? `${headline}. ${detail}` : headline;
   } else if (maia.message && (mode === "loading" || args.enginesWarming)) {

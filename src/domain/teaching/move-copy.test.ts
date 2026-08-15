@@ -136,7 +136,6 @@ describe("describeBecause", () => {
             pinned: { type: "n", color: "b", square: "c6" },
             target: { type: "k", color: "b", square: "e8" },
             pinner: { type: "r", color: "w", square: "e1" },
-            likely: true,
           },
         ],
         "w",

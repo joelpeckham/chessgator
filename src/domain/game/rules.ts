@@ -17,8 +17,12 @@ export function createChess(fen: string = DEFAULT_POSITION): Chess {
   return new Chess(fen);
 }
 
+export function sideToMoveFromFen(fen: string): Color {
+  return fen.split(" ")[1] === "b" ? "b" : "w";
+}
+
 export function getTurn(fen: string): Color {
-  return createChess(fen).turn();
+  return sideToMoveFromFen(fen);
 }
 
 /** Square of the given side's king on an existing board. */

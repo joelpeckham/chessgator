@@ -3,7 +3,6 @@ import {
   type Color,
   type GameTree,
   getCurrentNode,
-  getNode,
   getStatusAtNode,
   getTurn,
   isHumanTurn,
@@ -26,8 +25,16 @@ export type PracticeTurn = {
   replyUci: string | null;
 };
 
-export type TimelineSessionState = {
-  mode: TimelineUiMode;
+export type PracticeDraft = {
+  tree: GameTree;
+  originId: string;
+  phase: PracticePhase;
+  turns: PracticeTurn[];
+  redo: PracticeTurn[];
+  error: string | null;
+};
+
+type TimelineBase = {
   /** Review / graph cursor. Null follows the live tip. */
   focusNodeId: string | null;
   previewNodeId: string | null;
@@ -35,13 +42,11 @@ export type TimelineSessionState = {
   pinnedBranchId: string | null;
   /** Decision whose local forks stay expanded while navigating. */
   expandedDecisionId: string | null;
-  draftTree: GameTree | null;
-  practiceOriginId: string | null;
-  practicePhase: PracticePhase | null;
-  practiceTurns: PracticeTurn[];
-  practiceRedo: PracticeTurn[];
-  practiceError: string | null;
 };
+
+export type TimelineSessionState =
+  | (TimelineBase & { mode: "live" | "review" })
+  | (TimelineBase & { mode: "practice"; draft: PracticeDraft });
 
 export const INITIAL_TIMELINE_SESSION: TimelineSessionState = {
   mode: "live",
@@ -49,13 +54,13 @@ export const INITIAL_TIMELINE_SESSION: TimelineSessionState = {
   previewNodeId: null,
   pinnedBranchId: null,
   expandedDecisionId: null,
-  draftTree: null,
-  practiceOriginId: null,
-  practicePhase: null,
-  practiceTurns: [],
-  practiceRedo: [],
-  practiceError: null,
 };
+
+export function practiceDraft(
+  state: TimelineSessionState,
+): PracticeDraft | null {
+  return state.mode === "practice" ? state.draft : null;
+}
 
 export type TimelineSessionAction =
   | {
@@ -76,7 +81,6 @@ export type TimelineSessionAction =
     }
   | { type: "practiceMove"; input: MoveInput; humanColor: Color }
   | { type: "practiceOpponentMove"; input: MoveInput }
-  | { type: "practiceJump"; nodeId: string }
   | { type: "practiceUndo" }
   | { type: "practiceRedo"; humanColor: Color }
   | { type: "practiceError"; message: string }
@@ -115,6 +119,18 @@ function pinFromSelect(
   };
 }
 
+function withDraft(
+  state: Extract<TimelineSessionState, { mode: "practice" }>,
+  draft: Partial<PracticeDraft>,
+  rest?: Partial<TimelineBase>,
+): TimelineSessionState {
+  return {
+    ...state,
+    ...rest,
+    draft: { ...state.draft, ...draft },
+  };
+}
+
 export function reduceTimelineSession(
   state: TimelineSessionState,
   action: TimelineSessionAction,
@@ -122,7 +138,7 @@ export function reduceTimelineSession(
   switch (action.type) {
     case "selectNode": {
       const pin = pinFromSelect(state, action);
-      if (state.mode === "practice" && state.draftTree) {
+      if (state.mode === "practice") {
         return {
           ...state,
           ...pin,
@@ -156,7 +172,7 @@ export function reduceTimelineSession(
     case "startPractice": {
       const jumped = jumpToNode(action.liveTree, action.originId);
       if (!jumped) return state;
-      const draft = cloneTree(jumped);
+      const tree = cloneTree(jumped);
       return {
         mode: "practice",
         focusNodeId: action.originId,
@@ -164,109 +180,98 @@ export function reduceTimelineSession(
         pinnedBranchId: PRACTICE_BRANCH_ID,
         expandedDecisionId:
           action.expandedDecisionId ?? state.expandedDecisionId,
-        draftTree: draft,
-        practiceOriginId: action.originId,
-        practicePhase: phaseFromDraft(draft, action.humanColor),
-        practiceTurns: [],
-        practiceRedo: [],
-        practiceError: null,
+        draft: {
+          tree,
+          originId: action.originId,
+          phase: phaseFromDraft(tree, action.humanColor),
+          turns: [],
+          redo: [],
+          error: null,
+        },
       };
     }
     case "practiceMove": {
-      if (state.mode !== "practice" || !state.draftTree) return state;
-      if (state.practicePhase !== "playerTurn") return state;
-      const current = getCurrentNode(state.draftTree);
+      if (state.mode !== "practice") return state;
+      if (state.draft.phase !== "playerTurn") return state;
+      const current = getCurrentNode(state.draft.tree);
       if (getTurn(current.fen) !== action.humanColor) return state;
       const played = playMoveOnTree(
-        state.draftTree,
-        state.draftTree.currentNodeId,
+        state.draft.tree,
+        state.draft.tree.currentNodeId,
         action.input,
         { asVariation: true },
       );
       if (!played) return state;
       const nextPhase = phaseFromDraft(played.tree, action.humanColor);
-      const completeWithoutReply =
-        nextPhase === "gameOver"
-          ? {
-              practiceTurns: [
-                ...state.practiceTurns,
-                { humanUci: played.node.move?.uci ?? "", replyUci: null },
-              ],
-            }
-          : {};
-      return {
-        ...state,
-        draftTree: played.tree,
-        focusNodeId: played.node.id,
-        practicePhase: nextPhase,
-        practiceRedo: [],
-        practiceError: null,
-        ...completeWithoutReply,
-      };
+      return withDraft(
+        state,
+        {
+          tree: played.tree,
+          phase: nextPhase,
+          redo: [],
+          error: null,
+          turns:
+            nextPhase === "gameOver"
+              ? [
+                  ...state.draft.turns,
+                  { humanUci: played.node.move?.uci ?? "", replyUci: null },
+                ]
+              : state.draft.turns,
+        },
+        { focusNodeId: played.node.id },
+      );
     }
     case "practiceOpponentMove": {
-      if (state.mode !== "practice" || !state.draftTree) return state;
-      if (state.practicePhase !== "opponentThinking") return state;
-      const humanNode = getCurrentNode(state.draftTree);
+      if (state.mode !== "practice") return state;
+      if (state.draft.phase !== "opponentThinking") return state;
+      const humanNode = getCurrentNode(state.draft.tree);
       const played = playMoveOnTree(
-        state.draftTree,
-        state.draftTree.currentNodeId,
+        state.draft.tree,
+        state.draft.tree.currentNodeId,
         action.input,
         { asVariation: true },
       );
       if (!played) {
-        return {
-          ...state,
-          practicePhase: "error",
-          practiceError: "Could not play Maia's practice reply",
-        };
+        return withDraft(state, {
+          phase: "error",
+          error: "Could not play Maia's practice reply",
+        });
       }
       const humanUci = humanNode.move?.uci;
       const replyUci = played.node.move?.uci ?? null;
       const followTip = state.focusNodeId === humanNode.id;
       const status = getStatusAtNode(played.tree, played.tree.currentNodeId);
-      return {
-        ...state,
-        draftTree: played.tree,
-        focusNodeId: followTip ? played.node.id : state.focusNodeId,
-        practicePhase: status.isGameOver ? "gameOver" : "playerTurn",
-        practiceTurns:
-          humanUci && replyUci
-            ? [...state.practiceTurns, { humanUci, replyUci }]
-            : state.practiceTurns,
-        practiceError: null,
-      };
-    }
-    case "practiceJump": {
-      if (state.mode !== "practice" || !state.draftTree) return state;
-      const jumped = jumpToNode(state.draftTree, action.nodeId);
-      if (!jumped) return state;
-      return {
-        ...state,
-        draftTree: jumped,
-        focusNodeId: action.nodeId,
-        previewNodeId: null,
-      };
+      return withDraft(
+        state,
+        {
+          tree: played.tree,
+          phase: status.isGameOver ? "gameOver" : "playerTurn",
+          turns:
+            humanUci && replyUci
+              ? [...state.draft.turns, { humanUci, replyUci }]
+              : state.draft.turns,
+          error: null,
+        },
+        { focusNodeId: followTip ? played.node.id : state.focusNodeId },
+      );
     }
     case "practiceUndo": {
-      if (state.mode !== "practice" || !state.draftTree) return state;
-      if (state.draftTree.currentNodeId === state.practiceOriginId) {
+      if (state.mode !== "practice") return state;
+      if (state.draft.tree.currentNodeId === state.draft.originId) {
         return state;
       }
-      if (state.practicePhase === "opponentThinking") {
-        const next = takebackOne(state.draftTree);
+      if (state.draft.phase === "opponentThinking") {
+        const next = takebackOne(state.draft.tree);
         if (!next) return state;
-        return {
-          ...state,
-          draftTree: next,
-          focusNodeId: next.currentNodeId,
-          practicePhase: "playerTurn",
-          practiceError: null,
-        };
+        return withDraft(
+          state,
+          { tree: next, phase: "playerTurn", error: null },
+          { focusNodeId: next.currentNodeId },
+        );
       }
-      const turn = state.practiceTurns[state.practiceTurns.length - 1];
+      const turn = state.draft.turns[state.draft.turns.length - 1];
       if (!turn) return state;
-      let nextTree = state.draftTree;
+      let nextTree = state.draft.tree;
       if (turn.replyUci) {
         const afterReply = takebackOne(nextTree);
         if (!afterReply) return state;
@@ -274,63 +279,54 @@ export function reduceTimelineSession(
       }
       const afterHuman = takebackOne(nextTree);
       if (!afterHuman) return state;
-      return {
-        ...state,
-        draftTree: afterHuman,
-        focusNodeId: afterHuman.currentNodeId,
-        practicePhase: "playerTurn",
-        practiceTurns: state.practiceTurns.slice(0, -1),
-        practiceRedo: [...state.practiceRedo, turn],
-        practiceError: null,
-      };
+      return withDraft(
+        state,
+        {
+          tree: afterHuman,
+          phase: "playerTurn",
+          turns: state.draft.turns.slice(0, -1),
+          redo: [...state.draft.redo, turn],
+          error: null,
+        },
+        { focusNodeId: afterHuman.currentNodeId },
+      );
     }
     case "practiceRedo": {
-      if (state.mode !== "practice" || !state.draftTree) return state;
-      const turn = state.practiceRedo[state.practiceRedo.length - 1];
+      if (state.mode !== "practice") return state;
+      const turn = state.draft.redo[state.draft.redo.length - 1];
       if (!turn) return state;
       const human = playMoveOnTree(
-        state.draftTree,
-        state.draftTree.currentNodeId,
+        state.draft.tree,
+        state.draft.tree.currentNodeId,
         turn.humanUci,
         { asVariation: true },
       );
       if (!human) return state;
-      let draft = human.tree;
+      let tree = human.tree;
       let focusId = human.node.id;
-      let phase: PracticePhase = "playerTurn";
       if (turn.replyUci) {
-        const reply = playMoveOnTree(
-          draft,
-          draft.currentNodeId,
-          turn.replyUci,
-          {
-            asVariation: true,
-          },
-        );
+        const reply = playMoveOnTree(tree, tree.currentNodeId, turn.replyUci, {
+          asVariation: true,
+        });
         if (!reply) return state;
-        draft = reply.tree;
+        tree = reply.tree;
         focusId = reply.node.id;
-        phase = phaseFromDraft(draft, action.humanColor);
-      } else {
-        phase = phaseFromDraft(draft, action.humanColor);
       }
-      return {
-        ...state,
-        draftTree: draft,
-        focusNodeId: focusId,
-        practicePhase: phase,
-        practiceTurns: [...state.practiceTurns, turn],
-        practiceRedo: state.practiceRedo.slice(0, -1),
-        practiceError: null,
-      };
+      return withDraft(
+        state,
+        {
+          tree,
+          phase: phaseFromDraft(tree, action.humanColor),
+          turns: [...state.draft.turns, turn],
+          redo: state.draft.redo.slice(0, -1),
+          error: null,
+        },
+        { focusNodeId: focusId },
+      );
     }
     case "practiceError":
       if (state.mode !== "practice") return state;
-      return {
-        ...state,
-        practicePhase: "error",
-        practiceError: action.message,
-      };
+      return withDraft(state, { phase: "error", error: action.message });
     default:
       return state;
   }
@@ -350,7 +346,7 @@ export function graphCursorId(
   liveId: string,
 ): string {
   if (state.mode === "practice") {
-    return state.focusNodeId ?? state.draftTree?.currentNodeId ?? liveId;
+    return state.focusNodeId ?? state.draft.tree.currentNodeId;
   }
   return state.focusNodeId ?? liveId;
 }
@@ -361,26 +357,8 @@ export function isReviewingNonLive(
 ): boolean {
   if (state.mode === "practice") {
     const viewed = viewedNodeId(state, liveId);
-    return viewed !== (state.draftTree?.currentNodeId ?? liveId);
+    return viewed !== state.draft.tree.currentNodeId;
   }
   const viewed = viewedNodeId(state, liveId);
   return viewed !== liveId;
-}
-
-export function firstDraftUci(
-  draft: GameTree,
-  originId: string,
-): string | null {
-  const chain: string[] = [];
-  let cursor: string | null = draft.currentNodeId;
-  const seen = new Set<string>();
-  while (cursor && cursor !== originId && !seen.has(cursor)) {
-    seen.add(cursor);
-    const node = getNode(draft, cursor);
-    if (!node?.move) break;
-    chain.push(node.move.uci);
-    cursor = node.parentId;
-  }
-  chain.reverse();
-  return chain[0] ?? null;
 }

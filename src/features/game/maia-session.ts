@@ -170,12 +170,14 @@ function createMaiaSessionFromClient(
         }
       }
 
+      const activeClient = client;
+      if (!activeClient) return null;
       pendingRequestId = input.requestId;
       store.setState({ phase: "thinking", message: "Maia thinking…" });
 
-      try {
-        client.setCurrentGameNodeId?.(input.gameNodeId);
-        const result = await client.infer({
+      const attempt = async (): Promise<MaiaMoveResult> => {
+        activeClient.setCurrentGameNodeId?.(input.gameNodeId);
+        const result = await activeClient.infer({
           requestId: input.requestId,
           gameNodeId: input.gameNodeId,
           fen: input.fen,
@@ -185,27 +187,35 @@ function createMaiaSessionFromClient(
           topP: 0.9,
           timeoutMs: input.movetimeMs ? input.movetimeMs + 5_000 : undefined,
         });
-
-        if (pendingRequestId !== input.requestId) return null;
-
+        if (pendingRequestId !== input.requestId) {
+          throw new Error("Maia move superseded");
+        }
         const moveUci = validateLegalUci(input.fen, result.moveUci);
         if (!moveUci) {
-          store.setState({
-            phase: "failed",
-            message: `Maia returned an illegal or missing move for ${input.fen}: ${result.moveUci}`,
-          });
-          return null;
+          throw new Error(
+            `Maia returned an illegal or missing move for ${input.fen}: ${result.moveUci}`,
+          );
         }
-
-        store.setState({
-          phase: "ready",
-          message: "Maia ready",
-        });
         return {
           requestId: input.requestId,
           gameNodeId: input.gameNodeId,
           moveUci,
         };
+      };
+
+      try {
+        let result: MaiaMoveResult;
+        try {
+          result = await attempt();
+        } catch {
+          if (pendingRequestId !== input.requestId) return null;
+          result = await attempt();
+        }
+        store.setState({
+          phase: "ready",
+          message: "Maia ready",
+        });
+        return result;
       } catch (err) {
         if (pendingRequestId !== input.requestId) return null;
         const message =

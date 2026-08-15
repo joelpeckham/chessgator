@@ -4,7 +4,10 @@ import type {
   PrincipalVariation,
 } from "@/domain/analysis/types";
 import { tryApplyMove, validateLegalUci } from "@/domain/game/rules";
-import { createWaitUntilReady } from "@/engines/shared/wait-until-ready";
+import {
+  createWaitUntilReady,
+  joinOrStartWorkerInit,
+} from "@/engines/shared/wait-until-ready";
 import { stockfishAssetWorkerUrl } from "@/engines/stockfish/assets";
 import type {
   StockfishAnalyzeRequest,
@@ -66,6 +69,34 @@ export function createStockfishWorkerRuntime(
     cancelRequested = false;
   }
 
+  function tearDownEngine(): void {
+    if (!engine) return;
+    try {
+      engine.terminate();
+    } catch {
+      // ignore
+    }
+    engine = null;
+  }
+
+  function failNestedEngine(message: string): void {
+    const error = new Error(`Stockfish worker error: ${message}`);
+    const failingInit = initInFlight;
+    const failingAnalyze = activeAnalyze;
+    tearDownEngine();
+    if (failingInit) {
+      initInFlight = null;
+      ready.signalError(error);
+    }
+    activeAnalyze = null;
+    resetSearchState();
+    deps.post({
+      type: "error",
+      requestId: failingAnalyze?.requestId ?? failingInit ?? "engine",
+      message: error.message,
+    });
+  }
+
   function ensureEngine(engineUrl: string): NestedStockfishEngine {
     if (engine) return engine;
     const url = engineUrl || stockfishAssetWorkerUrl();
@@ -73,11 +104,7 @@ export function createStockfishWorkerRuntime(
       url,
       (line) => handleEngineLine(line),
       (message) => {
-        deps.post({
-          type: "error",
-          requestId: activeAnalyze?.requestId ?? initInFlight ?? "engine",
-          message: `Stockfish worker error: ${message}`,
-        });
+        failNestedEngine(message);
       },
     );
     return engine;
@@ -87,23 +114,21 @@ export function createStockfishWorkerRuntime(
     requestId: string,
     engineUrl: string,
   ): Promise<void> {
-    if (ready.ready) {
-      deps.post({ type: "ready", requestId });
-      return;
-    }
-    if (initInFlight) {
-      try {
-        await ready.wait();
+    const shouldStart = joinOrStartWorkerInit({
+      isReady: ready.ready,
+      initInFlight,
+      wait: () => ready.wait(),
+      onAlreadyReady: () => {
         deps.post({ type: "ready", requestId });
-      } catch (err) {
-        deps.post({
-          type: "error",
-          requestId,
-          message: err instanceof Error ? err.message : String(err),
-        });
-      }
-      return;
-    }
+      },
+      onJoinedReady: () => {
+        deps.post({ type: "ready", requestId });
+      },
+      onJoinError: (message) => {
+        deps.post({ type: "error", requestId, message });
+      },
+    });
+    if (shouldStart !== true) return;
 
     try {
       initInFlight = requestId;

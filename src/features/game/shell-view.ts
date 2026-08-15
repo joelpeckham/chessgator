@@ -53,11 +53,12 @@ import {
 import {
   getStatusPresentation,
   type StatusPresentation,
-  type StatusPresentationInput,
 } from "@/features/game/status-copy";
 import {
   graphCursorId,
   isReviewingNonLive,
+  type PracticePhase,
+  practiceDraft,
   type TimelineSessionState,
   viewedNodeId,
 } from "@/features/game/timeline-session";
@@ -75,7 +76,6 @@ export type ShellView = {
   coachLaneLeft: number;
   stubMode: boolean;
   liveFen: string;
-  statusInput: StatusPresentationInput;
   status: StatusPresentation;
   badgeMode: SessionMode | "practicing";
   maiaPhase: GameRuntime["maia"]["phase"];
@@ -152,7 +152,7 @@ export type ShellView = {
 
 function timelineStatusText(args: {
   mode: TimelineSessionState["mode"];
-  practicePhase: TimelineSessionState["practicePhase"];
+  practicePhase: PracticePhase | null;
   originLabel: string | null;
   focusedLabel: string | null;
   livePly: number;
@@ -204,19 +204,15 @@ export function buildShellView(args: {
   const lastMove = liveMoves[liveMoves.length - 1] ?? null;
   const mode = session.mode;
   const timeline = ui.timeline;
-  const draftTree =
-    timeline.mode === "practice" && timeline.draftTree
-      ? timeline.draftTree
-      : null;
+  const draft = practiceDraft(timeline);
+  const draftTree = draft?.tree ?? null;
   const graphNodeId = graphCursorId(timeline, tree.currentNodeId);
   const boardNodeId = viewedNodeId(timeline, tree.currentNodeId);
   const isViewingNonLive = isReviewingNonLive(timeline, tree.currentNodeId);
 
   const virtual = parseVirtualTimelineId(graphNodeId);
   const tutorRootId =
-    virtual?.kind === "tutor"
-      ? virtual.rootNodeId
-      : (timeline.practiceOriginId ?? null);
+    virtual?.kind === "tutor" ? virtual.rootNodeId : (draft?.originId ?? null);
   const analyzedId = analyzedNodeIdForFocus({
     tree,
     focusNodeId: graphNodeId,
@@ -269,7 +265,7 @@ export function buildShellView(args: {
     liveTree: tree,
     humanColor,
     tutorRootId,
-    practiceOriginId: timeline.practiceOriginId,
+    practiceOriginId: draft?.originId ?? null,
     expandedDecisionId: timeline.expandedDecisionId,
   });
   const lessonFork = focusedDecision
@@ -292,14 +288,13 @@ export function buildShellView(args: {
     engineHint: timeline.mode === "practice" ? null : engineHint,
     cursorId: graphNodeId,
     pinnedBranchId: timeline.pinnedBranchId,
-    practice:
-      draftTree && timeline.practiceOriginId
-        ? {
-            originId: timeline.practiceOriginId,
-            draftTree,
-            currentId: draftTree.currentNodeId,
-          }
-        : null,
+    practice: draft
+      ? {
+          originId: draft.originId,
+          draftTree: draft.tree,
+          currentId: draft.tree.currentNodeId,
+        }
+      : null,
   });
 
   const graphBoardNode = graph.nodes.find((node) => node.id === boardNodeId);
@@ -314,7 +309,7 @@ export function buildShellView(args: {
 
   const interactive = deriveBoardInteractivity({
     timelineMode: timeline.mode,
-    practicePhase: timeline.practicePhase,
+    practicePhase: draft?.phase ?? null,
     draftTree,
     playCursorId: graphNodeId,
     liveMode: mode,
@@ -344,15 +339,15 @@ export function buildShellView(args: {
       : timeline.mode === "review"
         ? "reviewing"
         : mode;
-  const statusInput: StatusPresentationInput = {
+  const status = getStatusPresentation({
     mode: timeline.mode === "review" ? "reviewing" : mode,
     status:
-      timeline.mode === "practice" && draftTree
+      draftTree != null
         ? getStatusAtNode(draftTree, draftTree.currentNodeId)
         : currentStatus,
     terminalReason: session.terminalReason,
     maia: runtime.maia,
-    lastError: args.lastError ?? timeline.practiceError,
+    lastError: args.lastError ?? draft?.error ?? null,
     coachUnavailable: runtime.coachUnavailable,
     coachMessage: runtime.coaching.message,
     lastMove,
@@ -360,9 +355,8 @@ export function buildShellView(args: {
     enginesWarming: runtime.enginesWarming,
     humanColor,
     timelineMode: timeline.mode,
-    practicePhase: timeline.practicePhase,
-  };
-  const status = getStatusPresentation(statusInput);
+    practicePhase: draft?.phase ?? null,
+  });
 
   const canResign =
     mode === "playerTurn" ||
@@ -372,12 +366,12 @@ export function buildShellView(args: {
 
   const lastHumanId = lastHumanDecisionId(tree, humanColor);
   const practiceAtLatestOrigin =
-    timeline.mode === "practice" &&
-    timeline.practiceOriginId ===
+    draft != null &&
+    draft.originId ===
       (lastHumanId
         ? (getNode(tree, lastHumanId)?.parentId ?? tree.rootId)
         : null) &&
-    timeline.draftTree?.currentNodeId === timeline.practiceOriginId;
+    draft.tree.currentNodeId === draft.originId;
 
   const boardMarks = showCoachAnnotations
     ? styleBoardAnnotations(
@@ -433,16 +427,13 @@ export function buildShellView(args: {
     (virtual ? (tutorLine?.plies[0]?.san ?? null) : null);
   const originLabel = focusedDecision?.moveLabel ?? null;
 
-  const draftHumanUci =
-    timeline.mode === "practice" &&
-    timeline.draftTree &&
-    timeline.practiceOriginId
-      ? firstHumanUciFromDraft({
-          draft: timeline.draftTree,
-          originId: timeline.practiceOriginId,
-          humanColor,
-        })
-      : null;
+  const draftHumanUci = draft
+    ? firstHumanUciFromDraft({
+        draft: draft.tree,
+        originId: draft.originId,
+        humanColor,
+      })
+    : null;
   const prevNodeId = transportStep(
     graph,
     graphNodeId,
@@ -494,7 +485,6 @@ export function buildShellView(args: {
     coachLaneLeft: args.coachLaneLeft,
     stubMode: args.stubMode,
     liveFen,
-    statusInput,
     status,
     badgeMode,
     maiaPhase: runtime.maia.phase,
@@ -557,7 +547,7 @@ export function buildShellView(args: {
       mode: timeline.mode,
       statusText: timelineStatusText({
         mode: timeline.mode,
-        practicePhase: timeline.practicePhase,
+        practicePhase: draft?.phase ?? null,
         originLabel,
         focusedLabel,
         livePly: liveNode.ply,
@@ -565,15 +555,13 @@ export function buildShellView(args: {
       canGoPrev: prevNodeId != null,
       canGoNext: nextNodeId != null,
       canPracticeUndo:
-        timeline.mode === "practice" &&
-        Boolean(timeline.draftTree) &&
-        (timeline.draftTree!.currentNodeId !== timeline.practiceOriginId ||
-          timeline.practicePhase === "opponentThinking"),
-      canPracticeRedo:
-        timeline.mode === "practice" && timeline.practiceRedo.length > 0,
-      canCommitPractice: timeline.mode === "practice" && Boolean(draftHumanUci),
+        draft != null &&
+        (draft.tree.currentNodeId !== draft.originId ||
+          draft.phase === "opponentThinking"),
+      canPracticeRedo: (draft?.redo.length ?? 0) > 0,
+      canCommitPractice: Boolean(draftHumanUci),
       canTakeBackLive: practiceAtLatestOrigin,
-      disabled: mode === "error" || timeline.practicePhase === "error",
+      disabled: mode === "error" || draft?.phase === "error",
       orientation: humanColor === "b" ? "black" : "white",
       prevNodeId,
       nextNodeId,

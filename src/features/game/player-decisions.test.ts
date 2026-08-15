@@ -9,12 +9,10 @@ import type { TeachingInsight } from "@/domain/teaching";
 import {
   analyzedNodeIdForFocus,
   buildDecisionGraph,
-  graphHasCursor,
   lastHumanDecisionId,
   PRACTICE_BRANCH_ID,
   projectOpeningPlies,
   projectPlayerDecisions,
-  suggestedAlternateUci,
 } from "@/features/game/player-decisions";
 
 const mistake: TeachingInsight = {
@@ -172,42 +170,6 @@ describe("analyzedNodeIdForFocus", () => {
   });
 });
 
-describe("suggestedAlternateUci", () => {
-  it("returns a different coach suggestion at the origin", () => {
-    let tree = createInitialTree();
-    tree = playMoveOnTree(tree, tree.rootId, "d2d4")!.tree;
-    const d4Id = tree.currentNodeId;
-    expect(
-      suggestedAlternateUci({
-        tree,
-        originId: tree.rootId,
-        humanColor: "w",
-        lessons: { [d4Id]: mistake },
-      }),
-    ).toBe("e2e4");
-  });
-
-  it("ignores a suggestion that matches the live human ply", () => {
-    let tree = createInitialTree();
-    tree = playMoveOnTree(tree, tree.rootId, "e2e4")!.tree;
-    const e4Id = tree.currentNodeId;
-    expect(
-      suggestedAlternateUci({
-        tree,
-        originId: tree.rootId,
-        humanColor: "w",
-        lessons: {
-          [e4Id]: {
-            ...mistake,
-            suggestedMoveUci: "e2e4",
-            suggestedMoveSan: "e4",
-          },
-        },
-      }),
-    ).toBeNull();
-  });
-});
-
 describe("buildDecisionGraph", () => {
   it("lays out the live path as a trunk of ply columns", () => {
     let tree = createInitialTree();
@@ -317,8 +279,12 @@ describe("buildDecisionGraph", () => {
     expect(graph.nodes.filter((n) => n.kind === "variation")).toHaveLength(2);
     expect(overflow).toBeDefined();
     if (!overflow) return;
-    expect(graphHasCursor(graph, overflow.id)).toBe(false);
-    expect(graphHasCursor(graph, e4Id)).toBe(true);
+    expect(
+      graph.nodes.some((n) => n.id === overflow.id && n.kind !== "overflow"),
+    ).toBe(false);
+    expect(
+      graph.nodes.some((n) => n.id === e4Id && n.kind !== "overflow"),
+    ).toBe(true);
   });
 
   it("keeps a selected saved try in the graph", () => {
@@ -345,7 +311,9 @@ describe("buildDecisionGraph", () => {
       cursorId: d4Id,
       pinnedBranchId: `try:${d4Id}`,
     });
-    expect(graphHasCursor(graph, d4Id)).toBe(true);
+    expect(
+      graph.nodes.some((n) => n.id === d4Id && n.kind !== "overflow"),
+    ).toBe(true);
   });
 
   it("overlays the practice line on the live trunk", () => {
@@ -385,7 +353,9 @@ describe("buildDecisionGraph", () => {
     expect(
       graph.nodes.some((n) => n.kind === "practice" && n.san === "e4"),
     ).toBe(true);
-    expect(graphHasCursor(graph, practiceId)).toBe(true);
+    expect(
+      graph.nodes.some((n) => n.id === practiceId && n.kind !== "overflow"),
+    ).toBe(true);
   });
 });
 

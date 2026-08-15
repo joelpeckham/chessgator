@@ -165,4 +165,19 @@ describe("game store adapter", () => {
       "e4",
     );
   });
+
+  it("surfaces persist failures in lastError", async () => {
+    const repo = createLocalStorageGameRepository({
+      storage: {
+        getItem: () => null,
+        setItem: () => {
+          throw new DOMException("quota", "QuotaExceededError");
+        },
+        removeItem: () => {},
+      },
+    });
+    useGameStore.getState().startGame();
+    await useGameStore.getState().persist(repo);
+    expect(useGameStore.getState().lastError).toMatch(/could not save/i);
+  });
 });

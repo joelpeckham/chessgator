@@ -5,6 +5,31 @@ export type WaitUntilReadyOptions = {
   clearTimer?: (handle: unknown) => void;
 };
 
+export function joinOrStartWorkerInit(args: {
+  isReady: boolean;
+  initInFlight: string | null;
+  wait: () => Promise<void>;
+  onAlreadyReady: () => void;
+  onJoinedReady: () => void;
+  onJoinError: (message: string) => void;
+}): boolean | Promise<false> {
+  if (args.isReady) {
+    args.onAlreadyReady();
+    return false;
+  }
+  if (!args.initInFlight) return true;
+  return args
+    .wait()
+    .then(() => {
+      args.onJoinedReady();
+      return false as const;
+    })
+    .catch((err: unknown) => {
+      args.onJoinError(err instanceof Error ? err.message : String(err));
+      return false as const;
+    });
+}
+
 export type WaitUntilReady = {
   readonly ready: boolean;
   wait: () => Promise<void>;

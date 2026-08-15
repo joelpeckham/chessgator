@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildMoveAnalysisEvidence } from "@/domain/analysis/move-analysis";
 import type { AnalysisEvidence } from "@/domain/analysis/types";
-import { tryApplyMove } from "@/domain/game/rules";
+import { sideToMoveFromFen, tryApplyMove } from "@/domain/game/rules";
 import type { GameMove } from "@/domain/game/types";
 import { describeBecause } from "@/domain/teaching/move-copy";
 import { selectTeachingInsight } from "@/domain/teaching/select-insight";
@@ -17,7 +17,7 @@ function evidence(
     requestId: "swarm",
     gameNodeId: "swarm-node",
     fen,
-    sideToMove: fen.split(" ")[1] === "b" ? "b" : "w",
+    sideToMove: sideToMoveFromFen(fen),
     score,
     bestMoveUci,
     lines: [{ multipv: 1, score, pvUci: pv }, ...extraLines],

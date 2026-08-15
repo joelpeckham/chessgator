@@ -1,4 +1,5 @@
 import {
+  isTeachable,
   type MoveClassification,
   shouldNudge,
 } from "@/domain/analysis/classification";
@@ -112,10 +113,7 @@ export function selectTeachingInsight(
     mover: evidence.playedMove.color,
   });
 
-  const teachable =
-    evidence.classification === "inaccuracy" ||
-    evidence.classification === "mistake" ||
-    evidence.classification === "blunder";
+  const teachable = isTeachable(evidence.classification);
   const explainPlayedAsBenefit = !teachable;
 
   let playedBenefits = dropTautologyReasons(
@@ -267,12 +265,7 @@ export function chooseConcept(evidence: MoveAnalysisEvidence): TeachingConcept {
 
   if (classification === "best") return "best_move";
 
-  if (
-    mateAgainst &&
-    (classification === "inaccuracy" ||
-      classification === "mistake" ||
-      classification === "blunder")
-  ) {
+  if (mateAgainst && isTeachable(classification)) {
     return "king_safety";
   }
 
@@ -282,9 +275,7 @@ export function chooseConcept(evidence: MoveAnalysisEvidence): TeachingConcept {
     }
   }
 
-  return classification === "excellent" || classification === "good"
-    ? "solid_move"
-    : "missed_improvement";
+  return "missed_improvement";
 }
 
 function matchesConcept(
@@ -293,10 +284,7 @@ function matchesConcept(
   t: TacticalFacts,
   evalLossCp: number,
 ): boolean {
-  const teachable =
-    classification === "inaccuracy" ||
-    classification === "mistake" ||
-    classification === "blunder";
+  const teachable = isTeachable(classification);
 
   switch (concept) {
     case "piece_safety":

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { collectTacticalFacts } from "@/domain/analysis/tactics";
+import { collectTacticalFacts } from "@/domain/analysis/move-effects";
 import { tryApplyMove } from "@/domain/game/rules";
 
 describe("tactical facts", () => {
