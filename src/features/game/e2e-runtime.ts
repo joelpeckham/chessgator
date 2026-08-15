@@ -11,6 +11,7 @@ export function resolveGameRuntimeOptions(): GameRuntimeOptions {
     return {};
   }
   return {
+    stubMode: true,
     createMaiaSession:
       stub === "fallback"
         ? undefined

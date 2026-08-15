@@ -33,6 +33,7 @@ test.describe("playable slice (stub Maia)", () => {
 
     await openSettings(page);
     await page.getByTestId("resign-button").click();
+    await page.getByTestId("confirm-resign").click();
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
       "gameOver",

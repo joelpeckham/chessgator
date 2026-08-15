@@ -1,9 +1,9 @@
 /** Target CSS pixels per dither cell. */
-export const VEIL_CELL_PX = 2;
+export const VEIL_CELL_PX = 4;
 export const VEIL_GRID_MIN = 64;
 export const VEIL_GRID_MAX = 512;
 
-export const VEIL_COVERAGE_CENTER = 1;
+export const VEIL_COVERAGE_CENTER = 0.55;
 export const VEIL_COVERAGE_EDGE = 0.1;
 export const VEIL_RADIUS_INNER = 0.1;
 export const VEIL_FALLOFF_GAMMA = 5;

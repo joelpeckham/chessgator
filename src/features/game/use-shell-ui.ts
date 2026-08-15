@@ -50,6 +50,7 @@ export type ShellChrome = {
   navMessage: string | null;
   dismissedNotices: ReadonlySet<string>;
   pendingHumanColor: Color;
+  gameOverDismissed: boolean;
 };
 
 export type TimelineNodeMeta = {
@@ -83,6 +84,7 @@ export type ShellUi = ShellChrome & {
   handlePracticeRedo: () => void;
   handleCommitPractice: () => void;
   handleCancelPractice: () => void;
+  dismissGameOver: () => void;
 };
 
 export function useShellUi(runtime: GameRuntime): ShellUi {
@@ -103,6 +105,7 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
   const [pendingHumanColor, setPendingHumanColor] = useState<Color>(
     () => useGameStore.getState().humanColor,
   );
+  const [gameOverDismissed, setGameOverDismissed] = useState(false);
   const [schedulerNonce, setSchedulerNonce] = useState(0);
 
   const startGame = useGameStore((s) => s.startGame);
@@ -168,7 +171,7 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
       return;
     }
     if (state.resumed && state.session.mode === "gameOver") {
-      queueNav("Loaded finished game — open settings for a new one");
+      queueNav("Loaded finished game");
       return;
     }
     if (state.session.mode === "loading" || !state.resumed) {
@@ -360,14 +363,21 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
 
   function handleResign(): void {
     resetPending();
+    setSettingsOpen(false);
     resign();
   }
 
   function handleRestart(): void {
     resetPending({ clearCoach: true });
+    setGameOverDismissed(false);
+    setSettingsOpen(false);
     useGameStore.setState({ resumed: false });
     startGame({ humanColor: pendingHumanColor });
     queueNav("New game started");
+  }
+
+  function dismissGameOver(): void {
+    setGameOverDismissed(true);
   }
 
   async function handleRetryEngines(): Promise<void> {
@@ -525,7 +535,9 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     handleResign,
     handleRestart,
     pendingHumanColor,
+    gameOverDismissed,
     setPendingHumanColor,
+    dismissGameOver,
     handleRetryEngines,
     handleSelectTimelineNode,
     handleSelectDecision,

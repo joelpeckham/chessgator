@@ -16,6 +16,7 @@ export type TeachingCardProps = {
   /** FEN for converting hint UCI lines to SAN. */
   hintFen?: string | null;
   showTutorLaneHint?: boolean;
+  emptyCopy?: string | null;
 };
 
 /**
@@ -31,6 +32,7 @@ export function TeachingCard({
   onRequestHint,
   hintFen = null,
   showTutorLaneHint = false,
+  emptyCopy = null,
 }: TeachingCardProps) {
   const showHints = Boolean(onRequestHint) || Boolean(hint);
   const hintLadder = showHints ? (
@@ -77,7 +79,7 @@ export function TeachingCard({
               Coach
             </h3>
             <p className="text-xs text-muted-foreground">
-              Feedback appears after each move.
+              {emptyCopy ?? "Feedback appears after each move."}
             </p>
           </div>
         </div>

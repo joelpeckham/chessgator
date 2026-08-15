@@ -101,9 +101,11 @@ const HEAD_HEIGHTS = Object.values(GATOR_ART).map(
 
 /** Reserved left strip so the board never sits on the peeking gator. */
 export const MASCOT_PEEK_WIDTH_PX = 128;
+/** Wide-screen coach lane for the always-open teaching card; centers with the board. */
+export const COACH_COLUMN_WIDTH_PX = 380;
 /** Tallest head, plus a little air above the timeline ledge. */
 export const MASCOT_PEEK_HEIGHT_PX = Math.ceil(Math.max(...HEAD_HEIGHTS)) + 4;
 /** Inset from the screen edge so claws are not clipped. */
 export const GATOR_LEDGE_INSET_PX = 24;
-/** Pull the neck under the footer border so the crop tucks behind the ledge. */
-export const GATOR_LEDGE_OVERLAP_PX = 0;
+/** A few pixels of the head sit under the timeline edge so the border crops the neck. */
+export const GATOR_LEDGE_OVERLAP_PX = 3;

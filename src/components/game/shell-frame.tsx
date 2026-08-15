@@ -41,7 +41,7 @@ export function ShellFrame({
         {children}
       </main>
       <footer
-        className="sticky bottom-0 z-20 shrink-0 overflow-visible border-t border-border bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/80"
+        className="sticky bottom-0 z-20 shrink-0 overflow-visible"
         data-testid={testId === "game-shell" ? "timeline-bar" : undefined}
       >
         {footer}

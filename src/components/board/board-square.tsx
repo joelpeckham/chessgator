@@ -96,6 +96,7 @@ export function BoardSquare({
         "relative h-full w-full outline-none",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
       )}
+      data-board-square="true"
       onKeyDown={onKeyDown}
     >
       {children}
@@ -110,7 +111,7 @@ export function BoardSquare({
       {annotation ? (
         <span
           aria-hidden
-          className="pointer-events-none absolute right-0.5 bottom-0.5 rounded-sm bg-background/90 px-0.5 font-mono text-[0.55rem] tracking-wide text-foreground uppercase ring-1 ring-foreground/30"
+          className="pointer-events-none absolute right-0.5 bottom-0.5 rounded-sm bg-background/90 px-1 py-px font-mono text-[0.7rem] tracking-wide text-foreground uppercase ring-1 ring-foreground/30"
           data-testid={`square-label-${square}`}
         >
           {annotation}

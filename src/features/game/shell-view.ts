@@ -1,5 +1,9 @@
 import { styleBoardAnnotations } from "@/components/board/annotation-style";
 import { lastMoveSquares } from "@/components/board/move-utils";
+import {
+  type GatorMood,
+  gameOverMood,
+} from "@/components/coach/gator-expression";
 import { isIdleHintEligible } from "@/components/coach/teaser-timing";
 import type { SettingsEngineStatus } from "@/components/game/settings-sheet";
 import {
@@ -21,6 +25,7 @@ import {
   getStatusAtNode,
   getTurn,
   isHumanTurn,
+  movesToPgn,
   type SessionMode,
 } from "@/domain/game";
 import {
@@ -66,6 +71,9 @@ export type ShellView = {
   boardSize: number;
   mascotBelow: boolean;
   boardLeft: number;
+  coachDocked: boolean;
+  coachLaneLeft: number;
+  stubMode: boolean;
   liveFen: string;
   statusInput: StatusPresentationInput;
   status: StatusPresentation;
@@ -96,6 +104,15 @@ export type ShellView = {
     hintFen: string;
     showTutorLaneHint: boolean;
     idleHintEligible: boolean;
+    orientationTeaser: string | null;
+    mood: GatorMood | null;
+  };
+  gameOver: {
+    visible: boolean;
+    headline: string;
+    detail: string | null;
+    mood: GatorMood;
+    pgn: string;
   };
   timeline: {
     graph: DecisionGraph;
@@ -122,6 +139,8 @@ export type ShellView = {
     canPlayMove: boolean;
     engine: Omit<SettingsEngineStatus, "onRetry">;
     canResign: boolean;
+    confirmRestart: boolean;
+    pgn: string;
     pendingHumanColor: Color;
   };
   promotion: {
@@ -172,6 +191,9 @@ export function buildShellView(args: {
   boardSize: number;
   mascotBelow: boolean;
   boardLeft: number;
+  coachDocked: boolean;
+  coachLaneLeft: number;
+  stubMode: boolean;
   runtime: GameRuntime;
   ui: ShellChrome;
 }): ShellView {
@@ -309,7 +331,7 @@ export function buildShellView(args: {
 
   const analyzing =
     runtime.coaching.phase === "analyzing" || mode === "analyzing";
-  const coachExpanded = ui.coachExpanded;
+  const coachExpanded = ui.coachExpanded || args.coachDocked;
 
   const showCoachAnnotations =
     Boolean(visibleInsight) &&
@@ -434,12 +456,43 @@ export function buildShellView(args: {
     timeline.pinnedBranchId,
   );
 
+  const firstHumanTurn = !liveMoves.some((m) => m.color === humanColor);
+  const orientationTeaser =
+    !args.resumed &&
+    firstHumanTurn &&
+    timeline.mode === "live" &&
+    mode !== "gameOver"
+      ? `You're ${humanColor === "b" ? "Black" : "White"} — make a move. I'll coach you after each one.`
+      : null;
+  const overMood = gameOverMood({
+    result: currentStatus.result,
+    terminalReason: session.terminalReason,
+    humanColor,
+  });
+  const rootFen = getNode(tree, tree.rootId)?.fen ?? liveFen;
+  const pgnResult =
+    session.terminalReason === "resignation"
+      ? humanColor === "w"
+        ? "blackWins"
+        : "whiteWins"
+      : currentStatus.result;
+  const pgn = movesToPgn({
+    rootFen,
+    moves: liveMoves,
+    result: pgnResult,
+  });
+  const coachMood: GatorMood | null =
+    badgeMode === "gameOver" ? overMood : null;
+
   return {
     hydrated: args.hydrated,
     resumed: args.resumed,
     boardSize: args.boardSize,
     mascotBelow: args.mascotBelow,
     boardLeft: args.boardLeft,
+    coachDocked: args.coachDocked,
+    coachLaneLeft: args.coachLaneLeft,
+    stubMode: args.stubMode,
     liveFen,
     statusInput,
     status,
@@ -477,11 +530,23 @@ export function buildShellView(args: {
       hintFen: liveFen,
       showTutorLaneHint: Boolean(tutorLine),
       idleHintEligible: isIdleHintEligible({
-        firstHumanTurn: !liveMoves.some((m) => m.color === humanColor),
+        firstHumanTurn,
         playerTurn: interactive && timeline.mode === "live",
         hasInsight: Boolean(visibleInsight),
         hasHint: Boolean(runtime.coaching.hint),
       }),
+      orientationTeaser,
+      mood: coachMood,
+    },
+    gameOver: {
+      visible:
+        badgeMode === "gameOver" &&
+        timeline.mode === "live" &&
+        !ui.gameOverDismissed,
+      headline: status.headline,
+      detail: status.detail,
+      mood: overMood,
+      pgn,
     },
     timeline: {
       graph,
@@ -523,7 +588,9 @@ export function buildShellView(args: {
             ? runtime.maia.message
             : runtime.enginesWarming
               ? (runtime.maia.message ?? "Starting engines…")
-              : "Maia ready",
+              : runtime.coachUnavailable
+                ? "Maia ready"
+                : "Maia ready · Coach ready",
         starting: runtime.enginesWarming && runtime.maia.phase !== "failed",
         failed: runtime.maia.phase === "failed" || mode === "error",
         coachMessage:
@@ -533,6 +600,8 @@ export function buildShellView(args: {
             : null),
       },
       canResign,
+      confirmRestart: liveMoves.length > 0 && mode !== "gameOver",
+      pgn,
       pendingHumanColor: ui.pendingHumanColor,
     },
     promotion: {

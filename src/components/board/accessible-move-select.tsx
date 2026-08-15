@@ -57,6 +57,9 @@ export function AccessibleMoveSelect({
           ))}
         </SelectContent>
       </Select>
+      {disabled ? (
+        <p className="text-xs text-muted-foreground">Available on your turn.</p>
+      ) : null}
     </div>
   );
 }

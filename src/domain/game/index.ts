@@ -3,6 +3,7 @@ export {
   createNodeId,
   resetNodeIdSequenceForTests,
 } from "@/domain/game/id";
+export { movesToPgn, pgnResultTag } from "@/domain/game/pgn";
 export {
   createChess,
   DEFAULT_POSITION,

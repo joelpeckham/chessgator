@@ -12,6 +12,11 @@ import {
   NODE_CAPTION_H,
   NODE_LABEL_H,
 } from "@/components/timeline/timeline-layout";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 export type DecisionGraphViewProps = {
@@ -56,6 +61,13 @@ function shortCaption(caption: string | null): string | null {
 function nodeSan(node: DecisionGraph["nodes"][number]): string {
   if (node.kind === "projected") return `~${node.san}`;
   return node.san || node.moveLabel;
+}
+
+function tooltipFor(node: DecisionGraph["nodes"][number]): string {
+  if (node.kind === "projected") return "Likely reply (engine idea)";
+  if (node.kind === "tutor") return "Gator's suggested line";
+  if (node.isLive) return "Live position";
+  return ariaLabelFor(node);
 }
 
 function NodeGlyph({ node }: { node: DecisionGraph["nodes"][number] }) {
@@ -204,49 +216,56 @@ export function DecisionGraphView({
                 {caption}
               </span>
             ) : null}
-            <button
-              type="button"
-              id={`timeline-node-${node.id}`}
-              role="option"
-              tabIndex={-1}
-              aria-selected={selected}
-              aria-label={ariaLabelFor(node)}
-              data-timeline-node="true"
-              data-node-id={node.id}
-              data-kind={node.kind}
-              data-lane={node.lane}
-              data-testid={`timeline-node-${node.id}`}
-              disabled={disabled}
-              className={cn(
-                "group absolute flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full sm:size-9",
-                "bg-transparent",
-                "outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                "touch-manipulation",
-              )}
-              style={{ left: cx, top: cy }}
-              onClick={() => {
-                if (node.isDecision) {
-                  onSelectDecision(node.id, meta);
-                  if (node.prominent) onOpenCoach?.();
-                  return;
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <button
+                    type="button"
+                    id={`timeline-node-${node.id}`}
+                    role="option"
+                    tabIndex={-1}
+                    aria-selected={selected}
+                    aria-label={ariaLabelFor(node)}
+                    data-timeline-node="true"
+                    data-node-id={node.id}
+                    data-kind={node.kind}
+                    data-lane={node.lane}
+                    data-testid={`timeline-node-${node.id}`}
+                    disabled={disabled}
+                    className={cn(
+                      "group absolute flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full sm:size-9",
+                      "bg-transparent",
+                      "outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      "touch-manipulation",
+                    )}
+                    style={{ left: cx, top: cy }}
+                    onClick={() => {
+                      if (node.isDecision) {
+                        onSelectDecision(node.id, meta);
+                        if (node.prominent) onOpenCoach?.();
+                        return;
+                      }
+                      onSelectNode(node.id, meta);
+                      if (node.kind === "tutor") onOpenCoach?.();
+                    }}
+                    onPointerEnter={() => onPreviewNode?.(node.id)}
+                  />
                 }
-                onSelectNode(node.id, meta);
-                if (node.kind === "tutor") onOpenCoach?.();
-              }}
-              onPointerEnter={() => onPreviewNode?.(node.id)}
-            >
-              <span
-                className={cn(
-                  "flex size-5 items-center justify-center rounded-full",
-                  selected && "ring-2 ring-primary",
-                  node.isLive && !selected && "ring-2 ring-primary/55",
-                  !selected &&
-                    "group-hover:ring-1 group-hover:ring-foreground/30",
-                )}
               >
-                <NodeGlyph node={node} />
-              </span>
-            </button>
+                <span
+                  className={cn(
+                    "flex size-5 items-center justify-center rounded-full",
+                    selected && "ring-2 ring-primary",
+                    node.isLive && !selected && "ring-2 ring-primary/55",
+                    !selected &&
+                      "group-hover:ring-1 group-hover:ring-foreground/30",
+                  )}
+                >
+                  <NodeGlyph node={node} />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top">{tooltipFor(node)}</TooltipContent>
+            </Tooltip>
             <span
               className={cn(
                 "pointer-events-none absolute truncate text-center font-mono text-[0.65rem] leading-none tabular-nums text-muted-foreground",

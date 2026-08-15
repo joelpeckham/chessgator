@@ -18,6 +18,7 @@ const COACH_UNAVAILABLE_FALLBACK =
 export type GameRuntimeOptions = {
   createMaiaSession?: () => MaiaSession;
   createCoachingController?: () => CoachingController;
+  stubMode?: boolean;
 };
 
 export type GameRuntime = {
