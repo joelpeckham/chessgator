@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import type { TeachingInsight } from "@/domain/teaching";
 import {
   fromSavedLesson,
-  isProminentLesson,
   toSavedLesson,
 } from "@/features/game/learning-moments";
 
@@ -22,40 +21,6 @@ function insight(overrides: Partial<TeachingInsight> = {}): TeachingInsight {
     ...overrides,
   };
 }
-
-describe("isProminentLesson", () => {
-  it("promotes nudged mistakes with a because-clause", () => {
-    expect(isProminentLesson(insight())).toBe(true);
-  });
-
-  it("rejects empty-authority strongest-move copy", () => {
-    expect(
-      isProminentLesson(
-        insight({
-          classification: "best",
-          concept: "best_move",
-          nudge: false,
-          suggestedMoveUci: null,
-          explanation: "Moving your knight to f3 is the strongest move.",
-        }),
-      ),
-    ).toBe(false);
-  });
-
-  it("rejects best/excellent even with a suggestion", () => {
-    expect(
-      isProminentLesson(
-        insight({
-          classification: "best",
-          concept: "best_move",
-          nudge: false,
-          explanation:
-            "Moving your pawn to e4 is the strongest move because it claims the center.",
-        }),
-      ),
-    ).toBe(false);
-  });
-});
 
 describe("saved lesson round-trip", () => {
   it("preserves insight fields through the storage DTO", () => {

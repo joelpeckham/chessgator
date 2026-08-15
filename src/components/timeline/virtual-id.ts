@@ -1,32 +1,21 @@
-export function virtualId(
-  kind: "projected" | "tutor",
-  rootId: string,
-  pathKey: string,
-): string {
-  return `${kind}:${rootId}:${pathKey}`;
-}
-
-export function isVirtualTimelineId(id: string): boolean {
-  return id.startsWith("projected:") || id.startsWith("tutor:");
+export function virtualId(rootId: string, uci: string): string {
+  return `suggested:${rootId}:${uci}`;
 }
 
 /**
- * Extract the UCI path from a virtual timeline id relative to its root.
- * `tutor:rootId:e2e4/e7e5` → `{ rootNodeId, uciPath: ['e2e4','e7e5'], kind }`
+ * Extract the suggested UCI from a virtual timeline id.
+ * `suggested:rootId:e2e4` → `{ rootNodeId, uci: 'e2e4', kind }`
  */
 export function parseVirtualTimelineId(id: string): {
-  kind: "projected" | "tutor";
+  kind: "suggested";
   rootNodeId: string;
-  uciPath: string[];
+  uci: string;
 } | null {
-  const match = /^(projected|tutor):([^:]+):(.+)$/.exec(id);
+  const match = /^suggested:([^:]+):(.+)$/.exec(id);
   if (!match) return null;
-  const kind = match[1] as "projected" | "tutor";
-  const rootNodeId = match[2]!;
-  const pathKey = match[3]!;
   return {
-    kind,
-    rootNodeId,
-    uciPath: pathKey.split("/").filter(Boolean),
+    kind: "suggested",
+    rootNodeId: match[1]!,
+    uci: match[2]!,
   };
 }

@@ -15,7 +15,7 @@ export type TeachingCardProps = {
   onRequestHint?: () => void;
   /** FEN for converting hint UCI lines to SAN. */
   hintFen?: string | null;
-  showTutorLaneHint?: boolean;
+  showSuggestedMoveHint?: boolean;
   emptyCopy?: string | null;
 };
 
@@ -31,7 +31,7 @@ export function TeachingCard({
   hintDisabled = false,
   onRequestHint,
   hintFen = null,
-  showTutorLaneHint = false,
+  showSuggestedMoveHint = false,
   emptyCopy = null,
 }: TeachingCardProps) {
   const showHints = Boolean(onRequestHint) || Boolean(hint);
@@ -113,12 +113,13 @@ export function TeachingCard({
           <span className="font-medium">{insight.suggestedMoveSan}</span>
         </p>
       ) : null}
-      {showTutorLaneHint ? (
+      {showSuggestedMoveHint ? (
         <p
           className="text-xs text-muted-foreground"
-          data-testid="tutor-lane-hint"
+          data-testid="suggested-move-hint"
         >
-          Alternate line shown on the timeline as Gator&apos;s idea.
+          Gator&apos;s suggested move is shown on the timeline — click it to
+          try.
         </p>
       ) : null}
       {hintLadder}

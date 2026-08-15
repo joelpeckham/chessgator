@@ -16,9 +16,8 @@ import {
   type GameTree,
   getAncestors,
   getNode,
+  getTurn,
 } from "@/domain/game";
-import type { TeachingInsight } from "@/domain/teaching";
-import { isProminentLesson } from "@/features/game/learning-moments";
 
 export function formatMoveLabel(ply: number, san: string | null): string {
   if (!san) return "start";
@@ -98,31 +97,9 @@ function childMatchingUci(
   return null;
 }
 
-/**
- * Drop tutor prefix plies that already exist as real children so the dotted
- * rail only shows unrealized suggestions.
- */
-export function unrealizedTutorStart(args: {
-  tree: GameTree;
-  originId: string;
-  line: ProjectedLine;
-}): { fromId: string; plies: ProjectedLine["plies"] } {
-  let fromId = args.originId;
-  let start = 0;
-  for (const ply of args.line.plies) {
-    const existing = childMatchingUci(args.tree, fromId, ply.uci);
-    if (!existing) break;
-    fromId = existing;
-    start += 1;
-  }
-  return { fromId, plies: args.line.plies.slice(start) };
-}
-
 export function buildTreeGraph(args: {
   tree: GameTree;
-  lessons: Readonly<Record<string, TeachingInsight>>;
-  tutorLine: ProjectedLine | null;
-  futureLine: ProjectedLine | null;
+  suggestedMove: ProjectedLine | null;
 }): DecisionGraph {
   const { tree } = args;
   const input: Record<string, LayoutInputNode> = {};
@@ -145,7 +122,6 @@ export function buildTreeGraph(args: {
   for (const node of Object.values(tree.nodes)) {
     const pos = layout.positions.get(node.id);
     if (!pos) continue;
-    const lesson = args.lessons[node.id];
     pushNode(nodes, {
       id: node.id,
       parentId: node.parentId,
@@ -155,9 +131,9 @@ export function buildTreeGraph(args: {
       san: node.move?.san ?? "",
       moveLabel: formatMoveLabel(node.ply, node.move?.san ?? null),
       caption: null,
-      prominent: lesson ? isProminentLesson(lesson) : false,
       isCurrent: node.id === tree.currentNodeId,
       fen: node.fen,
+      moveColor: node.move?.color ?? null,
     });
     if (node.parentId) {
       pushEdge(edges, node.parentId, node.id, "committed");
@@ -168,75 +144,37 @@ export function buildTreeGraph(args: {
   let maxLane = layout.maxLane;
   let columns = layout.columns;
 
-  if (args.tutorLine && args.tutorLine.plies.length > 0) {
-    const { fromId, plies } = unrealizedTutorStart({
-      tree,
-      originId: args.tutorLine.rootNodeId,
-      line: args.tutorLine,
-    });
+  const suggestedPly = args.suggestedMove?.plies[0];
+  if (suggestedPly && args.suggestedMove) {
+    const fromId = args.suggestedMove.rootNodeId;
+    const alreadyPlayed = childMatchingUci(tree, fromId, suggestedPly.uci);
     const originPos = layout.positions.get(fromId);
-    if (originPos && plies.length > 0) {
-      const firstColumn = originPos.column + 1;
+    if (originPos && !alreadyPlayed) {
+      const column = originPos.column + 1;
       const lane = nearestFreeLane(
-        usedLanesAtColumn(nodes, firstColumn),
+        usedLanesAtColumn(nodes, column),
         originPos.lane + 1,
       );
-      let parentId = fromId;
-      for (const [index, ply] of plies.entries()) {
-        const id = virtualId("tutor", args.tutorLine.rootNodeId, ply.pathKey);
-        const column = firstColumn + index;
-        const origin = getNode(tree, args.tutorLine.rootNodeId);
-        const plyNumber = (origin?.ply ?? 0) + ply.plyOffset;
-        pushNode(nodes, {
-          id,
-          parentId,
-          column,
-          lane,
-          kind: "tutor",
-          san: ply.san,
-          moveLabel: formatMoveLabel(plyNumber, ply.san),
-          caption: index === 0 ? "Gator" : null,
-          prominent: false,
-          isCurrent: false,
-          fen: ply.fen,
-        });
-        pushEdge(edges, parentId, id, "tutor");
-        parentId = id;
-        if (lane < minLane) minLane = lane;
-        if (lane > maxLane) maxLane = lane;
-        if (column + 1 > columns) columns = column + 1;
-      }
-    }
-  }
-
-  const futureHead = args.futureLine?.plies[0];
-  if (futureHead && args.futureLine) {
-    const currentPos = layout.positions.get(tree.currentNodeId);
-    if (currentPos) {
-      const column = currentPos.column + 1;
-      const occupied = usedLanesAtColumn(nodes, column);
-      if (!occupied.has(currentPos.lane)) {
-        const id = virtualId(
-          "projected",
-          args.futureLine.rootNodeId,
-          futureHead.pathKey,
-        );
-        pushNode(nodes, {
-          id,
-          parentId: tree.currentNodeId,
-          column,
-          lane: currentPos.lane,
-          kind: "projected",
-          san: futureHead.san,
-          moveLabel: futureHead.san,
-          caption: null,
-          prominent: false,
-          isCurrent: false,
-          fen: futureHead.fen,
-        });
-        pushEdge(edges, tree.currentNodeId, id, "projected");
-        if (column + 1 > columns) columns = column + 1;
-      }
+      const id = virtualId(fromId, suggestedPly.uci);
+      const origin = getNode(tree, fromId);
+      const plyNumber = (origin?.ply ?? 0) + suggestedPly.plyOffset;
+      pushNode(nodes, {
+        id,
+        parentId: fromId,
+        column,
+        lane,
+        kind: "suggested",
+        san: suggestedPly.san,
+        moveLabel: formatMoveLabel(plyNumber, suggestedPly.san),
+        caption: "Gator",
+        isCurrent: false,
+        fen: suggestedPly.fen,
+        moveColor: origin ? getTurn(origin.fen) : null,
+      });
+      pushEdge(edges, fromId, id, "suggested");
+      if (lane < minLane) minLane = lane;
+      if (lane > maxLane) maxLane = lane;
+      if (column + 1 > columns) columns = column + 1;
     }
   }
 

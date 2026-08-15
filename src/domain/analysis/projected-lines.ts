@@ -1,11 +1,5 @@
-import type {
-  AnalysisEvidence,
-  EvaluationScore,
-} from "@/domain/analysis/types";
+import type { EvaluationScore } from "@/domain/analysis/types";
 import { legalUciPrefix, tryApplyMove } from "@/domain/game/rules";
-
-/** Default plies shown as the "future" continuation on the timeline. */
-export const FUTURE_PROJECTION_PLIES = 5;
 
 export type ProjectedPly = {
   /** Stable id relative to the projection root: `uci0/uci1/...` */
@@ -20,24 +14,24 @@ export type ProjectedPly = {
 export type ProjectedLine = {
   rootFen: string;
   rootNodeId: string;
-  kind: "future" | "tutor";
+  kind: "suggested";
   plies: ProjectedPly[];
   score: EvaluationScore | null;
 };
 
 /**
- * Build a validated projected line from a UCI sequence (tutor alternate or
- * best-play future). Illegal suffixes are dropped.
+ * Build a validated projected line from a UCI sequence. Illegal suffixes
+ * are dropped.
  */
 export function projectUciLine(args: {
   rootFen: string;
   rootNodeId: string;
   lineUci: readonly string[];
-  kind: "future" | "tutor";
+  kind?: "suggested";
   maxPlies?: number;
   score?: EvaluationScore | null;
 }): ProjectedLine {
-  const maxPlies = args.maxPlies ?? FUTURE_PROJECTION_PLIES;
+  const maxPlies = args.maxPlies ?? 1;
   const validated = legalUciPrefix(args.rootFen, args.lineUci).slice(
     0,
     maxPlies,
@@ -64,33 +58,8 @@ export function projectUciLine(args: {
   return {
     rootFen: args.rootFen,
     rootNodeId: args.rootNodeId,
-    kind: args.kind,
+    kind: "suggested",
     plies,
     score: args.score ?? null,
   };
-}
-
-/**
- * Prefer MultiPV line 1 (best) as the future continuation from a position
- * analysis. Returns null when there is no legal PV prefix.
- */
-export function projectBestFuture(
-  evidence: AnalysisEvidence,
-  options?: { maxPlies?: number },
-): ProjectedLine | null {
-  const best =
-    evidence.lines.find((line) => line.multipv === 1) ?? evidence.lines[0];
-  const pv =
-    best?.pvUci ?? (evidence.bestMoveUci ? [evidence.bestMoveUci] : []);
-  if (pv.length === 0) return null;
-
-  const line = projectUciLine({
-    rootFen: evidence.fen,
-    rootNodeId: evidence.gameNodeId,
-    lineUci: pv,
-    kind: "future",
-    maxPlies: options?.maxPlies ?? FUTURE_PROJECTION_PLIES,
-    score: best?.score ?? evidence.score,
-  });
-  return line.plies.length > 0 ? line : null;
 }

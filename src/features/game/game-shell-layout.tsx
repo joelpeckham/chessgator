@@ -66,7 +66,7 @@ export function GameShellLayout({
       hint={view.coach.hint}
       hintDisabled={view.coach.hintDisabled}
       hintFen={view.coach.hintFen}
-      showTutorLaneHint={view.coach.showTutorLaneHint}
+      showSuggestedMoveHint={view.coach.showSuggestedMoveHint}
       onRequestHint={ui.handleRequestHint}
       idleHintEligible={view.coach.idleHintEligible}
       docked={view.coachDocked}
@@ -137,11 +137,9 @@ export function GameShellLayout({
                 canGoNext={view.timeline.canGoNext}
                 prevNodeId={view.timeline.prevNodeId}
                 nextNodeId={view.timeline.nextNodeId}
-                canTakeBack={view.timeline.canTakeBack}
                 disabled={view.timeline.disabled}
                 onSelectNode={ui.handleSelectTimelineNode}
                 onOpenCoach={ui.handleOpenCoach}
-                onTakeBack={ui.handleUndoHumanMove}
                 expanded={ui.timelineExpanded}
                 onExpandedChange={ui.setTimelineExpanded}
                 className="rounded-none shadow-none ring-0"

@@ -34,7 +34,9 @@ test.describe("time travel + branching timeline", () => {
 
     await expect(page.getByTestId("explore-line-button")).toBeVisible();
     await expect(
-      page.locator('[data-testid="move-timeline"] [data-kind="tutor"]').first(),
+      page
+        .locator('[data-testid="move-timeline"] [data-kind="suggested"]')
+        .first(),
     ).toBeVisible({ timeout: 10_000 });
 
     const boardBefore = await page.getByTestId("board-frame").boundingBox();
@@ -101,7 +103,7 @@ test.describe("time travel + branching timeline", () => {
     await expect(page.getByTestId("timeline-status")).toContainText(/e4/i);
   });
 
-  test("take back clears coaching so Try from here cannot target old node", async ({
+  test("jumping to start hides Try from here for the old node", async ({
     page,
   }) => {
     await startCoachGame(page);
@@ -119,8 +121,10 @@ test.describe("time travel + branching timeline", () => {
     );
 
     await expect(page.getByTestId("explore-line-button")).toBeVisible();
-    await page.getByTestId("undo-human-move-button").click();
-    await expect(page.getByTestId("live-region")).toContainText(/undo|try/i);
+    const timeline = page.getByTestId("move-list");
+    await timeline.focus();
+    await page.keyboard.press("Home");
+    await expect(page.getByTestId("timeline-status")).toContainText(/start/i);
     await expect(page.getByTestId("explore-line-button")).toHaveCount(0);
     await expect(page.getByTestId("variation-explorer")).toHaveCount(0);
     await expect(page.getByTestId("practice-controls")).toHaveCount(0);

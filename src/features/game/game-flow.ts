@@ -5,7 +5,6 @@ import {
   type GameNode,
   type GameTree,
   getCurrentNode,
-  getMoveHistory,
   getNode,
   getStatusAtNode,
   type PieceSymbol,
@@ -16,28 +15,28 @@ import type { CoachingController } from "@/features/game/coaching-controller";
 import { useGameStore } from "@/features/game/game-store";
 import type { MaiaSession } from "@/features/game/maia-session";
 
-export function buildTutorLine(
+export function buildSuggestedMove(
   tree: GameTree,
   insight: TeachingInsight | null,
   analyzedNodeId: string | null,
 ): ProjectedLine | null {
-  if (!insight?.lineUci.length || !analyzedNodeId) return null;
-  if (!insight.suggestedMoveUci) return null;
+  if (!analyzedNodeId) return null;
+  const uci = insight?.suggestedMoveUci ?? insight?.lineUci[0];
+  if (!uci) return null;
   const analyzed = getNode(tree, analyzedNodeId);
   const playedUci = analyzed?.move?.uci.toLowerCase();
-  const firstPly = insight.lineUci[0]?.toLowerCase();
-  if (!firstPly || (playedUci && firstPly === playedUci)) return null;
+  if (playedUci && uci.toLowerCase() === playedUci) return null;
 
   const originId = analyzed?.parentId ?? tree.rootId;
   const origin = getNode(tree, originId);
   if (!origin) return null;
-  return projectUciLine({
+  const line = projectUciLine({
     rootFen: origin.fen,
     rootNodeId: originId,
-    lineUci: insight.lineUci,
-    kind: "tutor",
-    maxPlies: 5,
+    lineUci: [uci],
+    maxPlies: 1,
   });
+  return line.plies.length > 0 ? line : null;
 }
 
 function isLiveOpponentTurnAt(nodeId: string): boolean {
@@ -206,48 +205,25 @@ export function playHumanMove(args: {
   };
 }
 
-export type RealizeTutorResult =
+export type RealizeSuggestedResult =
   | { ok: false; message: string }
   | { ok: true; tree: GameTree; nodeId: string };
 
-/** Replay a UCI prefix onto the live tree, reusing matching children. */
-export function realizeTutorLine(args: {
+/** Play a single suggested UCI onto the live tree, reusing a matching child. */
+export function realizeSuggestedMove(args: {
   tree: GameTree;
   originNodeId: string;
-  uciPath: readonly string[];
-}): RealizeTutorResult {
-  if (args.uciPath.length === 0) {
+  uci: string;
+}): RealizeSuggestedResult {
+  if (!args.uci) {
     return { ok: false, message: "No suggested move to play" };
   }
   if (!getNode(args.tree, args.originNodeId)) {
-    return { ok: false, message: "Could not play that suggested line" };
+    return { ok: false, message: "Could not play that suggested move" };
   }
-  let tree = args.tree;
-  let fromId = args.originNodeId;
-  for (const uci of args.uciPath) {
-    const played = playMoveOnTree(tree, fromId, uci);
-    if (!played) {
-      return { ok: false, message: "Could not play that suggested line" };
-    }
-    tree = played.tree;
-    fromId = played.node.id;
+  const played = playMoveOnTree(args.tree, args.originNodeId, args.uci);
+  if (!played) {
+    return { ok: false, message: "Could not play that suggested move" };
   }
-  return { ok: true, tree, nodeId: fromId };
-}
-
-export function undoHumanMove(): void {
-  const store = useGameStore.getState();
-  const history = getMoveHistory(store.tree, store.tree.currentNodeId);
-  let lastHumanIndex = -1;
-  for (let i = history.length - 1; i >= 0; i -= 1) {
-    if (history[i]?.color === store.humanColor) {
-      lastHumanIndex = i;
-      break;
-    }
-  }
-  if (lastHumanIndex < 0) return;
-  const pliesToUndo = history.length - lastHumanIndex;
-  for (let i = 0; i < pliesToUndo; i += 1) {
-    store.retryMove();
-  }
+  return { ok: true, tree: played.tree, nodeId: played.node.id };
 }

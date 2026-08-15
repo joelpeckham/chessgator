@@ -19,7 +19,6 @@ import {
   type SessionMode,
   type SessionState,
   sessionModeForTurn,
-  takebackOne,
 } from "@/domain/game";
 import type { TeachingInsight } from "@/domain/teaching";
 import {
@@ -61,7 +60,6 @@ export type GameStoreState = {
     input: MoveInput,
     options?: { afterMode?: SessionMode; asVariation?: boolean },
   ) => boolean;
-  retryMove: () => boolean;
   resign: () => boolean;
   setMode: (mode: SessionMode, errorMessage?: string | null) => boolean;
   setMaiaElo: (elo: number) => void;
@@ -81,14 +79,6 @@ const PLAYABLE_MODES: ReadonlySet<SessionMode> = new Set([
   "opponentThinking",
   "reviewing",
   "analyzing",
-]);
-
-const RETRYABLE_MODES: ReadonlySet<SessionMode> = new Set([
-  "playerTurn",
-  "opponentThinking",
-  "analyzing",
-  "reviewing",
-  "gameOver",
 ]);
 
 function sessionState(
@@ -220,29 +210,6 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     set({
       tree: played.tree,
       session: sessionState(mode, terminalReason),
-      lastError: null,
-    });
-    return true;
-  },
-
-  retryMove: () => {
-    const { session } = get();
-    if (!RETRYABLE_MODES.has(session.mode)) {
-      set({ lastError: `Cannot retry while in mode ${session.mode}` });
-      return false;
-    }
-
-    const nextTree = takebackOne(get().tree);
-    if (!nextTree) {
-      set({ lastError: "Nothing to retry" });
-      return false;
-    }
-
-    const status = getStatusAtNode(nextTree, nextTree.currentNodeId);
-
-    set({
-      tree: nextTree,
-      session: sessionState(sessionModeForTurn(status.turn, get().humanColor)),
       lastError: null,
     });
     return true;

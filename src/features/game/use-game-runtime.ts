@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { getNode, getTurn, isHumanTurn } from "@/domain/game";
 import {
   type CoachingController,
   createCoachingController,
@@ -33,10 +32,9 @@ export type GameRuntime = {
 };
 
 /**
- * Owns engine sessions, hydrate/persist, and future projection.
+ * Owns engine sessions, hydrate/persist.
  * Effects: hydrate once; start engines; debounce persist on tree/session/elo;
- * dispose on unmount; arm the engine-loading notice; project Stockfish futures
- * on the live tip while it is the human's turn.
+ * dispose on unmount; arm the engine-loading notice.
  */
 export function useGameRuntime(options: GameRuntimeOptions = {}): GameRuntime {
   const hydrated = useGameStore((s) => s.hydrated);
@@ -126,22 +124,6 @@ export function useGameRuntime(options: GameRuntimeOptions = {}): GameRuntime {
     const arm = setTimeout(() => setEngineNoticeArmed(true), 400);
     return () => clearTimeout(arm);
   }, [enginesWarming, maia.phase]);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    if (mode === "gameOver" || mode === "error") return;
-    const tipId = tree.currentNodeId;
-    const tip = getNode(tree, tipId);
-    if (!tip) return;
-    if (!isHumanTurn(getTurn(tip.fen), humanColor)) {
-      coach.clearFuture();
-      return;
-    }
-    void coach.projectFuture({
-      fen: tip.fen,
-      gameNodeId: tipId,
-    });
-  }, [hydrated, tree, mode, coach, humanColor]);
 
   async function retryEngines(): Promise<void> {
     await maiaSession.dispose();

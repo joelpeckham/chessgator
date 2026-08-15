@@ -25,50 +25,59 @@ export type DecisionGraphViewProps = {
   onOpenCoach?: () => void;
 };
 
+function moverLabel(node: DecisionGraph["nodes"][number]): string | null {
+  if (node.moveColor === "w") return `White: ${node.san || node.moveLabel}`;
+  if (node.moveColor === "b") return `Black: ${node.san || node.moveLabel}`;
+  return null;
+}
+
 function ariaLabelFor(node: DecisionGraph["nodes"][number]): string {
   const parts: string[] = [];
   if (node.caption) parts.push(node.caption);
+  const mover = moverLabel(node);
+  if (mover) parts.push(mover);
   else if (node.moveLabel) parts.push(node.moveLabel);
-  if (node.kind === "tutor" && node.caption !== "Gator") {
-    parts.push("Gator's idea");
-  }
-  if (node.kind === "projected") parts.push("engine idea");
-  if (node.prominent) parts.push("coach lesson");
+  if (node.kind === "suggested") parts.push("Gator's suggested move");
   if (node.isCurrent) parts.push("current position");
   return parts.join(", ");
 }
 
 function nodeSan(node: DecisionGraph["nodes"][number]): string {
-  if (node.kind === "projected") return `~${node.san}`;
   return node.san || node.moveLabel;
 }
 
 function tooltipFor(node: DecisionGraph["nodes"][number]): string {
-  if (node.kind === "projected") return "Likely reply (engine idea)";
-  if (node.kind === "tutor") return "Gator's suggested line";
+  if (node.kind === "suggested") {
+    return "Gator's suggested move — click to try it";
+  }
   if (node.isCurrent) return "Current position";
   return ariaLabelFor(node);
 }
 
 function NodeGlyph({ node }: { node: DecisionGraph["nodes"][number] }) {
-  if (node.kind === "tutor") {
+  if (node.kind === "suggested") {
     return (
       <span
-        className="size-2.5 rotate-45 border-2 border-primary bg-background"
+        className="size-2.5 rounded-full border-2 border-dashed border-primary bg-background"
         aria-hidden
       />
     );
   }
-  const hollow = node.kind === "projected";
+  if (!node.moveColor) {
+    return (
+      <span
+        className="size-2.5 rounded-full border-2 border-foreground bg-foreground"
+        aria-hidden
+      />
+    );
+  }
   return (
     <span
       className={cn(
         "size-2.5 rounded-full border-2",
-        hollow
-          ? "border-muted-foreground bg-background"
-          : node.prominent
-            ? "border-primary bg-background"
-            : "border-foreground bg-foreground",
+        node.moveColor === "w"
+          ? "border-neutral-800 bg-white"
+          : "border-neutral-200 bg-neutral-900",
       )}
       aria-hidden
     />
@@ -76,7 +85,7 @@ function NodeGlyph({ node }: { node: DecisionGraph["nodes"][number] }) {
 }
 
 /**
- * Git-style tree of committed moves plus a dotted Gator proposal rail.
+ * Git-style tree of committed moves plus a dotted Gator suggestion.
  */
 export function DecisionGraphView({
   graph,
@@ -108,24 +117,16 @@ export function DecisionGraphView({
           const a = graphNodeCenter(from.column, from.lane, graph.maxLane);
           const b = graphNodeCenter(to.column, to.lane, graph.maxLane);
           const midX = (a.cx + b.cx) / 2;
-          const dashed = edge.kind === "projected" || edge.kind === "tutor";
+          const suggested = edge.kind === "suggested";
           return (
             <path
               key={`${edge.fromId}->${edge.toId}`}
               d={`M ${a.cx} ${a.cy} C ${midX} ${a.cy}, ${midX} ${b.cy}, ${b.cx} ${b.cy}`}
               fill="none"
               stroke="var(--border)"
-              strokeWidth={edge.kind === "tutor" ? 1.75 : 1.5}
-              strokeDasharray={
-                edge.kind === "projected" ? "2 3" : dashed ? "4 3" : undefined
-              }
-              className={cn(
-                edge.kind === "tutor"
-                  ? "stroke-primary/70"
-                  : edge.kind === "projected"
-                    ? "stroke-muted-foreground/45"
-                    : undefined,
-              )}
+              strokeWidth={suggested ? 1.75 : 1.5}
+              strokeDasharray={suggested ? "4 3" : undefined}
+              className={suggested ? "stroke-primary/70" : undefined}
             />
           );
         })}
@@ -138,14 +139,14 @@ export function DecisionGraphView({
           graph.maxLane,
         );
         const selected = node.id === focusedNodeId;
-        const caption = node.caption === "Gator" ? "Gator" : node.caption;
+        const caption = node.caption;
         return (
           <div key={node.id}>
             {caption ? (
               <span
                 className={cn(
                   "pointer-events-none absolute truncate text-center text-[0.6rem] leading-none",
-                  node.kind === "tutor"
+                  node.kind === "suggested"
                     ? "text-primary"
                     : "text-muted-foreground",
                 )}
@@ -174,7 +175,7 @@ export function DecisionGraphView({
                     data-kind={node.kind}
                     data-lane={node.lane}
                     data-testid={`timeline-node-${node.id}`}
-                    disabled={disabled || node.kind === "projected"}
+                    disabled={disabled}
                     className={cn(
                       "group absolute flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full sm:size-9",
                       "bg-transparent",
@@ -183,9 +184,8 @@ export function DecisionGraphView({
                     )}
                     style={{ left: cx, top: cy }}
                     onClick={() => {
-                      if (node.kind === "projected") return;
                       onSelectNode(node.id);
-                      if (node.kind === "tutor" || node.prominent) {
+                      if (node.kind === "suggested") {
                         onOpenCoach?.();
                       }
                     }}
@@ -209,9 +209,7 @@ export function DecisionGraphView({
             <span
               className={cn(
                 "pointer-events-none absolute truncate text-center font-mono text-[0.65rem] leading-none tabular-nums text-muted-foreground",
-                node.kind === "projected" && "opacity-70",
-                node.prominent && "text-primary",
-                node.kind === "tutor" && "text-primary",
+                node.kind === "suggested" && "text-primary",
               )}
               style={{
                 left: node.column * COL_W + 4,

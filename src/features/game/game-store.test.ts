@@ -23,20 +23,18 @@ describe("game store adapter", () => {
     });
   });
 
-  it("plays moves and retries without mutating the tree from outside the store", () => {
+  it("plays moves without mutating the tree from outside the store", () => {
     const store = useGameStore.getState();
     store.startGame();
     expect(store.playMove("e2e4")).toBe(true);
     expect(useGameStore.getState().session.mode).toBe("opponentThinking");
     expect(useGameStore.getState().playMove("e7e5")).toBe(true);
-
-    expect(useGameStore.getState().retryMove()).toBe(true);
     expect(
       getMoveHistory(
         useGameStore.getState().tree,
         useGameStore.getState().tree.currentNodeId,
       ).map((m) => m.uci),
-    ).toEqual(["e2e4"]);
+    ).toEqual(["e2e4", "e7e5"]);
   });
 
   it("rejects illegal moves and keeps lastError", () => {

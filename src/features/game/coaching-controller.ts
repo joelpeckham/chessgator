@@ -1,8 +1,6 @@
 import {
   buildMoveAnalysisEvidence,
   type MoveAnalysisEvidence,
-  type ProjectedLine,
-  projectBestFuture,
 } from "@/domain/analysis";
 import type { GameMove } from "@/domain/game";
 import {
@@ -46,9 +44,6 @@ export type CoachingControllerState = {
   annotations: BoardAnnotation;
   /** Soft-dismissed tutor card; insight remains cached for reopen. */
   insightDismissed: boolean;
-  /** Latest projected future for the active projection node. */
-  futureLine: ProjectedLine | null;
-  futureNodeId: string | null;
 };
 
 export type AnalyzePlayerMoveInput = {
@@ -69,13 +64,6 @@ export type CoachingController = {
   analyzePlayerMove: (
     input: AnalyzePlayerMoveInput,
   ) => Promise<MoveAnalysisEvidence | null>;
-  projectFuture: (input: {
-    fen: string;
-    gameNodeId: string;
-    movetimeMs?: number;
-  }) => Promise<ProjectedLine | null>;
-  /** Clear the engine future line (e.g. while it is the opponent's turn). */
-  clearFuture: () => void;
   getCachedInsight: (gameNodeId: string) => TeachingInsight | null;
   dismissInsight: () => void;
   showInsight: (gameNodeId?: string | null) => void;
@@ -107,11 +95,7 @@ const IDLE: CoachingControllerState = {
   hint: null,
   annotations: EMPTY_ANNOTATIONS,
   insightDismissed: false,
-  futureLine: null,
-  futureNodeId: null,
 };
-
-const FUTURE_CACHE_LIMIT = 24;
 
 /**
  * Owns Stockfish-backed move analysis + hint ladder for the coaching slice.
@@ -129,24 +113,10 @@ export function createCoachingController(
 
   let engine: StockfishClientLike | null = null;
   let activeRequestId: string | null = null;
-  let latestFutureNodeId: string | null = null;
   const insightByNodeId = new Map<string, TeachingInsight>();
-  const futureByNodeId = new Map<string, ProjectedLine>();
 
   function setState(partial: Partial<CoachingControllerState>): void {
     store.setState(partial);
-  }
-
-  function rememberFuture(nodeId: string, line: ProjectedLine | null): void {
-    if (!line) {
-      futureByNodeId.delete(nodeId);
-      return;
-    }
-    futureByNodeId.set(nodeId, line);
-    if (futureByNodeId.size > FUTURE_CACHE_LIMIT) {
-      const first = futureByNodeId.keys().next().value;
-      if (first) futureByNodeId.delete(first);
-    }
   }
 
   function refreshAnnotations(
@@ -351,62 +321,6 @@ export function createCoachingController(
       }
     },
 
-    async projectFuture(input) {
-      latestFutureNodeId = input.gameNodeId;
-      const cached = futureByNodeId.get(input.gameNodeId);
-      if (cached) {
-        if (latestFutureNodeId !== input.gameNodeId) return null;
-        setState({
-          futureLine: cached,
-          futureNodeId: input.gameNodeId,
-        });
-        return cached;
-      }
-
-      const ready = await controller.whenReady();
-      if (
-        latestFutureNodeId !== input.gameNodeId ||
-        gate.disposed ||
-        !ready ||
-        !engine ||
-        store.getState().phase === "failed"
-      ) {
-        return null;
-      }
-
-      const requestId = `future-${gate.generation}-${input.gameNodeId}`;
-      try {
-        const evidence = await engine.analyze({
-          requestId,
-          gameNodeId: input.gameNodeId,
-          fen: input.fen,
-          priority: "background",
-          multipv: 1,
-          movetimeMs: input.movetimeMs ?? Math.max(80, defaultMovetimeMs),
-        });
-        if (latestFutureNodeId !== input.gameNodeId || gate.disposed) {
-          return null;
-        }
-        const line = projectBestFuture(evidence);
-        rememberFuture(input.gameNodeId, line);
-        setState({
-          futureLine: line,
-          futureNodeId: input.gameNodeId,
-        });
-        return line;
-      } catch {
-        return null;
-      }
-    },
-
-    clearFuture() {
-      latestFutureNodeId = null;
-      setState({
-        futureLine: null,
-        futureNodeId: null,
-      });
-    },
-
     getCachedInsight(gameNodeId) {
       return insightByNodeId.get(gameNodeId) ?? null;
     },
@@ -530,8 +444,6 @@ export function createCoachingController(
       }
       if (gate.isDisposeCurrent(disposeGen)) {
         insightByNodeId.clear();
-        futureByNodeId.clear();
-        latestFutureNodeId = null;
         store.replace({ ...IDLE });
       }
     },

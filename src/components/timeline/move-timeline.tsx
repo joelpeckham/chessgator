@@ -38,11 +38,9 @@ export type MoveTimelineProps = {
   canGoNext: boolean;
   prevNodeId: string | null;
   nextNodeId: string | null;
-  canTakeBack: boolean;
   disabled?: boolean;
   onSelectNode: (nodeId: string) => void;
   onOpenCoach?: () => void;
-  onTakeBack?: () => void;
   expanded: boolean;
   onExpandedChange: (expanded: boolean) => void;
   className?: string;
@@ -66,11 +64,9 @@ export function MoveTimeline({
   canGoNext,
   prevNodeId,
   nextNodeId,
-  canTakeBack,
   disabled = false,
   onSelectNode,
   onOpenCoach,
-  onTakeBack,
   expanded,
   onExpandedChange,
   className,
@@ -298,18 +294,6 @@ export function MoveTimeline({
       >
         <p className="truncate text-xs text-muted-foreground">{statusText}</p>
         <div className="flex shrink-0 items-center gap-1">
-          {canTakeBack ? (
-            <Button
-              type="button"
-              size="xs"
-              variant="ghost"
-              disabled={disabled}
-              data-testid="undo-human-move-button"
-              onClick={onTakeBack}
-            >
-              Take back
-            </Button>
-          ) : null}
           <Button
             type="button"
             size="icon-xs"

@@ -21,11 +21,7 @@ export type {
   ProjectedLine,
   ProjectedPly,
 } from "@/domain/analysis/projected-lines";
-export {
-  FUTURE_PROJECTION_PLIES,
-  projectBestFuture,
-  projectUciLine,
-} from "@/domain/analysis/projected-lines";
+export { projectUciLine } from "@/domain/analysis/projected-lines";
 export type { SideToMove } from "@/domain/analysis/score";
 export {
   negateScore,

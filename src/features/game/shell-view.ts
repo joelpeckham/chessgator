@@ -17,8 +17,6 @@ import {
   getMoveHistory,
   getNode,
   getStatusAtNode,
-  getTurn,
-  isHumanTurn,
   movesToPgn,
   type SessionMode,
 } from "@/domain/game";
@@ -28,7 +26,7 @@ import {
   type HintStep,
   type TeachingInsight,
 } from "@/domain/teaching";
-import { buildTutorLine } from "@/features/game/game-flow";
+import { buildSuggestedMove } from "@/features/game/game-flow";
 import type { GameStorePreferences } from "@/features/game/game-store";
 import { buildFeedbackNotices } from "@/features/game/notices";
 import {
@@ -39,7 +37,6 @@ import {
   analyzedNodeIdForFocus,
   buildTreeGraph,
   formatMoveLabel,
-  lastHumanDecisionId,
 } from "@/features/game/tree-graph";
 import { deriveBoardInteractivity } from "@/features/game/turn-controller";
 import type { GameRuntime } from "@/features/game/use-game-runtime";
@@ -79,7 +76,7 @@ export type ShellView = {
     evidenceGameNodeId: string | undefined;
     hintDisabled: boolean;
     hintFen: string;
-    showTutorLaneHint: boolean;
+    showSuggestedMoveHint: boolean;
     idleHintEligible: boolean;
     orientationTeaser: string | null;
     mood: GatorMood | null;
@@ -98,7 +95,6 @@ export type ShellView = {
     statusText: string;
     canGoPrev: boolean;
     canGoNext: boolean;
-    canTakeBack: boolean;
     disabled: boolean;
     prevNodeId: string | null;
     nextNodeId: string | null;
@@ -171,19 +167,11 @@ export function buildShellView(args: {
       runtime.coaching.evidence.gameNodeId === analyzedId);
   const visibleInsight = liveMatchesCurrent ? liveInsight : storedLesson;
 
-  const tutorLine = buildTutorLine(tree, visibleInsight, analyzedId);
-  const liveTurn = getTurn(liveFen);
-  const futureLine =
-    isHumanTurn(liveTurn, humanColor) &&
-    runtime.coaching.futureNodeId === tree.currentNodeId
-      ? runtime.coaching.futureLine
-      : null;
+  const suggestedMove = buildSuggestedMove(tree, visibleInsight, analyzedId);
 
   const graph = buildTreeGraph({
     tree,
-    lessons: args.lessons,
-    tutorLine,
-    futureLine,
+    suggestedMove,
   });
 
   const interactive = deriveBoardInteractivity({
@@ -317,13 +305,13 @@ export function buildShellView(args: {
       insight: visibleInsight,
       analyzing,
       showTrySuggested: Boolean(
-        visibleInsight && !runtime.coachUnavailable && tutorLine,
+        visibleInsight && !runtime.coachUnavailable && suggestedMove,
       ),
       hint: runtime.coaching.hint,
       evidenceGameNodeId: analyzedId ?? runtime.coaching.evidence?.gameNodeId,
       hintDisabled: !interactive || Boolean(runtime.coachUnavailable),
       hintFen: liveFen,
-      showTutorLaneHint: Boolean(tutorLine),
+      showSuggestedMoveHint: Boolean(suggestedMove),
       idleHintEligible: isIdleHintEligible({
         firstHumanTurn,
         playerTurn: interactive,
@@ -350,7 +338,6 @@ export function buildShellView(args: {
       }),
       canGoPrev: prevNodeId != null,
       canGoNext: nextNodeId != null,
-      canTakeBack: lastHumanDecisionId(tree, humanColor) != null,
       disabled: mode === "error",
       prevNodeId,
       nextNodeId,

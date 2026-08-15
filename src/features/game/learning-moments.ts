@@ -13,28 +13,6 @@ const TEACHING_CONCEPTS: ReadonlySet<TeachingConcept> = new Set([
   "best_move",
 ]);
 
-const EMPTY_AUTHORITY = /is the strongest move\.?$/i;
-
-/**
- * Only high-confidence, actionable lessons become timeline markers.
- * Empty-authority copy (verdict with no because) never gets visual weight.
- */
-export function isProminentLesson(insight: TeachingInsight): boolean {
-  const text = insight.explanation.trim();
-  if (!text) return false;
-  if (EMPTY_AUTHORITY.test(text) && !/\bbecause\b/i.test(text)) return false;
-  if (insight.nudge) return true;
-  if (
-    insight.suggestedMoveUci &&
-    /\bbecause\b/i.test(text) &&
-    insight.classification !== "best" &&
-    insight.classification !== "excellent"
-  ) {
-    return true;
-  }
-  return false;
-}
-
 export function toSavedLesson(insight: TeachingInsight): SavedLesson {
   return {
     classification: insight.classification,

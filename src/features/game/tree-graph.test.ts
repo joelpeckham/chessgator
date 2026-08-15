@@ -10,7 +10,6 @@ import {
   buildTreeGraph,
   formatMoveLabel,
   lastHumanDecisionId,
-  unrealizedTutorStart,
 } from "@/features/game/tree-graph";
 
 function play(tree: GameTree, uci: string): GameTree {
@@ -72,9 +71,7 @@ describe("buildTreeGraph", () => {
     expect(tree.nodes[tree.rootId]?.childIds[0]).toBe(tree.currentNodeId);
     const graph = buildTreeGraph({
       tree,
-      lessons: {},
-      tutorLine: null,
-      futureLine: null,
+      suggestedMove: null,
     });
     expect(nodePos(graph, e4).lane).toBe(0);
     expect(nodePos(graph, e5).lane).toBe(0);
@@ -90,60 +87,56 @@ describe("buildTreeGraph", () => {
     const jumped = { ...tree, currentNodeId: e4 };
     const graphA = buildTreeGraph({
       tree: atE5,
-      lessons: {},
-      tutorLine: null,
-      futureLine: null,
+      suggestedMove: null,
     });
     const graphB = buildTreeGraph({
       tree: jumped,
-      lessons: {},
-      tutorLine: null,
-      futureLine: null,
+      suggestedMove: null,
     });
     expect(nodePos(graphA, e4)).toEqual(nodePos(graphB, e4));
     expect(nodePos(graphA, tree.rootId)).toEqual(nodePos(graphB, tree.rootId));
   });
 
-  it("lays out a fork and overlays an unrealized tutor rail", () => {
+  it("lays out a fork and overlays a single suggested move", () => {
     let tree = createInitialTree();
     tree = play(tree, "d2d4");
-    const tutorLine = projectUciLine({
+    const suggestedMove = projectUciLine({
       rootFen: tree.nodes[tree.rootId]!.fen,
       rootNodeId: tree.rootId,
       lineUci: ["e2e4", "e7e5"],
-      kind: "tutor",
+      maxPlies: 1,
     });
     const graph = buildTreeGraph({
       tree,
-      lessons: {},
-      tutorLine,
-      futureLine: null,
+      suggestedMove,
     });
     expect(graph.nodes.some((node) => node.id === tree.rootId)).toBe(true);
-    expect(
-      graph.nodes.some((node) => node.kind === "tutor" && node.san === "e4"),
-    ).toBe(true);
-    expect(graph.nodes.some((node) => node.caption === "Gator")).toBe(true);
+    const suggested = graph.nodes.filter((node) => node.kind === "suggested");
+    expect(suggested).toHaveLength(1);
+    expect(suggested[0]?.san).toBe("e4");
+    expect(suggested[0]?.caption).toBe("Gator");
+    expect(suggested[0]?.moveColor).toBe("w");
     expect(
       graph.nodes.find((node) => node.id === tree.currentNodeId)?.isCurrent,
     ).toBe(true);
+    expect(
+      graph.nodes.find((node) => node.id === tree.currentNodeId)?.moveColor,
+    ).toBe("w");
   });
 
-  it("skips tutor plies that already exist on the tree", () => {
+  it("skips a suggested move that already exists on the tree", () => {
     let tree = createInitialTree();
     tree = play(tree, "e2e4");
-    const line = projectUciLine({
+    const suggestedMove = projectUciLine({
       rootFen: tree.nodes[tree.rootId]!.fen,
       rootNodeId: tree.rootId,
-      lineUci: ["e2e4", "e7e5"],
-      kind: "tutor",
+      lineUci: ["e2e4"],
+      maxPlies: 1,
     });
-    const start = unrealizedTutorStart({
+    const graph = buildTreeGraph({
       tree,
-      originId: tree.rootId,
-      line,
+      suggestedMove,
     });
-    expect(start.fromId).toBe(tree.currentNodeId);
-    expect(start.plies.map((ply) => ply.uci)).toEqual(["e7e5"]);
+    expect(graph.nodes.some((node) => node.kind === "suggested")).toBe(false);
   });
 });

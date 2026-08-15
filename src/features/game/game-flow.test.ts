@@ -10,11 +10,10 @@ import {
 import type { GameTree } from "@/domain/game/types";
 import { createCoachingController } from "@/features/game/coaching-controller";
 import {
-  buildTutorLine,
-  realizeTutorLine,
+  buildSuggestedMove,
+  realizeSuggestedMove,
   requestOpponentMove,
   runPostMoveCoaching,
-  undoHumanMove,
 } from "@/features/game/game-flow";
 import { useGameStore } from "@/features/game/game-store";
 import { createStubAnalysisEngine } from "@/features/game/stub-analysis";
@@ -26,47 +25,45 @@ function play(tree: GameTree, uci: string): GameTree {
   return result.tree;
 }
 
-describe("realizeTutorLine", () => {
-  it("replays a prefix onto the live tree and reuses matching children", () => {
+describe("realizeSuggestedMove", () => {
+  it("plays a single suggested UCI and reuses a matching child", () => {
     let tree = createInitialTree();
     tree = play(tree, "d2d4");
     const d4Id = tree.currentNodeId;
-    const result = realizeTutorLine({
+    const result = realizeSuggestedMove({
       tree,
       originNodeId: tree.rootId,
-      uciPath: ["e2e4", "e7e5"],
+      uci: "e2e4",
     });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.tree.nodes[result.nodeId]?.move?.uci).toBe("e7e5");
+    expect(result.tree.nodes[result.nodeId]?.move?.uci).toBe("e2e4");
     const origin = getNode(result.tree, result.tree.rootId);
     expect(origin?.childIds).toContain(d4Id);
-    expect(origin?.childIds).toContain(
-      result.tree.nodes[result.nodeId]?.parentId,
-    );
+    expect(origin?.childIds).toContain(result.nodeId);
 
-    const again = realizeTutorLine({
+    const again = realizeSuggestedMove({
       tree: result.tree,
       originNodeId: result.tree.rootId,
-      uciPath: ["e2e4"],
+      uci: "e2e4",
     });
     expect(again.ok).toBe(true);
     if (!again.ok) return;
-    expect(again.tree.nodes[again.nodeId]?.move?.uci).toBe("e2e4");
+    expect(again.nodeId).toBe(result.nodeId);
     expect(Object.keys(again.tree.nodes).length).toBe(
       Object.keys(result.tree.nodes).length,
     );
   });
 });
 
-describe("buildTutorLine", () => {
-  it("projects from the analyzed human node's parent, not a tutor origin", () => {
+describe("buildSuggestedMove", () => {
+  it("projects a single move from the analyzed human node's parent", () => {
     let tree = createInitialTree();
     tree = play(tree, "d2d4");
     const analyzedId = tree.currentNodeId;
     tree = play(tree, "d7d5");
 
-    const line = buildTutorLine(
+    const line = buildSuggestedMove(
       tree,
       {
         concept: "missed_improvement",
@@ -84,7 +81,8 @@ describe("buildTutorLine", () => {
     );
     expect(line).not.toBeNull();
     expect(line!.rootNodeId).toBe(tree.rootId);
-    expect(line!.kind).toBe("tutor");
+    expect(line!.kind).toBe("suggested");
+    expect(line!.plies).toHaveLength(1);
     expect(line!.plies[0]?.san).toBe("e4");
   });
 });
@@ -239,53 +237,5 @@ describe("requestOpponentMove", () => {
       ).map((m) => m.uci),
     ).toEqual(["e2e4"]);
     await maia.dispose();
-  });
-});
-
-describe("undoHumanMove", () => {
-  beforeEach(() => {
-    useGameStore.setState({
-      ...useGameStore.getInitialState(),
-    });
-  });
-
-  it("takes back the human ply and the opponent reply", () => {
-    useGameStore.getState().startGame();
-    useGameStore.getState().playMove("e2e4");
-    useGameStore.getState().playMove("e7e5");
-    undoHumanMove();
-    expect(
-      getMoveHistory(
-        useGameStore.getState().tree,
-        useGameStore.getState().tree.currentNodeId,
-      ),
-    ).toEqual([]);
-    expect(useGameStore.getState().session.mode).toBe("playerTurn");
-  });
-
-  it("does not take back Maia's opening when the human has not moved", () => {
-    useGameStore.getState().startGame({ humanColor: "b" });
-    useGameStore.getState().playMove("e2e4");
-    undoHumanMove();
-    expect(
-      getMoveHistory(
-        useGameStore.getState().tree,
-        useGameStore.getState().tree.currentNodeId,
-      ).map((m) => m.uci),
-    ).toEqual(["e2e4"]);
-  });
-
-  it("takes back only the Black human ply when it is last", () => {
-    useGameStore.getState().startGame({ humanColor: "b" });
-    useGameStore.getState().playMove("e2e4");
-    useGameStore.getState().playMove("e7e5");
-    undoHumanMove();
-    expect(
-      getMoveHistory(
-        useGameStore.getState().tree,
-        useGameStore.getState().tree.currentNodeId,
-      ).map((m) => m.uci),
-    ).toEqual(["e2e4"]);
-    expect(useGameStore.getState().session.mode).toBe("playerTurn");
   });
 });

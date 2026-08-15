@@ -6,10 +6,9 @@ import { parseVirtualTimelineId } from "@/components/timeline/virtual-id";
 import { type Color, type GameMove, getCurrentNode } from "@/domain/game";
 import {
   playHumanMove,
-  realizeTutorLine,
+  realizeSuggestedMove,
   requestOpponentMove,
   runPostMoveCoaching,
-  undoHumanMove,
 } from "@/features/game/game-flow";
 import { useGameStore } from "@/features/game/game-store";
 import { analyzedNodeIdForFocus } from "@/features/game/tree-graph";
@@ -49,7 +48,6 @@ export type ShellUi = ShellChrome & {
   dismissNotice: (id: string) => void;
   applyPlayerMove: (move: BoardMove | GameMove) => boolean;
   handleTrySuggested: () => void;
-  handleUndoHumanMove: () => void;
   handleResign: () => void;
   handleRestart: () => void;
   setPendingHumanColor: (color: Color) => void;
@@ -224,7 +222,9 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     return true;
   }
 
-  function applyRealizedTree(tree: ReturnType<typeof realizeTutorLine>): void {
+  function applyRealizedTree(
+    tree: ReturnType<typeof realizeSuggestedMove>,
+  ): void {
     if (!tree.ok) {
       queueNav(tree.message);
       return;
@@ -248,18 +248,12 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     }
     const originId = tree.nodes[analyzedId]?.parentId ?? tree.rootId;
     applyRealizedTree(
-      realizeTutorLine({
+      realizeSuggestedMove({
         tree,
         originNodeId: originId,
-        uciPath: [firstUci],
+        uci: firstUci,
       }),
     );
-  }
-
-  function handleUndoHumanMove(): void {
-    resetPending({ clearCoach: true });
-    undoHumanMove();
-    queueNav("Undid your last move — try a different one");
   }
 
   function handleResign(): void {
@@ -288,13 +282,12 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
 
   function handleSelectTimelineNode(nodeId: string): void {
     const virtual = parseVirtualTimelineId(nodeId);
-    if (virtual?.kind === "projected") return;
-    if (virtual?.kind === "tutor") {
+    if (virtual?.kind === "suggested") {
       applyRealizedTree(
-        realizeTutorLine({
+        realizeSuggestedMove({
           tree: useGameStore.getState().tree,
           originNodeId: virtual.rootNodeId,
-          uciPath: virtual.uciPath,
+          uci: virtual.uci,
         }),
       );
       return;
@@ -366,7 +359,6 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     dismissNotice,
     applyPlayerMove,
     handleTrySuggested,
-    handleUndoHumanMove,
     handleResign,
     handleRestart,
     pendingHumanColor,

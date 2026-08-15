@@ -12,15 +12,15 @@ function nodeById(
 
 function childIds(graph: DecisionGraph, fromId: string): string[] {
   const committed: string[] = [];
-  const tutor: string[] = [];
+  const suggested: string[] = [];
   for (const edge of graph.edges) {
     if (edge.fromId !== fromId) continue;
     const child = nodeById(graph, edge.toId);
-    if (!child || child.kind === "projected") continue;
-    if (child.kind === "tutor") tutor.push(child.id);
+    if (!child) continue;
+    if (child.kind === "suggested") suggested.push(child.id);
     else committed.push(child.id);
   }
-  return [...committed, ...tutor];
+  return [...committed, ...suggested];
 }
 
 export function parentNodeId(
@@ -57,9 +57,7 @@ export function siblingsAtParent(
   const current = nodeById(graph, nodeId);
   if (!current) return [];
   return graph.nodes
-    .filter(
-      (node) => node.parentId === current.parentId && node.kind !== "projected",
-    )
+    .filter((node) => node.parentId === current.parentId)
     .toSorted((a, b) => b.lane - a.lane);
 }
 

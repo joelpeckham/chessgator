@@ -5,12 +5,12 @@ import {
 } from "@/components/timeline/virtual-id";
 
 describe("virtual timeline ids", () => {
-  it("round-trips a tutor path", () => {
-    const id = virtualId("tutor", "root-1", "e2e4/e7e5");
+  it("round-trips a suggested move", () => {
+    const id = virtualId("root-1", "e2e4");
     expect(parseVirtualTimelineId(id)).toEqual({
-      kind: "tutor",
+      kind: "suggested",
       rootNodeId: "root-1",
-      uciPath: ["e2e4", "e7e5"],
+      uci: "e2e4",
     });
   });
 

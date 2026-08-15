@@ -1,4 +1,6 @@
-export type DecisionGraphNodeKind = "committed" | "tutor" | "projected";
+import type { Color } from "@/domain/game";
+
+export type DecisionGraphNodeKind = "committed" | "suggested";
 
 export type DecisionGraphNode = {
   id: string;
@@ -9,9 +11,10 @@ export type DecisionGraphNode = {
   san: string;
   moveLabel: string;
   caption: string | null;
-  prominent: boolean;
   isCurrent: boolean;
   fen: string;
+  /** Side that made this move; null for the root. */
+  moveColor: Color | null;
 };
 
 export type DecisionGraphEdge = {

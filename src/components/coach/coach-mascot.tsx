@@ -44,7 +44,7 @@ export type CoachMascotProps = {
   hintDisabled?: boolean;
   hintFen?: string | null;
   onRequestHint: () => void;
-  showTutorLaneHint?: boolean;
+  showSuggestedMoveHint?: boolean;
   idleHintEligible?: boolean;
   docked?: boolean;
   laneLeft?: number;
@@ -159,7 +159,7 @@ export function CoachMascot({
   hintDisabled = false,
   hintFen = null,
   onRequestHint,
-  showTutorLaneHint = false,
+  showSuggestedMoveHint = false,
   idleHintEligible = false,
   docked = false,
   laneLeft = 0,
@@ -268,7 +268,7 @@ export function CoachMascot({
       hint={hint}
       hintDisabled={hintDisabled}
       hintFen={hintFen}
-      showTutorLaneHint={showTutorLaneHint}
+      showSuggestedMoveHint={showSuggestedMoveHint}
       onRequestHint={requestHintAndExpand}
       emptyCopy={orientationTeaser}
     />

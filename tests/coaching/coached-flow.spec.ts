@@ -7,7 +7,7 @@ import {
 } from "../shared/playwright-helpers";
 
 test.describe("coaching slice (deterministic engine stubs)", () => {
-  test("hints, quiet best feedback, explore line, undo my move", async ({
+  test("hints, quiet best feedback, explore line, jump to start", async ({
     page,
   }) => {
     await startCoachGame(page);
@@ -95,7 +95,7 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
       Math.abs((boardAfterExpand!.width ?? 0) - (boardAfterBest!.width ?? 0)),
     ).toBeLessThanOrEqual(1);
 
-    // Opponent replies, then undo White's move and retry.
+    // Opponent replies, then jump back to the start of the game.
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
       /playerTurn|reviewing/,
@@ -103,16 +103,17 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
     );
 
     await expandCoach(page);
-    await page.getByTestId("undo-human-move-button").click();
+    const timeline = page.getByTestId("move-list");
+    await timeline.focus();
+    await page.keyboard.press("Home");
+    await expect(page.getByTestId("timeline-status")).toContainText(/start/i);
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
       "playerTurn",
     );
     await expect(page.getByTestId("explore-line-button")).toHaveCount(0);
     await expect(page.getByTestId("move-list")).toContainText("No moves yet");
-    await expect(page.getByTestId("live-region")).toContainText(/undo|try/i);
 
-    // After clear, expand shows empty coach state (collapse ≠ dismiss).
     await expandCoach(page);
     await expect(page.getByTestId("teaching-card")).toHaveAttribute(
       "data-state",
