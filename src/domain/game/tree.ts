@@ -216,6 +216,85 @@ export function jumpToNode(tree: GameTree, nodeId: string): GameTree | null {
   return { ...tree, currentNodeId: nodeId };
 }
 
+/** Ids of all strict descendants of nodeId (cycle-safe BFS over childIds). */
+export function getDescendantIds(tree: GameTree, nodeId: string): string[] {
+  const start = tree.nodes[nodeId];
+  if (!start) return [];
+  const ids: string[] = [];
+  const visited = new Set<string>([nodeId]);
+  const queue = [...start.childIds];
+  while (queue.length > 0) {
+    const id = queue.shift();
+    if (!id || visited.has(id)) continue;
+    visited.add(id);
+    const node = tree.nodes[id];
+    if (!node) continue;
+    ids.push(id);
+    queue.push(...node.childIds);
+  }
+  return ids;
+}
+
+export type PruneScope = "descendants" | "branch";
+
+/**
+ * Remove nodes from the tree. scope "descendants" keeps nodeId and deletes
+ * everything below it; scope "branch" also deletes nodeId (rejected for root).
+ * Relocates currentNodeId to the surviving cut node when it was removed.
+ * Returns null for unknown nodes / nothing to remove.
+ */
+export function pruneAtNode(
+  tree: GameTree,
+  nodeId: string,
+  scope: PruneScope,
+): { tree: GameTree; removedIds: string[] } | null {
+  const node = tree.nodes[nodeId];
+  if (!node) return null;
+  if (scope === "branch" && nodeId === tree.rootId) return null;
+
+  const descendantIds = getDescendantIds(tree, nodeId);
+  const removedIds =
+    scope === "branch" ? [nodeId, ...descendantIds] : descendantIds;
+  if (removedIds.length === 0) return null;
+
+  const removed = new Set(removedIds);
+  const nodes = cloneNodes(tree.nodes);
+  for (const id of removedIds) {
+    delete nodes[id];
+  }
+
+  if (scope === "descendants") {
+    const kept = nodes[nodeId];
+    if (kept) {
+      nodes[nodeId] = { ...kept, childIds: [] };
+    }
+  } else if (node.parentId) {
+    const parent = nodes[node.parentId];
+    if (parent) {
+      nodes[node.parentId] = {
+        ...parent,
+        childIds: parent.childIds.filter((id) => id !== nodeId),
+      };
+    }
+  }
+
+  let currentNodeId = tree.currentNodeId;
+  if (removed.has(currentNodeId)) {
+    const cutId =
+      scope === "descendants" ? nodeId : (node.parentId ?? tree.rootId);
+    currentNodeId = nodes[cutId] ? cutId : tree.rootId;
+  }
+
+  return {
+    tree: {
+      nodes,
+      rootId: tree.rootId,
+      currentNodeId,
+    },
+    removedIds,
+  };
+}
+
 /** Move the pointer to the parent of the current node (takeback / retry base). */
 export function takebackOne(tree: GameTree): GameTree | null {
   const current = tree.nodes[tree.currentNodeId];

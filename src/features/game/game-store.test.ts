@@ -164,6 +164,46 @@ describe("game store adapter", () => {
     );
   });
 
+  it("prunes descendants, drops lessons, and relocates the pointer", () => {
+    useGameStore.getState().startGame();
+    useGameStore.getState().playMove("e2e4");
+    const e4 = useGameStore.getState().tree.currentNodeId;
+    useGameStore.getState().setLesson(e4, {
+      concept: "missed_improvement",
+      confidence: 0.8,
+      explanation: "e4 is fine.",
+      suggestedMoveUci: "d2d4",
+      suggestedMoveSan: "d4",
+      lineUci: ["d2d4"],
+      refutationUci: [],
+      classification: "best",
+      quip: "Solid.",
+      nudge: false,
+    });
+    useGameStore.getState().playMove("e7e5");
+    const e5 = useGameStore.getState().tree.currentNodeId;
+    useGameStore.getState().setLesson(e5, {
+      concept: "missed_improvement",
+      confidence: 0.5,
+      explanation: "e5 is fine.",
+      suggestedMoveUci: "c7c5",
+      suggestedMoveSan: "c5",
+      lineUci: ["c7c5"],
+      refutationUci: [],
+      classification: "best",
+      quip: "Okay.",
+      nudge: false,
+    });
+
+    expect(useGameStore.getState().pruneAtNode(e4, "descendants")).toBe(true);
+    const state = useGameStore.getState();
+    expect(state.tree.currentNodeId).toBe(e4);
+    expect(state.tree.nodes[e5]).toBeUndefined();
+    expect(state.lessons[e4]).toBeDefined();
+    expect(state.lessons[e5]).toBeUndefined();
+    expect(state.session.mode).toBe("opponentThinking");
+  });
+
   it("goToNode jumps the pointer and syncs the side to move", () => {
     useGameStore.getState().startGame();
     useGameStore.getState().playMove("e2e4");

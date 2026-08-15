@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { DecisionGraph } from "@/components/timeline/decision-types";
 import {
   COL_W,
@@ -15,6 +16,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import type { PruneScope } from "@/domain/game";
 import { cn } from "@/lib/utils";
 
 export type DecisionGraphViewProps = {
@@ -23,6 +25,13 @@ export type DecisionGraphViewProps = {
   disabled?: boolean;
   onSelectNode: (nodeId: string) => void;
   onOpenCoach?: () => void;
+  pruneMode?: boolean;
+  onPruneTarget?: (
+    nodeId: string,
+    scope: PruneScope,
+    removalCount: number,
+    san: string,
+  ) => void;
 };
 
 function moverLabel(node: DecisionGraph["nodes"][number]): string | null {
@@ -52,6 +61,48 @@ function tooltipFor(node: DecisionGraph["nodes"][number]): string {
   }
   if (node.isCurrent) return "Current position";
   return ariaLabelFor(node);
+}
+
+function pruneSan(node: DecisionGraph["nodes"][number] | undefined): string {
+  if (!node) return "the start";
+  return node.san || node.moveLabel || "the start";
+}
+
+function childIdsByParent(graph: DecisionGraph): Map<string, string[]> {
+  const children = new Map<string, string[]>();
+  for (const edge of graph.edges) {
+    if (edge.kind === "suggested") continue;
+    const list = children.get(edge.fromId) ?? [];
+    list.push(edge.toId);
+    children.set(edge.fromId, list);
+  }
+  return children;
+}
+
+function descendantIds(
+  children: Map<string, string[]>,
+  nodeId: string,
+): string[] {
+  const ids: string[] = [];
+  const visited = new Set<string>([nodeId]);
+  const queue = [...(children.get(nodeId) ?? [])];
+  while (queue.length > 0) {
+    const id = queue.shift();
+    if (!id || visited.has(id)) continue;
+    visited.add(id);
+    ids.push(id);
+    queue.push(...(children.get(id) ?? []));
+  }
+  return ids;
+}
+
+function removalIds(
+  children: Map<string, string[]>,
+  target: { nodeId: string; scope: PruneScope } | null,
+): Set<string> {
+  if (!target) return new Set();
+  const kids = descendantIds(children, target.nodeId);
+  return new Set(target.scope === "branch" ? [target.nodeId, ...kids] : kids);
 }
 
 function NodeGlyph({ node }: { node: DecisionGraph["nodes"][number] }) {
@@ -93,8 +144,18 @@ export function DecisionGraphView({
   disabled = false,
   onSelectNode,
   onOpenCoach,
+  pruneMode = false,
+  onPruneTarget,
 }: DecisionGraphViewProps) {
+  const [hoverTarget, setHoverTarget] = useState<{
+    nodeId: string;
+    scope: PruneScope;
+  } | null>(null);
   const nodeById = new Map(graph.nodes.map((node) => [node.id, node]));
+  const children = childIdsByParent(graph);
+  const highlighted = pruneMode
+    ? removalIds(children, hoverTarget)
+    : new Set<string>();
   const width = Math.max(graph.columns, 1) * COL_W;
   const height = graphContentHeight(graph.minLane, graph.maxLane);
 
@@ -103,6 +164,7 @@ export function DecisionGraphView({
       className="relative"
       style={{ width, height }}
       data-testid="timeline-graph"
+      data-prune-mode={pruneMode ? "true" : "false"}
     >
       <svg
         className="pointer-events-none absolute inset-0"
@@ -118,16 +180,49 @@ export function DecisionGraphView({
           const b = graphNodeCenter(to.column, to.lane, graph.maxLane);
           const midX = (a.cx + b.cx) / 2;
           const suggested = edge.kind === "suggested";
+          const marked = highlighted.has(edge.toId);
+          const d = `M ${a.cx} ${a.cy} C ${midX} ${a.cy}, ${midX} ${b.cy}, ${b.cx} ${b.cy}`;
           return (
-            <path
-              key={`${edge.fromId}->${edge.toId}`}
-              d={`M ${a.cx} ${a.cy} C ${midX} ${a.cy}, ${midX} ${b.cy}, ${b.cx} ${b.cy}`}
-              fill="none"
-              stroke="var(--border)"
-              strokeWidth={suggested ? 1.75 : 1.5}
-              strokeDasharray={suggested ? "4 3" : undefined}
-              className={suggested ? "stroke-primary/70" : undefined}
-            />
+            <g key={`${edge.fromId}->${edge.toId}`}>
+              <path
+                d={d}
+                fill="none"
+                stroke="var(--border)"
+                strokeWidth={suggested ? 1.75 : 1.5}
+                strokeDasharray={suggested ? "4 3" : undefined}
+                className={
+                  marked
+                    ? "stroke-destructive"
+                    : suggested
+                      ? "stroke-primary/70"
+                      : undefined
+                }
+                data-prune-target={marked ? "true" : undefined}
+              />
+              {pruneMode && !suggested ? (
+                <path
+                  d={d}
+                  fill="none"
+                  stroke="transparent"
+                  strokeWidth={10}
+                  className="pointer-events-auto cursor-crosshair"
+                  data-timeline-edge="true"
+                  data-from-id={edge.fromId}
+                  data-to-id={edge.toId}
+                  data-testid={`timeline-edge-${edge.fromId}-${edge.toId}`}
+                  onPointerEnter={() => {
+                    setHoverTarget({ nodeId: edge.toId, scope: "branch" });
+                  }}
+                  onPointerLeave={() => {
+                    setHoverTarget(null);
+                  }}
+                  onClick={() => {
+                    const count = 1 + descendantIds(children, edge.toId).length;
+                    onPruneTarget?.(edge.toId, "branch", count, pruneSan(from));
+                  }}
+                />
+              ) : null}
+            </g>
           );
         })}
       </svg>
@@ -140,6 +235,10 @@ export function DecisionGraphView({
         );
         const selected = node.id === focusedNodeId;
         const caption = node.caption;
+        const childCount = descendantIds(children, node.id).length;
+        const canPrune =
+          pruneMode && node.kind === "committed" && childCount > 0;
+        const marked = highlighted.has(node.id);
         return (
           <div key={node.id}>
             {caption ? (
@@ -149,6 +248,7 @@ export function DecisionGraphView({
                   node.kind === "suggested"
                     ? "text-primary"
                     : "text-muted-foreground",
+                  marked && "text-destructive",
                 )}
                 style={{
                   left: node.column * COL_W + 2,
@@ -175,15 +275,38 @@ export function DecisionGraphView({
                     data-kind={node.kind}
                     data-lane={node.lane}
                     data-testid={`timeline-node-${node.id}`}
+                    data-prune-target={marked ? "true" : undefined}
                     disabled={disabled}
                     className={cn(
                       "group absolute flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full sm:size-9",
                       "bg-transparent",
                       "outline-none focus-visible:ring-2 focus-visible:ring-ring",
                       "touch-manipulation",
+                      pruneMode &&
+                        (canPrune ? "cursor-crosshair" : "cursor-not-allowed"),
                     )}
                     style={{ left: cx, top: cy }}
+                    onPointerEnter={() => {
+                      if (!canPrune) return;
+                      setHoverTarget({
+                        nodeId: node.id,
+                        scope: "descendants",
+                      });
+                    }}
+                    onPointerLeave={() => {
+                      if (pruneMode) setHoverTarget(null);
+                    }}
                     onClick={() => {
+                      if (pruneMode) {
+                        if (!canPrune) return;
+                        onPruneTarget?.(
+                          node.id,
+                          "descendants",
+                          childCount,
+                          pruneSan(node),
+                        );
+                        return;
+                      }
                       onSelectNode(node.id);
                       if (node.kind === "suggested") {
                         onOpenCoach?.();
@@ -195,21 +318,36 @@ export function DecisionGraphView({
                 <span
                   className={cn(
                     "flex size-5 items-center justify-center rounded-full",
-                    selected && "ring-2 ring-primary",
-                    node.isCurrent && !selected && "ring-2 ring-primary/55",
-                    !selected &&
+                    marked && "ring-2 ring-destructive opacity-50",
+                    !marked && selected && "ring-2 ring-primary",
+                    !marked &&
+                      node.isCurrent &&
+                      !selected &&
+                      "ring-2 ring-primary/55",
+                    !marked &&
+                      !selected &&
+                      !pruneMode &&
                       "group-hover:ring-1 group-hover:ring-foreground/30",
                   )}
                 >
                   <NodeGlyph node={node} />
                 </span>
               </TooltipTrigger>
-              <TooltipContent side="top">{tooltipFor(node)}</TooltipContent>
+              <TooltipContent side="top">
+                {pruneMode
+                  ? canPrune
+                    ? `Remove ${childCount} ${childCount === 1 ? "move" : "moves"} after ${pruneSan(node)}`
+                    : node.kind === "suggested"
+                      ? "Suggested moves cannot be pruned"
+                      : "Nothing to prune here"
+                  : tooltipFor(node)}
+              </TooltipContent>
             </Tooltip>
             <span
               className={cn(
                 "pointer-events-none absolute truncate text-center font-mono text-[0.65rem] leading-none tabular-nums text-muted-foreground",
                 node.kind === "suggested" && "text-primary",
+                marked && "text-destructive",
               )}
               style={{
                 left: node.column * COL_W + 4,

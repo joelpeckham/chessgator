@@ -5,6 +5,7 @@ import {
   expectCoachCollapsed,
   selectedTimelineNode,
   startCoachGame,
+  startStubGame,
 } from "../shared/playwright-helpers";
 
 test.describe("time travel + branching timeline", () => {
@@ -160,5 +161,62 @@ test.describe("time travel + branching timeline", () => {
     );
     await page.keyboard.press("Escape");
     await expectCoachCollapsed(page);
+  });
+
+  test("prune tool cuts descendants after confirmation", async ({ page }) => {
+    await startStubGame(page);
+    await chooseLegalMove(page, "e4");
+    await expect(page.getByTestId("status-badge")).toHaveAttribute(
+      "data-mode",
+      "playerTurn",
+      { timeout: 10_000 },
+    );
+    await expect(page.getByTestId("move-list")).toContainText("e4");
+
+    const timeline = page.getByTestId("move-list");
+    await timeline.focus();
+    await page.keyboard.press("Home");
+    await expect(selectedTimelineNode(page)).toHaveAttribute(
+      "aria-label",
+      /start/i,
+    );
+
+    await page.getByTestId("timeline-prune").click();
+    await expect(page.getByTestId("move-timeline")).toHaveAttribute(
+      "data-prune-mode",
+      "true",
+    );
+
+    const startNode = page
+      .locator(
+        '[data-testid="move-timeline"] [data-timeline-node][aria-label*="start" i]',
+      )
+      .first();
+    await startNode.hover();
+    await expect(
+      page
+        .locator(
+          '[data-testid="move-timeline"] [data-timeline-node][data-prune-target="true"]',
+        )
+        .first(),
+    ).toBeVisible();
+
+    await startNode.click();
+    await expect(page.getByTestId("confirm-prune")).toBeVisible();
+    await page.getByTestId("confirm-prune").click();
+
+    await expect(page.getByTestId("move-list")).not.toContainText("e4");
+    await expect(selectedTimelineNode(page)).toHaveAttribute(
+      "aria-label",
+      /start/i,
+    );
+    await expect(page.getByTestId("status-badge")).toHaveAttribute(
+      "data-mode",
+      "playerTurn",
+    );
+    await expect(page.getByTestId("move-timeline")).toHaveAttribute(
+      "data-prune-mode",
+      "false",
+    );
   });
 });

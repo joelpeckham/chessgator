@@ -15,7 +15,9 @@ import {
   jumpToNode,
   type MoveInput,
   normalizeSessionForResume,
+  type PruneScope,
   playMoveOnTree,
+  pruneAtNode as pruneTreeAtNode,
   type SessionMode,
   type SessionState,
   sessionModeForTurn,
@@ -56,6 +58,8 @@ export type GameStoreState = {
   replaceTree: (tree: GameTree) => void;
   /** Jump the live pointer to an existing node and sync session mode. */
   goToNode: (nodeId: string) => boolean;
+  /** Cut a branch or descendants from the tree and drop lessons for removed ids. */
+  pruneAtNode: (nodeId: string, scope: PruneScope) => boolean;
   playMove: (
     input: MoveInput,
     options?: { afterMode?: SessionMode; asVariation?: boolean },
@@ -176,6 +180,53 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
     set({
       tree: next,
+      session: sessionState(sessionModeForTurn(status.turn, humanColor)),
+      lastError: null,
+    });
+    return true;
+  },
+
+  pruneAtNode: (nodeId, scope) => {
+    const { tree, session, humanColor, lessons } = get();
+    const pruned = pruneTreeAtNode(tree, nodeId, scope);
+    if (!pruned) {
+      set({ lastError: "Nothing to prune" });
+      return false;
+    }
+
+    const removed = new Set(pruned.removedIds);
+    const nextLessons: Record<string, TeachingInsight> = {};
+    for (const [id, insight] of Object.entries(lessons)) {
+      if (!removed.has(id)) nextLessons[id] = insight;
+    }
+
+    if (
+      session.mode === "gameOver" &&
+      session.terminalReason === "resignation"
+    ) {
+      set({ tree: pruned.tree, lessons: nextLessons, lastError: null });
+      return true;
+    }
+
+    if (pruned.tree.currentNodeId === tree.currentNodeId) {
+      set({ tree: pruned.tree, lessons: nextLessons, lastError: null });
+      return true;
+    }
+
+    const status = getStatusAtNode(pruned.tree, pruned.tree.currentNodeId);
+    if (status.isGameOver) {
+      set({
+        tree: pruned.tree,
+        lessons: nextLessons,
+        session: sessionState("gameOver", status.reason),
+        lastError: null,
+      });
+      return true;
+    }
+
+    set({
+      tree: pruned.tree,
+      lessons: nextLessons,
       session: sessionState(sessionModeForTurn(status.turn, humanColor)),
       lastError: null,
     });

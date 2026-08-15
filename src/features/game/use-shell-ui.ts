@@ -3,7 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import type { BoardMove } from "@/components/board/move-utils";
 import { parseVirtualTimelineId } from "@/components/timeline/virtual-id";
-import { type Color, type GameMove, getCurrentNode } from "@/domain/game";
+import {
+  type Color,
+  type GameMove,
+  getCurrentNode,
+  type PruneScope,
+} from "@/domain/game";
 import {
   playHumanMove,
   realizeSuggestedMove,
@@ -53,6 +58,7 @@ export type ShellUi = ShellChrome & {
   setPendingHumanColor: (color: Color) => void;
   handleRetryEngines: () => Promise<void>;
   handleSelectTimelineNode: (nodeId: string) => void;
+  handlePruneTimelineNode: (nodeId: string, scope: PruneScope) => void;
   handleCoachExpandedChange: (next: boolean) => void;
   handleDismissCoach: () => void;
   handleRequestHint: () => void;
@@ -83,6 +89,7 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
   const resumePlay = useGameStore((s) => s.resumePlay);
   const resign = useGameStore((s) => s.resign);
   const goToNode = useGameStore((s) => s.goToNode);
+  const pruneAtNode = useGameStore((s) => s.pruneAtNode);
   const replaceTree = useGameStore((s) => s.replaceTree);
   const hydrated = useGameStore((s) => s.hydrated);
   const liveMode = useGameStore((s) => s.session.mode);
@@ -300,6 +307,22 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     if (lesson) setCoachExpanded(true);
   }
 
+  function handlePruneTimelineNode(nodeId: string, scope: PruneScope): void {
+    if (parseVirtualTimelineId(nodeId)) return;
+    const evidenceId = runtime.coach.getState().evidence?.gameNodeId;
+    runtime.maiaSession.cancelPending();
+    runtime.coach.cancelPending();
+    bumpScheduler();
+    if (!pruneAtNode(nodeId, scope)) return;
+    const stillPresent =
+      evidenceId != null &&
+      useGameStore.getState().tree.nodes[evidenceId] != null;
+    if (evidenceId && !stillPresent) {
+      runtime.coach.clearFeedback();
+      setCoachExpanded(false);
+    }
+  }
+
   function handleCoachExpandedChange(next: boolean): void {
     setCoachExpanded(next);
     if (next) {
@@ -367,6 +390,7 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     dismissGameOver,
     handleRetryEngines,
     handleSelectTimelineNode,
+    handlePruneTimelineNode,
     handleCoachExpandedChange,
     handleDismissCoach,
     handleRequestHint,

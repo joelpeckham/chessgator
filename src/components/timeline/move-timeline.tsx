@@ -1,6 +1,10 @@
 "use client";
 
-import { RiContractUpDownLine, RiExpandUpDownLine } from "@remixicon/react";
+import {
+  RiContractUpDownLine,
+  RiExpandUpDownLine,
+  RiScissorsCutLine,
+} from "@remixicon/react";
 import {
   type KeyboardEvent,
   type PointerEvent,
@@ -24,7 +28,18 @@ import {
   stepSiblingLane,
   transportStep,
 } from "@/components/timeline/tree-nav";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import type { PruneScope } from "@/domain/game";
 import { prefersReducedMotion } from "@/lib/prefers-reduced-motion";
 import { cn } from "@/lib/utils";
 
@@ -39,9 +54,17 @@ export type MoveTimelineProps = {
   disabled?: boolean;
   onSelectNode: (nodeId: string) => void;
   onOpenCoach?: () => void;
+  onPrune?: (nodeId: string, scope: PruneScope) => void;
   expanded: boolean;
   onExpandedChange: (expanded: boolean) => void;
   className?: string;
+};
+
+type PendingPrune = {
+  nodeId: string;
+  scope: PruneScope;
+  count: number;
+  san: string;
 };
 
 export {
@@ -64,11 +87,14 @@ export function MoveTimeline({
   disabled = false,
   onSelectNode,
   onOpenCoach,
+  onPrune,
   expanded,
   onExpandedChange,
   className,
 }: MoveTimelineProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [pruneMode, setPruneMode] = useState(false);
+  const [pendingPrune, setPendingPrune] = useState<PendingPrune | null>(null);
   const [panOverride, setPanOverride] = useState<{
     key: string;
     y: number;
@@ -127,6 +153,12 @@ export function MoveTimeline({
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>): void {
     if (disabled) return;
+    if (event.key === "Escape" && pruneMode) {
+      event.preventDefault();
+      setPruneMode(false);
+      setPendingPrune(null);
+      return;
+    }
     if (event.key === "ArrowRight") {
       event.preventDefault();
       const nextId = transportStep(graph, focusedNodeId, 1);
@@ -164,7 +196,10 @@ export function MoveTimeline({
   function onPointerDown(event: PointerEvent<HTMLDivElement>): void {
     if (event.button !== 0) return;
     const target = event.target;
-    if (target instanceof Element && target.closest("[data-timeline-node]")) {
+    if (
+      target instanceof Element &&
+      target.closest("[data-timeline-node], [data-timeline-edge]")
+    ) {
       return;
     }
     dragRef.current = {
@@ -206,6 +241,7 @@ export function MoveTimeline({
       )}
       data-testid="move-timeline"
       data-expanded={expanded ? "true" : "false"}
+      data-prune-mode={pruneMode ? "true" : "false"}
       aria-label="Move timeline"
       style={{
         height: expanded
@@ -245,6 +281,24 @@ export function MoveTimeline({
         >
           ›
         </Button>
+        {onPrune ? (
+          <Button
+            type="button"
+            size="icon-xs"
+            variant={pruneMode ? "default" : "secondary"}
+            className="rounded-full shadow-sm"
+            disabled={disabled || !hasMoves}
+            aria-label={pruneMode ? "Exit prune mode" : "Prune moves"}
+            aria-pressed={pruneMode}
+            data-testid="timeline-prune"
+            onClick={() => {
+              setPruneMode((on) => !on);
+              setPendingPrune(null);
+            }}
+          >
+            <RiScissorsCutLine />
+          </Button>
+        ) : null}
         <Button
           type="button"
           size="icon-xs"
@@ -268,7 +322,8 @@ export function MoveTimeline({
         aria-activedescendant={`timeline-node-${focusedNodeId}`}
         tabIndex={0}
         className={cn(
-          "min-h-0 min-w-0 flex-1 cursor-grab overflow-x-auto overflow-y-hidden pr-24 select-none scrollbar-thin active:cursor-grabbing focus-visible:ring-2 focus-visible:ring-ring",
+          "min-h-0 min-w-0 flex-1 overflow-x-auto overflow-y-hidden pr-24 select-none scrollbar-thin focus-visible:ring-2 focus-visible:ring-ring",
+          pruneMode ? "cursor-crosshair" : "cursor-grab active:cursor-grabbing",
           !expanded && "scroll-fade-x",
         )}
         data-testid="move-list"
@@ -299,9 +354,50 @@ export function MoveTimeline({
             disabled={disabled}
             onSelectNode={onSelectNode}
             onOpenCoach={onOpenCoach}
+            pruneMode={pruneMode}
+            onPruneTarget={(nodeId, scope, count, san) => {
+              setPendingPrune({ nodeId, scope, count, san });
+            }}
           />
         </div>
       </div>
+      <AlertDialog
+        open={pendingPrune != null}
+        onOpenChange={(next) => {
+          if (!next) setPendingPrune(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingPrune
+                ? `Remove ${pendingPrune.count} ${pendingPrune.count === 1 ? "move" : "moves"} after ${pendingPrune.san}?`
+                : "Remove moves?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Those positions will be deleted from the timeline. This cannot be
+              undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="confirm-prune-cancel">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              data-testid="confirm-prune"
+              onClick={() => {
+                if (!pendingPrune || !onPrune) return;
+                onPrune(pendingPrune.nodeId, pendingPrune.scope);
+                setPendingPrune(null);
+                setPruneMode(false);
+              }}
+            >
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }

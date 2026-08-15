@@ -140,6 +140,7 @@ export function GameShellLayout({
                 disabled={view.timeline.disabled}
                 onSelectNode={ui.handleSelectTimelineNode}
                 onOpenCoach={ui.handleOpenCoach}
+                onPrune={ui.handlePruneTimelineNode}
                 expanded={ui.timelineExpanded}
                 onExpandedChange={ui.setTimelineExpanded}
                 className="rounded-none shadow-none ring-0"

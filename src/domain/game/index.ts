@@ -31,12 +31,13 @@ export {
   normalizeSessionForResume,
   sessionModeForTurn,
 } from "@/domain/game/session";
-export type { PlayMoveOnTreeOptions } from "@/domain/game/tree";
+export type { PlayMoveOnTreeOptions, PruneScope } from "@/domain/game/tree";
 export {
   createBootstrapTree,
   createInitialTree,
   getAncestors,
   getCurrentNode,
+  getDescendantIds,
   getMainlinePath,
   getMoveHistory,
   getNode,
@@ -44,6 +45,7 @@ export {
   jumpToNode,
   listMainlineChild,
   playMoveOnTree,
+  pruneAtNode,
   takebackOne,
 } from "@/domain/game/tree";
 export type {

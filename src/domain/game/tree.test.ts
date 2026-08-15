@@ -3,11 +3,13 @@ import {
   createBootstrapTree,
   createInitialTree,
   getAncestors,
+  getDescendantIds,
   getMoveHistory,
   getStatusAtNode,
   jumpToNode,
   listMainlineChild,
   playMoveOnTree,
+  pruneAtNode,
   takebackOne,
 } from "@/domain/game/tree";
 
@@ -140,5 +142,76 @@ describe("game tree", () => {
     const status = getStatusAtNode(tree, tree.currentNodeId);
     expect(status.isCheckmate).toBe(true);
     expect(status.isGameOver).toBe(true);
+  });
+
+  it("lists strict descendants without including the start node", () => {
+    let tree = createInitialTree();
+    tree = playMoveOnTree(tree, tree.currentNodeId, "e2e4")!.tree;
+    const e4 = tree.currentNodeId;
+    tree = playMoveOnTree(tree, tree.currentNodeId, "e7e5")!.tree;
+    const e5 = tree.currentNodeId;
+    tree = jumpToNode(tree, tree.rootId)!;
+    tree = playMoveOnTree(tree, tree.rootId, "d2d4")!.tree;
+    const d4 = tree.currentNodeId;
+
+    expect(getDescendantIds(tree, e4)).toEqual([e5]);
+    expect(getDescendantIds(tree, e5)).toEqual([]);
+    expect(getDescendantIds(tree, tree.rootId).toSorted()).toEqual(
+      [e4, e5, d4].toSorted(),
+    );
+  });
+
+  it("returns null when pruning a leaf or unknown node", () => {
+    let tree = createInitialTree();
+    tree = playMoveOnTree(tree, tree.currentNodeId, "e2e4")!.tree;
+    expect(pruneAtNode(tree, tree.currentNodeId, "descendants")).toBeNull();
+    expect(pruneAtNode(tree, "missing", "descendants")).toBeNull();
+  });
+
+  it("keeps the cut node when pruning descendants", () => {
+    let tree = createInitialTree();
+    tree = playMoveOnTree(tree, tree.currentNodeId, "e2e4")!.tree;
+    const e4 = tree.currentNodeId;
+    tree = playMoveOnTree(tree, tree.currentNodeId, "e7e5")!.tree;
+    const e5 = tree.currentNodeId;
+    tree = playMoveOnTree(tree, tree.currentNodeId, "g1f3")!.tree;
+
+    const pruned = pruneAtNode(tree, e4, "descendants");
+    expect(pruned).not.toBeNull();
+    expect(pruned!.removedIds).toContain(e5);
+    expect(pruned!.tree.nodes[e4]).toBeDefined();
+    expect(pruned!.tree.nodes[e4]!.childIds).toEqual([]);
+    expect(pruned!.tree.nodes[e5]).toBeUndefined();
+    expect(pruned!.tree.currentNodeId).toBe(e4);
+  });
+
+  it("rejects pruning the root as a branch and unlinks a sibling branch", () => {
+    let tree = createInitialTree();
+    tree = playMoveOnTree(tree, tree.currentNodeId, "e2e4")!.tree;
+    const e4 = tree.currentNodeId;
+    tree = jumpToNode(tree, tree.rootId)!;
+    tree = playMoveOnTree(tree, tree.rootId, "d2d4")!.tree;
+    const d4 = tree.currentNodeId;
+
+    expect(pruneAtNode(tree, tree.rootId, "branch")).toBeNull();
+
+    const pruned = pruneAtNode(tree, e4, "branch");
+    expect(pruned).not.toBeNull();
+    expect(pruned!.removedIds).toEqual([e4]);
+    expect(pruned!.tree.nodes[e4]).toBeUndefined();
+    expect(pruned!.tree.nodes[d4]).toBeDefined();
+    expect(pruned!.tree.nodes[tree.rootId]!.childIds).toEqual([d4]);
+    expect(pruned!.tree.currentNodeId).toBe(d4);
+  });
+
+  it("moves the pointer to the parent when the current node is pruned", () => {
+    let tree = createInitialTree();
+    tree = playMoveOnTree(tree, tree.currentNodeId, "e2e4")!.tree;
+    const e4 = tree.currentNodeId;
+    tree = playMoveOnTree(tree, tree.currentNodeId, "e7e5")!.tree;
+
+    const pruned = pruneAtNode(tree, e4, "branch");
+    expect(pruned).not.toBeNull();
+    expect(pruned!.tree.currentNodeId).toBe(tree.rootId);
   });
 });
