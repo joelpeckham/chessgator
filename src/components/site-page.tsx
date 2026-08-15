@@ -27,7 +27,7 @@ export function SitePage({
         {children}
         <p>
           <Link
-            href="/"
+            href="/game"
             className="text-sm text-primary underline-offset-4 hover:underline"
           >
             Back to the board

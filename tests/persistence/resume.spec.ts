@@ -86,7 +86,7 @@ test.describe("local resume + corruption", () => {
       localStorage.setItem(key, "{not-json");
     }, STORAGE_KEY);
 
-    await page.goto("/?e2eStub=1");
+    await page.goto("/game?e2eStub=1");
     await expect(page.getByTestId("game-shell")).toHaveAttribute(
       "data-hydrated",
       "true",

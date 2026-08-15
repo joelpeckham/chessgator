@@ -1,7 +1,7 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "entry": [
-    "src/app/**/{page,layout,loading,error,not-found,default,template,route,robots,sitemap}.{ts,tsx}",
+    "src/app/**/{page,layout,loading,error,not-found,default,template,route,robots,sitemap,manifest}.{ts,tsx}",
     "src/domain/**/index.ts",
     "src/engines/stockfish/index.ts",
     "src/workers/**/*.{ts,tsx}",

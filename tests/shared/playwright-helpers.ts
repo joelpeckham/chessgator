@@ -50,7 +50,7 @@ export function selectedTimelineNode(page: Page) {
 
 /** Wait for an auto-started stubbed playable game (`?e2eStub=1`). */
 export async function startStubGame(page: Page): Promise<void> {
-  await page.goto("/?e2eStub=1");
+  await page.goto("/game?e2eStub=1");
   await expect(page.getByTestId("game-shell")).toBeVisible();
   await expect(page.getByTestId("game-shell")).toHaveAttribute(
     "data-hydrated",
@@ -66,7 +66,7 @@ export async function startStubGame(page: Page): Promise<void> {
 
 /** Wait for an auto-started stubbed coached game (`?e2eStub=coach`). */
 export async function startCoachGame(page: Page): Promise<void> {
-  await page.goto("/?e2eStub=coach");
+  await page.goto("/game?e2eStub=coach");
   await expect(page.getByTestId("game-shell")).toBeVisible();
   await expect(page.getByTestId("game-shell")).toHaveAttribute(
     "data-hydrated",

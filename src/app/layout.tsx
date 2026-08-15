@@ -1,6 +1,8 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import { Figtree, Merriweather } from "next/font/google";
 import "./globals.css";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 const merriweatherHeading = Merriweather({
@@ -13,26 +15,39 @@ const figtree = Figtree({
   variable: "--font-sans",
 });
 
-const description =
-  "Local-only chess coach. Play as White or Black against Maia with Stockfish coaching analysis.";
-
 export const metadata: Metadata = {
-  metadataBase: new URL("https://chessgator.com"),
-  title: "chessgator",
-  description,
-  applicationName: "chessgator",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: `${SITE_NAME} — local-only chess coach`,
+    template: `%s · ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  keywords: [
+    "chess",
+    "chess coach",
+    "Maia",
+    "Stockfish",
+    "local chess",
+    "browser chess",
+    "chess training",
+  ],
+  category: "games",
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "chessgator",
-    description,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
     url: "/",
-    siteName: "chessgator",
+    siteName: SITE_NAME,
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "chessgator",
-    description,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
   },
 };
 
@@ -50,7 +65,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         merriweatherHeading.variable,
       )}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }

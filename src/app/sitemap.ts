@@ -11,6 +11,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
+      url: "https://chessgator.com/game",
+      lastModified: new Date("2026-08-15"),
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
       url: "https://chessgator.com/faq",
       lastModified: new Date("2026-08-15"),
       changeFrequency: "monthly",

@@ -13,7 +13,7 @@ test.describe("composed real-engine shell", () => {
   test("auto-start, one legal move, opponent reply, coaching state", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/game");
 
     await expect(page.getByTestId("game-shell")).toBeVisible();
     await expect(page.getByTestId("chessboard")).toBeVisible();

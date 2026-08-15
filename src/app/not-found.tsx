@@ -28,7 +28,7 @@ export default function NotFound() {
         <h1 className="font-heading text-2xl font-semibold tracking-tight text-pretty">
           That square isn&apos;t on the board.
         </h1>
-        <Link className={buttonVariants()} href="/">
+        <Link className={buttonVariants()} href="/game">
           Back to the board
         </Link>
       </main>
