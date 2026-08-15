@@ -36,6 +36,13 @@ import { bouncySpring, popSpring } from "@/lib/motion-presets";
 import { cn } from "@/lib/utils";
 
 /**
+ * The gator art is cut flat at the neck. Hover lift and nudge bounces can
+ * raise that edge above the timeline ledge, so a mirrored sliver of the
+ * same image extends the neck just enough to keep the edge hidden.
+ */
+const NECK_BLEED_PX = 12;
+
+/**
  * Head motion states: a slow breathing loop when idle, a thinking sway
  * while analyzing, one bounce for mistakes, bounce + worry pulse for
  * blunders.
@@ -423,7 +430,7 @@ export function CoachMascot({
           >
             <motion.span
               key={expression}
-              className="block h-full w-full"
+              className="relative block h-full w-full"
               initial={{ scale: 0.82, opacity: 0.4 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={popSpring}
@@ -437,6 +444,22 @@ export function CoachMascot({
                 draggable={false}
                 loading="eager"
               />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-x-0 top-full block overflow-hidden"
+                style={{ height: NECK_BLEED_PX }}
+              >
+                <Image
+                  src={gatorSrc(expression)}
+                  alt=""
+                  width={Math.round(head.width)}
+                  height={Math.round(head.height)}
+                  className="block w-full -scale-y-100 select-none"
+                  style={{ height: head.height }}
+                  draggable={false}
+                  loading="eager"
+                />
+              </span>
             </motion.span>
           </motion.span>
         </motion.button>

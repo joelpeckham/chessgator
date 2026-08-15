@@ -204,7 +204,9 @@ export function DecisionGraphView({
                   strokeWidth={suggested ? 1.75 : 1.5}
                   strokeDasharray={suggested ? "4 3" : undefined}
                   initial={
-                    suggested ? { opacity: 0 } : { pathLength: 0, opacity: 0 }
+                    suggested
+                      ? { opacity: 0, d }
+                      : { pathLength: 0, opacity: 0, d }
                   }
                   animate={
                     suggested

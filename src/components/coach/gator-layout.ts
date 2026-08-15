@@ -11,7 +11,7 @@ export const GATOR_ART: Record<
   sad: { width: 200.917, height: 291.95 },
   mischievous: { width: 212.842, height: 290.435 },
   shocked: { width: 214.027, height: 307.993 },
-  confused: { width: 261.119, height: 301.264 },
+  confused: { width: 262, height: 299.971 },
   scared: { width: 222.396, height: 307.113 },
 };
 

@@ -12,7 +12,6 @@ import {
   useEffect,
   useRef,
   useState,
-  type WheelEvent,
 } from "react";
 import { DecisionGraphView } from "@/components/timeline/decision-graph";
 import type { DecisionGraph } from "@/components/timeline/decision-types";
@@ -109,6 +108,11 @@ export function MoveTimeline({
     originScrollLeft: number;
     originY: number;
   } | null>(null);
+  const wheelPanRef = useRef({
+    panKey: "",
+    panY: 0,
+    clampPanY: (y: number) => y,
+  });
 
   const focused = graph.nodes.find((node) => node.id === focusedNodeId);
   const viewportHeight = expanded ? EXPANDED_GRAPH_H : STRIP_GRAPH_H;
@@ -127,6 +131,7 @@ export function MoveTimeline({
     const minY = viewportHeight / 2 - bottomCy;
     return Math.min(maxY, Math.max(minY, y));
   }
+  wheelPanRef.current = { panKey, panY, clampPanY };
 
   // Scroll horizontally only; vertical centering is the pan transform's
   // job. scrollIntoView would race the pan spring and leave a stray
@@ -197,14 +202,27 @@ export function MoveTimeline({
     }
   }
 
-  function onWheel(event: WheelEvent<HTMLDivElement>): void {
-    event.preventDefault();
-    event.currentTarget.scrollLeft += event.deltaX;
-    setPanOverride({
-      key: panKey,
-      y: clampPanY(panY - event.deltaY),
-    });
-  }
+  // React's onWheel is passive, so preventDefault is a no-op and floods
+  // the console. Bind a non-passive listener to intercept page scroll.
+  useEffect(() => {
+    const list = scrollRef.current;
+    if (!list) return;
+
+    function onWheel(event: WheelEvent): void {
+      event.preventDefault();
+      list.scrollLeft += event.deltaX;
+      const { panKey: key, panY: y, clampPanY: clamp } = wheelPanRef.current;
+      setPanOverride({
+        key,
+        y: clamp(y - event.deltaY),
+      });
+    }
+
+    list.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      list.removeEventListener("wheel", onWheel);
+    };
+  }, []);
 
   function onPointerDown(event: PointerEvent<HTMLDivElement>): void {
     if (event.button !== 0) return;
@@ -343,7 +361,6 @@ export function MoveTimeline({
         )}
         data-testid="move-list"
         onKeyDown={onKeyDown}
-        onWheel={onWheel}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
