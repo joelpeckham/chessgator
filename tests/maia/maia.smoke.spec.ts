@@ -9,7 +9,7 @@ test.describe("Maia3 5M fp16 worker / ONNX", () => {
       consoleMessages.push(msg.text());
     });
 
-    await page.goto("/game");
+    await page.goto("/");
 
     const result = await page.evaluate(async () => {
       const runner = (

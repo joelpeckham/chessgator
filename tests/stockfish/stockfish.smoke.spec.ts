@@ -4,7 +4,7 @@ test.describe("Stockfish lite-single worker/WASM", () => {
   test("typed worker initializes and returns a legal-looking bestmove", async ({
     page,
   }) => {
-    await page.goto("/game");
+    await page.goto("/");
 
     const result = await page.evaluate(async () => {
       const runner = (
