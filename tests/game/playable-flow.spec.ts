@@ -60,8 +60,10 @@ test.describe("playable slice (stub Maia)", () => {
     );
 
     await openSettings(page);
-    await page.getByTestId("play-as-select").click();
-    await page.getByRole("option", { name: "Black" }).click();
+    await page
+      .getByTestId("play-as-select")
+      .getByRole("radio", { name: "Black" })
+      .click();
     await page.getByTestId("restart-button").click();
 
     await expect(page.getByTestId("chessboard")).toHaveAttribute(

@@ -1,9 +1,16 @@
 "use client";
 
+import { RiErrorWarningLine } from "@remixicon/react";
 import { useState } from "react";
 import { AccessibleMoveSelect } from "@/components/board/accessible-move-select";
 import { CopyPgnButton } from "@/components/game/copy-pgn-button";
-import { MAIA_ELO_OPTIONS } from "@/components/game/maia-elo-options";
+import {
+  formatMaiaElo,
+  MAIA_ELO_ITEMS,
+  MAIA_ELO_OPTIONS,
+} from "@/components/game/maia-elo-options";
+import { PlayAsToggle } from "@/components/game/play-as-toggle";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +34,7 @@ import {
   Sheet,
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
@@ -60,8 +68,6 @@ export type SettingsSheetProps = {
   onRestart: () => void;
 };
 
-const PLAY_AS_ITEMS = { w: "White", b: "Black" } as const;
-
 export function SettingsSheet({
   open,
   onOpenChange,
@@ -81,6 +87,7 @@ export function SettingsSheet({
   onRestart,
 }: SettingsSheetProps) {
   const [confirm, setConfirm] = useState<"resign" | "restart" | null>(null);
+  const playAsLabel = pendingHumanColor === "b" ? "Black" : "White";
 
   function requestRestart(): void {
     if (confirmRestart) {
@@ -104,66 +111,60 @@ export function SettingsSheet({
         >
           <SheetHeader className="border-b border-border p-4">
             <SheetTitle>Settings</SheetTitle>
-            <SheetDescription>
-              Opponent strength, engines, and game actions.
+            <SheetDescription className="sr-only">
+              Opponent strength, next game, and actions for this game.
             </SheetDescription>
           </SheetHeader>
 
           <div className="flex flex-1 flex-col gap-6 overflow-y-auto p-4">
-            <section
-              className="flex flex-col gap-2"
-              data-testid="game-controls"
-            >
-              <label
-                htmlFor="play-as"
-                className="text-xs font-medium text-muted-foreground"
-              >
-                Play as
-              </label>
-              <Select
-                value={pendingHumanColor}
-                items={PLAY_AS_ITEMS}
-                onValueChange={(value) => {
-                  if (value === "w" || value === "b") {
-                    onPendingHumanColorChange(value);
-                  }
-                }}
-                disabled={engine.starting}
-              >
-                <SelectTrigger id="play-as" data-testid="play-as-select">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="w">White</SelectItem>
-                  <SelectItem value="b">Black</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                Applies when you start a new game.
-              </p>
-            </section>
+            {engine.failed ? (
+              <Alert variant="destructive">
+                <RiErrorWarningLine />
+                <AlertTitle>Engines failed</AlertTitle>
+                <AlertDescription>
+                  <p data-testid="engine-status-message">
+                    {engine.message ?? "Opponent engine failed"}
+                  </p>
+                  {engine.coachMessage ? <p>{engine.coachMessage}</p> : null}
+                </AlertDescription>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="mt-3"
+                  onClick={engine.onRetry}
+                  data-testid="retry-engines-button"
+                >
+                  Retry engines
+                </Button>
+              </Alert>
+            ) : null}
 
             <section className="flex flex-col gap-2">
               <label
                 htmlFor="maia-elo"
                 className="text-xs font-medium text-muted-foreground"
               >
-                Maia Elo
+                Opponent strength
               </label>
               <Select
                 value={String(maiaElo)}
+                items={MAIA_ELO_ITEMS}
                 onValueChange={(value) => {
                   if (value != null) onMaiaEloChange(Number(value));
                 }}
                 disabled={engine.starting}
               >
-                <SelectTrigger id="maia-elo" data-testid="maia-elo-select">
+                <SelectTrigger
+                  id="maia-elo"
+                  className="w-full min-w-0"
+                  data-testid="maia-elo-select"
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {MAIA_ELO_OPTIONS.map((elo) => (
-                    <SelectItem key={elo} value={String(elo)}>
-                      {elo}
+                  {MAIA_ELO_OPTIONS.map((option) => (
+                    <SelectItem key={option.elo} value={String(option.elo)}>
+                      {formatMaiaElo(option.elo)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -173,73 +174,86 @@ export function SettingsSheet({
               </p>
             </section>
 
-            <section className="flex flex-col gap-2" aria-label="Engine status">
+            <section
+              className="flex flex-col gap-3 rounded-xl border border-border p-4"
+              data-testid="game-controls"
+            >
               <h3 className="text-xs font-medium text-muted-foreground">
-                Engines
+                Next game
               </h3>
-              <div className="rounded-xl bg-muted/50 p-3 text-sm">
-                <div className="flex items-start gap-2">
-                  {engine.starting ? <Spinner className="mt-0.5" /> : null}
-                  <div className="flex min-w-0 flex-col gap-1">
-                    <p data-testid="engine-status-message">
-                      {engine.message ??
-                        (engine.failed
-                          ? "Opponent engine failed"
-                          : "Engines ready")}
-                    </p>
-                    {engine.coachMessage ? (
-                      <p className="text-xs text-destructive">
-                        {engine.coachMessage}
-                      </p>
-                    ) : null}
-                  </div>
-                </div>
-                {engine.failed ? (
-                  <Button
-                    type="button"
-                    size="sm"
-                    className="mt-3"
-                    onClick={engine.onRetry}
-                    data-testid="retry-engines-button"
-                  >
-                    Retry engines
-                  </Button>
-                ) : null}
+              <div className="flex flex-col gap-2">
+                <span
+                  id="play-as-label"
+                  className="text-xs font-medium text-muted-foreground"
+                >
+                  Play as
+                </span>
+                <PlayAsToggle
+                  value={pendingHumanColor}
+                  onChange={onPendingHumanColorChange}
+                  disabled={engine.starting}
+                  labelledBy="play-as-label"
+                />
               </div>
-            </section>
-
-            <Separator />
-
-            <AccessibleMoveSelect
-              fen={fen}
-              disabled={!canPlayMove}
-              onSelectMove={onSelectMove}
-            />
-
-            <Separator />
-
-            <div className="flex flex-wrap gap-2">
               <Button
                 type="button"
-                variant="outline"
+                className="w-full"
                 onClick={requestRestart}
                 disabled={!canRestart || engine.starting}
                 data-testid="restart-button"
               >
-                New game
+                Start new game
               </Button>
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={requestResign}
-                disabled={!canResign || engine.starting}
-                data-testid="resign-button"
-              >
-                Resign
-              </Button>
-              <CopyPgnButton pgn={pgn} />
-            </div>
+              <p className="text-xs text-muted-foreground">
+                Starts a fresh game as {playAsLabel} vs Maia {maiaElo}.
+              </p>
+            </section>
+
+            <section className="flex flex-col gap-3">
+              <h3 className="text-xs font-medium text-muted-foreground">
+                This game
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={requestResign}
+                  disabled={!canResign || engine.starting}
+                  data-testid="resign-button"
+                >
+                  Resign
+                </Button>
+                <CopyPgnButton pgn={pgn} />
+              </div>
+              <Separator />
+              <AccessibleMoveSelect
+                fen={fen}
+                disabled={!canPlayMove}
+                onSelectMove={onSelectMove}
+              />
+            </section>
           </div>
+
+          {engine.failed ? null : (
+            <SheetFooter className="border-t border-border p-4">
+              <div
+                className="flex items-start gap-2 text-xs text-muted-foreground"
+                aria-label="Engine status"
+              >
+                {engine.starting ? (
+                  <Spinner className="mt-0.5 size-3.5" />
+                ) : null}
+                <div className="flex min-w-0 flex-col gap-1">
+                  <p data-testid="engine-status-message">
+                    {engine.message ?? "Engines ready"}
+                  </p>
+                  {engine.coachMessage ? (
+                    <p className="text-destructive">{engine.coachMessage}</p>
+                  ) : null}
+                </div>
+              </div>
+            </SheetFooter>
+          )}
         </SheetContent>
       </Sheet>
 

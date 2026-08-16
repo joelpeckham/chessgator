@@ -29,7 +29,7 @@ export function AccessibleMoveSelect({
         htmlFor="accessible-move-select"
         className="text-xs font-medium text-muted-foreground"
       >
-        Play move (keyboard)
+        Play a move with the keyboard
       </label>
       <Select
         key={fen}
