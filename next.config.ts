@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   reactCompiler: true,
+  allowedDevOrigins: ["192.168.4.92"],
 };
 
 export default nextConfig;
