@@ -30,6 +30,7 @@ export function createStubAnalysisEngine(options?: {
   let statusValue = "idle";
   let currentNode: string | null = null;
   const cancelled = new Set<string>();
+  let cancelEpoch = 0;
 
   return {
     status: () => statusValue,
@@ -45,7 +46,7 @@ export function createStubAnalysisEngine(options?: {
       cancelled.add(requestId);
     },
     cancelAll() {
-      cancelled.clear();
+      cancelEpoch += 1;
     },
     async dispose() {
       statusValue = "disposed";
@@ -54,8 +55,9 @@ export function createStubAnalysisEngine(options?: {
       if (statusValue !== "ready") {
         throw new Error("Stub analysis engine not ready");
       }
+      const epoch = cancelEpoch;
       await wait(delayMs);
-      if (cancelled.has(opts.requestId)) {
+      if (cancelled.has(opts.requestId) || epoch !== cancelEpoch) {
         cancelled.delete(opts.requestId);
         throw new Error(`Analysis cancelled: ${opts.requestId}`);
       }

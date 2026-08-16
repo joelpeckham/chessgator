@@ -39,7 +39,9 @@ export const NUDGE_CLASSIFICATIONS: ReadonlySet<MoveClassification> = new Set([
 export function scoreToCpWhite(score: EvaluationScore): number | null {
   const primary = pickPrimaryScore(score);
   if (primary.mate !== undefined) {
-    const sign = primary.mate > 0 ? 1 : -1;
+    // White-perspective convention: mate >= 0 means White mates (including
+    // mate: 0 = White just delivered checkmate).
+    const sign = primary.mate >= 0 ? 1 : -1;
     const plies = Math.min(50, Math.abs(primary.mate));
     return sign * (10_000 - plies * 10);
   }

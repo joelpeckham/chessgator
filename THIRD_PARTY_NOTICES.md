@@ -8,7 +8,7 @@ are not committed to git; run `bun run prepare:assets` after install.
 ## Stockfish.js (GPL-3.0)
 
 - **What**: Stockfish 18 WASM chess engine, lite single-thread build
-  (`stockfish-18-lite-single.js` / `.wasm`)
+  (`stockfish-18.0.8-lite-single.js` / `.wasm`)
 - **npm package**: [`stockfish`](https://www.npmjs.com/package/stockfish) `18.0.8`
 - **Upstream project**: [nmrugg/stockfish.js](https://github.com/nmrugg/stockfish.js)
 - **Engine lineage**: [official-stockfish/Stockfish](https://github.com/official-stockfish/Stockfish)

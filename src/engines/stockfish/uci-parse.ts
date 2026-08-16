@@ -79,6 +79,10 @@ export function parseInfoLine(line: string): ParsedInfoLine | null {
       case "score": {
         const kind = tokens[i + 1];
         const value = tokens[i + 2];
+        const bound = tokens[i + 3];
+        if (bound === "lowerbound" || bound === "upperbound") {
+          return null;
+        }
         if (kind === "cp" && value !== undefined) {
           score = { cp: Number.parseInt(value, 10) };
           i += 2;

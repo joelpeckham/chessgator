@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { isHangingBySee, seeGainCp } from "@/domain/analysis/see";
+import {
+  isHangingBySee,
+  seeGainCp,
+  seeGainForCapture,
+} from "@/domain/analysis/see";
 import { createChess } from "@/domain/game";
 
 describe("seeGainCp", () => {
@@ -18,6 +22,17 @@ describe("seeGainCp", () => {
     const chess = createChess("4k3/8/8/4p3/3Q4/5N2/8/4K3 b - - 0 1");
     expect(seeGainCp(chess, "d4", "b")).toBe(800);
     expect(isHangingBySee(chess, "d4", "w")).toBe(true);
+  });
+
+  it("credits an en-passant capture of a free pawn", () => {
+    const chess = createChess("4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1");
+    expect(
+      seeGainForCapture(
+        chess,
+        { from: "e5", to: "d6", piece: "p", color: "w" },
+        "d5",
+      ),
+    ).toBe(100);
   });
 
   it("treats an equal minor-piece trade as stand-pat zero", () => {

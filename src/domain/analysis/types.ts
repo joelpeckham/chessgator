@@ -11,7 +11,7 @@
 export type EvaluationScore = {
   /** Centipawns; positive = White better. Mutually exclusive with `mate` when set from UCI. */
   cp?: number;
-  /** Mate in N plies for the mating side; positive = White mates, negative = Black mates. */
+  /** Mate in N full moves (UCI); positive = White mates, negative = Black mates. 0 = White just delivered mate. */
   mate?: number;
 };
 

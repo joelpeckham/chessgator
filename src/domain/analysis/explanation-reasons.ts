@@ -679,9 +679,7 @@ export function pickMateBenefits(input: {
   bestLineScore?: EvaluationScore;
   mover: Color;
 }): ExplanationReason[] {
-  const forced =
-    mateInFor(input.bestLineScore ?? input.evalBefore, input.mover) ??
-    mateInFor(input.evalBefore, input.mover);
+  const forced = mateInFor(input.bestLineScore, input.mover);
   if (forced !== null) {
     return [{ kind: "forces_mate", mateIn: forced }];
   }

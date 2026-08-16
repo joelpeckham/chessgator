@@ -75,30 +75,33 @@ describe("static host cache configuration", () => {
       existsSync(outOrt) &&
       existsSync(outModels) &&
       existsSync(outHeaders);
+    const versionedJs = "stockfish-18.0.8-lite-single.js";
+    const versionedWasm = "stockfish-18.0.8-lite-single.wasm";
 
-    if (!outReady) {
+    expect(existsSync(path.join(ROOT, "public/engine", versionedJs))).toBe(
+      true,
+    );
+    expect(existsSync(path.join(ROOT, "public/engine", versionedWasm))).toBe(
+      true,
+    );
+    expect(existsSync(path.join(ROOT, "public/ort/1.27.0"))).toBe(true);
+    expect(
+      existsSync(
+        path.join(ROOT, "public/models/maia3-5m.fp16.ca22fc303197.onnx"),
+      ),
+    ).toBe(true);
+
+    if (!outReady || !existsSync(path.join(outEngine, versionedJs))) {
       if (REQUIRE_OUT) {
         throw new Error(
           "out/ artifacts incomplete — run `bun run build` before the static-host gate",
         );
       }
-      // Pre-build unit runs: only require prepared public assets.
-      expect(existsSync(path.join(ROOT, "public/engine"))).toBe(true);
-      expect(existsSync(path.join(ROOT, "public/ort/1.27.0"))).toBe(true);
-      expect(
-        existsSync(
-          path.join(ROOT, "public/models/maia3-5m.fp16.ca22fc303197.onnx"),
-        ),
-      ).toBe(true);
       return;
     }
 
-    expect(
-      existsSync(path.join(outEngine, "stockfish-18-lite-single.js")),
-    ).toBe(true);
-    expect(
-      existsSync(path.join(outEngine, "stockfish-18-lite-single.wasm")),
-    ).toBe(true);
+    expect(existsSync(path.join(outEngine, versionedJs))).toBe(true);
+    expect(existsSync(path.join(outEngine, versionedWasm))).toBe(true);
     expect(existsSync(path.join(outOrt, "ort-wasm-simd-threaded.wasm"))).toBe(
       true,
     );

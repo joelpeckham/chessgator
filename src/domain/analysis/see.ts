@@ -19,6 +19,36 @@ export function seeGainCp(chess: Chess, square: Square, side: Color): number {
   return seeRecurse(board, square, side);
 }
 
+/**
+ * SEE for a completed capture. En passant lands on an empty square, so the
+ * usual "is this square attacked?" check against the captured pawn fails.
+ */
+export function seeGainForCapture(
+  chess: Chess,
+  move: { from: string; to: string; piece: PieceSymbol; color: Color },
+  capturedSquare: Square,
+): number {
+  const isEnPassant =
+    move.piece === "p" &&
+    move.from[0] !== move.to[0] &&
+    !chess.get(move.to as Square);
+  if (!isEnPassant) {
+    return seeGainCp(chess, capturedSquare, move.color);
+  }
+  const board = new Chess(chess.fen());
+  try {
+    board.move({ from: move.from, to: move.to });
+  } catch {
+    return PIECE_VALUE_CP.p;
+  }
+  const recapture = seeGainCp(
+    board,
+    move.to as Square,
+    oppositeColor(move.color),
+  );
+  return Math.max(0, PIECE_VALUE_CP.p - recapture);
+}
+
 /** True when the opponent wins material by capturing on this square. */
 export function isHangingBySee(
   chess: Chess,

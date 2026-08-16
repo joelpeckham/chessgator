@@ -84,12 +84,14 @@ export function createStockfishWorkerRuntime(
     const failingInit = initInFlight;
     const failingAnalyze = activeAnalyze;
     tearDownEngine();
-    if (failingInit) {
-      initInFlight = null;
-      ready.signalError(error);
-    }
+    initInFlight = null;
     activeAnalyze = null;
     resetSearchState();
+    if (failingInit) {
+      ready.signalError(error);
+    } else {
+      ready.reset();
+    }
     deps.post({
       type: "error",
       requestId: failingAnalyze?.requestId ?? failingInit ?? "engine",

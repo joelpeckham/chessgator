@@ -62,6 +62,35 @@ describe("explanation reasons", () => {
     ).toEqual([{ kind: "forces_mate", mateIn: 3 }]);
   });
 
+  it("reports a missed mate when the best line is not a mate", () => {
+    expect(
+      pickMateBenefits({
+        evalBefore: { mate: 2 },
+        bestLineScore: { cp: 40 },
+        mover: "w",
+      }),
+    ).toEqual([{ kind: "missed_mate", mateIn: 2 }]);
+  });
+
+  it("flags material lost across the refutation from the player's view", () => {
+    const fen = "4k3/8/8/8/8/8/8/3QK3 w - - 0 1";
+    const applied = tryApplyMove(fen, "e1f1")!;
+    const effects = collectMoveEffects({
+      fenBefore: fen,
+      move: applied.move,
+      fenAfter: applied.fenAfter,
+    });
+    const reasons = pickProblemReasons(effects, [], {
+      refutationNetCp: -900,
+    });
+    expect(
+      reasons.some(
+        (reason) =>
+          reason.kind === "refutation_material" && reason.netCp === -900,
+      ),
+    ).toBe(true);
+  });
+
   it("flags a move that allows mate", () => {
     const fen = "rnbqkbnr/pppp1ppp/8/4p3/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq - 0 2";
     const applied = tryApplyMove(fen, "d8h4")!;

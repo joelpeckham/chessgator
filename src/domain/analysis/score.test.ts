@@ -18,6 +18,11 @@ describe("score normalization", () => {
     expect(scoreFromSideToMove({ mate: -4 }, "b")).toEqual({ mate: 4 });
   });
 
+  it("resolves mate-in-0 for the side that is checkmated", () => {
+    expect(scoreFromSideToMove({ mate: 0 }, "w")).toEqual({ mate: -1 });
+    expect(scoreFromSideToMove({ mate: 0 }, "b")).toEqual({ mate: 1 });
+  });
+
   it("round-trips White perspective back to side-to-move", () => {
     const white = { cp: -90 };
     expect(scoreToSideToMove(white, "b")).toEqual({ cp: 90 });

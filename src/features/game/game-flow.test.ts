@@ -115,6 +115,38 @@ describe("runPostMoveCoaching", () => {
     await coach.dispose();
   });
 
+  it("auto-advances to an existing reply instead of wedging on opponentThinking", async () => {
+    useGameStore.getState().startGame();
+    useGameStore.getState().playMove("e2e4", { afterMode: "analyzing" });
+    const e4 = useGameStore.getState().tree.currentNodeId;
+    useGameStore.getState().playMove("e7e5");
+    useGameStore.getState().goToNode(useGameStore.getState().tree.rootId);
+    useGameStore.getState().playMove("e2e4", { afterMode: "analyzing" });
+    expect(useGameStore.getState().tree.currentNodeId).toBe(e4);
+    const node = getCurrentNode(useGameStore.getState().tree);
+    const coach = createCoachingController({
+      createEngine: () => createStubAnalysisEngine({ delayMs: 10 }),
+    });
+    await coach.start();
+    await runPostMoveCoaching({
+      coach,
+      fenBefore: DEFAULT_POSITION,
+      gameNodeId: node.id,
+      playedMove: node.move!,
+      coachUnavailable: null,
+      requestId: "coach-replay",
+    });
+    expect(useGameStore.getState().tree.currentNodeId).not.toBe(e4);
+    expect(useGameStore.getState().session.mode).toBe("playerTurn");
+    expect(
+      getMoveHistory(
+        useGameStore.getState().tree,
+        useGameStore.getState().tree.currentNodeId,
+      ).map((m) => m.uci),
+    ).toEqual(["e2e4", "e7e5"]);
+    await coach.dispose();
+  });
+
   it("moves to opponentThinking when analysis still owns the node", async () => {
     useGameStore.getState().startGame();
     useGameStore.getState().playMove("e2e4", { afterMode: "analyzing" });

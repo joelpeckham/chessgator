@@ -34,6 +34,17 @@ describe("parseInfoLine", () => {
     expect(parseInfoLine("info string available processors 8")).toBeNull();
     expect(parseInfoLine("uciok")).toBeNull();
   });
+
+  it("ignores aspiration-window bound scores", () => {
+    expect(
+      parseInfoLine(
+        "info depth 12 multipv 1 score cp 80 lowerbound nodes 100 pv e2e4",
+      ),
+    ).toBeNull();
+    expect(
+      parseInfoLine("info depth 12 multipv 1 score mate 2 upperbound pv d8h4"),
+    ).toBeNull();
+  });
 });
 
 describe("parseBestMove", () => {

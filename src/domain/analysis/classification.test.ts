@@ -96,5 +96,30 @@ describe("eval loss for mover", () => {
   it("maps mate scores to large finite cp", () => {
     expect(scoreToCpWhite({ mate: 2 })).toBeGreaterThan(9_000);
     expect(scoreToCpWhite({ mate: -3 })).toBeLessThan(-9_000);
+    expect(scoreToCpWhite({ mate: 0 })).toBeGreaterThan(9_000);
+  });
+
+  it("does not charge White for delivering mate", () => {
+    expect(
+      evalLossForMover({
+        evalBeforeWhite: { mate: 1 },
+        evalAfterWhite: { mate: 0 },
+        mover: "w",
+      }),
+    ).toBeLessThan(20);
+  });
+
+  it("classifies an alternate mating move as best", () => {
+    expect(
+      classifyPlayedMove({
+        lossCp: evalLossForMover({
+          evalBeforeWhite: { mate: 1 },
+          evalAfterWhite: { mate: 0 },
+          mover: "w",
+        }),
+        playedUci: "e1e7",
+        bestMoveUci: "e1e8",
+      }),
+    ).toBe("best");
   });
 });

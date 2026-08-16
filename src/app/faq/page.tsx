@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "FAQ",
   description: "Common questions about chessgator, the local-only chess coach.",
   alternates: { canonical: "/faq" },
+  openGraph: { url: "/faq" },
 };
 
 const faqJsonLd = {

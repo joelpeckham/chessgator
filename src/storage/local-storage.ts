@@ -9,10 +9,14 @@ import {
 type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 
 function getDefaultStorage(): StorageLike | null {
-  if (typeof globalThis.localStorage === "undefined") {
+  try {
+    const storage = globalThis.localStorage;
+    if (typeof storage === "undefined") return null;
+    return storage;
+  } catch {
+    // Privacy mode / blocked site data throws SecurityError on access.
     return null;
   }
-  return globalThis.localStorage;
 }
 
 /**

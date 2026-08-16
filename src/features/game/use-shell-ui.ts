@@ -92,7 +92,8 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
   const replaceTree = useGameStore((s) => s.replaceTree);
   const hydrated = useGameStore((s) => s.hydrated);
   const liveMode = useGameStore((s) => s.session.mode);
-  const liveCurrentId = useGameStore((s) => s.tree.currentNodeId);
+  const liveTree = useGameStore((s) => s.tree);
+  const liveCurrentId = liveTree.currentNodeId;
 
   const requestSeq = useRef(0);
   const bootstrappedRef = useRef(false);
@@ -124,9 +125,13 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
 
   const opponentTarget = deriveOpponentTarget({
     liveMode,
-    liveTree: useGameStore.getState().tree,
+    liveTree,
   });
   const targetKey = opponentTargetKey(opponentTarget);
+
+  if (liveMode !== "gameOver" && gameOverDismissed) {
+    setGameOverDismissed(false);
+  }
 
   useEffect(() => {
     if (!hydrated || bootstrappedRef.current) return;

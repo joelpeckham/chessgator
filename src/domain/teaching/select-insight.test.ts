@@ -109,6 +109,52 @@ describe("teaching selection", () => {
     );
   });
 
+  it("does not recommend a worse move when the player already played the engine best", () => {
+    const fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    const applied = tryApplyMove(fen, "e2e4")!;
+    const moveEvidence = buildMoveAnalysisEvidence({
+      requestId: "r-best-noise",
+      gameNodeId: "node-best-noise",
+      playedMove: applied.move,
+      fenBefore: fen,
+      fenAfter: applied.fenAfter,
+      before: {
+        ...evidence(fen, { cp: 25 }, "e2e4"),
+        lines: [
+          { multipv: 1, score: { cp: 25 }, pvUci: ["e2e4"] },
+          { multipv: 2, score: { cp: 10 }, pvUci: ["d2d4"] },
+        ],
+      },
+      after: evidence(applied.fenAfter, { cp: -80 }, "e7e5"),
+    });
+    expect(moveEvidence.classification).not.toBe("best");
+    const insight = selectTeachingInsight(moveEvidence);
+    expect(insight.suggestedMoveUci).toBeNull();
+    expect(insight.explanation.toLowerCase()).not.toMatch(/d4|d2/);
+  });
+
+  it("explains material lost in the coming exchanges", () => {
+    const fenBefore = "4k3/8/8/8/8/8/3n4/3QK3 w - - 0 1";
+    const played = tryApplyMove(fenBefore, "e1e2")!;
+    const moveEvidence = buildMoveAnalysisEvidence({
+      requestId: "r-refute",
+      gameNodeId: "node-refute",
+      playedMove: played.move,
+      fenBefore,
+      fenAfter: played.fenAfter,
+      before: evidence(fenBefore, { cp: 800 }, "d1d2", ["d1d2"]),
+      after: {
+        ...evidence(played.fenAfter, { cp: -200 }, "d2d1", ["d2d1"]),
+        lines: [{ multipv: 1, score: { cp: -200 }, pvUci: ["d2d1"] }],
+      },
+    });
+    expect(moveEvidence.classification).toBe("blunder");
+    const insight = selectTeachingInsight(moveEvidence);
+    expect(insight.explanation.toLowerCase()).toMatch(
+      /queen|exchanges|material|loses/,
+    );
+  });
+
   it("templates render classification without Maia likelihood", () => {
     const text = renderExplanation({
       playedPhrase: "moving your knight to f3",

@@ -14,6 +14,7 @@ function createBook(
   } = {},
 ) {
   const cancelled: string[] = [];
+  const removed: string[] = [];
   const timers = new Map<string, () => void>();
   const book = new EngineJobBook<string, Job>({
     setTimer: (fn) => {
@@ -24,7 +25,9 @@ function createBook(
     clearTimer: (handle) => {
       timers.delete(handle as string);
     },
-    removeFromQueue: () => {},
+    removeFromQueue: (requestId) => {
+      removed.push(requestId);
+    },
     postCancel: (requestId) => {
       cancelled.push(requestId);
     },
@@ -36,7 +39,7 @@ function createBook(
     cancelAckTimeoutMs: extras.cancelAckTimeoutMs,
     onUnresponsive: extras.onUnresponsive,
   });
-  return { book, cancelled, timers };
+  return { book, cancelled, removed, timers };
 }
 
 function pendingJob(
@@ -119,6 +122,16 @@ describe("EngineJobBook", () => {
     expect(book.takeResult("r1", "old")).toBeNull();
     await expect(result).rejects.toThrow(/stale old/);
     expect(book.active).toBeNull();
+  });
+
+  it("removes failed jobs from the queue", async () => {
+    const { book, removed } = createBook();
+    const { job, result } = pendingJob("ghost");
+    book.track(job);
+    book.fail(job, new Error("init failed"));
+    await expect(result).rejects.toThrow(/init failed/);
+    expect(removed).toContain("ghost");
+    expect(book.pending.size).toBe(0);
   });
 
   it("times out a hung job", async () => {

@@ -20,6 +20,7 @@ import {
   pruneAtNode as pruneTreeAtNode,
   type SessionMode,
   type SessionState,
+  sessionModeForPosition,
   sessionModeForTurn,
 } from "@/domain/game";
 import type { TeachingInsight } from "@/domain/teaching";
@@ -143,7 +144,9 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       return;
     }
     set({
-      session: sessionState(sessionModeForTurn(status.turn, humanColor)),
+      session: sessionState(
+        sessionModeForPosition(tree, tree.currentNodeId, humanColor),
+      ),
       lastError: null,
     });
   },
@@ -180,7 +183,9 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
     set({
       tree: next,
-      session: sessionState(sessionModeForTurn(status.turn, humanColor)),
+      session: sessionState(
+        sessionModeForPosition(next, next.currentNodeId, humanColor),
+      ),
       lastError: null,
     });
     return true;
@@ -208,11 +213,6 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       return true;
     }
 
-    if (pruned.tree.currentNodeId === tree.currentNodeId) {
-      set({ tree: pruned.tree, lessons: nextLessons, lastError: null });
-      return true;
-    }
-
     const status = getStatusAtNode(pruned.tree, pruned.tree.currentNodeId);
     if (status.isGameOver) {
       set({
@@ -227,7 +227,13 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     set({
       tree: pruned.tree,
       lessons: nextLessons,
-      session: sessionState(sessionModeForTurn(status.turn, humanColor)),
+      session: sessionState(
+        sessionModeForPosition(
+          pruned.tree,
+          pruned.tree.currentNodeId,
+          humanColor,
+        ),
+      ),
       lastError: null,
     });
     return true;
@@ -317,9 +323,10 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     });
   },
 
-  hydrate: async (repository = defaultRepository()) => {
+  hydrate: async (repository) => {
     try {
-      const loaded = await repository.load();
+      const repo = repository ?? defaultRepository();
+      const loaded = await repo.load();
       if (!loaded) {
         set({ hydrated: true, resumed: false });
         return false;
@@ -364,8 +371,9 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     }
   },
 
-  persist: async (repository = defaultRepository()) => {
+  persist: async (repository) => {
     try {
+      const repo = repository ?? defaultRepository();
       const state = get();
       const snapshot: SavedGameV2 = toPersistedGame(state.tree, {
         maiaElo: state.preferences.maiaElo,
@@ -373,7 +381,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         resigned: state.session.terminalReason === "resignation",
         lessons: lessonsToSaved(state.lessons),
       });
-      await repository.save(snapshot);
+      await repo.save(snapshot);
     } catch (err) {
       set({
         lastError:
@@ -382,7 +390,8 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     }
   },
 
-  clearPersisted: async (repository = defaultRepository()) => {
-    await repository.clear();
+  clearPersisted: async (repository) => {
+    const repo = repository ?? defaultRepository();
+    await repo.clear();
   },
 }));

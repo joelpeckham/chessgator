@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "About",
   description: "What chessgator is and how it coaches your chess.",
   alternates: { canonical: "/about" },
+  openGraph: { url: "/about" },
 };
 
 export default function AboutPage() {

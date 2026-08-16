@@ -52,18 +52,18 @@ export function selectTeachingInsight(
   evidence: MoveAnalysisEvidence,
 ): TeachingInsight {
   const concept = chooseConcept(evidence);
+  const playedUci = evidence.playedMove.uci.toLowerCase();
+  const engineBestUci = evidence.bestMoveUci?.toLowerCase() ?? null;
+  const playedIsEngineBest =
+    engineBestUci !== null && engineBestUci === playedUci;
   const suggestedMoveUci =
-    evidence.classification === "best"
+    evidence.classification === "best" || playedIsEngineBest
       ? null
-      : evidence.bestMoveUci &&
-          evidence.bestMoveUci.toLowerCase() !==
-            evidence.playedMove.uci.toLowerCase()
+      : engineBestUci && engineBestUci !== playedUci
         ? evidence.bestMoveUci
         : (evidence.alternatives.find(
             (line) =>
-              line.pvUci[0] &&
-              line.pvUci[0].toLowerCase() !==
-                evidence.playedMove.uci.toLowerCase(),
+              line.pvUci[0] && line.pvUci[0].toLowerCase() !== playedUci,
           )?.pvUci[0] ?? null);
 
   const suggestedApplied = suggestedMoveUci
@@ -101,10 +101,13 @@ export function selectTeachingInsight(
     { extendForcing: true },
   );
 
+  // summarizeLine is from the opponent's perspective at fenAfter; flip so
+  // negative means the player lost material in the coming exchanges.
+  const refutationNetCp = -refutation.netMaterialCp;
   const problemReasons = rankReasons(
     pickProblemReasons(playedEffects, refutation.events, {
       evalAfter: evidence.evalAfter,
-      refutationNetCp: refutation.netMaterialCp,
+      refutationNetCp,
     }),
   );
   const mateBenefits = pickMateBenefits({
@@ -184,7 +187,7 @@ export function selectTeachingInsight(
       (problemReasons[0]?.kind === "refutation_material"
         ? describeRefutationPunchline(
             refutation.events,
-            refutation.netMaterialCp,
+            refutationNetCp,
             evidence.playedMove.color,
             copyOpts,
           )

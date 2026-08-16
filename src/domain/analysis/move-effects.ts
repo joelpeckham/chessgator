@@ -31,7 +31,11 @@ import {
   relativePinIsExploitable,
   type SkewerFact,
 } from "@/domain/analysis/motifs";
-import { cheapestAttacker, seeGainCp } from "@/domain/analysis/see";
+import {
+  cheapestAttacker,
+  seeGainCp,
+  seeGainForCapture,
+} from "@/domain/analysis/see";
 import {
   collectStructureDelta,
   detectGamePhase,
@@ -384,7 +388,9 @@ export function collectMoveEffects(input: {
     move,
     castleSide,
     captured,
-    capturedSeeCp: captured ? seeGainCp(before, captured.square, mover) : 0,
+    capturedSeeCp: captured
+      ? seeGainForCapture(before, move, captured.square)
+      : 0,
     capturedDefenderCount: captured
       ? namedAttackers(before, captured.square, opponent).length
       : 0,
@@ -490,7 +496,7 @@ export function summarizeLine(
       move: applied.move,
       captured,
       capturedSeeCp: captured
-        ? seeGainCp(before, captured.square, applied.move.color)
+        ? seeGainForCapture(before, applied.move, captured.square)
         : 0,
       gaveCheck,
       pins: pinsAfter.filter(

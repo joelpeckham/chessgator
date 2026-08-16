@@ -202,4 +202,16 @@ describe("move effects", () => {
       true,
     );
   });
+
+  it("credits an en-passant capture as winning a pawn", () => {
+    const fen = "4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1";
+    const applied = tryApplyMove(fen, "e5d6")!;
+    const effects = collectMoveEffects({
+      fenBefore: fen,
+      move: applied.move,
+      fenAfter: applied.fenAfter,
+    });
+    expect(effects.captured?.type).toBe("p");
+    expect(effects.capturedSeeCp).toBe(100);
+  });
 });

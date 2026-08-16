@@ -67,7 +67,11 @@ export function ChessboardAdapter({
     square: string | null;
   }>({ fen, square: null });
 
-  const selectedSquare = selection.fen === fen ? selection.square : null;
+  if (selection.fen !== fen) {
+    setSelection({ fen, square: null });
+  }
+
+  const selectedSquare = selection.square;
   const labelBySquare = new Map(
     squareLabels.map((entry) => [entry.square, entry.text] as const),
   );
@@ -153,9 +157,6 @@ export function ChessboardAdapter({
     },
     onSquareClick: ({ square }: SquareHandlerArgs) => {
       activateSquare(square);
-    },
-    onPieceClick: ({ square }: { square: string | null }) => {
-      if (square) activateSquare(square);
     },
     squareRenderer: ({
       square,

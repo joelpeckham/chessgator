@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useSyncExternalStore } from "react";
 import { cn } from "@/lib/utils";
 
 /** Single-row footer height; reserved in the game-shell viewport math. */
@@ -9,6 +12,15 @@ const LINKS = [
   { href: "/about", label: "About" },
   { href: "/privacy", label: "Privacy" },
 ] as const;
+
+function currentYear(): number {
+  return new Date().getFullYear();
+}
+
+function CopyrightYear() {
+  const year = useSyncExternalStore(() => () => {}, currentYear, currentYear);
+  return <span suppressHydrationWarning>{year}</span>;
+}
 
 export function SiteFooter({ className }: { className?: string }) {
   return (
@@ -21,7 +33,9 @@ export function SiteFooter({ className }: { className?: string }) {
       )}
       style={{ height: SITE_FOOTER_H }}
     >
-      <p className="truncate">© {new Date().getFullYear()} chessgator</p>
+      <p className="truncate">
+        © <CopyrightYear /> chessgator
+      </p>
       <ul className="flex shrink-0 items-center gap-3">
         {LINKS.map((link) => (
           <li key={link.href}>

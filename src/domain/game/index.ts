@@ -29,6 +29,7 @@ export {
 } from "@/domain/game/rules";
 export {
   normalizeSessionForResume,
+  sessionModeForPosition,
   sessionModeForTurn,
 } from "@/domain/game/session";
 export type { PlayMoveOnTreeOptions, PruneScope } from "@/domain/game/tree";

@@ -157,6 +157,67 @@ describe("createStockfishWorkerRuntime", () => {
     });
   });
 
+  it("recovers from a nested-engine crash after init", async () => {
+    const harness = await readyEngine();
+    harness.runtime.handleRequest({
+      type: "analyze",
+      requestId: "a1",
+      gameNodeId: "n1",
+      fen: DEFAULT_POSITION,
+      multipv: 1,
+      movetimeMs: 50,
+    });
+    harness.triggerError("wasm abort");
+    expect(
+      harness.posted.some((m) => m.type === "error" && m.requestId === "a1"),
+    ).toBe(true);
+
+    harness.runtime.handleRequest({
+      type: "analyze",
+      requestId: "a2",
+      gameNodeId: "n2",
+      fen: DEFAULT_POSITION,
+      multipv: 1,
+      movetimeMs: 50,
+    });
+    expect(
+      harness.posted.some(
+        (m) =>
+          m.type === "error" &&
+          m.requestId === "a2" &&
+          m.message === "Stockfish is not ready",
+      ),
+    ).toBe(true);
+
+    harness.runtime.handleRequest({
+      type: "init",
+      requestId: "init-2",
+      engineUrl: "/engine.js",
+    });
+    harness.runtime.handleEngineLine("uciok");
+    harness.runtime.handleEngineLine("readyok");
+    expect(harness.posted.at(-1)).toEqual({
+      type: "ready",
+      requestId: "init-2",
+    });
+
+    harness.runtime.handleRequest({
+      type: "analyze",
+      requestId: "a3",
+      gameNodeId: "n3",
+      fen: DEFAULT_POSITION,
+      multipv: 1,
+      movetimeMs: 50,
+    });
+    harness.runtime.handleEngineLine(
+      "info depth 8 multipv 1 score cp 10 pv e2e4",
+    );
+    harness.runtime.handleEngineLine("bestmove e2e4");
+    expect(
+      harness.posted.some((m) => m.type === "result" && m.requestId === "a3"),
+    ).toBe(true);
+  });
+
   it("disposes the nested engine", async () => {
     const harness = await readyEngine();
     harness.runtime.handleRequest({ type: "dispose", requestId: "d1" });

@@ -2,6 +2,7 @@ import { getStatusAtNode } from "@/domain/game/tree";
 import {
   type Color,
   type GameSession,
+  type GameTree,
   type SessionMode,
 } from "@/domain/game/types";
 
@@ -48,4 +49,23 @@ export function sessionModeForTurn(
   humanColor: Color,
 ): Extract<SessionMode, "playerTurn" | "opponentThinking"> {
   return turn === humanColor ? "playerTurn" : "opponentThinking";
+}
+
+/**
+ * Mode for a live pointer. Interior opponent-to-move nodes are reviewing
+ * (view-only) so the UI never claims Maia is thinking with no request armed.
+ */
+export function sessionModeForPosition(
+  tree: GameTree,
+  nodeId: string,
+  humanColor: Color,
+): Exclude<SessionMode, "loading" | "error" | "analyzing"> {
+  const status = getStatusAtNode(tree, nodeId);
+  if (status.isGameOver) return "gameOver";
+  const turnMode = sessionModeForTurn(status.turn, humanColor);
+  if (turnMode === "opponentThinking") {
+    const node = tree.nodes[nodeId];
+    if (node && node.childIds.length > 0) return "reviewing";
+  }
+  return turnMode;
 }

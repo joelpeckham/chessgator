@@ -93,6 +93,7 @@ export function useGameRuntime(options: GameRuntimeOptions = {}): GameRuntime {
     if (!hydrated) return;
     if (persistTimer.current) clearTimeout(persistTimer.current);
     persistTimer.current = setTimeout(() => {
+      persistTimer.current = null;
       void persist();
     }, 250);
     return () => {
@@ -108,6 +109,31 @@ export function useGameRuntime(options: GameRuntimeOptions = {}): GameRuntime {
     lessons,
     persist,
   ]);
+
+  useEffect(() => {
+    function flush(): void {
+      if (persistTimer.current) {
+        clearTimeout(persistTimer.current);
+        persistTimer.current = null;
+      }
+      if (useGameStore.getState().hydrated) {
+        void useGameStore.getState().persist();
+      }
+    }
+    function onPageHide(): void {
+      flush();
+    }
+    function onVisibility(): void {
+      if (document.visibilityState === "hidden") flush();
+    }
+    window.addEventListener("pagehide", onPageHide);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("pagehide", onPageHide);
+      document.removeEventListener("visibilitychange", onVisibility);
+      flush();
+    };
+  }, []);
 
   useEffect(() => {
     return () => {

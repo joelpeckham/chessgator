@@ -208,7 +208,7 @@ describe("game store adapter", () => {
     useGameStore.getState().playMove("e7e5");
     expect(useGameStore.getState().goToNode(e4)).toBe(true);
     expect(useGameStore.getState().tree.currentNodeId).toBe(e4);
-    expect(useGameStore.getState().session.mode).toBe("opponentThinking");
+    expect(useGameStore.getState().session.mode).toBe("reviewing");
 
     useGameStore.getState().goToNode(useGameStore.getState().tree.rootId);
     expect(useGameStore.getState().session.mode).toBe("playerTurn");
@@ -227,5 +227,37 @@ describe("game store adapter", () => {
     useGameStore.getState().startGame();
     await useGameStore.getState().persist(repo);
     expect(useGameStore.getState().lastError).toMatch(/could not save/i);
+  });
+
+  it("hydrates as a fresh session when storage access throws", async () => {
+    const desc = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+    Object.defineProperty(globalThis, "localStorage", {
+      configurable: true,
+      get() {
+        throw new DOMException("Blocked", "SecurityError");
+      },
+    });
+    try {
+      expect(await useGameStore.getState().hydrate()).toBe(false);
+      expect(useGameStore.getState().hydrated).toBe(true);
+      expect(useGameStore.getState().resumed).toBe(false);
+    } finally {
+      if (desc) {
+        Object.defineProperty(globalThis, "localStorage", desc);
+      } else {
+        // oxlint-disable-next-line typescript/no-dynamic-delete
+        delete (globalThis as { localStorage?: Storage }).localStorage;
+      }
+    }
+  });
+
+  it("resumePlay maps an interior opponent-to-move node to reviewing", () => {
+    useGameStore.getState().startGame();
+    useGameStore.getState().playMove("e2e4");
+    const e4 = useGameStore.getState().tree.currentNodeId;
+    useGameStore.getState().playMove("e7e5");
+    useGameStore.getState().goToNode(e4);
+    useGameStore.getState().resumePlay();
+    expect(useGameStore.getState().session.mode).toBe("reviewing");
   });
 });

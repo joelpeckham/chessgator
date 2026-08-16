@@ -113,6 +113,7 @@ export function createCoachingController(
 
   let engine: StockfishClientLike | null = null;
   let activeRequestId: string | null = null;
+  let hintSeq = 0;
   const insightByNodeId = new Map<string, TeachingInsight>();
 
   function setState(partial: Partial<CoachingControllerState>): void {
@@ -358,7 +359,8 @@ export function createCoachingController(
       }
       const current = store.getState();
       const nextLevel = current.hint ? nextHintLevel(current.hintLevel) : 0;
-      const requestId = `hint-${gate.generation}-${nextLevel}`;
+      hintSeq += 1;
+      const requestId = `hint-${gate.generation}-${nextLevel}-${hintSeq}`;
       activeRequestId = requestId;
       engine.setCurrentGameNodeId(input.gameNodeId);
 

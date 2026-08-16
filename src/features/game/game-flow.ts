@@ -176,6 +176,15 @@ export async function runPostMoveCoaching(args: {
     return;
   }
 
+  const current = getNode(latest.tree, args.gameNodeId);
+  const replyId = current?.childIds.find(
+    (id) => !latest.tree.nodes[id]?.isVariation,
+  );
+  if (replyId) {
+    latest.goToNode(replyId);
+    return;
+  }
+
   latest.setMode("opponentThinking");
 }
 

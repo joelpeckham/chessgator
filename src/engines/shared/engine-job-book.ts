@@ -120,6 +120,7 @@ export class EngineJobBook<TResult, TJob extends EngineJob<TResult>> {
       return;
     }
     this.clearTimeout(job.requestId);
+    this.hooks.removeFromQueue(job.requestId);
     this.pending.delete(job.requestId);
     job.reject(error);
     if (releaseActive) {

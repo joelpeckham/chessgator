@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Privacy",
   description: "How chessgator handles your games and data.",
   alternates: { canonical: "/privacy" },
+  openGraph: { url: "/privacy" },
 };
 
 export default function PrivacyPage() {

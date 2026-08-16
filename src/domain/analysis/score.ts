@@ -12,6 +12,11 @@ export function scoreFromSideToMove(
   score: EvaluationScore,
   sideToMove: SideToMove,
 ): EvaluationScore {
+  if (score.mate === 0) {
+    // Side to move is checkmated. Represent as mate-in-1 for the winner so
+    // the sign survives negateScore (`-0 === 0`).
+    return { mate: sideToMove === "w" ? -1 : 1 };
+  }
   if (sideToMove === "w") {
     return { ...score };
   }

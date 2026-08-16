@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Play",
   description: SITE_DESCRIPTION,
   alternates: { canonical: "/game" },
+  openGraph: { url: "/game" },
 };
 
 const jsonLd = {
