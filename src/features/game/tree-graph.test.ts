@@ -114,8 +114,13 @@ describe("buildTreeGraph", () => {
     const suggested = graph.nodes.filter((node) => node.kind === "suggested");
     expect(suggested).toHaveLength(1);
     expect(suggested[0]?.san).toBe("e4");
+    expect(suggested[0]?.uci).toBe("e2e4");
     expect(suggested[0]?.caption).toBe("Gator");
     expect(suggested[0]?.moveColor).toBe("w");
+    expect(graph.nodes.find((node) => node.id === tree.rootId)?.uci).toBeNull();
+    expect(
+      graph.nodes.find((node) => node.id === tree.currentNodeId)?.uci,
+    ).toBe("d2d4");
     expect(
       graph.nodes.find((node) => node.id === tree.currentNodeId)?.isCurrent,
     ).toBe(true);

@@ -2,6 +2,7 @@
 
 import { RiSettings3Line } from "@remixicon/react";
 import { MotionConfig } from "motion/react";
+import { useState } from "react";
 import { ChessboardAdapter } from "@/components/board/chessboard-adapter";
 import { ChessgatorWordmark } from "@/components/brand/chessgator-wordmark";
 import { CoachMascot } from "@/components/coach/coach-mascot";
@@ -17,9 +18,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import type { PieceSymbol } from "@/domain/game";
+import { resolveBoardPreview } from "@/features/game/board-preview";
 import type { ShellView } from "@/features/game/shell-view";
 import { useLiveAnnouncements } from "@/features/game/use-live-announcements";
 import type { ShellUi } from "@/features/game/use-shell-ui";
+import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
+import { cn } from "@/lib/utils";
 
 export type GameShellLayoutProps = {
   view: ShellView;
@@ -32,6 +36,25 @@ export function GameShellLayout({
   ui,
   onMaiaEloChange,
 }: GameShellLayoutProps) {
+  const [hoverNodeId, setHoverNodeId] = useState<string | null>(null);
+  const reducedMotion = usePrefersReducedMotion();
+  const preview = resolveBoardPreview(
+    view.timeline.graph,
+    hoverNodeId,
+    view.timeline.focusedNodeId,
+  );
+  const board = preview
+    ? {
+        fen: preview.fen,
+        interactive: false,
+        lastMove: preview.lastMove,
+        isCheck: preview.isCheck,
+        checkSquare: preview.checkSquare,
+        highlightSquares: [] as string[],
+        labels: [] as typeof view.board.labels,
+        arrows: [] as typeof view.board.arrows,
+      }
+    : view.board;
   const announcements = useLiveAnnouncements({
     visibleInsight: view.coach.insight,
     evidenceGameNodeId: view.coach.evidenceGameNodeId,
@@ -134,6 +157,7 @@ export function GameShellLayout({
                   nextNodeId={view.timeline.nextNodeId}
                   disabled={view.timeline.disabled}
                   onSelectNode={ui.handleSelectTimelineNode}
+                  onHoverNode={setHoverNodeId}
                   onOpenCoach={ui.handleOpenCoach}
                   onPrune={ui.handlePruneTimelineNode}
                   expanded={ui.timelineExpanded}
@@ -155,24 +179,32 @@ export function GameShellLayout({
                 height: view.boardSize,
               }}
             >
-              <div className="relative h-full w-full" data-testid="board-frame">
+              <div
+                className="relative h-full w-full"
+                data-testid="board-frame"
+                data-preview={preview ? "true" : undefined}
+              >
                 <ChessboardAdapter
-                  fen={view.board.fen}
-                  interactive={view.board.interactive}
+                  fen={board.fen}
+                  interactive={board.interactive}
                   orientation={view.board.orientation}
-                  lastMove={view.board.lastMove}
-                  isCheck={view.board.isCheck}
-                  checkSquare={view.board.checkSquare}
-                  highlightSquares={view.board.highlightSquares}
-                  squareLabels={view.board.labels}
-                  arrows={view.board.arrows}
+                  lastMove={board.lastMove}
+                  isCheck={board.isCheck}
+                  checkSquare={board.checkSquare}
+                  highlightSquares={board.highlightSquares}
+                  squareLabels={board.labels}
+                  arrows={board.arrows}
                   onMove={ui.applyPlayerMove}
                   onPromotionNeeded={(from, to) =>
                     ui.setPromotion({ from, to })
                   }
-                  className="h-full w-full"
+                  className={cn(
+                    "h-full w-full",
+                    !reducedMotion && "transition-opacity duration-200",
+                    preview && "opacity-75",
+                  )}
                 />
-                {view.gameOver.visible ? (
+                {view.gameOver.visible && !preview ? (
                   <GameOverCard
                     headline={view.gameOver.headline}
                     detail={view.gameOver.detail}

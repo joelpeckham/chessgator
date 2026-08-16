@@ -28,6 +28,7 @@ export type DecisionGraphViewProps = {
   onSelectNode: (nodeId: string) => void;
   onOpenCoach?: () => void;
   pruneMode?: boolean;
+  onHoverNode?: (nodeId: string | null) => void;
   onPruneTarget?: (
     nodeId: string,
     scope: PruneScope,
@@ -153,6 +154,7 @@ export function DecisionGraphView({
   onSelectNode,
   onOpenCoach,
   pruneMode = false,
+  onHoverNode,
   onPruneTarget,
 }: DecisionGraphViewProps) {
   const [hoverTarget, setHoverTarget] = useState<{
@@ -177,6 +179,9 @@ export function DecisionGraphView({
       style={{ width, height }}
       data-testid="timeline-graph"
       data-prune-mode={pruneMode ? "true" : "false"}
+      onPointerLeave={() => {
+        onHoverNode?.(null);
+      }}
     >
       <svg
         className="pointer-events-none absolute inset-0"
@@ -351,12 +356,20 @@ export function DecisionGraphView({
                             : "cursor-not-allowed"),
                       )}
                       style={{ left: 0, top: 0 }}
-                      onPointerEnter={() => {
-                        if (!canPrune) return;
-                        setHoverTarget({
-                          nodeId: node.id,
-                          scope: "descendants",
-                        });
+                      onPointerEnter={(event) => {
+                        if (canPrune) {
+                          setHoverTarget({
+                            nodeId: node.id,
+                            scope: "descendants",
+                          });
+                        }
+                        if (
+                          !pruneMode &&
+                          !disabled &&
+                          event.pointerType === "mouse"
+                        ) {
+                          onHoverNode?.(node.id);
+                        }
                       }}
                       onPointerLeave={() => {
                         if (pruneMode) setHoverTarget(null);

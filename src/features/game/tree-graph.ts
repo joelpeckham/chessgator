@@ -133,6 +133,7 @@ export function buildTreeGraph(args: {
       caption: null,
       isCurrent: node.id === tree.currentNodeId,
       fen: node.fen,
+      uci: node.move?.uci ?? null,
       moveColor: node.move?.color ?? null,
     });
     if (node.parentId) {
@@ -169,6 +170,7 @@ export function buildTreeGraph(args: {
         caption: "Gator",
         isCurrent: false,
         fen: suggestedPly.fen,
+        uci: suggestedPly.uci,
         moveColor: origin ? getTurn(origin.fen) : null,
       });
       pushEdge(edges, fromId, id, "suggested");

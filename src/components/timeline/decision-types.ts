@@ -13,6 +13,8 @@ export type DecisionGraphNode = {
   caption: string | null;
   isCurrent: boolean;
   fen: string;
+  /** Move that reached this node; null for the root. */
+  uci: string | null;
   /** Side that made this move; null for the root. */
   moveColor: Color | null;
 };

@@ -55,6 +55,7 @@ export type MoveTimelineProps = {
   nextNodeId: string | null;
   disabled?: boolean;
   onSelectNode: (nodeId: string) => void;
+  onHoverNode?: (nodeId: string | null) => void;
   onOpenCoach?: () => void;
   onPrune?: (nodeId: string, scope: PruneScope) => void;
   expanded: boolean;
@@ -88,6 +89,7 @@ export function MoveTimeline({
   nextNodeId,
   disabled = false,
   onSelectNode,
+  onHoverNode,
   onOpenCoach,
   onPrune,
   expanded,
@@ -328,7 +330,9 @@ export function MoveTimeline({
             aria-pressed={pruneMode}
             data-testid="timeline-prune"
             onClick={() => {
-              setPruneMode((on) => !on);
+              const next = !pruneMode;
+              setPruneMode(next);
+              if (next) onHoverNode?.(null);
               setPendingPrune(null);
             }}
           >
@@ -384,6 +388,7 @@ export function MoveTimeline({
             focusedNodeId={focusedNodeId}
             disabled={disabled}
             onSelectNode={onSelectNode}
+            onHoverNode={onHoverNode}
             onOpenCoach={onOpenCoach}
             pruneMode={pruneMode}
             onPruneTarget={(nodeId, scope, count, san) => {
