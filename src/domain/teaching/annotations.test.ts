@@ -30,7 +30,7 @@ describe("annotationsFromInsight", () => {
   it("shows the suggested move when no hint move is up", () => {
     const marks = annotationsFromInsight(insight, null, null);
     expect(marks.arrows).toEqual([{ from: "e2", to: "e4", kind: "better" }]);
-    expect(marks.labels).toEqual([{ square: "e4", text: "better" }]);
+    expect(marks.labels).toEqual([]);
   });
 
   it("hides the suggested move while a hint candidate is showing", () => {
@@ -45,7 +45,7 @@ describe("annotationsFromInsight", () => {
     );
     expect(marks.arrows).toEqual([{ from: "g1", to: "f3", kind: "hint" }]);
     expect(marks.arrows.some((arrow) => arrow.kind === "better")).toBe(false);
-    expect(marks.labels).toEqual([{ square: "f3", text: "hint" }]);
+    expect(marks.labels).toEqual([]);
   });
 
   it("draws a hint line even when there is no last-move insight", () => {

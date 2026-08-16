@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { shouldShowCoachAnnotations } from "@/features/game/shell-view";
+import {
+  COACH_UNAVAILABLE_EMPTY,
+  coachEmptyCopy,
+  shouldShowCoachAnnotations,
+} from "@/features/game/shell-view";
+
+describe("coachEmptyCopy", () => {
+  it("explains when the coach is down", () => {
+    expect(coachEmptyCopy(true)).toBe(COACH_UNAVAILABLE_EMPTY);
+    expect(coachEmptyCopy(false)).toBeNull();
+  });
+});
 
 describe("shouldShowCoachAnnotations", () => {
   it("shows hint marks even when there is no last-move insight", () => {

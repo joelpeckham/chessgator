@@ -13,12 +13,7 @@ export function SitePage({
   return (
     <div className="flex min-h-dvh flex-1 flex-col bg-background">
       <header className="flex h-12 shrink-0 items-center border-b border-border px-3 sm:px-4">
-        <Link
-          href="/"
-          className="rounded-sm focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <ChessgatorWordmark />
-        </Link>
+        <ChessgatorWordmark href="/" />
       </header>
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 px-6 py-10">
         <h1 className="font-heading text-2xl font-semibold tracking-tight text-pretty">

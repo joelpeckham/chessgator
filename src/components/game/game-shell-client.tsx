@@ -17,7 +17,7 @@ function GameShellPlaceholder() {
       busy
       header={
         <>
-          <ChessgatorWordmark />
+          <ChessgatorWordmark href="/" />
           <div className="size-8 animate-pulse rounded-full bg-muted/40" />
         </>
       }

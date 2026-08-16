@@ -30,12 +30,22 @@ export const FAQ_ITEMS: FaqItem[] = [
       "After the page and engine files have loaded once, play and analysis continue without a network. A later visit still needs the site and assets if your browser cache has cleared them.",
   },
   {
+    question: "Why is the first visit a large download?",
+    answer:
+      "The first time you open the board, the browser downloads Maia, Stockfish, and the ONNX Runtime — about 30 MB total. You can move while they load; Maia replies when it is ready. Later visits reuse the cached files.",
+  },
+  {
+    question: "Which browsers work?",
+    answer:
+      "chessgator needs a modern browser with WebAssembly and Web Workers. Current Chrome, Edge, Firefox, and Safari should work. Automated tests run in Chromium.",
+  },
+  {
     question: "Is chessgator free?",
     answer: "Yes. There are no accounts, subscriptions, or in-app purchases.",
   },
   {
     question: "How do I start over or clear a game?",
     answer:
-      "Use New game in the app settings to reset the board. To wipe stored data entirely, clear this site's data in your browser settings. chessgator stores the active game under the key chessgator:game:v2.",
+      "Use New game in the app settings to reset the board. To wipe stored data entirely, clear this site's data in your browser settings.",
   },
 ];

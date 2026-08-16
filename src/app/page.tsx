@@ -44,7 +44,7 @@ export default function LandingPage() {
     <div className="flex min-h-dvh flex-1 flex-col bg-background">
       <JsonLd data={jsonLd} />
       <header className="flex h-12 shrink-0 items-center justify-between border-b border-border px-3 sm:px-4">
-        <ChessgatorWordmark />
+        <ChessgatorWordmark href="/" />
         <Link className={buttonVariants({ size: "sm" })} href="/game">
           Play
         </Link>
@@ -100,7 +100,8 @@ export default function LandingPage() {
             Ready for a game?
           </h2>
           <p className="text-muted-foreground">
-            No sign-up, no downloads. Open the board and make your first move.
+            No sign-up. Open the board and make your first move — engines load
+            in the browser once.
           </p>
           <Link className={buttonVariants({ size: "lg" })} href="/game">
             Start playing

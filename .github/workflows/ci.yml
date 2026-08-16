@@ -63,6 +63,11 @@ jobs:
       - name: Static host cache gate
         run: bun run test:static-host
 
+      - name: E2E static build
+        run: bun run build
+        env:
+          NEXT_PUBLIC_E2E: "1"
+
       - name: Playable flow e2e
         run: bunx playwright test -c tests/game/playwright.config.ts
 

@@ -10,6 +10,9 @@ import {
   GATOR_LEDGE_OVERLAP_PX,
   gatorDisplaySize,
   gatorPeekLiftPx,
+  NECK_BLEED_PX,
+  NECK_MIRROR_OVERLAP_PX,
+  neckMirrorStyle,
 } from "@/components/coach/gator-layout";
 
 describe("GATOR_CLAWS", () => {
@@ -74,6 +77,15 @@ describe("gatorDisplaySize", () => {
     expect(gatorDisplaySize("sad", 0.28)).toEqual({
       width: GATOR_ART.sad.width * 0.28,
       height: GATOR_ART.sad.height * 0.28,
+    });
+  });
+});
+
+describe("neckMirrorStyle", () => {
+  it("overlaps the head so the mirrored neck hides the seam", () => {
+    expect(neckMirrorStyle()).toEqual({
+      height: NECK_BLEED_PX + NECK_MIRROR_OVERLAP_PX,
+      top: `calc(100% - ${NECK_MIRROR_OVERLAP_PX}px)`,
     });
   });
 });

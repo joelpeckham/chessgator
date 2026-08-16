@@ -24,7 +24,6 @@ export function annotationsFromInsight(
 ): SemanticBoardAnnotation {
   const highlightSquares = new Set<string>();
   const arrows: SemanticBoardAnnotation["arrows"] = [];
-  const labels: SemanticBoardAnnotation["labels"] = [];
 
   const hintShowsMove = Boolean(
     hint?.candidateMoveUci ||
@@ -38,10 +37,6 @@ export function annotationsFromInsight(
         from: hint.candidateMoveUci.slice(0, 2),
         to: hint.candidateMoveUci.slice(2, 4),
         kind: "hint",
-      });
-      labels.push({
-        square: hint.candidateMoveUci.slice(2, 4),
-        text: "hint",
       });
     }
     if (hint.level >= 3) {
@@ -64,13 +59,12 @@ export function annotationsFromInsight(
         to: uci.slice(2, 4),
         kind: "better",
       });
-      labels.push({ square: uci.slice(2, 4), text: "better" });
     }
   }
 
   return {
     highlightSquares: [...highlightSquares],
     arrows,
-    labels,
+    labels: [],
   };
 }

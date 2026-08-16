@@ -17,10 +17,11 @@ import {
   GATOR_CLAWS,
   GATOR_LEDGE_OVERLAP_PX,
   gatorDisplaySize,
-  NECK_BLEED_PX,
+  neckMirrorStyle,
 } from "@/components/coach/gator-layout";
 import { TeachingCard } from "@/components/coach/teaching-card";
 import {
+  HINT_PENDING_QUIP,
   IDLE_HINT_QUIP,
   scheduleIdleHint,
   scheduleTeaserExpiry,
@@ -95,6 +96,7 @@ export type CoachMascotProps = {
   /** Viewport x of the gator's left edge; hugs the board's left side. */
   left?: number;
   orientationTeaser?: string | null;
+  emptyCopy?: string | null;
   mood?: GatorMood | null;
 };
 
@@ -110,7 +112,11 @@ function deriveTeaser(args: {
   orientationTeaser: string | null;
   idlePromptVisible: boolean;
   idleHintEligible: boolean;
+  waitingForHint: boolean;
 }): CoachTeaser | null {
+  if (args.waitingForHint) {
+    return { text: HINT_PENDING_QUIP, key: "hint-pending" };
+  }
   if (args.orientationTeaser) {
     return {
       text: args.orientationTeaser,
@@ -149,8 +155,10 @@ function mascotAriaLabel(args: {
   expanded: boolean;
   mode: MascotMode;
   insight: TeachingInsight | null;
+  waitingForHint: boolean;
 }): string {
   if (args.expanded) return "Hide coach feedback";
+  if (args.waitingForHint) return "Coach is thinking of a hint";
   if (args.mode === "analyzing") return "Coach is analyzing";
   if (args.insight?.classification === "blunder") {
     return "Coach: blunder — show why";
@@ -183,6 +191,7 @@ export function CoachMascot({
   idleHintEligible = false,
   left = 0,
   orientationTeaser = null,
+  emptyCopy = null,
   mood = null,
 }: CoachMascotProps) {
   const gatorButtonRef = useRef<HTMLButtonElement>(null);
@@ -199,13 +208,13 @@ export function CoachMascot({
     orientationTeaser,
     idlePromptVisible,
     idleHintEligible,
+    waitingForHint,
   });
   const teaserKey = teaser?.key ?? null;
-  const showOrientationTeaser = teaserKey === "orientation";
+  const keepTeaser =
+    teaserKey === "orientation" || teaserKey === "hint-pending";
   const shownTeaser =
-    !expanded &&
-    teaser &&
-    (showOrientationTeaser || expiredTeaserKey !== teaserKey)
+    !expanded && teaser && (keepTeaser || expiredTeaserKey !== teaserKey)
       ? teaser
       : null;
 
@@ -218,6 +227,7 @@ export function CoachMascot({
     if (
       !teaserKey ||
       teaserKey === "orientation" ||
+      teaserKey === "hint-pending" ||
       expiredTeaserKey === teaserKey
     )
       return;
@@ -288,7 +298,7 @@ export function CoachMascot({
       hintDisabled={hintDisabled}
       hintFen={hintFen}
       onRequestHint={onRequestHint}
-      emptyCopy={orientationTeaser}
+      emptyCopy={emptyCopy}
     />
   );
 
@@ -358,7 +368,12 @@ export function CoachMascot({
             "block p-0 leading-none rounded-md outline-offset-2 focus-visible:outline-2 focus-visible:outline-dashed focus-visible:outline-foreground",
             (analyzing || waitingForHint) && "cursor-default opacity-90",
           )}
-          aria-label={mascotAriaLabel({ expanded, mode, insight })}
+          aria-label={mascotAriaLabel({
+            expanded,
+            mode,
+            insight,
+            waitingForHint,
+          })}
           aria-expanded={expanded}
           aria-controls="coach-balloon"
           data-testid="coach-gator"
@@ -393,8 +408,8 @@ export function CoachMascot({
               />
               <span
                 aria-hidden
-                className="pointer-events-none absolute inset-x-0 top-full block overflow-hidden"
-                style={{ height: NECK_BLEED_PX }}
+                className="pointer-events-none absolute inset-x-0 block overflow-hidden"
+                style={neckMirrorStyle()}
               >
                 <Image
                   src={gatorSrc(expression)}

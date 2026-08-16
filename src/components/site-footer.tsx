@@ -11,6 +11,7 @@ const LINKS = [
   { href: "/faq", label: "FAQ" },
   { href: "/about", label: "About" },
   { href: "/privacy", label: "Privacy" },
+  { href: "/notices", label: "Notices" },
 ] as const;
 
 function currentYear(): number {
@@ -35,6 +36,14 @@ export function SiteFooter({ className }: { className?: string }) {
     >
       <p className="truncate">
         © <CopyrightYear /> chessgator
+        <span aria-hidden> • </span>
+        made by{" "}
+        <a
+          href="https://jpeckham.com"
+          className="underline-offset-4 hover:text-foreground hover:underline"
+        >
+          jpeckham.com
+        </a>
       </p>
       <ul className="flex shrink-0 items-center gap-3">
         {LINKS.map((link) => (

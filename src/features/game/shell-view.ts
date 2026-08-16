@@ -41,6 +41,14 @@ import { deriveBoardInteractivity } from "@/features/game/turn-controller";
 import type { GameRuntime } from "@/features/game/use-game-runtime";
 import type { ShellChrome } from "@/features/game/use-shell-ui";
 
+export const COACH_UNAVAILABLE_EMPTY =
+  "The coach is unavailable. You can still play.";
+
+/** Balloon empty-state copy when Stockfish is down; otherwise the card default. */
+export function coachEmptyCopy(coachUnavailable: boolean): string | null {
+  return coachUnavailable ? COACH_UNAVAILABLE_EMPTY : null;
+}
+
 /** Hint marks follow the live hint; last-move arrows need the balloon open. */
 export function shouldShowCoachAnnotations(args: {
   coachUnavailable: boolean;
@@ -89,6 +97,7 @@ export type ShellView = {
     hintFen: string;
     idleHintEligible: boolean;
     orientationTeaser: string | null;
+    emptyCopy: string | null;
     mood: GatorMood | null;
   };
   gameOver: {
@@ -315,6 +324,7 @@ export function buildShellView(args: {
         hasHint: Boolean(liveHint),
       }),
       orientationTeaser,
+      emptyCopy: coachEmptyCopy(Boolean(runtime.coachUnavailable)),
       mood: coachMood,
     },
     gameOver: {

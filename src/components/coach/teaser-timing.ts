@@ -1,6 +1,7 @@
 export const TEASER_VISIBLE_MS = 5_000;
 export const IDLE_HINT_DELAY_MS = 30_000;
 export const IDLE_HINT_QUIP = "Tap the gator to get a hint.";
+export const HINT_PENDING_QUIP = "Looking at the position…";
 
 export function isIdleHintEligible(input: {
   firstHumanTurn: boolean;

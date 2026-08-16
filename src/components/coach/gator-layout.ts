@@ -7,12 +7,12 @@ export const GATOR_ART: Record<
   GatorExpression,
   { width: number; height: number }
 > = {
-  "neutral-happy": { width: 202.16, height: 292.018 },
-  sad: { width: 200.917, height: 291.95 },
-  mischievous: { width: 212.842, height: 290.435 },
-  shocked: { width: 214.027, height: 307.993 },
-  confused: { width: 262, height: 299.971 },
-  scared: { width: 222.396, height: 307.113 },
+  "neutral-happy": { width: 202.16, height: 291.502 },
+  sad: { width: 200.917, height: 291.439 },
+  mischievous: { width: 212.842, height: 289.919 },
+  shocked: { width: 214.027, height: 307.068 },
+  confused: { width: 262, height: 300.325 },
+  scared: { width: 222.396, height: 306.109 },
 };
 
 export const CLAWS_SRC = "/coach/gator-claws.svg";
@@ -58,6 +58,18 @@ export const CLAWS_DISPLAY = clawsDisplaySize();
  * extends the neck just enough to keep the edge hidden.
  */
 export const NECK_BLEED_PX = 12;
+/** Pull the mirror up so the anti-aliased neck edge does not flash a gap. */
+export const NECK_MIRROR_OVERLAP_PX = 2;
+
+export function neckMirrorStyle(): {
+  height: number;
+  top: string;
+} {
+  return {
+    height: NECK_BLEED_PX + NECK_MIRROR_OVERLAP_PX,
+    top: `calc(100% - ${NECK_MIRROR_OVERLAP_PX}px)`,
+  };
+}
 
 /** Screen-relative: `left` is the claw nearer the viewport's left edge. */
 export type GatorHands = "left" | "right" | "both";

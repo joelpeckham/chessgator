@@ -90,6 +90,7 @@ export function GameShellLayout({
       idleHintEligible={view.coach.idleHintEligible}
       left={view.mascotLeft}
       orientationTeaser={view.coach.orientationTeaser}
+      emptyCopy={view.coach.emptyCopy}
       mood={view.coach.mood}
     />
   );
@@ -116,7 +117,7 @@ export function GameShellLayout({
           header={
             <>
               <div className="flex min-w-0 items-center gap-2.5">
-                <ChessgatorWordmark />
+                <ChessgatorWordmark href="/" />
                 <Badge
                   variant={status.badgeVariant}
                   data-testid="status-badge"

@@ -8,5 +8,6 @@ chessgator is a free browser chess coach. You play against Maia, a human-like op
 
 - [Play](https://chessgator.com/game): The game board — play against Maia with local Stockfish coaching
 - [About](https://chessgator.com/about): What chessgator is, how a session works, and engine credits
-- [FAQ](https://chessgator.com/faq): Common questions about coaching, data, offline use, and resetting a game
+- [FAQ](https://chessgator.com/faq): Common questions about coaching, data, first-load size, browsers, and resetting a game
 - [Privacy](https://chessgator.com/privacy): Device storage, Vercel hosting logs, cookieless analytics, and contact
+- [Notices](https://chessgator.com/notices): App license and Stockfish / Maia / ONNX Runtime attribution

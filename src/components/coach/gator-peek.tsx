@@ -11,7 +11,7 @@ import {
   GATOR_CLAWS,
   GATOR_LEDGE_OVERLAP_PX,
   gatorDisplaySize,
-  NECK_BLEED_PX,
+  neckMirrorStyle,
 } from "@/components/coach/gator-layout";
 import { cn } from "@/lib/utils";
 
@@ -83,8 +83,8 @@ export function GatorPeek({
             />
             <span
               aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-full block overflow-hidden"
-              style={{ height: NECK_BLEED_PX }}
+              className="pointer-events-none absolute inset-x-0 block overflow-hidden"
+              style={neckMirrorStyle()}
             >
               <Image
                 src={gatorSrc(expression)}

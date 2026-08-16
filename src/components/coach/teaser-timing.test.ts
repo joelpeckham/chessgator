@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  HINT_PENDING_QUIP,
   IDLE_HINT_DELAY_MS,
   IDLE_HINT_QUIP,
   isIdleHintEligible,
@@ -98,5 +99,6 @@ describe("idle hint and teaser timers", () => {
 
   it("keeps the idle prompt copy instructional", () => {
     expect(IDLE_HINT_QUIP).toBe("Tap the gator to get a hint.");
+    expect(HINT_PENDING_QUIP).toBe("Looking at the position…");
   });
 });

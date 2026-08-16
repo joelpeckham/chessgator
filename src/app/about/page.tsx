@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { SitePage } from "@/components/site-page";
 
 export const metadata: Metadata = {
@@ -34,7 +35,15 @@ export default function AboutPage() {
         <p className="text-muted-foreground">
           Opponent play uses Maia, a neural network trained on human games.
           Coaching analysis uses Stockfish. Both run in the browser through ONNX
-          Runtime and WebAssembly. chessgator is built by Joel Peckham.
+          Runtime and WebAssembly. chessgator is built by Joel Peckham. Source
+          and third-party licenses are on the{" "}
+          <Link
+            href="/notices"
+            className="text-primary underline-offset-4 hover:underline"
+          >
+            notices
+          </Link>{" "}
+          page.
         </p>
       </section>
     </SitePage>
