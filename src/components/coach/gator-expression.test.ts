@@ -3,12 +3,12 @@ import {
   gameOverMood,
   gatorExpressionFor,
   gatorSrc,
+  resolveCoachExpression,
 } from "@/components/coach/gator-expression";
 
 describe("gatorExpressionFor", () => {
   it("maps moods to expression assets", () => {
     expect(gatorExpressionFor("idle")).toBe("neutral-happy");
-    expect(gatorExpressionFor("analyzing")).toBe("confused");
     expect(gatorExpressionFor("best")).toBe("mischievous");
     expect(gatorExpressionFor("excellent")).toBe("mischievous");
     expect(gatorExpressionFor("good")).toBe("neutral-happy");
@@ -18,6 +18,30 @@ describe("gatorExpressionFor", () => {
     expect(gatorExpressionFor("gameWon")).toBe("mischievous");
     expect(gatorExpressionFor("gameLost")).toBe("sad");
     expect(gatorExpressionFor("gameDraw")).toBe("neutral-happy");
+  });
+
+  it("holds the last reaction face while analyzing", () => {
+    expect(
+      resolveCoachExpression({
+        mood: "idle",
+        analyzing: true,
+        held: "mischievous",
+      }),
+    ).toBe("mischievous");
+    expect(
+      resolveCoachExpression({
+        mood: "blunder",
+        analyzing: true,
+        held: "mischievous",
+      }),
+    ).toBe("scared");
+    expect(
+      resolveCoachExpression({
+        mood: "idle",
+        analyzing: false,
+        held: "mischievous",
+      }),
+    ).toBe("neutral-happy");
   });
 
   it("points at public coach SVGs", () => {

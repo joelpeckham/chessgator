@@ -6,9 +6,10 @@ import { useEffect, useRef, useState } from "react";
 import { computeBalloonLayout } from "@/components/coach/balloon-layout";
 import { CoachBalloon } from "@/components/coach/coach-balloon";
 import {
+  type GatorExpression,
   type GatorMood,
-  gatorExpressionFor,
   gatorSrc,
+  resolveCoachExpression,
 } from "@/components/coach/gator-expression";
 import {
   CLAWS_DISPLAY,
@@ -141,12 +142,10 @@ function deriveMode(args: {
 }
 
 function deriveMood(args: {
-  mode: MascotMode;
   insight: TeachingInsight | null;
   mood?: GatorMood | null;
 }): GatorMood {
   if (args.mood) return args.mood;
-  if (args.mode === "analyzing") return "analyzing";
   if (args.insight) return args.insight.classification;
   return "idle";
 }
@@ -197,13 +196,22 @@ export function CoachMascot({
   const gatorButtonRef = useRef<HTMLButtonElement>(null);
   const [idlePromptVisible, setIdlePromptVisible] = useState(false);
   const [expiredTeaserKey, setExpiredTeaserKey] = useState<string | null>(null);
+  const [heldExpression, setHeldExpression] =
+    useState<GatorExpression>("neutral-happy");
   if (!idleHintEligible && idlePromptVisible) {
     setIdlePromptVisible(false);
   }
 
   const waitingForHint = hintPending && !expanded;
   const mode = deriveMode({ analyzing, insight, hint });
-  const expression = gatorExpressionFor(deriveMood({ mode, insight, mood }));
+  const expression = resolveCoachExpression({
+    mood: deriveMood({ insight, mood }),
+    analyzing,
+    held: heldExpression,
+  });
+  if (heldExpression !== expression) {
+    setHeldExpression(expression);
+  }
   const teaser = deriveTeaser({
     orientationTeaser,
     idlePromptVisible,

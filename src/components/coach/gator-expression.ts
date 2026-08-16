@@ -12,14 +12,12 @@ export type GatorExpression =
 export type GatorMood =
   | MoveClassification
   | "idle"
-  | "analyzing"
   | "gameWon"
   | "gameLost"
   | "gameDraw";
 
 export function gatorExpressionFor(mood: GatorMood): GatorExpression {
   switch (mood) {
-    case "analyzing":
     case "inaccuracy":
       return "confused";
     case "best":
@@ -35,6 +33,16 @@ export function gatorExpressionFor(mood: GatorMood): GatorExpression {
     default:
       return "neutral-happy";
   }
+}
+
+/** Keep the last reaction face while analysis is in flight with no new mood. */
+export function resolveCoachExpression(args: {
+  mood: GatorMood;
+  analyzing: boolean;
+  held: GatorExpression;
+}): GatorExpression {
+  if (args.analyzing && args.mood === "idle") return args.held;
+  return gatorExpressionFor(args.mood);
 }
 
 export function gatorSrc(expression: GatorExpression): string {
