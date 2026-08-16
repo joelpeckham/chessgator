@@ -1,7 +1,11 @@
 "use client";
 
 import { type ReactNode, useState } from "react";
-import { Chessboard, type SquareHandlerArgs } from "react-chessboard";
+import {
+  Chessboard,
+  defaultArrowOptions,
+  type SquareHandlerArgs,
+} from "react-chessboard";
 import {
   type BoardArrow,
   dedupeBoardArrows,
@@ -139,6 +143,12 @@ export function ChessboardAdapter({
     clearArrowsOnClick: false,
     clearArrowsOnPositionChange: false,
     arrows: boardArrows,
+    // Shaft + head must be opaque; layer opacity in CSS composites them as one.
+    arrowOptions: {
+      ...defaultArrowOptions,
+      opacity: 1,
+      activeOpacity: 1,
+    },
     showNotation: true,
     ...boardSurfaceOptions({ transparent: true }),
     canDragPiece: ({ square }: { square: string | null }) => {

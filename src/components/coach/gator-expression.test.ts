@@ -9,7 +9,6 @@ describe("gatorExpressionFor", () => {
   it("maps moods to expression assets", () => {
     expect(gatorExpressionFor("idle")).toBe("neutral-happy");
     expect(gatorExpressionFor("analyzing")).toBe("confused");
-    expect(gatorExpressionFor("hint")).toBe("confused");
     expect(gatorExpressionFor("best")).toBe("mischievous");
     expect(gatorExpressionFor("excellent")).toBe("mischievous");
     expect(gatorExpressionFor("good")).toBe("neutral-happy");

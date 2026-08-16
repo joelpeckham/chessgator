@@ -19,21 +19,24 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
       page.getByTestId("coach-mascot").getByTestId("hint-button"),
     ).toHaveCount(0);
 
-    // Progressive hint ladder opens the balloon.
+    // Balloon stays closed until the first hint is ready — no empty flash.
     await page.getByTestId("coach-gator").click();
     await expect(page.getByTestId("coach-balloon")).toBeVisible();
+    await expect(page.getByTestId("teaching-card")).toHaveAttribute(
+      "data-state",
+      "hints",
+    );
     await expect(page.getByTestId("hint-ladder")).toHaveAttribute(
       "data-hint-level",
-      "0",
+      "2",
     );
-    await expect(page.getByTestId("hint-question")).toBeVisible();
+    await expect(page.getByTestId("hint-candidate")).toBeVisible();
 
     await page.getByTestId("coach-balloon").getByTestId("hint-button").click();
     await expect(page.getByTestId("hint-ladder")).toHaveAttribute(
       "data-hint-level",
-      "1",
+      "3",
     );
-    await expect(page.getByTestId("hint-squares")).toBeVisible();
 
     // Collapse without dismissing — Escape collapses the balloon.
     await page.keyboard.press("Escape");
@@ -68,13 +71,14 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
 
     await expandCoach(page);
     await expect(page.getByTestId("teaching-card")).toHaveAttribute(
-      "data-classification",
-      "best",
-    );
-    await expect(page.getByTestId("teaching-card")).toHaveAttribute(
       "data-state",
       "feedback",
     );
+    await expect(page.getByTestId("teaching-card")).toHaveAttribute(
+      "data-classification",
+      "best",
+    );
+    await expect(page.getByTestId("hint-ladder")).toHaveCount(0);
     await expect(page.getByTestId("classification-badge")).toContainText(
       "Best",
     );
@@ -96,15 +100,29 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
       Math.abs((boardAfterExpand!.width ?? 0) - (boardAfterBest!.width ?? 0)),
     ).toBeLessThanOrEqual(1);
 
-    // Opponent replies, then jump back to the start of the game.
+    // Return to the live tip. Gator tap is last-move review; Hint switches modes.
+    const timeline = page.getByTestId("move-list");
+    await timeline.focus();
+    await page.keyboard.press("End");
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
-      /playerTurn|reviewing/,
+      "playerTurn",
       { timeout: 10_000 },
     );
 
-    await expandCoach(page);
-    const timeline = page.getByTestId("move-list");
+    await page.keyboard.press("Escape");
+    await expectCoachCollapsed(page);
+    await page.getByTestId("coach-gator").click();
+    await expect(page.getByTestId("teaching-card")).toHaveAttribute(
+      "data-state",
+      "feedback",
+    );
+    await page.getByTestId("hint-button").click();
+    await expect(page.getByTestId("teaching-card")).toHaveAttribute(
+      "data-state",
+      "hints",
+    );
+
     await timeline.focus();
     await page.keyboard.press("Home");
     await expect(selectedTimelineNode(page)).toHaveAttribute(
@@ -145,14 +163,11 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
     await expect(page.getByTestId("coach-teaser")).toHaveCount(0);
 
     await expandCoach(page);
-    await expect(page.getByTestId("teaching-card")).toHaveAttribute(
-      "data-state",
-      "feedback",
-    );
     await expect(page.getByTestId("teaching-explanation")).toContainText(
       /because/i,
     );
     await expect(page.getByTestId("explore-line-button")).toBeVisible();
+    await expect(page.getByTestId("hint-ladder")).toHaveCount(0);
 
     // Collapse via Escape — insight remains available on the mascot.
     await page.keyboard.press("Escape");
@@ -196,7 +211,7 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
       "scared",
     );
 
-    // The insight is still there when reopened by hand.
+    // The insight is still there when reopened from the gator.
     await expandCoach(page);
     await expect(page.getByTestId("teaching-card")).toHaveAttribute(
       "data-classification",

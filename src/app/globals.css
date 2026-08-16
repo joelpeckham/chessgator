@@ -54,6 +54,7 @@
   --foreground: oklch(0.2 0.025 150);
   --board-light: oklch(0.9 0.04 95);
   --board-dark: oklch(0.55 0.06 145);
+  --board-arrow: oklch(0.72 0.19 55);
 }
 
 @layer base {
@@ -95,6 +96,11 @@
   background: color-mix(in oklch, var(--primary) 28%, transparent);
   outline: 2px solid color-mix(in oklch, var(--primary) 70%, transparent);
   outline-offset: -2px;
+}
+
+/* Fade the arrows overlay once so shaft + head do not stack at the join. */
+.chessboard-adapter svg:has(marker) {
+  opacity: 0.65;
 }
 
 [data-board-square="true"][data-hint-square="true"] {

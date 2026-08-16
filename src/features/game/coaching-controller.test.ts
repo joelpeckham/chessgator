@@ -229,16 +229,42 @@ describe("coaching controller", () => {
       gameNodeId: "root",
       sideToMove: "w",
     });
-    expect(h0?.level).toBe(0);
-    expect(h0?.question.length).toBeGreaterThan(0);
+    expect(h0?.level).toBe(2);
+    expect(h0?.candidateMoveSan).toBeTruthy();
 
     const h1 = await coach.escalateHint({
       fen: START,
       gameNodeId: "root",
       sideToMove: "w",
     });
-    expect(h1?.level).toBe(1);
-    expect(h1?.highlightSquares.length).toBeGreaterThan(0);
+    expect(h1?.level).toBe(3);
+    expect(h1?.lineUci.length).toBeGreaterThan(0);
+    expect(coach.getState().hintNodeId).toBe("root");
+
+    coach.resetHints();
+    expect(coach.getState().hint).toBeNull();
+    expect(coach.getState().hintNodeId).toBeNull();
+    await coach.dispose();
+  });
+
+  it("starts a fresh hint when the board node changes", async () => {
+    const coach = stubCoach();
+    await coach.start();
+    await coach.escalateHint({
+      fen: START,
+      gameNodeId: "root",
+      sideToMove: "w",
+    });
+    expect(coach.getState().hintNodeId).toBe("root");
+    expect(coach.getState().hintLevel).toBe(2);
+
+    const next = await coach.escalateHint({
+      fen: START,
+      gameNodeId: "other-node",
+      sideToMove: "w",
+    });
+    expect(next?.level).toBe(2);
+    expect(coach.getState().hintNodeId).toBe("other-node");
     await coach.dispose();
   });
 

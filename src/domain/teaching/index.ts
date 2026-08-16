@@ -8,7 +8,10 @@ export type { FeedbackNotice } from "@/domain/teaching/feedback-notice";
 export {
   type BuildHintInput,
   buildHintStep,
+  buildInitialHintStep,
   MAX_HINT_LEVEL,
+  MIN_HINT_LEVEL,
+  nextHintActionLabel,
   nextHintLevel,
 } from "@/domain/teaching/hints";
 export {

@@ -22,7 +22,6 @@ export type TeachingCardProps = {
   onRequestHint?: () => void;
   /** FEN for converting hint UCI lines to SAN. */
   hintFen?: string | null;
-  showSuggestedMoveHint?: boolean;
   emptyCopy?: string | null;
 };
 
@@ -38,7 +37,6 @@ export function TeachingCard({
   hintDisabled = false,
   onRequestHint,
   hintFen = null,
-  showSuggestedMoveHint = false,
   emptyCopy = null,
 }: TeachingCardProps) {
   const showHints = Boolean(onRequestHint) || Boolean(hint);
@@ -73,6 +71,25 @@ export function TeachingCard({
     );
   }
 
+  if (hint) {
+    return (
+      <motion.div
+        key={`hint:${hint.level}:${hint.question}`}
+        {...STATE_FADE}
+        className="flex flex-col gap-2"
+        data-testid="teaching-card"
+        data-state="hints"
+        role="region"
+        aria-labelledby="coach-expanded-title"
+      >
+        <h3 id="coach-expanded-title" className="text-sm font-medium">
+          Coach
+        </h3>
+        {hintLadder}
+      </motion.div>
+    );
+  }
+
   if (!insight) {
     return (
       <motion.div
@@ -84,20 +101,22 @@ export function TeachingCard({
         role="region"
         aria-labelledby="coach-expanded-title"
       >
-        <div className="flex items-center justify-between gap-2">
-          <div className="min-w-0">
-            <h3 id="coach-expanded-title" className="text-sm font-medium">
-              Coach
-            </h3>
-            <p className="text-xs text-muted-foreground">
-              {emptyCopy ?? "Feedback appears after each move."}
-            </p>
-          </div>
+        <div className="min-w-0">
+          <h3 id="coach-expanded-title" className="text-sm font-medium">
+            Coach
+          </h3>
+          <p className="text-xs text-muted-foreground">
+            {emptyCopy ?? "Feedback appears after each move."}
+          </p>
         </div>
         {hintLadder}
       </motion.div>
     );
   }
+
+  const tryLabel = insight.suggestedMoveSan
+    ? `Try ${insight.suggestedMoveSan}`
+    : "Try this move";
 
   return (
     <motion.div
@@ -120,35 +139,32 @@ export function TeachingCard({
       <p className="text-sm text-pretty" data-testid="teaching-explanation">
         {insight.explanation}
       </p>
-      {insight.suggestedMoveSan ? (
-        <p className="text-sm" data-testid="suggested-move">
-          <span className="text-muted-foreground">Try instead: </span>
-          <span className="font-medium">{insight.suggestedMoveSan}</span>
-        </p>
+      {onTrySuggested || (onRequestHint && !hintDisabled) ? (
+        <div className="flex flex-wrap gap-1.5 pt-0.5">
+          {onTrySuggested ? (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={onTrySuggested}
+              data-testid="explore-line-button"
+            >
+              {tryLabel}
+            </Button>
+          ) : null}
+          {onRequestHint && !hintDisabled ? (
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={onRequestHint}
+              data-testid="hint-button"
+            >
+              Hint
+            </Button>
+          ) : null}
+        </div>
       ) : null}
-      {showSuggestedMoveHint ? (
-        <p
-          className="text-xs text-muted-foreground"
-          data-testid="suggested-move-hint"
-        >
-          Gator&apos;s suggested move is shown on the timeline — click it to
-          try.
-        </p>
-      ) : null}
-      {hintLadder}
-      <div className="flex flex-wrap gap-1.5 pt-0.5">
-        {onTrySuggested ? (
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={onTrySuggested}
-            data-testid="explore-line-button"
-          >
-            Try again from here
-          </Button>
-        ) : null}
-      </div>
     </motion.div>
   );
 }

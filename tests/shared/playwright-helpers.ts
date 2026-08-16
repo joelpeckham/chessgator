@@ -33,6 +33,15 @@ export async function expandCoach(page: Page): Promise<void> {
   await expect(page.getByTestId("coach-balloon")).toBeVisible();
 }
 
+/** Committed timeline node whose aria-label includes `san`. */
+export function committedTimelineNode(page: Page, san: string) {
+  return page
+    .locator(
+      `[data-testid="move-timeline"] button[data-kind="committed"][aria-label*="${san}"]`,
+    )
+    .first();
+}
+
 /** Assert the coach balloon is collapsed (mascot still present). */
 export async function expectCoachCollapsed(page: Page): Promise<void> {
   await expect(page.getByTestId("coach-mascot")).toBeVisible();

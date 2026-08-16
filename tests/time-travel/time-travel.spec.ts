@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import {
   chooseLegalMove,
+  committedTimelineNode,
   expandCoach,
   expectCoachCollapsed,
   selectedTimelineNode,
@@ -30,11 +31,12 @@ test.describe("time travel + branching timeline", () => {
     );
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
-      "playerTurn",
+      /playerTurn|reviewing/,
       { timeout: 10_000 },
     );
 
     await expect(page.getByTestId("explore-line-button")).toBeVisible();
+    await expect(page.getByTestId("explore-line-button")).toHaveText(/Try e4/);
     await expect(
       page
         .locator('[data-testid="move-timeline"] [data-kind="suggested"]')
@@ -61,11 +63,7 @@ test.describe("time travel + branching timeline", () => {
       Math.abs((boardAfterTry!.width ?? 0) - (boardBefore!.width ?? 0)),
     ).toBeLessThanOrEqual(1);
 
-    const d4Node = page
-      .locator(
-        '[data-testid="move-timeline"] button[data-kind="committed"][aria-label*="d4"]',
-      )
-      .first();
+    const d4Node = committedTimelineNode(page, "d4");
     await expect(d4Node).toBeVisible();
     await d4Node.click();
     await expect(selectedTimelineNode(page)).toHaveAttribute(
@@ -86,6 +84,41 @@ test.describe("time travel + branching timeline", () => {
       "aria-label",
       /start/i,
     );
+  });
+
+  test("accepting a suggestion drops a hint from the old position", async ({
+    page,
+  }) => {
+    await startCoachGame(page);
+    await chooseLegalMove(page, "d4");
+    await expect(page.getByTestId("coach-mascot")).toHaveAttribute(
+      "data-mode",
+      "feedback",
+      { timeout: 10_000 },
+    );
+    await expandCoach(page);
+    await expect(page.getByTestId("status-badge")).toHaveAttribute(
+      "data-mode",
+      "playerTurn",
+      { timeout: 10_000 },
+    );
+    await expect(page.getByTestId("explore-line-button")).toBeVisible();
+    await page.getByTestId("hint-button").click();
+    await expect(page.getByTestId("teaching-card")).toHaveAttribute(
+      "data-state",
+      "hints",
+    );
+
+    await page
+      .locator('[data-testid="move-timeline"] [data-kind="suggested"]')
+      .first()
+      .click();
+    await expect(page.getByTestId("move-list")).toContainText("e4");
+    await expect(page.getByTestId("teaching-card")).not.toHaveAttribute(
+      "data-state",
+      "hints",
+    );
+    await expect(page.getByTestId("hint-question")).toHaveCount(0);
   });
 
   test("timeline jump keeps earlier lines", async ({ page }) => {
@@ -132,9 +165,13 @@ test.describe("time travel + branching timeline", () => {
       { timeout: 10_000 },
     );
     await expandCoach(page);
+    await expect(page.getByTestId("teaching-card")).toHaveAttribute(
+      "data-state",
+      "feedback",
+    );
     await expect(page.getByTestId("status-badge")).toHaveAttribute(
       "data-mode",
-      "playerTurn",
+      /playerTurn|reviewing/,
       { timeout: 10_000 },
     );
 

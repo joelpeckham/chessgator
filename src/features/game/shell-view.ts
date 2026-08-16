@@ -41,6 +41,18 @@ import { deriveBoardInteractivity } from "@/features/game/turn-controller";
 import type { GameRuntime } from "@/features/game/use-game-runtime";
 import type { ShellChrome } from "@/features/game/use-shell-ui";
 
+/** Hint marks follow the live hint; last-move arrows need the balloon open. */
+export function shouldShowCoachAnnotations(args: {
+  coachUnavailable: boolean;
+  expanded: boolean;
+  hasInsight: boolean;
+  hasHint: boolean;
+}): boolean {
+  if (args.coachUnavailable) return false;
+  if (args.hasHint) return true;
+  return args.expanded && args.hasInsight;
+}
+
 export type ShellView = {
   hydrated: boolean;
   resumed: boolean;
@@ -75,7 +87,6 @@ export type ShellView = {
     evidenceGameNodeId: string | undefined;
     hintDisabled: boolean;
     hintFen: string;
-    showSuggestedMoveHint: boolean;
     idleHintEligible: boolean;
     orientationTeaser: string | null;
     mood: GatorMood | null;
@@ -177,10 +188,17 @@ export function buildShellView(args: {
     runtime.coaching.phase === "analyzing" || mode === "analyzing";
   const coachExpanded = ui.coachExpanded;
 
-  const showCoachAnnotations =
-    Boolean(visibleInsight) &&
-    !runtime.coachUnavailable &&
-    (coachExpanded || Boolean(runtime.coaching.hint));
+  const liveHint =
+    runtime.coaching.hint && runtime.coaching.hintNodeId === tree.currentNodeId
+      ? runtime.coaching.hint
+      : null;
+
+  const showCoachAnnotations = shouldShowCoachAnnotations({
+    coachUnavailable: Boolean(runtime.coachUnavailable),
+    expanded: coachExpanded,
+    hasInsight: Boolean(visibleInsight),
+    hasHint: Boolean(liveHint),
+  });
 
   const status = getStatusPresentation({
     mode,
@@ -207,7 +225,7 @@ export function buildShellView(args: {
         annotationsFromInsight(
           visibleInsight,
           runtime.coaching.evidence,
-          runtime.coaching.hint,
+          liveHint,
         ),
       )
     : styleBoardAnnotations({
@@ -286,16 +304,15 @@ export function buildShellView(args: {
       showTrySuggested: Boolean(
         visibleInsight && !runtime.coachUnavailable && suggestedMove,
       ),
-      hint: runtime.coaching.hint,
+      hint: liveHint,
       evidenceGameNodeId: analyzedId ?? runtime.coaching.evidence?.gameNodeId,
       hintDisabled: !interactive || Boolean(runtime.coachUnavailable),
       hintFen: liveFen,
-      showSuggestedMoveHint: Boolean(suggestedMove),
       idleHintEligible: isIdleHintEligible({
         firstHumanTurn,
         playerTurn: interactive,
         hasInsight: Boolean(visibleInsight),
-        hasHint: Boolean(runtime.coaching.hint),
+        hasHint: Boolean(liveHint),
       }),
       orientationTeaser,
       mood: coachMood,

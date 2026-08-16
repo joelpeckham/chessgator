@@ -39,7 +39,7 @@ export type HintLevel = 0 | 1 | 2 | 3;
 
 export type HintStep = {
   level: HintLevel;
-  /** Level 0 — Socratic prompt. */
+  /** Motif or check prompt when we have one; empty otherwise. */
   question: string;
   /** Level 1 — squares to highlight (pattern + labels, not color-only). */
   highlightSquares: string[];

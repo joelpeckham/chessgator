@@ -69,7 +69,6 @@ export function renderExplanation(ctx: TemplateContext): string {
 
 export function hintQuestionForPosition(input: {
   hangingSquares: string[];
-  bestMoveSan: string | null;
   inCheck: boolean;
   question?: string;
 }): string {
@@ -81,10 +80,7 @@ export function hintQuestionForPosition(input: {
     const sq = input.hangingSquares[0] ?? "";
     return `Something on ${sq} may be unsafe. What is the threat, and how do you answer it?`;
   }
-  if (input.bestMoveSan) {
-    return "What is the most useful idea here — a threat, a developing move, or a king-safety step?";
-  }
-  return "What is your plan on this move?";
+  return "";
 }
 
 const VERDICT_BY_CLASSIFICATION: Record<MoveClassification, string> = {

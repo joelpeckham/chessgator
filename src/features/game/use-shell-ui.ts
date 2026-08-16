@@ -28,6 +28,8 @@ export type ShellChrome = {
   promotion: { from: string; to: string } | null;
   settingsOpen: boolean;
   coachExpanded: boolean;
+  /** Hint request in flight; balloon stays closed until content is ready. */
+  hintPending: boolean;
   timelineExpanded: boolean;
   navMessage: string | null;
   dismissedNotices: ReadonlySet<string>;
@@ -61,6 +63,7 @@ export type ShellUi = ShellChrome & {
   handlePruneTimelineNode: (nodeId: string, scope: PruneScope) => void;
   handleCoachExpandedChange: (next: boolean) => void;
   handleRequestHint: () => void;
+  handleClearHint: () => void;
   handleOpenCoach: () => void;
   handleSettingsOpenChange: (open: boolean) => void;
   dismissGameOver: () => void;
@@ -73,6 +76,8 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
   } | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [coachExpanded, setCoachExpanded] = useState(false);
+  const [hintPending, setHintPending] = useState(false);
+  const hintRequestRef = useRef(false);
   const [timelineExpanded, setTimelineExpanded] = useState(false);
   const [navMessage, setNavMessage] = useState<string | null>(null);
   const [dismissedNotices, setDismissedNotices] = useState<Set<string>>(
@@ -253,6 +258,7 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     }
     runtime.maiaSession.cancelPending();
     runtime.coach.cancelPending();
+    runtime.coach.resetHints();
     bumpScheduler();
     replaceTree(tree.tree);
     goToNode(tree.nodeId);
@@ -318,6 +324,7 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     runtime.coach.cancelPending();
     bumpScheduler();
     if (!goToNode(nodeId)) return;
+    runtime.coach.resetHints();
     const lesson = useGameStore.getState().lessons[nodeId];
     if (lesson) setCoachExpanded(true);
   }
@@ -347,15 +354,32 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
   }
 
   function handleRequestHint(): void {
-    if (runtime.coachUnavailable) return;
+    if (runtime.coachUnavailable || hintRequestRef.current) return;
     const tree = useGameStore.getState().tree;
-    setCoachExpanded(true);
+    const gameNodeId = tree.currentNodeId;
+    const expandWhenReady = !coachExpanded;
     runtime.coach.showInsight();
-    void runtime.coach.escalateHint({
-      fen: getCurrentNode(tree).fen,
-      gameNodeId: tree.currentNodeId,
-      sideToMove: useGameStore.getState().humanColor,
-    });
+    hintRequestRef.current = true;
+    setHintPending(true);
+    void runtime.coach
+      .escalateHint({
+        fen: getCurrentNode(tree).fen,
+        gameNodeId,
+        sideToMove: useGameStore.getState().humanColor,
+      })
+      .then((built) => {
+        if (!built) return;
+        if (useGameStore.getState().tree.currentNodeId !== gameNodeId) return;
+        if (expandWhenReady) setCoachExpanded(true);
+      })
+      .finally(() => {
+        hintRequestRef.current = false;
+        setHintPending(false);
+      });
+  }
+
+  function handleClearHint(): void {
+    runtime.coach.resetHints();
   }
 
   function handleOpenCoach(): void {
@@ -381,6 +405,7 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     promotion,
     settingsOpen,
     coachExpanded,
+    hintPending,
     timelineExpanded,
     navMessage,
     dismissedNotices,
@@ -403,6 +428,7 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     handlePruneTimelineNode,
     handleCoachExpandedChange,
     handleRequestHint,
+    handleClearHint,
     handleOpenCoach,
     handleSettingsOpenChange,
   };

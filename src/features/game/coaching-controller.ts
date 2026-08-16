@@ -6,6 +6,7 @@ import type { GameMove } from "@/domain/game";
 import {
   annotationsFromInsight,
   buildHintStep,
+  buildInitialHintStep,
   EMPTY_BOARD_ANNOTATIONS,
   type HintLevel,
   type HintStep,
@@ -41,6 +42,8 @@ export type CoachingControllerState = {
   insight: TeachingInsight | null;
   hintLevel: HintLevel;
   hint: HintStep | null;
+  /** Tree node the current hint was built for; null when no hint. */
+  hintNodeId: string | null;
   annotations: BoardAnnotation;
   /** Soft-dismissed tutor card; insight remains cached for reopen. */
   insightDismissed: boolean;
@@ -93,6 +96,7 @@ const IDLE: CoachingControllerState = {
   insight: null,
   hintLevel: 0,
   hint: null,
+  hintNodeId: null,
   annotations: EMPTY_ANNOTATIONS,
   insightDismissed: false,
 };
@@ -228,6 +232,7 @@ export function createCoachingController(
         insightDismissed: false,
         hint: null,
         hintLevel: 0,
+        hintNodeId: null,
         annotations: EMPTY_ANNOTATIONS,
       });
 
@@ -298,6 +303,7 @@ export function createCoachingController(
           insightDismissed: false,
           hint: null,
           hintLevel: 0,
+          hintNodeId: null,
         });
         activeRequestId = null;
         markEnd("analysis-player-move");
@@ -358,9 +364,11 @@ export function createCoachingController(
         }
       }
       const current = store.getState();
-      const nextLevel = current.hint ? nextHintLevel(current.hintLevel) : 0;
+      const continuing =
+        Boolean(current.hint) && current.hintNodeId === input.gameNodeId;
+      const nextLevel = continuing ? nextHintLevel(current.hintLevel) : null;
       hintSeq += 1;
-      const requestId = `hint-${gate.generation}-${nextLevel}-${hintSeq}`;
+      const requestId = `hint-${gate.generation}-${nextLevel ?? "initial"}-${hintSeq}`;
       activeRequestId = requestId;
       engine.setCurrentGameNodeId(input.gameNodeId);
 
@@ -379,15 +387,23 @@ export function createCoachingController(
       }
       if (gate.disposed || activeRequestId !== requestId) return null;
 
-      const built = buildHintStep({
-        fen: input.fen,
-        sideToMove: input.sideToMove,
-        positionAnalysis,
-        level: nextLevel,
-      });
+      const built =
+        continuing && nextLevel != null
+          ? buildHintStep({
+              fen: input.fen,
+              sideToMove: input.sideToMove,
+              positionAnalysis,
+              level: nextLevel,
+            })
+          : buildInitialHintStep({
+              fen: input.fen,
+              sideToMove: input.sideToMove,
+              positionAnalysis,
+            });
       refreshAnnotations({
         hint: built,
-        hintLevel: nextLevel,
+        hintLevel: built.level,
+        hintNodeId: input.gameNodeId,
         phase: "ready",
         insightDismissed: false,
       });
@@ -396,7 +412,7 @@ export function createCoachingController(
     },
 
     resetHints() {
-      refreshAnnotations({ hint: null, hintLevel: 0 });
+      refreshAnnotations({ hint: null, hintLevel: 0, hintNodeId: null });
     },
 
     clearFeedback() {
@@ -413,6 +429,7 @@ export function createCoachingController(
         insightDismissed: false,
         hint: null,
         hintLevel: 0,
+        hintNodeId: null,
         annotations: EMPTY_ANNOTATIONS,
         message: phase === "ready" ? null : current.message,
       });

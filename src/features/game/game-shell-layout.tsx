@@ -78,14 +78,15 @@ export function GameShellLayout({
       onExpandedChange={ui.handleCoachExpandedChange}
       insight={view.coach.insight}
       analyzing={view.coach.analyzing}
+      hintPending={ui.hintPending}
       onTrySuggested={
         view.coach.showTrySuggested ? ui.handleTrySuggested : undefined
       }
       hint={view.coach.hint}
       hintDisabled={view.coach.hintDisabled}
       hintFen={view.coach.hintFen}
-      showSuggestedMoveHint={view.coach.showSuggestedMoveHint}
       onRequestHint={ui.handleRequestHint}
+      onClearHint={ui.handleClearHint}
       idleHintEligible={view.coach.idleHintEligible}
       left={view.mascotLeft}
       orientationTeaser={view.coach.orientationTeaser}

@@ -215,9 +215,17 @@ describe("hintQuestionForPosition", () => {
     expect(
       hintQuestionForPosition({
         hangingSquares: ["e4"],
-        bestMoveSan: "Nf3",
         inCheck: true,
       }),
     ).toContain("in check");
+  });
+
+  it("stays quiet when there is no concrete motif", () => {
+    expect(
+      hintQuestionForPosition({
+        hangingSquares: [],
+        inCheck: false,
+      }),
+    ).toBe("");
   });
 });

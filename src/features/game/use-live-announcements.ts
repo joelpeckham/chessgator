@@ -44,7 +44,9 @@ export function useLiveAnnouncements(args: {
     if (lastAnnouncedHintLevel.current === args.hint.level) return;
     lastAnnouncedHintLevel.current = args.hint.level;
     setHintAnnouncement(
-      `Hint ${args.hint.level + 1} of 4. ${args.hint.question}`,
+      args.hint.question
+        ? `Hint ${args.hint.level} of 3. ${args.hint.question}`
+        : `Hint ${args.hint.level} of 3.`,
     );
     const t = setTimeout(() => setHintAnnouncement(null), 3500);
     return () => clearTimeout(t);

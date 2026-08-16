@@ -12,7 +12,11 @@ import type { PieceSymbol, Square } from "@/domain/game/types";
 import { hintQuestionForPosition } from "@/domain/teaching/templates";
 import type { HintLevel, HintStep } from "@/domain/teaching/types";
 
+/** Squares-only rung; skipped when there is no question to read. */
+export const MIN_HINT_LEVEL: HintLevel = 1;
 export const MAX_HINT_LEVEL: HintLevel = 3;
+/** First readable rung when the position has no motif question. */
+const CANDIDATE_HINT_LEVEL: HintLevel = 2;
 
 export type BuildHintInput = {
   fen: string;
@@ -26,7 +30,7 @@ export type BuildHintInput = {
 
 /**
  * Progressive hint ladder:
- * 0 question → 1 visual squares → 2 candidate move → 3 short line.
+ * 1 visual squares → 2 candidate move → 3 short line.
  */
 export function buildHintStep(input: BuildHintInput): HintStep {
   const level = clampLevel(input.level);
@@ -41,7 +45,6 @@ export function buildHintStep(input: BuildHintInput): HintStep {
   const motif = hintMotif(input, hanging);
   const question = hintQuestionForPosition({
     hangingSquares: hanging,
-    bestMoveSan: bestSan,
     inCheck: chess.isCheck(),
     question: motif.question,
   });
@@ -61,9 +64,28 @@ export function buildHintStep(input: BuildHintInput): HintStep {
   };
 }
 
+/**
+ * First hint the player can actually read: a motif/check question if we have
+ * one, otherwise the candidate move. Never an empty card.
+ */
+export function buildInitialHintStep(
+  input: Omit<BuildHintInput, "level">,
+): HintStep {
+  const atSquares = buildHintStep({ ...input, level: MIN_HINT_LEVEL });
+  if (atSquares.question) return atSquares;
+  return buildHintStep({ ...input, level: CANDIDATE_HINT_LEVEL });
+}
+
 export function nextHintLevel(current: HintLevel): HintLevel {
   if (current >= MAX_HINT_LEVEL) return MAX_HINT_LEVEL;
   return (current + 1) as HintLevel;
+}
+
+/** Button copy for the next rung: squares → move → line. */
+export function nextHintActionLabel(currentLevel: number): string {
+  if (currentLevel < MIN_HINT_LEVEL) return "Hint";
+  if (currentLevel < CANDIDATE_HINT_LEVEL) return "Show move";
+  return "Show line";
 }
 
 function clampLevel(level: number): HintLevel {

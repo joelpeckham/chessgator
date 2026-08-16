@@ -13,7 +13,6 @@ export type GatorMood =
   | MoveClassification
   | "idle"
   | "analyzing"
-  | "hint"
   | "gameWon"
   | "gameLost"
   | "gameDraw";
@@ -21,7 +20,6 @@ export type GatorMood =
 export function gatorExpressionFor(mood: GatorMood): GatorExpression {
   switch (mood) {
     case "analyzing":
-    case "hint":
     case "inaccuracy":
       return "confused";
     case "best":

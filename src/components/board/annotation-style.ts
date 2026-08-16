@@ -7,9 +7,9 @@ import type {
 export type { SemanticArrowKind, SemanticBoardAnnotation };
 
 const ARROW_COLOR: Record<SemanticArrowKind, string> = {
-  hint: "var(--primary)",
-  "hint-line": "color-mix(in oklch, var(--primary) 70%, transparent)",
-  better: "var(--primary)",
+  hint: "var(--board-arrow)",
+  "hint-line": "color-mix(in oklch, var(--board-arrow) 70%, var(--background))",
+  better: "var(--board-arrow)",
 };
 
 /** Map coaching marks onto board presentation tokens. */

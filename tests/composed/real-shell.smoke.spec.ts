@@ -73,7 +73,7 @@ test.describe("composed real-engine shell", () => {
     await expandCoach(page);
     await expect(page.getByTestId("teaching-card")).toHaveAttribute(
       "data-state",
-      /empty|feedback|analyzing/,
+      /empty|feedback|analyzing|hints/,
     );
   });
 });

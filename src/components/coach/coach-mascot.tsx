@@ -83,12 +83,14 @@ export type CoachMascotProps = {
   onExpandedChange: (expanded: boolean) => void;
   insight: TeachingInsight | null;
   analyzing: boolean;
+  /** Hint is loading; keep the balloon closed until content is ready. */
+  hintPending?: boolean;
   onTrySuggested?: () => void;
   hint: HintStep | null;
   hintDisabled?: boolean;
   hintFen?: string | null;
   onRequestHint: () => void;
-  showSuggestedMoveHint?: boolean;
+  onClearHint?: () => void;
   idleHintEligible?: boolean;
   /** Viewport x of the gator's left edge; hugs the board's left side. */
   left?: number;
@@ -127,7 +129,7 @@ function deriveMode(args: {
   hint: HintStep | null;
 }): MascotMode {
   if (args.analyzing) return "analyzing";
-  if (args.hint && !args.insight) return "hints";
+  if (args.hint) return "hints";
   if (args.insight) return "feedback";
   return "idle";
 }
@@ -139,7 +141,6 @@ function deriveMood(args: {
 }): GatorMood {
   if (args.mood) return args.mood;
   if (args.mode === "analyzing") return "analyzing";
-  if (args.mode === "hints") return "hint";
   if (args.insight) return args.insight.classification;
   return "idle";
 }
@@ -172,12 +173,13 @@ export function CoachMascot({
   onExpandedChange,
   insight,
   analyzing,
+  hintPending = false,
   onTrySuggested,
   hint,
   hintDisabled = false,
   hintFen = null,
   onRequestHint,
-  showSuggestedMoveHint = false,
+  onClearHint,
   idleHintEligible = false,
   left = 0,
   orientationTeaser = null,
@@ -190,6 +192,7 @@ export function CoachMascot({
     setIdlePromptVisible(false);
   }
 
+  const waitingForHint = hintPending && !expanded;
   const mode = deriveMode({ analyzing, insight, hint });
   const expression = gatorExpressionFor(deriveMood({ mode, insight, mood }));
   const teaser = deriveTeaser({
@@ -236,31 +239,31 @@ export function CoachMascot({
     return () => window.removeEventListener("keydown", onKey);
   }, [expanded, onExpandedChange]);
 
-  function requestHintAndExpand(): void {
-    onRequestHint();
-    onExpandedChange(true);
-  }
-
   function collapse(): void {
     onExpandedChange(false);
     gatorButtonRef.current?.focus();
   }
 
   function toggle(): void {
-    if (analyzing) return;
+    if (analyzing || waitingForHint) return;
     if (expanded) {
       collapse();
       return;
     }
-    if ((mode === "idle" || mode === "hints") && !hint && !hintDisabled) {
-      requestHintAndExpand();
+    if (insight) {
+      onClearHint?.();
+      onExpandedChange(true);
+      return;
+    }
+    if (!hint && !hintDisabled) {
+      onRequestHint();
       return;
     }
     onExpandedChange(true);
   }
 
   const headState =
-    mode === "analyzing"
+    mode === "analyzing" || waitingForHint
       ? "analyzing"
       : mode === "feedback" &&
           !expanded &&
@@ -284,8 +287,7 @@ export function CoachMascot({
       hint={hint}
       hintDisabled={hintDisabled}
       hintFen={hintFen}
-      showSuggestedMoveHint={showSuggestedMoveHint}
-      onRequestHint={requestHintAndExpand}
+      onRequestHint={onRequestHint}
       emptyCopy={orientationTeaser}
     />
   );
@@ -305,6 +307,7 @@ export function CoachMascot({
       data-expression={expression}
       data-hands={GATOR_CLAWS[expression].hands}
       data-expanded={expanded ? "true" : "false"}
+      data-hint-pending={hintPending ? "true" : "false"}
       data-balloon-anchor={balloon.anchor}
       data-hint-level={hint?.level ?? "none"}
       role="region"
@@ -353,13 +356,13 @@ export function CoachMascot({
           type="button"
           className={cn(
             "block p-0 leading-none rounded-md outline-offset-2 focus-visible:outline-2 focus-visible:outline-dashed focus-visible:outline-foreground",
-            analyzing && "cursor-default opacity-90",
+            (analyzing || waitingForHint) && "cursor-default opacity-90",
           )}
           aria-label={mascotAriaLabel({ expanded, mode, insight })}
           aria-expanded={expanded}
           aria-controls="coach-balloon"
           data-testid="coach-gator"
-          disabled={analyzing}
+          disabled={analyzing || waitingForHint}
           onClick={toggle}
           whileHover={{ y: -5, rotate: -2, scale: 1.04 }}
           whileTap={{ y: 1, scaleX: 1.06, scaleY: 0.92 }}

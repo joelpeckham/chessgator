@@ -26,6 +26,11 @@ export function annotationsFromInsight(
   const arrows: SemanticBoardAnnotation["arrows"] = [];
   const labels: SemanticBoardAnnotation["labels"] = [];
 
+  const hintShowsMove = Boolean(
+    hint?.candidateMoveUci ||
+      (hint && hint.level >= 3 && hint.lineUci.length > 0),
+  );
+
   if (hint) {
     for (const sq of hint.highlightSquares) highlightSquares.add(sq);
     if (hint.candidateMoveUci && hint.candidateMoveUci.length >= 4) {
@@ -51,7 +56,7 @@ export function annotationsFromInsight(
     }
   }
 
-  if (insight?.suggestedMoveUci) {
+  if (!hintShowsMove && insight?.suggestedMoveUci) {
     const uci = insight.suggestedMoveUci;
     if (uci.length >= 4) {
       arrows.push({
