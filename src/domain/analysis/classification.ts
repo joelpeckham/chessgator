@@ -27,9 +27,8 @@ export const CLASSIFICATION_THRESHOLDS = {
   // blunder: anything above mistakeMaxLossCp
 } as const;
 
-/** Classifications that nudge the mascot (teaser, not auto-open). */
+/** Classifications that auto-open the coach's advice. */
 export const NUDGE_CLASSIFICATIONS: ReadonlySet<MoveClassification> = new Set([
-  "mistake",
   "blunder",
 ]);
 

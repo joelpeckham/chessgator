@@ -125,7 +125,7 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
     );
   });
 
-  test("mistake nudges without opening; collapse is not dismiss", async ({
+  test("mistake stays quiet; advice is opt-in and survives collapse", async ({
     page,
   }) => {
     await startCoachGame(page);
@@ -136,12 +136,13 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
       "feedback",
       { timeout: 10_000 },
     );
+    // Mistakes no longer tease or auto-open — the face reacts, nothing else.
     await expectCoachCollapsed(page);
     await expect(page.getByTestId("coach-mascot")).toHaveAttribute(
       "data-expression",
       "shocked",
     );
-    await expect(page.getByTestId("coach-teaser")).toBeVisible();
+    await expect(page.getByTestId("coach-teaser")).toHaveCount(0);
 
     await expandCoach(page);
     await expect(page.getByTestId("teaching-card")).toHaveAttribute(
@@ -160,19 +161,46 @@ test.describe("coaching slice (deterministic engine stubs)", () => {
       "data-mode",
       "feedback",
     );
-    await expect(page.getByTestId("coach-teaser")).toBeVisible();
+    await expect(page.getByTestId("coach-teaser")).toHaveCount(0);
 
     await expandCoach(page);
     await expect(page.getByTestId("teaching-card")).toHaveAttribute(
       "data-state",
       "feedback",
     );
+  });
 
+  test("blunder auto-opens the advice; closing keeps it closed", async ({
+    page,
+  }) => {
+    await startCoachGame(page);
+    await chooseLegalMove(page, "g4");
+
+    // The advice balloon opens by itself for blunders.
+    await expect(page.getByTestId("coach-balloon")).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page.getByTestId("teaching-card")).toHaveAttribute(
+      "data-classification",
+      "blunder",
+    );
+    await expect(page.getByTestId("teaching-explanation")).toContainText(
+      /because/i,
+    );
+
+    // Closing it does not re-trigger the auto-open for the same insight.
     await page.keyboard.press("Escape");
-    await page.getByTestId("dismiss-teaching-card").click();
+    await expectCoachCollapsed(page);
     await expect(page.getByTestId("coach-mascot")).toHaveAttribute(
-      "data-mode",
-      "idle",
+      "data-expression",
+      "scared",
+    );
+
+    // The insight is still there when reopened by hand.
+    await expandCoach(page);
+    await expect(page.getByTestId("teaching-card")).toHaveAttribute(
+      "data-classification",
+      "blunder",
     );
   });
 });

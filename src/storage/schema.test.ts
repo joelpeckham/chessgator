@@ -202,7 +202,6 @@ describe("persistence schema v2", () => {
           suggestedMoveSan: "e4",
           lineUci: ["e2e4"],
           refutationUci: [],
-          quip: "There's better.",
           nudge: true,
         },
       },
@@ -227,7 +226,6 @@ describe("persistence schema v2", () => {
       suggestedMoveSan: null,
       lineUci: [],
       refutationUci: [],
-      quip: "",
       nudge: false,
     };
     const parsed = parseSavedGame(JSON.parse(JSON.stringify(persisted)));

@@ -47,8 +47,8 @@ export type ShellView = {
   boardSize: number;
   mascotBelow: boolean;
   boardLeft: number;
-  coachDocked: boolean;
-  coachLaneLeft: number;
+  /** Viewport x of the gator's left edge; hugs the board's left side. */
+  mascotLeft: number;
   stubMode: boolean;
   liveFen: string;
   status: StatusPresentation;
@@ -126,8 +126,7 @@ export function buildShellView(args: {
   boardSize: number;
   mascotBelow: boolean;
   boardLeft: number;
-  coachDocked: boolean;
-  coachLaneLeft: number;
+  mascotLeft: number;
   stubMode: boolean;
   runtime: GameRuntime;
   ui: ShellChrome;
@@ -176,7 +175,7 @@ export function buildShellView(args: {
 
   const analyzing =
     runtime.coaching.phase === "analyzing" || mode === "analyzing";
-  const coachExpanded = ui.coachExpanded || args.coachDocked;
+  const coachExpanded = ui.coachExpanded;
 
   const showCoachAnnotations =
     Boolean(visibleInsight) &&
@@ -262,8 +261,7 @@ export function buildShellView(args: {
     boardSize: args.boardSize,
     mascotBelow: args.mascotBelow,
     boardLeft: args.boardLeft,
-    coachDocked: args.coachDocked,
-    coachLaneLeft: args.coachLaneLeft,
+    mascotLeft: args.mascotLeft,
     stubMode: args.stubMode,
     liveFen,
     status,

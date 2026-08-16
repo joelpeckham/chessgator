@@ -48,7 +48,16 @@ async function resolveFile(urlPath) {
   try {
     const info = await stat(candidate);
     if (info.isDirectory()) {
-      return path.join(candidate, "index.html");
+      const indexHtml = path.join(candidate, "index.html");
+      try {
+        await stat(indexHtml);
+        return indexHtml;
+      } catch {
+        // Next 16 export emits `route/` RSC payload dirs beside `route.html`.
+        const htmlSibling = path.join(OUT, `${relative}.html`);
+        await stat(htmlSibling);
+        return htmlSibling;
+      }
     }
     return candidate;
   } catch {

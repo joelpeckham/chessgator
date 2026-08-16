@@ -9,6 +9,7 @@ import { popSpring } from "@/lib/motion-presets";
 export type CoachBalloonProps = {
   children: ReactNode;
   onCollapse: () => void;
+  originX?: number;
 };
 
 function focusCloseOnMount(node: HTMLButtonElement | null): void {
@@ -18,13 +19,17 @@ function focusCloseOnMount(node: HTMLButtonElement | null): void {
 /**
  * Speech balloon for opt-in coach details. Positioned by CoachMascot.
  */
-export function CoachBalloon({ children, onCollapse }: CoachBalloonProps) {
+export function CoachBalloon({
+  children,
+  onCollapse,
+  originX = 0,
+}: CoachBalloonProps) {
   return (
     <motion.div
       id="coach-balloon"
       className="coach-balloon"
       data-testid="coach-balloon"
-      style={{ originX: 0, originY: 1 }}
+      style={{ originX, originY: 1 }}
       initial={{ opacity: 0, scale: 0.88, y: 8 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{

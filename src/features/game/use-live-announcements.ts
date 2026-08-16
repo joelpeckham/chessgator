@@ -13,7 +13,6 @@ export function useLiveAnnouncements(args: {
 }): {
   coachAnnouncement: string | null;
   hintAnnouncement: string | null;
-  announce: (message: string, durationMs?: number) => void;
 } {
   const [coachAnnouncement, setCoachAnnouncement] = useState<string | null>(
     null,
@@ -21,7 +20,6 @@ export function useLiveAnnouncements(args: {
   const [hintAnnouncement, setHintAnnouncement] = useState<string | null>(null);
   const lastAnnouncedInsightId = useRef<string | null>(null);
   const lastAnnouncedHintLevel = useRef<number | null>(null);
-  const announceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!args.visibleInsight) {
@@ -64,20 +62,5 @@ export function useLiveAnnouncements(args: {
     return () => clearTimeout(id);
   }, [args.navMessage]);
 
-  useEffect(() => {
-    return () => {
-      if (announceTimeout.current) clearTimeout(announceTimeout.current);
-    };
-  }, []);
-
-  function announce(message: string, durationMs = 2000): void {
-    setCoachAnnouncement(message);
-    if (announceTimeout.current) clearTimeout(announceTimeout.current);
-    announceTimeout.current = setTimeout(() => {
-      setCoachAnnouncement(null);
-      announceTimeout.current = null;
-    }, durationMs);
-  }
-
-  return { coachAnnouncement, hintAnnouncement, announce };
+  return { coachAnnouncement, hintAnnouncement };
 }

@@ -1,9 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { QUIP_BANK } from "@/domain/teaching/quip-bank";
 import {
   hintQuestionForPosition,
   renderExplanation,
-  renderQuip,
   type TemplateContext,
 } from "@/domain/teaching/templates";
 
@@ -221,19 +219,5 @@ describe("hintQuestionForPosition", () => {
         inCheck: true,
       }),
     ).toContain("in check");
-  });
-});
-
-describe("renderQuip", () => {
-  it("keeps mascot lines short", () => {
-    expect(renderQuip("best")).toBe("That's the one.");
-    expect(renderQuip("mistake")).toBe("That was shaky.");
-    expect(renderQuip("blunder")).toBe("Want to look at that?");
-  });
-
-  it("varies by seed while staying in the bank", () => {
-    const seeded = renderQuip("best", "node-1");
-    expect(seeded).toBe(renderQuip("best", "node-1"));
-    expect(QUIP_BANK.best).toContain(seeded);
   });
 });

@@ -6,7 +6,6 @@ import type {
   EvalFrame,
   MoveMargin,
 } from "@/domain/analysis/explanation-reasons";
-import { pickQuip } from "@/domain/teaching/quip-bank";
 import type { TeachingConcept } from "@/domain/teaching/types";
 
 export type TemplateContext = {
@@ -35,13 +34,6 @@ export function classificationLabel(
   classification: MoveClassification,
 ): string {
   return CLASSIFICATION_LABEL[classification];
-}
-
-export function renderQuip(
-  classification: MoveClassification,
-  seed?: string,
-): string {
-  return pickQuip(classification, seed);
 }
 
 export function renderExplanation(ctx: TemplateContext): string {

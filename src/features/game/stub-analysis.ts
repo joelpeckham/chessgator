@@ -105,6 +105,8 @@ export function defaultStubScripts(): StubAnalysisScript[] {
   const afterE4 = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1";
   // After 1.d4 — make d4 a teachable mistake vs e4 (eval drop > 100cp).
   const afterD4 = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1";
+  // After 1.g4 — make g4 a blunder vs e4 (eval drop > 200cp).
+  const afterG4 = "rnbqkbnr/pppppppp/8/8/6P1/8/PPPPPP1P/RNBQKBNR b KQkq";
   // Queen sortie position (White to move after …g6): saving the queen is best.
   const queenAttacked =
     "rnbqkbnr/pppp1p1p/6p1/4p2Q/4P3/8/PPPP1PPP/RNB1KBNR w KQkq - 0 3";
@@ -137,6 +139,14 @@ export function defaultStubScripts(): StubAnalysisScript[] {
         score: { cp: -120 },
         bestMoveUci: "d7d5",
         lines: [{ multipv: 1, score: { cp: -120 }, pvUci: ["d7d5", "c2c4"] }],
+      },
+    },
+    {
+      fen: afterG4,
+      evidence: {
+        score: { cp: -300 },
+        bestMoveUci: "d7d5",
+        lines: [{ multipv: 1, score: { cp: -300 }, pvUci: ["d7d5", "g4g5"] }],
       },
     },
     {

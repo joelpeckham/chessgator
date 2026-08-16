@@ -74,7 +74,6 @@ describe("buildSuggestedMove", () => {
         lineUci: ["e2e4", "e7e5"],
         refutationUci: [],
         classification: "mistake",
-        quip: "There's better.",
         nudge: true,
       },
       analyzedId,

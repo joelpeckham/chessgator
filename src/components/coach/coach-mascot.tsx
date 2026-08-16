@@ -1,9 +1,9 @@
 "use client";
 
-import { RiCloseLine } from "@remixicon/react";
 import { AnimatePresence, motion, type Variants } from "motion/react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { computeBalloonLayout } from "@/components/coach/balloon-layout";
 import { CoachBalloon } from "@/components/coach/coach-balloon";
 import {
   type GatorMood,
@@ -13,10 +13,8 @@ import {
 import {
   CLAWS_DISPLAY,
   CLAWS_SRC,
-  COACH_COLUMN_WIDTH_PX,
   clawsLayerStyle,
   GATOR_CLAWS,
-  GATOR_LEDGE_INSET_PX,
   GATOR_LEDGE_OVERLAP_PX,
   gatorDisplaySize,
 } from "@/components/coach/gator-layout";
@@ -26,7 +24,6 @@ import {
   scheduleIdleHint,
   scheduleTeaserExpiry,
 } from "@/components/coach/teaser-timing";
-import { Button } from "@/components/ui/button";
 import {
   classificationLabel,
   type HintStep,
@@ -44,8 +41,7 @@ const NECK_BLEED_PX = 12;
 
 /**
  * Head motion states: a slow breathing loop when idle, a thinking sway
- * while analyzing, one bounce for mistakes, bounce + worry pulse for
- * blunders.
+ * while analyzing, bounce + worry pulse for blunders.
  */
 const HEAD_VARIANTS: Variants = {
   idle: {
@@ -71,13 +67,6 @@ const HEAD_VARIANTS: Variants = {
       },
     },
   },
-  nudge: {
-    rotate: 0,
-    opacity: 1,
-    scale: 1,
-    y: [0, -7, -2, 0],
-    transition: { y: { duration: 0.6, ease: "easeOut" } },
-  },
   alarmed: {
     rotate: 0,
     scale: 1,
@@ -101,65 +90,39 @@ export type CoachMascotProps = {
   insight: TeachingInsight | null;
   analyzing: boolean;
   onTrySuggested?: () => void;
-  onDismiss: () => void;
   hint: HintStep | null;
   hintDisabled?: boolean;
   hintFen?: string | null;
   onRequestHint: () => void;
   showSuggestedMoveHint?: boolean;
   idleHintEligible?: boolean;
-  docked?: boolean;
-  laneLeft?: number;
+  /** Viewport x of the gator's left edge; hugs the board's left side. */
+  left?: number;
   orientationTeaser?: string | null;
   mood?: GatorMood | null;
 };
 
 type MascotMode = "idle" | "analyzing" | "feedback" | "hints";
 
-type TeaserKind = "praise" | "nudge" | "idle";
-
 type CoachTeaser = {
-  kind: TeaserKind;
   text: string;
   key: string;
 };
 
+/** Tutorial-only teasers: orientation copy and the idle hint prompt. */
 function deriveTeaser(args: {
-  insight: TeachingInsight | null;
-  mode: MascotMode;
   orientationTeaser: string | null;
-  docked: boolean;
   idlePromptVisible: boolean;
   idleHintEligible: boolean;
 }): CoachTeaser | null {
-  const quip = args.insight?.quip ?? null;
-  if (args.insight?.nudge && args.mode === "feedback" && quip) {
+  if (args.orientationTeaser) {
     return {
-      kind: "nudge",
-      text: quip,
-      key: `nudge:${args.insight.classification}:${args.insight.explanation}:${quip}`,
-    };
-  }
-  if (
-    (args.insight?.classification === "best" ||
-      args.insight?.classification === "excellent") &&
-    quip
-  ) {
-    return {
-      kind: "praise",
-      text: quip,
-      key: `praise:${args.insight.classification}:${args.insight.explanation}:${quip}`,
-    };
-  }
-  if (args.orientationTeaser && !args.docked) {
-    return {
-      kind: "idle",
       text: args.orientationTeaser,
       key: "orientation",
     };
   }
   if (args.idlePromptVisible && args.idleHintEligible) {
-    return { kind: "idle", text: IDLE_HINT_QUIP, key: "idle" };
+    return { text: IDLE_HINT_QUIP, key: "idle" };
   }
   return null;
 }
@@ -207,8 +170,8 @@ function mascotAriaLabel(args: {
 }
 
 /**
- * Coach mascot tucked behind the timeline ledge. Face always reacts;
- * the lesson balloon never auto-opens except in the wide docked lane.
+ * Coach mascot tucked behind the timeline ledge, floating at the board's
+ * left edge. Face always reacts; the advice only auto-opens on blunders.
  */
 export function CoachMascot({
   expanded,
@@ -216,15 +179,13 @@ export function CoachMascot({
   insight,
   analyzing,
   onTrySuggested,
-  onDismiss,
   hint,
   hintDisabled = false,
   hintFen = null,
   onRequestHint,
   showSuggestedMoveHint = false,
   idleHintEligible = false,
-  docked = false,
-  laneLeft = 0,
+  left = 0,
   orientationTeaser = null,
   mood = null,
 }: CoachMascotProps) {
@@ -238,10 +199,7 @@ export function CoachMascot({
   const mode = deriveMode({ analyzing, insight, hint });
   const expression = gatorExpressionFor(deriveMood({ mode, insight, mood }));
   const teaser = deriveTeaser({
-    insight,
-    mode,
     orientationTeaser,
-    docked,
     idlePromptVisible,
     idleHintEligible,
   });
@@ -272,7 +230,7 @@ export function CoachMascot({
   }, [teaserKey, expiredTeaserKey]);
 
   useEffect(() => {
-    if (!expanded || docked) return;
+    if (!expanded) return;
     function onKey(event: KeyboardEvent): void {
       if (event.key === "Escape") {
         event.preventDefault();
@@ -282,7 +240,7 @@ export function CoachMascot({
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [docked, expanded, onExpandedChange]);
+  }, [expanded, onExpandedChange]);
 
   function requestHintAndExpand(): void {
     onRequestHint();
@@ -296,12 +254,6 @@ export function CoachMascot({
 
   function toggle(): void {
     if (analyzing) return;
-    if (docked) {
-      if ((mode === "idle" || mode === "hints") && !hint && !hintDisabled) {
-        onRequestHint();
-      }
-      return;
-    }
     if (expanded) {
       collapse();
       return;
@@ -313,18 +265,23 @@ export function CoachMascot({
     onExpandedChange(true);
   }
 
-  const nudging = Boolean(insight?.nudge && !expanded && shownTeaser);
   const headState =
     mode === "analyzing"
       ? "analyzing"
-      : nudging && insight?.classification === "blunder"
+      : mode === "feedback" &&
+          !expanded &&
+          insight?.classification === "blunder"
         ? "alarmed"
-        : nudging && insight?.classification === "mistake"
-          ? "nudge"
-          : "idle";
+        : "idle";
 
   const head = gatorDisplaySize(expression);
   const claws = clawsLayerStyle(expression, head.height);
+  const balloon = computeBalloonLayout({
+    mascotLeft: left,
+    headWidth: head.width,
+    viewportWidth: typeof window === "undefined" ? 1280 : window.innerWidth,
+  });
+  const preferLeftMargin = balloon.anchor === "margin";
   const teachingCard = (
     <TeachingCard
       insight={insight}
@@ -343,23 +300,31 @@ export function CoachMascot({
     <div
       className="absolute"
       style={{
-        left: (docked ? laneLeft : 0) + GATOR_LEDGE_INSET_PX,
+        left,
         bottom: `calc(100% - ${GATOR_LEDGE_OVERLAP_PX}px)`,
+        ["--coach-balloon-left" as string]: `${balloon.left}px`,
+        ["--coach-balloon-max" as string]: `${balloon.maxWidth}px`,
+        ["--coach-tail-inset" as string]: `${balloon.tailInset}px`,
       }}
       data-testid="coach-mascot"
       data-mode={mode}
       data-expression={expression}
       data-hands={GATOR_CLAWS[expression].hands}
       data-expanded={expanded ? "true" : "false"}
-      data-docked={docked ? "true" : "false"}
+      data-balloon-anchor={balloon.anchor}
       data-hint-level={hint?.level ?? "none"}
       role="region"
       aria-label="Coach feedback"
     >
       <AnimatePresence>
-        {!docked && expanded ? (
+        {expanded ? (
           <div className="pointer-events-auto" key="coach-balloon">
-            <CoachBalloon onCollapse={collapse}>{teachingCard}</CoachBalloon>
+            <CoachBalloon
+              onCollapse={collapse}
+              originX={preferLeftMargin ? 1 : 0}
+            >
+              {teachingCard}
+            </CoachBalloon>
           </div>
         ) : null}
       </AnimatePresence>
@@ -368,11 +333,9 @@ export function CoachMascot({
         {shownTeaser ? (
           <motion.div
             key={shownTeaser.key}
-            className="coach-teaser pointer-events-auto"
+            className="coach-teaser"
             data-testid="coach-teaser"
-            data-kind={shownTeaser.kind}
-            aria-hidden={shownTeaser.kind === "praise" ? true : undefined}
-            style={{ originX: 0, originY: 1 }}
+            style={{ originX: preferLeftMargin ? 1 : 0, originY: 1 }}
             initial={{ opacity: 0, scale: 0.85, y: 6 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{
@@ -386,19 +349,6 @@ export function CoachMascot({
             <p className="text-xs font-medium text-pretty">
               {shownTeaser.text}
             </p>
-            {shownTeaser.kind === "nudge" ? (
-              <Button
-                type="button"
-                size="icon-xs"
-                variant="ghost"
-                className="size-6 shrink-0"
-                aria-label="Dismiss coach feedback"
-                data-testid="dismiss-teaching-card"
-                onClick={onDismiss}
-              >
-                <RiCloseLine />
-              </Button>
-            ) : null}
           </motion.div>
         ) : null}
       </AnimatePresence>
@@ -413,7 +363,7 @@ export function CoachMascot({
           )}
           aria-label={mascotAriaLabel({ expanded, mode, insight })}
           aria-expanded={expanded}
-          aria-controls={docked ? "coach-panel" : "coach-balloon"}
+          aria-controls="coach-balloon"
           data-testid="coach-gator"
           disabled={analyzing}
           onClick={toggle}
@@ -477,19 +427,6 @@ export function CoachMascot({
           loading="eager"
         />
       </div>
-      {docked ? (
-        <div
-          id="coach-panel"
-          className="coach-panel-docked"
-          style={{
-            left: 12 - GATOR_LEDGE_INSET_PX,
-            width: COACH_COLUMN_WIDTH_PX - 24,
-          }}
-          data-testid="coach-panel"
-        >
-          {teachingCard}
-        </div>
-      ) : null}
     </div>
   );
 }

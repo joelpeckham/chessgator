@@ -23,7 +23,6 @@ export function toSavedLesson(insight: TeachingInsight): SavedLesson {
     suggestedMoveSan: insight.suggestedMoveSan,
     lineUci: [...insight.lineUci],
     refutationUci: [...insight.refutationUci],
-    quip: insight.quip,
     nudge: insight.nudge,
   };
 }
@@ -39,7 +38,6 @@ export function fromSavedLesson(saved: SavedLesson): TeachingInsight | null {
     lineUci: [...saved.lineUci],
     refutationUci: [...saved.refutationUci],
     classification: saved.classification,
-    quip: saved.quip,
     nudge: saved.nudge,
   };
 }

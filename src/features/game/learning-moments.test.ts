@@ -16,7 +16,6 @@ function insight(overrides: Partial<TeachingInsight> = {}): TeachingInsight {
     lineUci: ["e2e4", "e7e5"],
     refutationUci: ["d7d5"],
     classification: "mistake",
-    quip: "Want to undo that?",
     nudge: true,
     ...overrides,
   };

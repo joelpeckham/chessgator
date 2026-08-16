@@ -63,11 +63,11 @@ describe("classification thresholds", () => {
     ).toBe("mistake");
   });
 
-  it("nudges only mistakes and blunders", () => {
+  it("nudges only blunders", () => {
     expect(shouldNudge("best")).toBe(false);
     expect(shouldNudge("good")).toBe(false);
     expect(shouldNudge("inaccuracy")).toBe(false);
-    expect(shouldNudge("mistake")).toBe(true);
+    expect(shouldNudge("mistake")).toBe(false);
     expect(shouldNudge("blunder")).toBe(true);
   });
 });

@@ -20,7 +20,6 @@ export {
   classificationLabel,
   hintQuestionForPosition,
   renderExplanation,
-  renderQuip,
   type TemplateContext,
 } from "@/domain/teaching/templates";
 export type {

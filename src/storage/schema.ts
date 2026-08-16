@@ -27,7 +27,6 @@ export type SavedLesson = {
   suggestedMoveSan: string | null;
   lineUci: string[];
   refutationUci: string[];
-  quip: string;
   nudge: boolean;
 };
 
@@ -127,7 +126,6 @@ function parseSavedLesson(value: unknown): SavedLesson | undefined {
   const lineUci = parseUciList(value.lineUci);
   const refutationUci = parseUciList(value.refutationUci);
   if (!lineUci || !refutationUci) return undefined;
-  if (value.quip !== undefined && !isString(value.quip)) return undefined;
   if (value.nudge !== undefined && !isBoolean(value.nudge)) return undefined;
 
   return {
@@ -143,7 +141,6 @@ function parseSavedLesson(value: unknown): SavedLesson | undefined {
       : null,
     lineUci,
     refutationUci,
-    quip: isString(value.quip) ? value.quip : "",
     nudge: value.nudge === true,
   };
 }

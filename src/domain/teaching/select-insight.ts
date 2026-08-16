@@ -29,7 +29,7 @@ import {
   describePlayedProblem,
   describeRefutationPunchline,
 } from "@/domain/teaching/move-copy";
-import { renderExplanation, renderQuip } from "@/domain/teaching/templates";
+import { renderExplanation } from "@/domain/teaching/templates";
 import type { TeachingConcept, TeachingInsight } from "@/domain/teaching/types";
 
 /**
@@ -247,10 +247,6 @@ export function selectTeachingInsight(
     lineUci: evidence.shortPvUci,
     refutationUci: evidence.refutationUci,
     classification: evidence.classification,
-    quip:
-      playedBecause || suggestedBecause || problem
-        ? renderQuip(evidence.classification, evidence.gameNodeId)
-        : "",
     nudge: shouldNudge(evidence.classification),
   };
 }

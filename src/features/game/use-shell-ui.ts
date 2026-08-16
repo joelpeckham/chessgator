@@ -60,7 +60,6 @@ export type ShellUi = ShellChrome & {
   handleSelectTimelineNode: (nodeId: string) => void;
   handlePruneTimelineNode: (nodeId: string, scope: PruneScope) => void;
   handleCoachExpandedChange: (next: boolean) => void;
-  handleDismissCoach: () => void;
   handleRequestHint: () => void;
   handleOpenCoach: () => void;
   handleSettingsOpenChange: (open: boolean) => void;
@@ -225,6 +224,17 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
           latest.session.mode === "analyzing"
         );
       },
+    }).then(() => {
+      // Blunders auto-open the coach's advice; everything else stays opt-in.
+      if (flowGen.current !== capturedGen) return;
+      const coaching = runtime.coach.getState();
+      if (
+        coaching.insight?.nudge &&
+        !coaching.insightDismissed &&
+        coaching.evidence?.gameNodeId === gameNodeId
+      ) {
+        setCoachExpanded(true);
+      }
     });
     return true;
   }
@@ -331,11 +341,6 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     }
   }
 
-  function handleDismissCoach(): void {
-    runtime.coach.dismissInsight();
-    setCoachExpanded(false);
-  }
-
   function handleRequestHint(): void {
     if (runtime.coachUnavailable) return;
     const tree = useGameStore.getState().tree;
@@ -392,7 +397,6 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     handleSelectTimelineNode,
     handlePruneTimelineNode,
     handleCoachExpandedChange,
-    handleDismissCoach,
     handleRequestHint,
     handleOpenCoach,
     handleSettingsOpenChange,

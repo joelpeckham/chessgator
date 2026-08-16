@@ -30,9 +30,7 @@ export type TeachingInsight = {
    */
   refutationUci: string[];
   classification: MoveClassification;
-  /** Short mascot line shown as a teaser or fleeting praise. */
-  quip: string;
-  /** Mistakes/blunders nudge the mascot; the lesson stays opt-in. */
+  /** Blunders auto-open the coach's advice; everything else stays opt-in. */
   nudge: boolean;
 };
 

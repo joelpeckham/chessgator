@@ -27,8 +27,9 @@ export function GameShell(props: GameRuntimeOptions = {}) {
 
   const runtime = useGameRuntime(props);
   const ui = useShellUi(runtime);
-  const { boardSize, mascotBelow, boardLeft, coachDocked, coachLaneLeft } =
-    useBoardViewport(ui.timelineExpanded);
+  const { boardSize, mascotBelow, boardLeft, mascotLeft } = useBoardViewport(
+    ui.timelineExpanded,
+  );
   const view = buildShellView({
     tree,
     session,
@@ -41,8 +42,7 @@ export function GameShell(props: GameRuntimeOptions = {}) {
     boardSize,
     mascotBelow,
     boardLeft,
-    coachDocked,
-    coachLaneLeft,
+    mascotLeft,
     stubMode: Boolean(props.stubMode),
     runtime,
     ui,

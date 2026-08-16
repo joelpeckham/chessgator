@@ -6,7 +6,7 @@ import {
   chooseConcept,
   selectTeachingInsight,
 } from "@/domain/teaching/select-insight";
-import { renderExplanation, renderQuip } from "@/domain/teaching/templates";
+import { renderExplanation } from "@/domain/teaching/templates";
 
 function evidence(
   fen: string,
@@ -48,7 +48,6 @@ describe("teaching selection", () => {
     const insight = selectTeachingInsight(moveEvidence);
     expect(insight.concept).toBe("best_move");
     expect(insight.nudge).toBe(false);
-    expect(insight.quip).toBe(renderQuip("best", "node-1"));
     expect(insight.suggestedMoveUci).toBeNull();
     expectQuality(insight.explanation);
     expect(insight.explanation.toLowerCase()).toContain("pawn");

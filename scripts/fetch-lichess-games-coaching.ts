@@ -73,7 +73,6 @@ export type GameMoveCoaching = {
   classification: string;
   concept: string;
   explanation: string;
-  quip: string;
   reasons: string[];
   suggestedMoveSan: string | null;
   evalBeforeCp: number | null;
@@ -340,7 +339,6 @@ function dumpMove(input: {
     classification: insight.classification,
     concept: insight.concept,
     explanation: insight.explanation,
-    quip: insight.quip,
     reasons,
     suggestedMoveSan: insight.suggestedMoveSan,
     evalBeforeCp: scoreToCpWhite(beforeScore),

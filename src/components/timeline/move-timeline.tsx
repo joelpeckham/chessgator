@@ -131,7 +131,10 @@ export function MoveTimeline({
     const minY = viewportHeight / 2 - bottomCy;
     return Math.min(maxY, Math.max(minY, y));
   }
-  wheelPanRef.current = { panKey, panY, clampPanY };
+  // Keep the wheel handler's snapshot fresh without touching refs in render.
+  useEffect(() => {
+    wheelPanRef.current = { panKey, panY, clampPanY };
+  });
 
   // Scroll horizontally only; vertical centering is the pan transform's
   // job. scrollIntoView would race the pan spring and leave a stray
@@ -208,7 +211,7 @@ export function MoveTimeline({
     const list = scrollRef.current;
     if (!list) return;
 
-    function onWheel(event: WheelEvent): void {
+    const onWheel = (event: WheelEvent): void => {
       event.preventDefault();
       list.scrollLeft += event.deltaX;
       const { panKey: key, panY: y, clampPanY: clamp } = wheelPanRef.current;
@@ -216,7 +219,7 @@ export function MoveTimeline({
         key,
         y: clamp(y - event.deltaY),
       });
-    }
+    };
 
     list.addEventListener("wheel", onWheel, { passive: false });
     return () => {

@@ -150,7 +150,6 @@ describe("game store adapter", () => {
       lineUci: ["e2e4"],
       refutationUci: [],
       classification: "mistake",
-      quip: "There's better.",
       nudge: true,
     });
     await useGameStore.getState().persist(repo);
@@ -177,7 +176,6 @@ describe("game store adapter", () => {
       lineUci: ["d2d4"],
       refutationUci: [],
       classification: "best",
-      quip: "Solid.",
       nudge: false,
     });
     useGameStore.getState().playMove("e7e5");
@@ -191,7 +189,6 @@ describe("game store adapter", () => {
       lineUci: ["c7c5"],
       refutationUci: [],
       classification: "best",
-      quip: "Okay.",
       nudge: false,
     });
 

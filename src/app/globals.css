@@ -123,11 +123,12 @@
 .coach-balloon {
   position: absolute;
   bottom: calc(100% + 0.75rem);
-  left: 0;
+  left: var(--coach-balloon-left, 0px);
   z-index: 25;
+  box-sizing: border-box;
   width: max-content;
-  min-width: 12rem;
-  max-width: min(36rem, calc(100vw - 3rem));
+  min-width: 0;
+  max-width: min(36rem, var(--coach-balloon-max, 36rem), calc(100vw - 2rem));
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   background: var(--card);
@@ -136,28 +137,15 @@
 
 .coach-balloon-body {
   max-height: min(40dvh, 280px);
+  overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-}
-
-.coach-panel-docked {
-  position: absolute;
-  bottom: calc(100% + 0.75rem);
-  z-index: 25;
-  max-height: min(56dvh, 28rem);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  background: var(--card);
-  padding: 0.75rem 1rem;
-  box-shadow: 0 8px 24px oklch(0 0 0 / 0.1);
 }
 
 .coach-balloon::after {
   content: "";
   position: absolute;
-  left: 1.25rem;
+  left: var(--coach-tail-inset, 1.25rem);
   bottom: -0.4rem;
   width: 0.7rem;
   height: 0.7rem;
@@ -170,24 +158,25 @@
 .coach-teaser {
   position: absolute;
   bottom: calc(100% + 0.75rem);
-  left: 0;
+  left: var(--coach-balloon-left, 0px);
   z-index: 24;
   display: flex;
   width: max-content;
-  max-width: min(28rem, calc(100vw - 3rem));
+  max-width: min(28rem, var(--coach-balloon-max, 28rem), calc(100vw - 2rem));
   align-items: center;
   gap: 0.25rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--card);
-  padding: 0.35rem 0.5rem 0.35rem 0.75rem;
+  padding: 0.35rem 0.75rem;
   box-shadow: 0 4px 16px oklch(0 0 0 / 0.08);
+  pointer-events: none;
 }
 
 .coach-teaser::after {
   content: "";
   position: absolute;
-  left: 1.25rem;
+  left: var(--coach-tail-inset, 1.25rem);
   bottom: -0.35rem;
   width: 0.55rem;
   height: 0.55rem;
@@ -197,14 +186,20 @@
   transform: rotate(45deg);
 }
 
-.coach-teaser[data-kind="praise"],
-.coach-teaser[data-kind="idle"] {
-  pointer-events: none;
+[data-balloon-anchor="margin"] .coach-balloon,
+[data-balloon-anchor="margin"] .coach-teaser {
+  left: auto;
+  right: 0;
+}
+
+[data-balloon-anchor="margin"] .coach-balloon::after,
+[data-balloon-anchor="margin"] .coach-teaser::after {
+  left: auto;
+  right: var(--coach-tail-inset, 1.25rem);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .coach-balloon,
-  .coach-panel-docked,
   .coach-teaser {
     box-shadow: none;
   }

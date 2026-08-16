@@ -148,7 +148,6 @@ describe("swarm-flag golden cases", () => {
       ),
     );
     expect(insight.explanation.toLowerCase()).toMatch(/because/);
-    expect(insight.quip.length).toBeGreaterThan(0);
   });
 
   it("does not claim uniqueness without a because on a quiet best move", () => {
@@ -161,7 +160,6 @@ describe("swarm-flag golden cases", () => {
     );
     if (!insight.explanation.toLowerCase().includes("because")) {
       expect(insight.explanation.toLowerCase()).not.toMatch(/strongest move/);
-      expect(insight.quip).toBe("");
     }
   });
 

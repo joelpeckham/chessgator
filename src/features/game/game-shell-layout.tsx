@@ -6,10 +6,7 @@ import { ChessboardAdapter } from "@/components/board/chessboard-adapter";
 import { ChessgatorWordmark } from "@/components/brand/chessgator-wordmark";
 import { CoachMascot } from "@/components/coach/coach-mascot";
 import { FeedbackStack } from "@/components/coach/feedback-stack";
-import {
-  COACH_COLUMN_WIDTH_PX,
-  MASCOT_PEEK_HEIGHT_PX,
-} from "@/components/coach/gator-layout";
+import { MASCOT_PEEK_HEIGHT_PX } from "@/components/coach/gator-layout";
 import { GameOverCard } from "@/components/game/game-over-card";
 import { PromotionDialog } from "@/components/game/promotion-dialog";
 import { SettingsSheet } from "@/components/game/settings-sheet";
@@ -61,18 +58,13 @@ export function GameShellLayout({
       onTrySuggested={
         view.coach.showTrySuggested ? ui.handleTrySuggested : undefined
       }
-      onDismiss={() => {
-        ui.handleDismissCoach();
-        announcements.announce("Coach feedback dismissed.");
-      }}
       hint={view.coach.hint}
       hintDisabled={view.coach.hintDisabled}
       hintFen={view.coach.hintFen}
       showSuggestedMoveHint={view.coach.showSuggestedMoveHint}
       onRequestHint={ui.handleRequestHint}
       idleHintEligible={view.coach.idleHintEligible}
-      docked={view.coachDocked}
-      laneLeft={view.coachLaneLeft}
+      left={view.mascotLeft}
       orientationTeaser={view.coach.orientationTeaser}
       mood={view.coach.mood}
     />
@@ -153,61 +145,17 @@ export function GameShellLayout({
             </>
           }
         >
-          <div
-            className={
-              view.coachDocked
-                ? "flex min-h-0 flex-1 items-center"
-                : view.mascotBelow
-                  ? "flex min-h-0 flex-1 flex-col"
-                  : "relative min-h-0 flex-1"
-            }
-            style={
-              view.coachDocked ? { paddingLeft: view.coachLaneLeft } : undefined
-            }
-          >
-            {view.coachDocked ? (
-              <aside
-                className="min-h-0 shrink-0"
-                style={{ width: COACH_COLUMN_WIDTH_PX }}
-                data-testid="coach-column"
-                aria-hidden
-              />
-            ) : null}
+          <div className="relative min-h-0 flex-1">
             <div
-              className={
-                view.coachDocked
-                  ? "flex shrink-0 items-center pl-4"
-                  : view.mascotBelow
-                    ? "flex min-h-0 min-w-0 flex-1 items-start justify-center px-4 pt-3"
-                    : "absolute"
-              }
-              style={
-                view.coachDocked || view.mascotBelow
-                  ? undefined
-                  : {
-                      left: view.boardLeft,
-                      bottom: 12,
-                      width: view.boardSize,
-                      height: view.boardSize,
-                    }
-              }
+              className="absolute"
+              style={{
+                left: view.boardLeft,
+                bottom: view.mascotBelow ? MASCOT_PEEK_HEIGHT_PX : 12,
+                width: view.boardSize,
+                height: view.boardSize,
+              }}
             >
-              <div
-                className={
-                  view.coachDocked || view.mascotBelow
-                    ? "relative shrink-0"
-                    : "relative h-full w-full"
-                }
-                style={
-                  view.coachDocked || view.mascotBelow
-                    ? {
-                        width: view.boardSize,
-                        height: view.boardSize,
-                      }
-                    : undefined
-                }
-                data-testid="board-frame"
-              >
+              <div className="relative h-full w-full" data-testid="board-frame">
                 <ChessboardAdapter
                   fen={view.board.fen}
                   interactive={view.board.interactive}
@@ -236,13 +184,6 @@ export function GameShellLayout({
                 ) : null}
               </div>
             </div>
-            {view.mascotBelow && !view.coachDocked ? (
-              <div
-                className="shrink-0"
-                style={{ height: MASCOT_PEEK_HEIGHT_PX }}
-                aria-hidden
-              />
-            ) : null}
           </div>
 
           <FeedbackStack
