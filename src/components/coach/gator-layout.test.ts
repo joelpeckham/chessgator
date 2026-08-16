@@ -1,10 +1,15 @@
 import { describe, expect, it } from "vitest";
 import {
+  CLAWS_ART,
   CLAWS_DISPLAY,
   clawsClipPath,
   clawsLayerStyle,
+  GATOR_ART,
   GATOR_ART_SCALE,
   GATOR_CLAWS,
+  GATOR_LEDGE_OVERLAP_PX,
+  gatorDisplaySize,
+  gatorPeekLiftPx,
 } from "@/components/coach/gator-layout";
 
 describe("GATOR_CLAWS", () => {
@@ -42,6 +47,41 @@ describe("clawsLayerStyle", () => {
     expect(style.clipPath).toBe("inset(0 0 0 50%)");
     expect(style.transform).toBe(
       `translateX(calc(-50% + ${GATOR_CLAWS.confused.offsetX * GATOR_ART_SCALE}px))`,
+    );
+  });
+
+  it("scales claw size and offset when a custom scale is given", () => {
+    const scale = 0.5;
+    const style = clawsLayerStyle("neutral-happy", 200, scale);
+    expect(style.width).toBe(CLAWS_ART.width * scale);
+    expect(style.height).toBe(CLAWS_ART.height * scale);
+    expect(style.top).toBe(200 - CLAWS_ART.cutoutFromTop * scale);
+    expect(style.transform).toBe(
+      `translateX(calc(-50% + ${GATOR_CLAWS["neutral-happy"].offsetX * scale}px))`,
+    );
+  });
+});
+
+describe("gatorDisplaySize", () => {
+  it("uses the default art scale when none is given", () => {
+    expect(gatorDisplaySize("sad")).toEqual({
+      width: GATOR_ART.sad.width * GATOR_ART_SCALE,
+      height: GATOR_ART.sad.height * GATOR_ART_SCALE,
+    });
+  });
+
+  it("applies a custom scale", () => {
+    expect(gatorDisplaySize("sad", 0.28)).toEqual({
+      width: GATOR_ART.sad.width * 0.28,
+      height: GATOR_ART.sad.height * 0.28,
+    });
+  });
+});
+
+describe("gatorPeekLiftPx", () => {
+  it("subtracts the ledge overlap from the scaled head height", () => {
+    expect(gatorPeekLiftPx("sad", 0.28)).toBe(
+      GATOR_ART.sad.height * 0.28 - GATOR_LEDGE_OVERLAP_PX,
     );
   });
 });

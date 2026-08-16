@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { ChessgatorWordmark } from "@/components/brand/chessgator-wordmark";
-import { gatorSrc } from "@/components/coach/gator-expression";
-import { GATOR_ART } from "@/components/coach/gator-layout";
+import { gatorPeekLiftPx } from "@/components/coach/gator-layout";
+import { GatorPeek } from "@/components/coach/gator-peek";
 import { SiteFooter } from "@/components/site-footer";
 import { buttonVariants } from "@/components/ui/button";
 import { JsonLd } from "@/lib/json-ld";
@@ -22,9 +21,8 @@ const jsonLd = {
 };
 
 const HERO_SCALE = 0.8;
-const heroArt = GATOR_ART["neutral-happy"];
-const heroWidth = Math.round(heroArt.width * HERO_SCALE);
-const heroHeight = Math.round(heroArt.height * HERO_SCALE);
+const HERO_EXPRESSION = "neutral-happy" as const;
+const heroLift = gatorPeekLiftPx(HERO_EXPRESSION, HERO_SCALE);
 
 const FEATURES = [
   {
@@ -52,33 +50,39 @@ export default function LandingPage() {
         </Link>
       </header>
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-16 px-6 py-16">
-        <section className="flex flex-col items-center gap-6 text-center">
-          <Image
-            src={gatorSrc("neutral-happy")}
-            alt=""
-            width={heroWidth}
-            height={heroHeight}
-            className="gator-wiggle select-none"
-            priority
-          />
-          <h1 className="font-heading text-4xl font-semibold tracking-tight text-balance">
-            Learn chess by playing it.
-          </h1>
-          <p className="max-w-xl text-lg text-muted-foreground text-pretty">
-            Play against a human-like opponent while a coach explains the ideas
-            behind better moves. Everything runs in your browser, and nothing
-            leaves your device.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link className={buttonVariants({ size: "lg" })} href="/game">
-              Play now — it&apos;s free
-            </Link>
-            <Link
-              className={buttonVariants({ variant: "outline", size: "lg" })}
-              href="/about"
-            >
-              How it works
-            </Link>
+        <section className="flex flex-col items-center text-center">
+          <div
+            className="relative w-full max-w-xl"
+            style={{ marginTop: heroLift }}
+          >
+            <GatorPeek
+              expression={HERO_EXPRESSION}
+              scale={HERO_SCALE}
+              wiggle
+              priority
+              className="left-[16%]"
+            />
+            <div className="relative z-10 flex flex-col items-center gap-6 rounded-2xl border border-border bg-card px-6 py-8 shadow-lg">
+              <h1 className="font-heading text-4xl font-semibold tracking-tight text-balance">
+                Learn chess by playing it.
+              </h1>
+              <p className="max-w-xl text-lg text-muted-foreground text-pretty">
+                Play against a human-like opponent while a coach explains the
+                ideas behind better moves. Everything runs in your browser, and
+                nothing leaves your device.
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <Link className={buttonVariants({ size: "lg" })} href="/game">
+                  Play now — it&apos;s free
+                </Link>
+                <Link
+                  className={buttonVariants({ variant: "outline", size: "lg" })}
+                  href="/about"
+                >
+                  How it works
+                </Link>
+              </div>
+            </div>
           </div>
         </section>
         <section className="grid gap-10 sm:grid-cols-3 sm:gap-6">

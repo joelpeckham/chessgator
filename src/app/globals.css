@@ -233,8 +233,8 @@
   }
 }
 
-/* Decorative gator hover wiggle (landing page, 404). */
-.gator-wiggle:hover {
+/* Decorative gator hover wiggle (landing page, 404). Head only — claws stay planted. */
+.gator-wiggle-group:hover .gator-wiggle {
   animation: gator-wiggle 0.7s ease-in-out;
 }
 
@@ -257,7 +257,7 @@
 @media (prefers-reduced-motion: reduce) {
   [data-board-square="true"],
   .board-target-dot,
-  .gator-wiggle:hover {
+  .gator-wiggle-group:hover .gator-wiggle {
     animation: none;
     transition: none;
   }

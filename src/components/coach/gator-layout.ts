@@ -24,22 +24,40 @@ export const CLAWS_ART = {
   cutoutFromTop: 26.123,
 } as const;
 
-export function gatorDisplaySize(expression: GatorExpression): {
+export function gatorDisplaySize(
+  expression: GatorExpression,
+  scale = GATOR_ART_SCALE,
+): {
   width: number;
   height: number;
 } {
   const art = GATOR_ART[expression];
   return {
-    width: art.width * GATOR_ART_SCALE,
-    height: art.height * GATOR_ART_SCALE,
+    width: art.width * scale,
+    height: art.height * scale,
   };
 }
 
-export const CLAWS_DISPLAY = {
-  width: CLAWS_ART.width * GATOR_ART_SCALE,
-  height: CLAWS_ART.height * GATOR_ART_SCALE,
-  cutoutFromTop: CLAWS_ART.cutoutFromTop * GATOR_ART_SCALE,
-};
+function clawsDisplaySize(scale = GATOR_ART_SCALE): {
+  width: number;
+  height: number;
+  cutoutFromTop: number;
+} {
+  return {
+    width: CLAWS_ART.width * scale,
+    height: CLAWS_ART.height * scale,
+    cutoutFromTop: CLAWS_ART.cutoutFromTop * scale,
+  };
+}
+
+export const CLAWS_DISPLAY = clawsDisplaySize();
+
+/**
+ * The gator art is cut flat at the neck. Hover lift and nudge bounces can
+ * raise that edge above the ledge, so a mirrored sliver of the same image
+ * extends the neck just enough to keep the edge hidden.
+ */
+export const NECK_BLEED_PX = 12;
 
 /** Screen-relative: `left` is the claw nearer the viewport's left edge. */
 export type GatorHands = "left" | "right" | "both";
@@ -74,6 +92,7 @@ export function clawsClipPath(hands: GatorHands): string | undefined {
 export function clawsLayerStyle(
   expression: GatorExpression,
   headHeight: number,
+  scale = GATOR_ART_SCALE,
 ): {
   top: number;
   width: number;
@@ -82,12 +101,13 @@ export function clawsLayerStyle(
   clipPath?: string;
 } {
   const { hands, offsetX } = GATOR_CLAWS[expression];
-  const shiftPx = offsetX * GATOR_ART_SCALE;
+  const claws = clawsDisplaySize(scale);
+  const shiftPx = offsetX * scale;
   const clipPath = clawsClipPath(hands);
   return {
-    top: headHeight - CLAWS_DISPLAY.cutoutFromTop,
-    width: CLAWS_DISPLAY.width,
-    height: CLAWS_DISPLAY.height,
+    top: headHeight - claws.cutoutFromTop,
+    width: claws.width,
+    height: claws.height,
     transform: `translateX(calc(-50% + ${shiftPx}px))`,
     ...(clipPath ? { clipPath } : {}),
   };
@@ -107,3 +127,11 @@ export const GATOR_LEDGE_INSET_PX = 24;
 export const MASCOT_SPAN_PX = MASCOT_PEEK_WIDTH_PX - GATOR_LEDGE_INSET_PX;
 /** A few pixels of the head sit under the timeline edge so the border crops the neck. */
 export const GATOR_LEDGE_OVERLAP_PX = 3;
+
+/** Visible head above the ledge (head height minus the tucked overlap). */
+export function gatorPeekLiftPx(
+  expression: GatorExpression,
+  scale = GATOR_ART_SCALE,
+): number {
+  return gatorDisplaySize(expression, scale).height - GATOR_LEDGE_OVERLAP_PX;
+}

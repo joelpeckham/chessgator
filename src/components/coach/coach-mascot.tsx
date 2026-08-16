@@ -17,6 +17,7 @@ import {
   GATOR_CLAWS,
   GATOR_LEDGE_OVERLAP_PX,
   gatorDisplaySize,
+  NECK_BLEED_PX,
 } from "@/components/coach/gator-layout";
 import { TeachingCard } from "@/components/coach/teaching-card";
 import {
@@ -31,13 +32,6 @@ import {
 } from "@/domain/teaching";
 import { bouncySpring, popSpring } from "@/lib/motion-presets";
 import { cn } from "@/lib/utils";
-
-/**
- * The gator art is cut flat at the neck. Hover lift and nudge bounces can
- * raise that edge above the timeline ledge, so a mirrored sliver of the
- * same image extends the neck just enough to keep the edge hidden.
- */
-const NECK_BLEED_PX = 12;
 
 /**
  * Head motion states: a slow breathing loop when idle, a thinking sway

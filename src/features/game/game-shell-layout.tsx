@@ -180,7 +180,12 @@ export function GameShellLayout({
               }}
             >
               <div
-                className="relative h-full w-full"
+                className={cn(
+                  "relative h-full w-full",
+                  view.gameOver.visible &&
+                    !preview &&
+                    "overflow-hidden rounded-lg",
+                )}
                 data-testid="board-frame"
                 data-preview={preview ? "true" : undefined}
               >
