@@ -51,6 +51,11 @@ export type GameStoreState = {
   hydrated: boolean;
   /** True when a persisted snapshot was loaded (tree may be resumed). */
   resumed: boolean;
+  /**
+   * A `/game?…` content CTA is seated. Ignore hydrate/persist until the
+   * visitor plays so a saved game cannot overwrite the landing as reviewing.
+   */
+  urlPresetApplied: boolean;
   lastError: string | null;
 
   startGame: (options?: { fen?: string; humanColor?: Color }) => void;
@@ -71,6 +76,9 @@ export type GameStoreState = {
   /** Seat the human on the side to move and enter playerTurn. */
   readyToMove: () => void;
   getCurrentNodeId: () => string;
+  getCurrentFen: () => string;
+  getParentNodeId: () => string | null;
+  markUrlPresetApplied: () => void;
   setLesson: (nodeId: string, insight: TeachingInsight) => void;
 
   hydrate: (repository?: GameRepository) => Promise<boolean>;
@@ -116,6 +124,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   lessons: {},
   hydrated: false,
   resumed: false,
+  urlPresetApplied: false,
   lastError: null,
 
   startGame: (options) => {
@@ -129,6 +138,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       lastError: null,
       hydrated: true,
       resumed: false,
+      urlPresetApplied: false,
       lessons: {},
     });
   },
@@ -271,6 +281,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       tree: played.tree,
       session: sessionState(mode, terminalReason),
       lastError: null,
+      urlPresetApplied: false,
     });
     return true;
   },
@@ -330,6 +341,14 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
   getCurrentNodeId: () => get().tree.currentNodeId,
 
+  getCurrentFen: () => getCurrentNode(get().tree).fen,
+
+  getParentNodeId: () => getCurrentNode(get().tree).parentId,
+
+  markUrlPresetApplied: () => {
+    set({ urlPresetApplied: true, resumed: false, hydrated: true });
+  },
+
   setLesson: (nodeId, insight) => {
     set({
       lessons: {
@@ -341,8 +360,10 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
   hydrate: async (repository) => {
     try {
+      if (get().urlPresetApplied) return false;
       const repo = repository ?? defaultRepository();
       const loaded = await repo.load();
+      if (get().urlPresetApplied) return false;
       if (!loaded) {
         set({ hydrated: true, resumed: false });
         return false;
@@ -356,6 +377,8 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         });
         return false;
       }
+
+      if (get().urlPresetApplied) return false;
 
       const baseSession: GameSession = {
         tree: reconstructed.tree,
@@ -388,6 +411,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   },
 
   persist: async (repository) => {
+    if (get().urlPresetApplied) return;
     try {
       const repo = repository ?? defaultRepository();
       const state = get();

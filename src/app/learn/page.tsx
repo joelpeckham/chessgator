@@ -9,6 +9,7 @@ export const metadata: Metadata = contentMetadata({
   description:
     "A glossary of tactics, checkmates, positional ideas, and endgames that chessgator teaches while you play.",
   path: "/learn",
+  type: "website",
 });
 
 export default function LearnPage() {

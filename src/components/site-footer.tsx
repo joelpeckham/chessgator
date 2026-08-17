@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 export const SITE_FOOTER_H = 32;
 
 const LINKS = [
+  { href: "/play", label: "Play" },
   { href: "/learn", label: "Learn" },
   { href: "/openings", label: "Openings" },
   { href: "/games", label: "Games" },

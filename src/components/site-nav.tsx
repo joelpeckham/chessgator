@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 export const SITE_CONTENT_LINKS = [
+  { href: "/play", label: "Play" },
   { href: "/learn", label: "Learn" },
   { href: "/openings", label: "Openings" },
   { href: "/games", label: "Games" },

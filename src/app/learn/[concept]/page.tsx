@@ -61,6 +61,7 @@ export default async function ConceptPage({ params }: ConceptPageProps) {
         fen={concept.fen}
         title={concept.boardTitle}
         highlights={concept.highlights}
+        orientation={concept.color}
       />
       {concept.paragraphs.map((paragraph) => (
         <p key={paragraph} className="text-muted-foreground">

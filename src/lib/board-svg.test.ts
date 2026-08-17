@@ -25,4 +25,10 @@ describe("renderBoardSvg", () => {
     expect(svg).toContain("Starting position");
     expect(svg).toContain("\u2654");
   });
+
+  it("flips file labels when Black is at the bottom", () => {
+    const svg = renderBoardSvg(START, { orientation: "black" });
+    expect(svg).toMatch(/x="22\.5"[^>]*>h</);
+    expect(svg).toMatch(/x="337\.5"[^>]*>a</);
+  });
 });

@@ -120,6 +120,7 @@ export default async function FamousGamePage({ params }: PageProps) {
         <StaticBoard
           fen={seat.fen}
           title={`${game.title}, after ply ${seat.ply}`}
+          orientation={seat.color}
         />
         <p className="text-sm text-muted-foreground">
           After {moveNumberLabel(seat.ply - 1)} {game.plies[seat.ply - 1]?.san}.{" "}
@@ -142,7 +143,11 @@ export default async function FamousGamePage({ params }: PageProps) {
         <h2 className="font-heading text-lg font-semibold tracking-tight">
           Step through
         </h2>
-        <GameStepper plies={game.plies} initialPly={game.criticalPly} />
+        <GameStepper
+          plies={game.plies}
+          initialPly={seat.ply}
+          orientation={seat.color}
+        />
       </section>
       <section className="space-y-3">
         <h2 className="font-heading text-lg font-semibold tracking-tight">

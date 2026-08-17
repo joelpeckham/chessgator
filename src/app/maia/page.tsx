@@ -4,7 +4,7 @@ import { PLAY_LEVELS } from "@/app/play/levels";
 import { ContentPage } from "@/components/content-page";
 import { buttonVariants } from "@/components/ui/button";
 import { gameHref } from "@/lib/game-href";
-import { articleJsonLd, JsonLd } from "@/lib/json-ld";
+import { collectionPageJsonLd, JsonLd } from "@/lib/json-ld";
 import { contentMetadata } from "@/lib/page-metadata";
 import { cn } from "@/lib/utils";
 
@@ -16,13 +16,18 @@ export const metadata: Metadata = contentMetadata({
   title,
   description,
   path: "/maia",
+  type: "website",
 });
 
 export default function MaiaPage() {
   return (
     <ContentPage title={title} breadcrumbs={[{ name: "Maia", path: "/maia" }]}>
       <JsonLd
-        data={articleJsonLd({ headline: title, description, path: "/maia" })}
+        data={collectionPageJsonLd({
+          name: title,
+          description,
+          path: "/maia",
+        })}
       />
       <div className="space-y-4 text-muted-foreground">
         <p>

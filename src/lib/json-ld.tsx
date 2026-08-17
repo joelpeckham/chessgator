@@ -47,18 +47,45 @@ export function articleJsonLd(args: {
   path: string;
   datePublished?: string;
 }) {
+  const url = absoluteUrl(args.path);
   return {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: args.headline,
     description: args.description,
-    url: absoluteUrl(args.path),
-    mainEntityOfPage: absoluteUrl(args.path),
-    publisher: {
+    url,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": url,
+    },
+    author: {
       "@type": "Organization",
       name: SITE_NAME,
       url: SITE_URL,
     },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: {
+        "@type": "ImageObject",
+        url: `${SITE_URL}/opengraph-image`,
+      },
+    },
     ...(args.datePublished ? { datePublished: args.datePublished } : {}),
+  };
+}
+
+export function collectionPageJsonLd(args: {
+  name: string;
+  description: string;
+  path: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: args.name,
+    description: args.description,
+    url: absoluteUrl(args.path),
   };
 }

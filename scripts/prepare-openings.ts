@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 /**
  * Fetch Lichess CC0 chess-openings TSVs and emit src/app/openings/data/openings.json.
  * Source: https://github.com/lichess-org/chess-openings (CC0)
@@ -161,4 +161,7 @@ async function main(): Promise<void> {
   console.log(`Wrote ${openings.length} openings to ${OUT}`);
 }
 
-await main();
+const invoked = process.argv[1];
+if (invoked && import.meta.url === pathToFileURL(invoked).href) {
+  await main();
+}

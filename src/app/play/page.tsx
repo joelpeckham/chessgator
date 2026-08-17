@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ContentPage } from "@/components/content-page";
 import { buttonVariants } from "@/components/ui/button";
 import { gameHref } from "@/lib/game-href";
-import { articleJsonLd, JsonLd } from "@/lib/json-ld";
+import { collectionPageJsonLd, JsonLd } from "@/lib/json-ld";
 import { contentMetadata } from "@/lib/page-metadata";
 import { cn } from "@/lib/utils";
 import { PLAY_LEVELS } from "./levels";
@@ -16,13 +16,18 @@ export const metadata: Metadata = contentMetadata({
   title,
   description,
   path: "/play",
+  type: "website",
 });
 
 export default function PlayHubPage() {
   return (
     <ContentPage title={title} breadcrumbs={[{ name: "Play", path: "/play" }]}>
       <JsonLd
-        data={articleJsonLd({ headline: title, description, path: "/play" })}
+        data={collectionPageJsonLd({
+          name: title,
+          description,
+          path: "/play",
+        })}
       />
       <p className="text-muted-foreground">
         chessgator runs Maia, a neural network trained on human games, at nine

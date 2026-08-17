@@ -27,12 +27,26 @@ export type BoardCell = {
   dark: boolean;
 };
 
+export type BoardOrientation = "white" | "black";
+
 export type BoardSvgOptions = {
   size?: number;
   highlights?: readonly string[];
   labels?: boolean;
   title?: string;
+  orientation?: BoardOrientation;
 };
+
+function displayCoords(
+  file: number,
+  rank: number,
+  orientation: BoardOrientation,
+): { file: number; rank: number } {
+  if (orientation === "black") {
+    return { file: 7 - file, rank: 7 - rank };
+  }
+  return { file, rank };
+}
 
 function squareName(file: number, rank: number): string {
   return `${FILES.charAt(file)}${rank + 1}`;
@@ -108,11 +122,13 @@ export function renderBoardSvg(
     (options.highlights ?? []).map((s) => s.toLowerCase()),
   );
   const title = options.title ?? "Chess position";
+  const orientation = options.orientation ?? "white";
 
   const squares = cells
     .map((cell) => {
-      const x = cell.file * sq;
-      const y = (7 - cell.rank) * sq;
+      const { file, rank } = displayCoords(cell.file, cell.rank, orientation);
+      const x = file * sq;
+      const y = (7 - rank) * sq;
       const fill = highlight.has(cell.square)
         ? BOARD_HIGHLIGHT
         : cell.dark
@@ -129,10 +145,12 @@ export function renderBoardSvg(
   let labelMarkup = "";
   if (labels) {
     for (let file = 0; file < 8; file += 1) {
-      labelMarkup += `<text x="${file * sq + sq / 2}" y="${board + 13}" text-anchor="middle" font-size="11" fill="#3d4f3a" font-family="ui-sans-serif, system-ui, sans-serif">${FILES.charAt(file)}</text>`;
+      const fileIndex = orientation === "black" ? 7 - file : file;
+      labelMarkup += `<text x="${file * sq + sq / 2}" y="${board + 13}" text-anchor="middle" font-size="11" fill="#3d4f3a" font-family="ui-sans-serif, system-ui, sans-serif">${FILES.charAt(fileIndex)}</text>`;
     }
     for (let rank = 0; rank < 8; rank += 1) {
-      labelMarkup += `<text x="${board + 9}" y="${(7 - rank) * sq + sq / 2}" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#3d4f3a" font-family="ui-sans-serif, system-ui, sans-serif">${rank + 1}</text>`;
+      const rankLabel = orientation === "black" ? 8 - rank : rank + 1;
+      labelMarkup += `<text x="${board + 9}" y="${(7 - rank) * sq + sq / 2}" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#3d4f3a" font-family="ui-sans-serif, system-ui, sans-serif">${rankLabel}</text>`;
     }
   }
 

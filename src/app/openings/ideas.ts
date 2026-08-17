@@ -3,7 +3,7 @@ import type { OpeningRecord } from "./data";
 const ECO_FAMILY: Record<string, string> = {
   A: "ECO A covers irregular and flank openings—systems that skip the main e4/d4 fight early.",
   B: "ECO B covers semi-open games after 1. e4 where Black does not reply …e5.",
-  C: "ECO C covers open games (1. e4 e5) and several 1. e4 defenses such as the French and Caro-Kann.",
+  C: "ECO C covers open games (1. e4 e5) and the French Defense.",
   D: "ECO D covers queen-pawn games and closed structures, including many Gambits and the Queen's Gambit complex.",
   E: "ECO E covers Indian defenses and related systems where Black fianchettoes or pressures the center from the flanks.",
 };
@@ -64,7 +64,10 @@ function formatMoveList(moves: readonly string[]): string {
   return text.trim();
 }
 
+const DESCRIPTION_MAX = 155;
+
 export function openingDescription(opening: OpeningRecord): string {
-  const moves = opening.moves.join(" ");
-  return `${opening.name} (${opening.eco}): ${moves}. ECO opening from the Lichess CC0 encyclopedia.`;
+  const full = `${opening.name} (${opening.eco}): ${opening.moves.join(" ")}. ECO opening from the Lichess CC0 encyclopedia.`;
+  if (full.length <= DESCRIPTION_MAX) return full;
+  return `${full.slice(0, DESCRIPTION_MAX - 1).trimEnd()}…`;
 }

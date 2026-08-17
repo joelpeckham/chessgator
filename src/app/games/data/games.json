@@ -62,8 +62,8 @@
       {
         "san": "dxe5",
         "fenAfter": "rn1qkbnr/ppp2ppp/8/4p3/4P3/5Q2/PPP2PPP/RNB1KB1R w KQkq - 0 6",
-        "comment": "White already has both bishops and the queen aiming at the uncastled king.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "White already has both bishops and the queen aiming at the uncastled king."
       },
       {
         "san": "Bc4",
@@ -108,8 +108,8 @@
       {
         "san": "Nxb5",
         "fenAfter": "rn2kb1r/p3qppp/2p2n2/1N2p1B1/2B1P3/1Q6/PPP2PPP/R3K2R b KQkq - 0 10",
-        "comment": "10.Nxb5 gives a piece to rip open the queenside. Black’s extra knight never gets into the game.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "10.Nxb5 gives a piece to rip open the queenside. Black’s extra knight never gets into the game."
       },
       {
         "san": "cxb5",
@@ -134,8 +134,8 @@
       {
         "san": "Rd8",
         "fenAfter": "3rkb1r/p2nqppp/5n2/1B2p1B1/4P3/1Q6/PPP2PPP/2KR3R w k - 3 13",
-        "comment": "Both rooks occupy the open d-file. Black’s king is still on e8.",
-        "classification": "good"
+        "classification": "good",
+        "comment": "Both rooks occupy the open d-file. Black’s king is still on e8."
       },
       {
         "san": "Rxd7",
@@ -170,8 +170,8 @@
       {
         "san": "Qb8+",
         "fenAfter": "1Q2kb1r/p2n1ppp/4q3/4p1B1/4P3/8/PPP2PPP/2KR4 b k - 1 16",
-        "comment": "16.Qb8+ forces the last defender off d7.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "16.Qb8+ forces the last defender off d7."
       },
       {
         "san": "Nxb8",
@@ -181,8 +181,8 @@
       {
         "san": "Rd8#",
         "fenAfter": "1n1Rkb1r/p4ppp/4q3/4p1B1/4P3/8/PPP2PPP/2K5 b k - 1 17",
-        "comment": "The remaining rook mates on the back rank. Every white piece took part; the black queenside never moved.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "The remaining rook mates on the back rank. Every white piece took part; the black queenside never moved."
       }
     ]
   },
@@ -304,8 +304,8 @@
       {
         "san": "Rg1",
         "fenAfter": "rnb1kb1r/p2p1ppp/2p2n2/1B3Nq1/4PpP1/3P4/PPP4P/RNBQ1KR1 b kq - 2 11",
-        "comment": "White leaves a rook hanging on g1 to keep the attack rolling.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "White leaves a rook hanging on g1 to keep the attack rolling."
       },
       {
         "san": "cxb5",
@@ -375,8 +375,8 @@
       {
         "san": "Bd6",
         "fenAfter": "rnb1k1nr/p2p1ppp/3B4/1pbN1N1P/4P1P1/3P1Q2/PqP5/R4KR1 b kq - 1 18",
-        "comment": "18.Bd6 shuts the black king in and offers a second rook.",
-        "classification": "blunder"
+        "classification": "blunder",
+        "comment": "18.Bd6 shuts the black king in and offers a second rook."
       },
       {
         "san": "Bxg1",
@@ -416,8 +416,8 @@
       {
         "san": "Qf6+",
         "fenAfter": "r1bk2nr/p2p1pNp/n2B1Q2/1p1NP2P/6P1/3P4/P1P1K3/q5b1 b - - 2 22",
-        "comment": "22.Qf6+ forces the knight off the mating square.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "22.Qf6+ forces the knight off the mating square."
       },
       {
         "san": "Nxf6",
@@ -427,8 +427,8 @@
       {
         "san": "Be7#",
         "fenAfter": "r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1 b - - 1 23",
-        "comment": "Bishop and two knights mate a king that never found a flight square.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "Bishop and two knights mate a king that never found a flight square."
       }
     ]
   },
@@ -610,8 +610,8 @@
       {
         "san": "Nf6+",
         "fenAfter": "1r2k2r/pbppnppp/1bn2N2/4P2q/Q7/B1PB1N2/P4PPP/R3R1K1 b k - 2 17",
-        "comment": "17.Nf6+ rips the g-pawn so the e-pawn can advance.",
-        "classification": "mistake"
+        "classification": "mistake",
+        "comment": "17.Nf6+ rips the g-pawn so the e-pawn can advance."
       },
       {
         "san": "gxf6",
@@ -641,8 +641,8 @@
       {
         "san": "Rxe7+",
         "fenAfter": "1r2k1r1/pbppRp1p/1bn2P2/8/Q7/B1PB1q2/P4PPP/3R2K1 b - - 0 20",
-        "comment": "Black takes a hanging queen. White has already calculated past it.",
-        "classification": "inaccuracy"
+        "classification": "inaccuracy",
+        "comment": "Black takes a hanging queen. White has already calculated past it."
       },
       {
         "san": "Nxe7",
@@ -652,8 +652,8 @@
       {
         "san": "Qxd7+",
         "fenAfter": "1r2k1r1/pbpQnp1p/1b3P2/8/8/B1PB1q2/P4PPP/3R2K1 b - - 0 21",
-        "comment": "21.Qxd7+ is the only move that works. The king is dragged to d7.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "21.Qxd7+ is the only move that works. The king is dragged to d7."
       },
       {
         "san": "Kxd7",
@@ -683,8 +683,8 @@
       {
         "san": "Bxe7#",
         "fenAfter": "1r3kr1/pbpBBp1p/1b3P2/8/8/2P2q2/P4PPP/3R2K1 b - - 0 24",
-        "comment": "The bishops finish the mate. Dufresne’s extra queen never checks.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "The bishops finish the mate. Dufresne’s extra queen never checks."
       }
     ]
   },
@@ -806,13 +806,13 @@
       {
         "san": "Bg5",
         "fenAfter": "r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R b K - 6 11",
-        "comment": "11...Na4 hits the queen and the c3-knight at once.",
         "classification": "inaccuracy"
       },
       {
         "san": "Na4",
         "fenAfter": "r2q1rk1/pp2ppbp/2p2np1/2Q3B1/n2PP1b1/2N2N2/PP3PPP/3RKB1R w K - 7 12",
-        "classification": "best"
+        "classification": "best",
+        "comment": "11...Na4 hits the queen and the c3-knight at once."
       },
       {
         "san": "Qa3",
@@ -832,8 +832,8 @@
       {
         "san": "Nxe4",
         "fenAfter": "r2q1rk1/pp2ppbp/2p3p1/6B1/3Pn1b1/Q1P2N2/P4PPP/3RKB1R w K - 0 14",
-        "comment": "The e-pawn falls and White’s king is stuck in the center.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "The e-pawn falls and White’s king is stuck in the center."
       },
       {
         "san": "Bxe7",
@@ -873,8 +873,8 @@
       {
         "san": "Be6",
         "fenAfter": "r3r1k1/pp3pbp/1qp1b1p1/2B5/2BP4/Q1n2N2/P4PPP/3R1K1R w - - 4 18",
-        "comment": "17...Be6 leaves the queen en prise. Taking it walks into a discovered check.",
-        "classification": "blunder"
+        "classification": "blunder",
+        "comment": "17...Be6 leaves the queen en prise. Taking it walks into a discovered check."
       },
       {
         "san": "Bxb6",
@@ -904,8 +904,8 @@
       {
         "san": "Nxd4+",
         "fenAfter": "r3r1k1/pp3pbp/1Bp3p1/8/2bn4/Q4N2/P4PPP/3R1K1R w - - 0 21",
-        "comment": "The knight windmill wins the queen back with interest.",
-        "classification": "mistake"
+        "classification": "mistake",
+        "comment": "The knight windmill wins the queen back with interest."
       },
       {
         "san": "Kg1",
@@ -1110,8 +1110,8 @@
       {
         "san": "Kc1",
         "fenAfter": "1Q6/5pk1/2p3p1/1p2N2p/1b5P/1bn5/r5P1/2K5 b - - 15 41",
-        "comment": "The last check forces mate on c2.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "The last check forces mate on c2."
       },
       {
         "san": "Rc2#",
@@ -1368,8 +1368,8 @@
       {
         "san": "Rxd4",
         "fenAfter": "b2r3r/k4p1p/p2q1np1/NppP4/3R1Q2/P4PPB/1PP4P/1K2R3 b - - 0 24",
-        "comment": "24.Rxd4 is the offer. Taking it leaves the black king on an open board.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "24.Rxd4 is the offer. Taking it leaves the black king on an open board."
       },
       {
         "san": "cxd4",
@@ -1379,7 +1379,8 @@
       {
         "san": "Re7+",
         "fenAfter": "b2r3r/k3Rp1p/p2q1np1/Np1P4/3p1Q2/P4PPB/1PP4P/1K6 b - - 1 25",
-        "classification": "inaccuracy"
+        "classification": "inaccuracy",
+        "comment": "25.Re7+ begins the walk. Every check takes a square away."
       },
       {
         "san": "Kb6",
@@ -1389,7 +1390,6 @@
       {
         "san": "Qxd4+",
         "fenAfter": "b2r3r/4Rp1p/pk1q1np1/Np1P4/3Q4/P4PPB/1PP4P/1K6 b - - 0 26",
-        "comment": "25.Re7+ begins the walk. Every check takes a square away.",
         "classification": "inaccuracy"
       },
       {
@@ -1400,7 +1400,8 @@
       {
         "san": "b4+",
         "fenAfter": "b2r3r/4Rp1p/p2q1np1/kp1P4/1P1Q4/P4PPB/2P4P/1K6 b - - 0 27",
-        "classification": "mistake"
+        "classification": "mistake",
+        "comment": "27.b4+ keeps the king on the a-file, where the queen can join."
       },
       {
         "san": "Ka4",
@@ -1410,7 +1411,6 @@
       {
         "san": "Qc3",
         "fenAfter": "b2r3r/4Rp1p/p2q1np1/1p1P4/kP6/P1Q2PPB/2P4P/1K6 b - - 2 28",
-        "comment": "27.b4+ keeps the king on the a-file, where the queen can join.",
         "classification": "mistake"
       },
       {
@@ -1491,8 +1491,8 @@
       {
         "san": "Bf1",
         "fenAfter": "3r3r/1R3p1p/6p1/1p6/2q5/5PP1/1Q5P/1K1k1B2 b - - 5 36",
-        "comment": "36.Bf1 is quiet: the bishop waits for the rook to land on d2.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "36.Bf1 is quiet: the bishop waits for the rook to land on d2."
       },
       {
         "san": "Rd2",
@@ -1572,8 +1572,8 @@
       {
         "san": "Qa7",
         "fenAfter": "8/Q6p/6p1/5p2/5P2/2p3P1/3r3P/2K1k3 b - - 3 44",
-        "comment": "44.Qa7 ends it. The king never found a hole.",
-        "classification": "inaccuracy"
+        "classification": "inaccuracy",
+        "comment": "44.Qa7 ends it. The king never found a hole."
       }
     ]
   },
@@ -1635,12 +1635,12 @@
       {
         "san": "Ng5",
         "fenAfter": "r1bqkbnr/pp1npppp/2p5/6N1/3P4/8/PPP2PPP/R1BQKBNR b KQkq - 2 5",
-        "classification": "good"
+        "classification": "good",
+        "comment": "5.Ng5 is the line that later became a warning in the Caro-Kann."
       },
       {
         "san": "Ngf6",
         "fenAfter": "r1bqkb1r/pp1npppp/2p2n2/6N1/3P4/8/PPP2PPP/R1BQKBNR w KQkq - 3 6",
-        "comment": "5.Ng5 is the line that later became a warning in the Caro-Kann.",
         "classification": "best"
       },
       {
@@ -1666,12 +1666,12 @@
       {
         "san": "Nxe6",
         "fenAfter": "r1bqkb1r/pp1n1pp1/2p1Nn1p/8/3P4/3B1N2/PPP2PPP/R1BQK2R b KQkq - 0 8",
-        "classification": "best"
+        "classification": "best",
+        "comment": "8.Nxe6 is the piece offer. Black’s king will be stuck on d8."
       },
       {
         "san": "Qe7",
         "fenAfter": "r1b1kb1r/pp1nqpp1/2p1Nn1p/8/3P4/3B1N2/PPP2PPP/R1BQK2R w KQkq - 1 9",
-        "comment": "8.Nxe6 is the piece offer. Black’s king will be stuck on d8.",
         "classification": "best"
       },
       {
@@ -1687,12 +1687,12 @@
       {
         "san": "Bg6+",
         "fenAfter": "r1b1kb1r/pp1nq1p1/2p1pnBp/8/3P4/5N2/PPP2PPP/R1BQ1RK1 b kq - 1 10",
-        "classification": "good"
+        "classification": "good",
+        "comment": "10.Bg6+ keeps the king in the center."
       },
       {
         "san": "Kd8",
         "fenAfter": "r1bk1b1r/pp1nq1p1/2p1pnBp/8/3P4/5N2/PPP2PPP/R1BQ1RK1 w - - 2 11",
-        "comment": "10.Bg6+ keeps the king in the center.",
         "classification": "best"
       },
       {
@@ -1778,8 +1778,8 @@
       {
         "san": "c4",
         "fenAfter": "r1k4r/p2nb1p1/2b4p/1p1n1p2/2PP4/3Q1NB1/1P3PPP/R5K1 b - - 0 19",
-        "comment": "Kasparov resigns a piece down with no development left.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "Kasparov resigns a piece down with no development left."
       }
     ]
   },
@@ -1876,8 +1876,8 @@
       {
         "san": "d5",
         "fenAfter": "r1bqkb1r/1p3ppp/p1n1pn2/3p4/2P1P3/N1N5/PP3PPP/R1BQKB1R w KQkq - 0 9",
-        "comment": "8...d5 is the pawn offer that opens the position Kasparov wanted.",
-        "classification": "excellent"
+        "classification": "excellent",
+        "comment": "8...d5 is the pawn offer that opens the position Kasparov wanted."
       },
       {
         "san": "cxd5",
@@ -1957,8 +1957,8 @@
       {
         "san": "Nd3",
         "fenAfter": "r2qr1k1/5ppp/p4n2/1pbP1bB1/8/N1Nn1B2/PP1Q1PPP/3R1RK1 w - - 2 17",
-        "comment": "16...Nd3. The knight cannot be taken without wrecking White’s coordination.",
-        "classification": "good"
+        "classification": "good",
+        "comment": "16...Nd3. The knight cannot be taken without wrecking White’s coordination."
       },
       {
         "san": "Nab1",
@@ -1968,8 +1968,8 @@
       {
         "san": "h6",
         "fenAfter": "r2qr1k1/5pp1/p4n1p/1pbP1bB1/8/2Nn1B2/PP1Q1PPP/1N1R1RK1 w - - 0 18",
-        "comment": "Both white knights are back on the first rank.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "Both white knights are back on the first rank."
       },
       {
         "san": "Bh4",
@@ -2134,8 +2134,8 @@
       {
         "san": "Qxd3",
         "fenAfter": "2r1r3/5pk1/6bp/8/Np1qnRP1/1P1Q2P1/6BP/1N1R3K b - - 0 34",
-        "comment": "Karpov finally takes the knight and loses the queen for it.",
-        "classification": "inaccuracy"
+        "classification": "inaccuracy",
+        "comment": "Karpov finally takes the knight and loses the queen for it."
       },
       {
         "san": "Nf2+",
@@ -2200,8 +2200,8 @@
       {
         "san": "Re1+",
         "fenAfter": "8/5pk1/7p/8/1p4P1/1P1R2P1/3N1qBP/3Nr2K w - - 1 41",
-        "comment": "40...Re1+ and mate is a move away. Karpov resigns.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "40...Re1+ and mate is a move away. Karpov resigns."
       }
     ]
   },
@@ -2363,8 +2363,8 @@
       {
         "san": "Bxh7+",
         "fenAfter": "r4rk1/1b2bppB/ppq1p3/2ppB2n/5P2/1P2P3/P1PPQ1PP/R4RK1 b - - 0 15",
-        "comment": "15.Bxh7+ starts the pair. The king is pulled to h7.",
-        "classification": "blunder"
+        "classification": "blunder",
+        "comment": "15.Bxh7+ starts the pair. The king is pulled to h7."
       },
       {
         "san": "Kxh7",
@@ -2384,8 +2384,8 @@
       {
         "san": "Bxg7",
         "fenAfter": "r4rk1/1b2bpB1/ppq1p3/2pp3Q/5P2/1P2P3/P1PP2PP/R4RK1 b - - 0 17",
-        "comment": "17.Bxg7 is the second bishop. Declining it is worse.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "17.Bxg7 is the second bishop. Declining it is worse."
       },
       {
         "san": "Kxg7",
@@ -2415,8 +2415,8 @@
       {
         "san": "Rh3+",
         "fenAfter": "r4r2/1b2bp1k/ppq5/2ppp3/5PQ1/1P2P2R/P1PP2PP/R5K1 b - - 1 20",
-        "comment": "The rook lift to h3 wins the queen for two pieces.",
-        "classification": "blunder"
+        "classification": "blunder",
+        "comment": "The rook lift to h3 wins the queen for two pieces."
       },
       {
         "san": "Qh6",
@@ -2436,8 +2436,8 @@
       {
         "san": "Qd7",
         "fenAfter": "r4r2/1b1Qbp2/pp5k/2ppp3/5P2/1P2P3/P1PP2PP/R5K1 b - - 1 22",
-        "comment": "White is a queen for a rook up and the rest is technique.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "White is a queen for a rook up and the rest is technique."
       },
       {
         "san": "Bf6",
@@ -2754,8 +2754,8 @@
       {
         "san": "Nd4",
         "fenAfter": "4r1k1/pp4pp/4pr2/3R4/3n4/2q4B/P1P1QPPP/5RK1 w - - 1 20",
-        "comment": "19...Nd4 opens the long diagonal toward White’s king.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "19...Nd4 opens the long diagonal toward White’s king."
       },
       {
         "san": "Qh5",
@@ -2785,8 +2785,8 @@
       {
         "san": "Rxh3",
         "fenAfter": "5rk1/pp4pp/4p3/4R1Q1/3n4/2q4r/P1P2PPP/5RK1 w - - 0 23",
-        "comment": "The h-file rook has already taken on h3.",
-        "classification": "inaccuracy"
+        "classification": "inaccuracy",
+        "comment": "The h-file rook has already taken on h3."
       },
       {
         "san": "Rc5",
@@ -2796,8 +2796,8 @@
       {
         "san": "Qg3",
         "fenAfter": "5rk1/pp4pp/4p3/2R3Q1/3n4/6qr/P1P2PPP/5RK1 w - - 2 24",
-        "comment": "23...Qg3. If 24.hxg3 Ne2 is mate; if 24.fxg3 Ne2+ wins the queen; if 24.Qxg3 Ne2+ 25.Kh1 Nxg3+ and the rook falls.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "23...Qg3. If 24.hxg3 Ne2 is mate; if 24.fxg3 Ne2+ wins the queen; if 24.Qxg3 Ne2+ 25.Kh1 Nxg3+ and the rook falls."
       }
     ]
   },
@@ -2819,8 +2819,8 @@
       {
         "san": "c4",
         "fenAfter": "rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR b KQkq - 0 1",
-        "comment": "1.c4. Fischer had almost never opened this way in a serious game.",
-        "classification": "excellent"
+        "classification": "excellent",
+        "comment": "1.c4. Fischer had almost never opened this way in a serious game."
       },
       {
         "san": "e6",
@@ -3010,8 +3010,8 @@
       {
         "san": "e4",
         "fenAfter": "2r2qk1/r2n2p1/p3p2p/2pp4/4P3/Q7/PP2BPPP/2R2RK1 b - - 0 20",
-        "comment": "20.e4 is the break. Black’s hanging pawns stop moving.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "20.e4 is the break. Black’s hanging pawns stop moving."
       },
       {
         "san": "d4",
@@ -3071,8 +3071,8 @@
       {
         "san": "f5",
         "fenAfter": "1r3n1k/r3q1p1/4p2p/p1p1PP2/2Bp4/1P5Q/P5PP/2R2RK1 b - - 0 26",
-        "comment": "26.f5 opens a file toward the king.",
-        "classification": "good"
+        "classification": "good",
+        "comment": "26.f5 opens a file toward the king."
       },
       {
         "san": "exf5",
@@ -3122,8 +3122,8 @@
       {
         "san": "e6",
         "fenAfter": "3q3k/1r2r1pn/4P2p/p1p2R2/2Bp3P/1P4Q1/P5P1/5RK1 b - - 0 31",
-        "comment": "31.e6 ties Black’s pieces to the blockade.",
-        "classification": "inaccuracy"
+        "classification": "inaccuracy",
+        "comment": "31.e6 ties Black’s pieces to the blockade."
       },
       {
         "san": "Rbc7",
@@ -3193,8 +3193,8 @@
       {
         "san": "Rxf6",
         "fenAfter": "4q2k/2r1r1p1/4PR1p/p1p5/P2pQ2P/1P1B1R2/6P1/6K1 b - - 0 38",
-        "comment": "38.Rxf6 rips the last cover. Spassky resigns a few moves later.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "38.Rxf6 rips the last cover. Spassky resigns a few moves later."
       },
       {
         "san": "gxf6",
@@ -3426,8 +3426,8 @@
       {
         "san": "e4",
         "fenAfter": "r3r1k1/p2q1ppp/1p3n2/3p4/P1pPP3/1nP2PN1/1BQ3PP/4RRK1 b - - 0 19",
-        "comment": "19.e4 starts the central pawn roll that the whole game is about.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "19.e4 starts the central pawn roll that the whole game is about."
       },
       {
         "san": "Qxa4",
@@ -3537,8 +3537,8 @@
       {
         "san": "Ba3",
         "fenAfter": "8/p3q1kp/1p2Pnp1/3pQ3/2pP4/BnP3N1/6PP/6K1 b - - 6 30",
-        "comment": "30.Ba3. The queen must leave e7 or the pawn queens.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "30.Ba3. The queen must leave e7 or the pawn queens."
       },
       {
         "san": "Qxa3",
@@ -3548,8 +3548,8 @@
       {
         "san": "Nh5+",
         "fenAfter": "8/p5kp/1p2Pnp1/3pQ2N/2pP4/qnP5/6PP/6K1 b - - 1 31",
-        "comment": "31.Nh5+ must be taken. The knight on f6 is pinned.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "31.Nh5+ must be taken. The knight on f6 is pinned."
       },
       {
         "san": "gxh5",
@@ -3579,8 +3579,8 @@
       {
         "san": "e7",
         "fenAfter": "6k1/p3P2p/1p3Q2/3p3p/2pP4/qnP5/6PP/6K1 b - - 0 34",
-        "comment": "34.e7 and the pawn is one square from a queen. The rest is checks.",
-        "classification": "mistake"
+        "classification": "mistake",
+        "comment": "34.e7 and the pawn is one square from a queen. The rest is checks."
       },
       {
         "san": "Qc1+",
@@ -3842,8 +3842,8 @@
       {
         "san": "Nd4",
         "fenAfter": "r3k2r/pp1qn1pp/5p2/3p4/3N4/8/PP2QPPP/2R1R1K1 b kq - 1 18",
-        "comment": "18.Nd4 opens the e-file against a king that just stepped to f7.",
-        "classification": "mistake"
+        "classification": "mistake",
+        "comment": "18.Nd4 opens the e-file against a king that just stepped to f7."
       },
       {
         "san": "Kf7",
@@ -3883,8 +3883,8 @@
       {
         "san": "Rxe7+",
         "fenAfter": "r1r1k3/pp1qR2p/5pp1/3p2N1/6Q1/8/PP3PPP/2R3K1 b - - 0 22",
-        "comment": "22.Rxe7+ starts the hanging-rook sequence.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "22.Rxe7+ starts the hanging-rook sequence."
       },
       {
         "san": "Kf8",
@@ -3914,8 +3914,8 @@
       {
         "san": "Rxh7+",
         "fenAfter": "r1r4k/pp1q3R/5pp1/3p2N1/6Q1/8/PP3PPP/2R3K1 b - - 0 25",
-        "comment": "25.Rxh7+. Von Bardeleben did not wait for 26.Rg7+ and the queen checks that follow.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "25.Rxh7+. Von Bardeleben did not wait for 26.Rg7+ and the queen checks that follow."
       }
     ]
   },
@@ -4127,13 +4127,13 @@
       {
         "san": "Kh1",
         "fenAfter": "2rr2k1/1b2qppp/pb2pn2/1p2P3/1P3P2/P1NB4/1B2Q1PP/R4R1K b - - 2 20",
-        "comment": "20...Ng4 and 21...Qh4 put every black piece on the white king.",
         "classification": "best"
       },
       {
         "san": "Ng4",
         "fenAfter": "2rr2k1/1b2qppp/pb2p3/1p2P3/1P3Pn1/P1NB4/1B2Q1PP/R4R1K w - - 3 21",
-        "classification": "best"
+        "classification": "best",
+        "comment": "20...Ng4 and 21...Qh4 put every black piece on the white king."
       },
       {
         "san": "Be4",
@@ -4148,13 +4148,13 @@
       {
         "san": "g3",
         "fenAfter": "2rr2k1/1b3ppp/pb2p3/1p2P3/1P2BPnq/P1N3P1/1B2Q2P/R4R1K b - - 0 22",
-        "comment": "22...Rxc3. Taking the rook loses to ...Rd2 and mate on the long diagonal.",
         "classification": "best"
       },
       {
         "san": "Rxc3",
         "fenAfter": "3r2k1/1b3ppp/pb2p3/1p2P3/1P2BPnq/P1r3P1/1B2Q2P/R4R1K w - - 0 23",
-        "classification": "mistake"
+        "classification": "mistake",
+        "comment": "22...Rxc3. Taking the rook loses to ...Rd2 and mate on the long diagonal."
       },
       {
         "san": "gxh4",
@@ -4169,13 +4169,13 @@
       {
         "san": "Qxd2",
         "fenAfter": "6k1/1b3ppp/pb2p3/1p2P3/1P2BPnP/P1r5/1B1Q3P/R4R1K b - - 0 24",
-        "comment": "24...Bxe4+ and 25...Rh3 leave White no check and no defense of h2.",
         "classification": "good"
       },
       {
         "san": "Bxe4+",
         "fenAfter": "6k1/5ppp/pb2p3/1p2P3/1P2bPnP/P1r5/1B1Q3P/R4R1K w - - 0 25",
-        "classification": "best"
+        "classification": "best",
+        "comment": "24...Bxe4+ and 25...Rh3 leave White no check and no defense of h2."
       },
       {
         "san": "Qg2",
@@ -4347,8 +4347,8 @@
       {
         "san": "e4",
         "fenAfter": "r3r1k1/ppqb2pp/2pbp3/5p2/2PPP3/1P3BP1/PB5P/R2Q1RK1 b - - 0 15",
-        "comment": "15.e4 opens the center once Black’s pawns have been provoked.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "15.e4 opens the center once Black’s pawns have been provoked."
       },
       {
         "san": "e5",
@@ -4418,8 +4418,8 @@
       {
         "san": "Qxf5",
         "fenAfter": "3r1bk1/ppq3pp/2p5/2P2Q1B/3B4/1P4P1/P6P/R5K1 b - - 0 22",
-        "comment": "22.Qxf5 wins a piece because the d4-rook is loose.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "22.Qxf5 wins a piece because the d4-rook is loose."
       },
       {
         "san": "Rxd4",
@@ -4449,8 +4449,8 @@
       {
         "san": "Be8",
         "fenAfter": "3rBb1k/ppq3pp/2p5/2P2Q2/8/1P4P1/P6P/5RK1 b - - 5 25",
-        "comment": "25.Be8. The bishop shuts the back rank. Black cannot stop mate and save the rook.",
-        "classification": "good"
+        "classification": "good",
+        "comment": "25.Be8. The bishop shuts the back rank. Black cannot stop mate and save the rook."
       }
     ]
   },
@@ -4672,13 +4672,13 @@
       {
         "san": "Qxh5",
         "fenAfter": "r4rk1/3q2pp/p2bp3/1b1p3Q/1p1Pp3/6PP/PP1B1PBK/1NR3R1 b - - 0 21",
-        "comment": "21...Rxf2 is the exchange offer that plants a rook on the second rank.",
         "classification": "best"
       },
       {
         "san": "Rxf2",
         "fenAfter": "r5k1/3q2pp/p2bp3/1b1p3Q/1p1Pp3/6PP/PP1B1rBK/1NR3R1 w - - 0 22",
-        "classification": "good"
+        "classification": "good",
+        "comment": "21...Rxf2 is the exchange offer that plants a rook on the second rank."
       },
       {
         "san": "Qg5",
@@ -4703,13 +4703,13 @@
       {
         "san": "Qe3",
         "fenAfter": "6k1/3q2pp/p2bp3/1b1p1r2/1p1Pp3/4Q1PP/PP1B1rB1/1NR3RK b - - 5 24",
-        "comment": "24...R8f5 and the bishop on d3 take the last squares from White’s queen.",
         "classification": "good"
       },
       {
         "san": "Bd3",
         "fenAfter": "6k1/3q2pp/p2bp3/3p1r2/1p1Pp3/3bQ1PP/PP1B1rB1/1NR3RK w - - 6 25",
-        "classification": "excellent"
+        "classification": "excellent",
+        "comment": "24...R8f5 and the bishop on d3 take the last squares from White’s queen."
       },
       {
         "san": "Rce1",
@@ -4719,8 +4719,8 @@
       {
         "san": "h6",
         "fenAfter": "6k1/3q2p1/p2bp2p/3p1r2/1p1Pp3/3bQ1PP/PP1B1rB1/1N2R1RK w - - 0 26",
-        "comment": "25...h6. Almost every white move loses a piece or allows ...R5f3. That is the point of the game.",
-        "classification": "good"
+        "classification": "good",
+        "comment": "25...h6. Almost every white move loses a piece or allows ...R5f3. That is the point of the game."
       }
     ]
   },
@@ -4942,12 +4942,12 @@
       {
         "san": "b4",
         "fenAfter": "r3rnk1/pb3ppp/3pp3/q5BQ/1P1P4/N2R4/P4PPP/4R1K1 b - - 0 21",
-        "classification": "best"
+        "classification": "best",
+        "comment": "21.b4 shuts the queen out of a5 before the combination."
       },
       {
         "san": "Qf5",
         "fenAfter": "r3rnk1/pb3ppp/3pp3/5qBQ/1P1P4/N2R4/P4PPP/4R1K1 w - - 1 22",
-        "comment": "21.b4 shuts the queen out of a5 before the combination.",
         "classification": "good"
       },
       {
@@ -4983,12 +4983,12 @@
       {
         "san": "Bf6",
         "fenAfter": "r3rnk1/pb3pp1/3ppB1p/1q5Q/1P1P4/4N1R1/P4PPP/4R1K1 b - - 5 25",
-        "classification": "inaccuracy"
+        "classification": "inaccuracy",
+        "comment": "25.Bf6. The bishop cannot be taken, and the queen on h5 is now loose."
       },
       {
         "san": "Qxh5",
         "fenAfter": "r3rnk1/pb3pp1/3ppB1p/7q/1P1P4/4N1R1/P4PPP/4R1K1 w - - 0 26",
-        "comment": "25.Bf6. The bishop cannot be taken, and the queen on h5 is now loose.",
         "classification": "best"
       },
       {
@@ -4999,8 +4999,8 @@
       {
         "san": "Kh8",
         "fenAfter": "r3rn1k/pb3pR1/3ppB1p/7q/1P1P4/4N3/P4PPP/4R1K1 w - - 1 27",
-        "comment": "The first check of the windmill. Each discovered check picks something up.",
-        "classification": "blunder"
+        "classification": "blunder",
+        "comment": "The first check of the windmill. Each discovered check picks something up."
       },
       {
         "san": "Rxf7+",
@@ -5055,12 +5055,12 @@
       {
         "san": "Rxh5",
         "fenAfter": "r3rn2/p6k/3ppB1p/7R/1P1P4/4N3/P4PPP/4R1K1 b - - 0 32",
-        "classification": "good"
+        "classification": "good",
+        "comment": "32.Rxh5 is the payoff. White is a piece up."
       },
       {
         "san": "Kg6",
         "fenAfter": "r3rn2/p7/3ppBkp/7R/1P1P4/4N3/P4PPP/4R1K1 w - - 1 33",
-        "comment": "32.Rxh5 is the payoff. White is a piece up.",
         "classification": "best"
       },
       {
@@ -5468,8 +5468,8 @@
       {
         "san": "Qf6+",
         "fenAfter": "4rr2/1bpR1pkp/1pq1pQp1/p3P3/P1PR4/5N1P/2P2PP1/6K1 b - - 3 29",
-        "comment": "29.Qf6+ fixes the black king and frees White’s own king to walk.",
-        "classification": "excellent"
+        "classification": "excellent",
+        "comment": "29.Qf6+ fixes the black king and frees White’s own king to walk."
       },
       {
         "san": "Kg8",
@@ -5499,8 +5499,8 @@
       {
         "san": "Kg3",
         "fenAfter": "2r2rk1/1bpR1p2/1pq1pQp1/p3P2p/P1PR3P/5NK1/2P2PP1/8 b - - 3 32",
-        "comment": "32.Kg3. The king is going to g5 on purpose.",
-        "classification": "inaccuracy"
+        "classification": "inaccuracy",
+        "comment": "32.Kg3. The king is going to g5 on purpose."
       },
       {
         "san": "Rce8",
@@ -5520,8 +5520,8 @@
       {
         "san": "Kg5",
         "fenAfter": "2b1rrk1/2pR1p2/1pq1pQp1/p3P1Kp/P1PR3P/5N2/2P2PP1/8 b - - 7 34",
-        "comment": "34.Kg5. Mate on h6 is next unless Black can check, and he cannot.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "34.Kg5. Mate on h6 is next unless Black can check, and he cannot."
       }
     ]
   },
@@ -5713,8 +5713,8 @@
       {
         "san": "e5",
         "fenAfter": "r3k2r/pb3pp1/1pp1qnnp/2p1P3/Q1N4B/2PB1P2/P5PP/R4RK1 b kq - 0 18",
-        "comment": "18.e5 opens the diagonal the bishop will use.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "18.e5 opens the diagonal the bishop will use."
       },
       {
         "san": "b5",
@@ -5724,8 +5724,8 @@
       {
         "san": "exf6",
         "fenAfter": "r3k2r/pb3pp1/2p1qPnp/1pp5/Q1N4B/2PB1P2/P5PP/R4RK1 b kq - 0 19",
-        "comment": "19.exf6. The queen on a4 is hanging. Black takes it.",
-        "classification": "good"
+        "classification": "good",
+        "comment": "19.exf6. The queen on a4 is hanging. Black takes it."
       },
       {
         "san": "bxa4",
@@ -5745,8 +5745,8 @@
       {
         "san": "Bf5",
         "fenAfter": "r3k1r1/pb3pP1/2p1q1np/2p2B2/p1N4B/2P2P2/P5PP/R4RK1 b q - 2 21",
-        "comment": "21.Bf5. The queen and the bishop are both en prise. Taking the queen walks into Nd6+.",
-        "classification": "good"
+        "classification": "good",
+        "comment": "21.Bf5. The queen and the bishop are both en prise. Taking the queen walks into Nd6+."
       },
       {
         "san": "Nxh4",
@@ -5756,8 +5756,8 @@
       {
         "san": "Bxe6",
         "fenAfter": "r3k1r1/pb3pP1/2p1B2p/2p5/p1N4n/2P2P2/P5PP/R4RK1 b q - 0 22",
-        "comment": "Hecht takes the bishop. Tal keeps enough pieces to win the ending.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "Hecht takes the bishop. Tal keeps enough pieces to win the ending."
       },
       {
         "san": "Ba6",
@@ -6164,8 +6164,8 @@
       {
         "san": "Qd3",
         "fenAfter": "r1b3k1/p1p2ppp/2p1r3/1pb5/8/2Pq1B2/PP1P1PPP/R1BQ1RK1 w - - 1 13",
-        "comment": "12...Qd3 parks the queen in White’s camp before the sacrifice.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "12...Qd3 parks the queen in White’s camp before the sacrifice."
       },
       {
         "san": "b4",
@@ -6215,8 +6215,8 @@
       {
         "san": "Qxf3",
         "fenAfter": "4r1k1/p1pb1ppp/Qbp1r3/8/1P6/2P2q2/R2P1PPP/2B2RK1 w - - 0 18",
-        "comment": "17...Qxf3. The queen is taken; the g-file and the bishops do the rest.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "17...Qxf3. The queen is taken; the g-file and the bishops do the rest."
       },
       {
         "san": "gxf3",
@@ -6236,8 +6236,8 @@
       {
         "san": "Bh3",
         "fenAfter": "4r1k1/p1p2ppp/Qbp3r1/8/1P6/2P2P1b/R2P1P1P/2B2R1K w - - 3 20",
-        "comment": "19...Bh3 threatens mate on g2 and stops the king from running.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "19...Bh3 threatens mate on g2 and stops the king from running."
       },
       {
         "san": "Rd1",
@@ -6307,8 +6307,8 @@
       {
         "san": "Re2",
         "fenAfter": "6k1/p1p2ppp/2p3r1/8/1P6/2P5/R2Prb1P/2B2R1K w - - 1 27",
-        "comment": "The second rook lands on e2. Paulsen is a queen up and lost.",
-        "classification": "inaccuracy"
+        "classification": "inaccuracy",
+        "comment": "The second rook lands on e2. Paulsen is a queen up and lost."
       },
       {
         "san": "Ra1",
@@ -6425,8 +6425,8 @@
       {
         "san": "d5",
         "fenAfter": "r1bq1rk1/2p1bppp/p1n2n2/1p1pp3/4P3/1BP2N2/PP1P1PPP/RNBQR1K1 w - - 0 9",
-        "comment": "8...d5 is the prepared break. White can take on d5 and e5.",
-        "classification": "excellent"
+        "classification": "excellent",
+        "comment": "8...d5 is the prepared break. White can take on d5 and e5."
       },
       {
         "san": "exd5",
@@ -6476,8 +6476,8 @@
       {
         "san": "Ng4",
         "fenAfter": "r1bq1rk1/2p2ppp/p2b4/1p6/6n1/1BP4P/PP1P1PP1/RNBQR1K1 w - - 1 14",
-        "comment": "13...Ng4 and 14...Qh4 are the attack Marshall had analyzed at home.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "13...Ng4 and 14...Qh4 are the attack Marshall had analyzed at home."
       },
       {
         "san": "Qf3",
@@ -6502,8 +6502,8 @@
       {
         "san": "Re2",
         "fenAfter": "r1b2rk1/2p2ppp/p2b4/1p6/3P3q/1BP2Q1P/PP2RnP1/RNB3K1 b - - 1 16",
-        "comment": "16.Re2 is the over-the-board find that holds the king.",
-        "classification": "mistake"
+        "classification": "mistake",
+        "comment": "16.Re2 is the over-the-board find that holds the king."
       },
       {
         "san": "Bg4",
@@ -6703,8 +6703,8 @@
       {
         "san": "Bxf7+",
         "fenAfter": "5rk1/1P3Bp1/R6p/8/6P1/2B1rQ2/2K3P1/6q1 b - - 0 36",
-        "comment": "36.Bxf7+ ends the counterplay. Marshall’s extra exchange is not enough.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "36.Bxf7+ ends the counterplay. Marshall’s extra exchange is not enough."
       }
     ]
   },
@@ -6866,8 +6866,8 @@
       {
         "san": "Nf7",
         "fenAfter": "r2qr1k1/pb1nbNpp/1p2pn2/2p2p2/2PP1B2/3B1N2/PP2QPPP/R4RK1 b - - 1 15",
-        "comment": "15.Nf7 leaves the queen and the e6-pawn both hanging.",
-        "classification": "mistake"
+        "classification": "mistake",
+        "comment": "15.Nf7 leaves the queen and the e6-pawn both hanging."
       },
       {
         "san": "Kxf7",
@@ -6877,8 +6877,8 @@
       {
         "san": "Qxe6+",
         "fenAfter": "r2qr3/pb1nbkpp/1p2Qn2/2p2p2/2PP1B2/3B1N2/PP3PPP/R4RK1 b - - 0 16",
-        "comment": "16.Qxe6+ pulls the king onto the color the knights want.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "16.Qxe6+ pulls the king onto the color the knights want."
       },
       {
         "san": "Kg6",
@@ -6898,8 +6898,8 @@
       {
         "san": "Nh4#",
         "fenAfter": "r2qr3/p2nb1pp/1p2Qnk1/2p2p2/2PPbBPN/3B4/PP3P1P/R4RK1 b - - 2 18",
-        "comment": "18.Nh4# is mate with the king on g6 and no flight square.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "18.Nh4# is mate with the king on g6 and no flight square."
       }
     ]
   },
@@ -7021,8 +7021,8 @@
       {
         "san": "Qxh7+",
         "fenAfter": "rn3rk1/pbppq1pQ/1p2pb2/4N3/3PN3/3B4/PPP2PPP/R3K2R b KQ - 0 11",
-        "comment": "11.Qxh7+ is the start. The king has to take.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "11.Qxh7+ is the start. The king has to take."
       },
       {
         "san": "Kxh7",
@@ -7052,8 +7052,8 @@
       {
         "san": "h4+",
         "fenAfter": "rn3r2/pbppq1p1/1p2pN2/6k1/3P2NP/3B4/PPP2PP1/R3K2R b KQ - 0 14",
-        "comment": "14.h4+ and 15.g3+ drive the king into White’s camp.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "14.h4+ and 15.g3+ drive the king into White’s camp."
       },
       {
         "san": "Kf4",
@@ -7093,8 +7093,8 @@
       {
         "san": "O-O-O#",
         "fenAfter": "rn3r2/pbppq1p1/1p2pN2/8/3P2NP/6P1/PPP1BP1R/2KR2k1 b - - 6 18",
-        "comment": "18.O-O-O# mates by discovered check. The king has walked to g1.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "18.O-O-O# mates by discovered check. The king has walked to g1."
       }
     ]
   },
@@ -7211,8 +7211,8 @@
       {
         "san": "Ne3",
         "fenAfter": "r1bq1rk1/pppn1pp1/3b3p/8/2PPNp2/3BnN2/PP4PP/R1BQ1RK1 w - - 1 11",
-        "comment": "10...Ne3 is the piece offer that tries to wreck White’s coordination.",
-        "classification": "good"
+        "classification": "good",
+        "comment": "10...Ne3 is the piece offer that tries to wreck White’s coordination."
       },
       {
         "san": "Bxe3",
@@ -7267,8 +7267,8 @@
       {
         "san": "Nxf7",
         "fenAfter": "r1bqrnk1/ppp1bNp1/7p/2P5/3P4/3Q1N2/PPB1p1PP/R4RK1 b - - 0 16",
-        "comment": "16.Nxf7 takes on f7 after the e2-pawn has promoted and been recaptured.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "16.Nxf7 takes on f7 after the e2-pawn has promoted and been recaptured."
       },
       {
         "san": "exf1=Q+",
@@ -7338,8 +7338,8 @@
       {
         "san": "Qe4+",
         "fenAfter": "r3rn2/ppp1q1pk/7p/2P1N3/3PQ3/1B6/PP4PP/5RK1 b - - 2 23",
-        "comment": "23.Qe4. Black is a rook up and the king cannot be defended.",
-        "classification": "mistake"
+        "classification": "mistake",
+        "comment": "23.Qe4. Black is a rook up and the king cannot be defended."
       }
     ]
   },
@@ -7601,13 +7601,13 @@
       {
         "san": "fxg6",
         "fenAfter": "2r3k1/pbr1q2p/1p2p1P1/8/3Pp3/1P2R3/PB1Q2PP/5RK1 b - - 0 25",
-        "comment": "25...Rc2 looks winning. White has already seen past it.",
         "classification": "inaccuracy"
       },
       {
         "san": "Rc2",
         "fenAfter": "2r3k1/pb2q2p/1p2p1P1/8/3Pp3/1P2R3/PBrQ2PP/5RK1 w - - 1 26",
-        "classification": "mistake"
+        "classification": "mistake",
+        "comment": "25...Rc2 looks winning. White has already seen past it."
       },
       {
         "san": "gxh7+",
@@ -7632,8 +7632,8 @@
       {
         "san": "Qb4",
         "fenAfter": "2r4k/pb2q2P/1p6/3Pp3/1Q2p3/1P2R3/PBr3PP/5RK1 b - - 1 28",
-        "comment": "28.Qb4. The queen leaves d2 and the whole attack works.",
-        "classification": "mistake"
+        "classification": "mistake",
+        "comment": "28.Qb4. The queen leaves d2 and the whole attack works."
       },
       {
         "san": "R8c5",
@@ -7643,8 +7643,8 @@
       {
         "san": "Rf8+",
         "fenAfter": "5R1k/pb2q2P/1p6/2rPp3/1Q2p3/1P2R3/PBr3PP/6K1 b - - 3 29",
-        "comment": "29.Rf8+ forces the king onto the long diagonal.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "29.Rf8+ forces the king onto the long diagonal."
       },
       {
         "san": "Kxh7",
@@ -7684,8 +7684,8 @@
       {
         "san": "Qxe7",
         "fenAfter": "6k1/pb2Q1B1/1p6/2rP4/8/1P2R3/P1r3PP/6K1 b - - 0 33",
-        "comment": "33.Qxe7. White is a queen up.",
-        "classification": "inaccuracy"
+        "classification": "inaccuracy",
+        "comment": "33.Qxe7. White is a queen up."
       }
     ]
   },
@@ -7842,8 +7842,8 @@
       {
         "san": "Nd3",
         "fenAfter": "r2qr1k1/p4pbp/bp3np1/3p4/8/BPNnP1P1/P2QNPBP/R2R2K1 w - - 2 15",
-        "comment": "14...Nd3 plants the knight that will take on f2.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "14...Nd3 plants the knight that will take on f2."
       },
       {
         "san": "Qc2",
@@ -7853,8 +7853,8 @@
       {
         "san": "Nxf2",
         "fenAfter": "r2qr1k1/p4pbp/bp3np1/3p4/8/BPN1P1P1/P1Q1NnBP/R2R2K1 w - - 0 16",
-        "comment": "15...Nxf2. The king is pulled to f2 and never gets safe.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "15...Nxf2. The king is pulled to f2 and never gets safe."
       },
       {
         "san": "Kxf2",
@@ -7904,8 +7904,8 @@
       {
         "san": "Bb7+",
         "fenAfter": "r2qr1k1/pb3pbp/1p4p1/8/3N4/BPN3P1/P2Q2KP/R2R4 w - - 1 21",
-        "comment": "20...Bb7+ forces the king to f1, where the queen check ends it.",
-        "classification": "good"
+        "classification": "good",
+        "comment": "20...Bb7+ forces the king to f1, where the queen check ends it."
       },
       {
         "san": "Kf1",
@@ -8167,13 +8167,13 @@
       {
         "san": "c6",
         "fenAfter": "4Br1k/1b2b1pp/2P4q/p3p3/2Qpp3/5P2/PP4PP/2RR2K1 b - - 0 24",
-        "comment": "24...exf3 starts the pawn roll that the game is remembered for.",
         "classification": "best"
       },
       {
         "san": "exf3",
         "fenAfter": "4Br1k/1b2b1pp/2P4q/p3p3/2Qp4/5p2/PP4PP/2RR2K1 w - - 0 25",
-        "classification": "inaccuracy"
+        "classification": "inaccuracy",
+        "comment": "24...exf3 starts the pawn roll that the game is remembered for."
       },
       {
         "san": "Rc2",
@@ -8268,13 +8268,13 @@
       {
         "san": "Qc5",
         "fenAfter": "3b1r1k/3P2pp/8/p1Q5/4p3/8/PP1p1pPP/2R1qR1K b - - 1 34",
-        "comment": "34...d2 and the pawns are one file from promotion.",
         "classification": "best"
       },
       {
         "san": "Rg8",
         "fenAfter": "3b2rk/3P2pp/8/p1Q5/4p3/8/PP1p1pPP/2R1qR1K w - - 2 35",
-        "classification": "best"
+        "classification": "best",
+        "comment": "34...d2 and the pawns are one file from promotion."
       },
       {
         "san": "Rd1",
@@ -8299,13 +8299,13 @@
       {
         "san": "Rxd1",
         "fenAfter": "3b2rk/3P2pp/8/p7/8/2Q1p3/PP1p1pPP/3R3K b - - 0 37",
-        "comment": "37...e2. Three pawns on the second rank; the queen cannot stop them all.",
         "classification": "best"
       },
       {
         "san": "e2",
         "fenAfter": "3b2rk/3P2pp/8/p7/8/2Q5/PP1pppPP/3R3K w - - 0 38",
-        "classification": "best"
+        "classification": "best",
+        "comment": "37...e2. Three pawns on the second rank; the queen cannot stop them all."
       }
     ]
   },
@@ -8462,8 +8462,8 @@
       {
         "san": "Nb4",
         "fenAfter": "r2qrbk1/1bp2pp1/p2p1n1p/1p6/Pn1PP3/5N1P/1PBN1PP1/R1BQR1K1 w - - 1 15",
-        "comment": "14...Nb4 heads for the hole on d3.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "14...Nb4 heads for the hole on d3."
       },
       {
         "san": "Bb1",
@@ -8573,8 +8573,8 @@
       {
         "san": "Nbd3",
         "fenAfter": "1r3bk1/5pp1/b4q1p/2nPN3/2p5/N2nR2P/1P3PP1/1BBQ2K1 w - - 1 26",
-        "comment": "25...Nbd3. The knight sits on the same square as in Moscow the year before.",
-        "classification": "mistake"
+        "classification": "mistake",
+        "comment": "25...Nbd3. The knight sits on the same square as in Moscow the year before."
       },
       {
         "san": "Ng4",
@@ -8594,13 +8594,13 @@
       {
         "san": "g6",
         "fenAfter": "1r3bk1/5p2/bq4pp/2nP4/2p3N1/N2n2RP/1P3PP1/1BBQ2K1 w - - 0 28",
-        "comment": "28.Bxh6 takes the pawn in front of the king. The knight on d3 does not defend h6.",
         "classification": "mistake"
       },
       {
         "san": "Bxh6",
         "fenAfter": "1r3bk1/5p2/bq4pB/2nP4/2p3N1/N2n2RP/1P3PP1/1B1Q2K1 b - - 0 28",
-        "classification": "inaccuracy"
+        "classification": "inaccuracy",
+        "comment": "28.Bxh6 takes the pawn in front of the king. The knight on d3 does not defend h6."
       },
       {
         "san": "Qxb2",
@@ -8730,8 +8730,8 @@
       {
         "san": "Nxf7",
         "fenAfter": "1r6/3P1N2/b7/3kn3/5Q2/3p3P/5PPK/8 b - - 0 41",
-        "comment": "41.Nxf7. The d-pawn is one square from a queen.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "41.Nxf7. The d-pawn is one square from a queen."
       }
     ]
   },
@@ -8893,8 +8893,8 @@
       {
         "san": "Qxd8+",
         "fenAfter": "r1bQk2r/p1b2ppp/2p1p3/8/2P5/P1N1P3/1P4PP/2KR1B1R b kq - 0 15",
-        "comment": "15.Qxd8+ is the trade Carlsen wanted. The ending is what he plays for.",
-        "classification": "excellent"
+        "classification": "excellent",
+        "comment": "15.Qxd8+ is the trade Carlsen wanted. The ending is what he plays for."
       },
       {
         "san": "Bxd8",
@@ -8944,8 +8944,8 @@
       {
         "san": "cxb6",
         "fenAfter": "r6r/p2bk1pp/1Pp1p3/5p2/4N3/P3PB2/1P4PP/2KR3R b - - 0 20",
-        "comment": "20.cxb6 and 21.b7 make a passed pawn on the seventh.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "20.cxb6 and 21.b7 make a passed pawn on the seventh."
       },
       {
         "san": "fxe4",
@@ -9320,13 +9320,13 @@
       {
         "san": "Kc5",
         "fenAfter": "8/P6R/8/2k5/2p5/2K5/r6P/8 w - - 1 58",
-        "comment": "58.h4. A second passed pawn starts. Anand resigns.",
         "classification": "inaccuracy"
       },
       {
         "san": "h4",
         "fenAfter": "8/P6R/8/2k5/2p4P/2K5/r7/8 b - - 0 58",
-        "classification": "good"
+        "classification": "good",
+        "comment": "58.h4. A second passed pawn starts. Anand resigns."
       }
     ]
   },
@@ -9448,19 +9448,19 @@
       {
         "san": "O-O",
         "fenAfter": "r1b2rk1/pp1pppbp/6p1/q7/3nP2Q/1BN1B3/PPP2PPP/R4RK1 b - - 3 11",
-        "comment": "11...Bf6 asks for a repetition. White does not repeat.",
         "classification": "best"
       },
       {
         "san": "Bf6",
         "fenAfter": "r1b2rk1/pp1ppp1p/5bp1/q7/3nP2Q/1BN1B3/PPP2PPP/R4RK1 w - - 4 12",
-        "classification": "best"
+        "classification": "best",
+        "comment": "11...Bf6 asks for a repetition. White does not repeat."
       },
       {
         "san": "Qxf6",
         "fenAfter": "r1b2rk1/pp1ppp1p/5Qp1/q7/3nP3/1BN1B3/PPP2PPP/R4RK1 b - - 0 12",
-        "comment": "12.Qxf6. The queen is taken after a knight check. Two pieces and the dark squares are the payment.",
-        "classification": "mistake"
+        "classification": "mistake",
+        "comment": "12.Qxf6. The queen is taken after a knight check. Two pieces and the dark squares are the payment."
       },
       {
         "san": "Ne2+",
@@ -9550,8 +9550,8 @@
       {
         "san": "Nxf6",
         "fenAfter": "r2q4/pp3pkp/3prNp1/1b6/4P3/1BB2R2/PPP2PPP/5RK1 b - - 0 21",
-        "comment": "21.Nxf6 keeps giving pieces to keep the bind.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "21.Nxf6 keeps giving pieces to keep the bind."
       },
       {
         "san": "Be2",
@@ -9631,8 +9631,8 @@
       {
         "san": "Rh8+",
         "fenAfter": "3q2kR/p4r2/3p2p1/1p2r1N1/3BPP2/8/PPP3PP/5K2 b - - 1 29",
-        "comment": "29.Rh8+ forces the king into a fork that wins the queen back.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "29.Rh8+ forces the king into a fork that wins the queen back."
       },
       {
         "san": "Kxh8",
@@ -9794,8 +9794,8 @@
       {
         "san": "Ng5",
         "fenAfter": "r2qkb1r/2p2ppp/p1n1b3/1pn1P1N1/3p4/1BP5/PP1N1PPP/R1BQ1RK1 b kq - 1 11",
-        "comment": "11.Ng5 is the Open Spanish line Kasparov had ready.",
-        "classification": "good"
+        "classification": "good",
+        "comment": "11.Ng5 is the Open Spanish line Kasparov had ready."
       },
       {
         "san": "dxc3",
@@ -9825,8 +9825,8 @@
       {
         "san": "Bc2",
         "fenAfter": "r3kb1r/2p3pp/p1n1p3/1pn1P3/8/2Pq4/P1BN1PPP/R1BQ1RK1 b kq - 2 14",
-        "comment": "14.Bc2 leaves the a1-rook hanging after ...Qxc3.",
-        "classification": "mistake"
+        "classification": "mistake",
+        "comment": "14.Bc2 leaves the a1-rook hanging after ...Qxc3."
       },
       {
         "san": "Qxc3",
@@ -9856,8 +9856,8 @@
       {
         "san": "Qg4",
         "fenAfter": "r3kb1r/2p3pp/p3p3/1p2P3/3n2Q1/1Bq5/P4PPP/R1B2RK1 b kq - 2 17",
-        "comment": "17.Qg4 offers the other rook. Taking on a1 walks into Bxe6 and Bh6.",
-        "classification": "good"
+        "classification": "good",
+        "comment": "17.Qg4 offers the other rook. Taking on a1 walks into Bxe6 and Bh6."
       },
       {
         "san": "Qxa1",
@@ -9897,8 +9897,8 @@
       {
         "san": "Bxh8",
         "fenAfter": "3rkb1B/2p4p/p3B3/1p2P3/3n2Q1/3q4/P4PPP/5RK1 b - - 0 21",
-        "comment": "21.Bxh8. White is a piece up. The rest is the extra pawns.",
-        "classification": "good"
+        "classification": "good",
+        "comment": "21.Bxh8. White is a piece up. The rest is the extra pawns."
       },
       {
         "san": "Qg6",
@@ -10150,12 +10150,12 @@
       {
         "san": "Be3",
         "fenAfter": "r1bqkbnr/pp3ppp/2np4/1N2p3/4P3/4B3/PPP2PPP/RN1QKB1R b KQkq - 1 7",
-        "classification": "best"
+        "classification": "best",
+        "comment": "7.Be3 and 8.N1c3 dare Black to push ...f4."
       },
       {
         "san": "f5",
         "fenAfter": "r1bqkbnr/pp4pp/2np4/1N2pp2/4P3/4B3/PPP2PPP/RN1QKB1R w KQkq - 0 8",
-        "comment": "7.Be3 and 8.N1c3 dare Black to push ...f4.",
         "classification": "inaccuracy"
       },
       {
@@ -10181,12 +10181,12 @@
       {
         "san": "Nbc7+",
         "fenAfter": "r1bqkbnr/ppN3pp/2np4/3Np3/4P3/4p3/PPP2PPP/R2QKB1R b KQkq - 1 10",
-        "classification": "best"
+        "classification": "best",
+        "comment": "10.Nbc7+ is the fork that decides the opening."
       },
       {
         "san": "Kf7",
         "fenAfter": "r1bq1bnr/ppN2kpp/2np4/3Np3/4P3/4p3/PPP2PPP/R2QKB1R w KQ - 2 11",
-        "comment": "10.Nbc7+ is the fork that decides the opening.",
         "classification": "best"
       },
       {
@@ -10237,8 +10237,8 @@
       {
         "san": "Kxf6",
         "fenAfter": "r1bq1b1r/ppN3pp/5k2/3Bp2Q/3nP3/4p3/PPP2PPP/R3K2R w KQ - 0 16",
-        "comment": "The king is on f6 and every white piece still has a check.",
-        "classification": "best"
+        "classification": "best",
+        "comment": "The king is on f6 and every white piece still has a check."
       },
       {
         "san": "fxe3",

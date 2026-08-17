@@ -2,6 +2,20 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { getCurrentNode, getMoveHistory } from "@/domain/game";
 import { applyGamePresets } from "@/features/game/apply-game-presets";
 import { useGameStore } from "@/features/game/game-store";
+import { createLocalStorageGameRepository } from "@/storage";
+
+function memoryStorage() {
+  const map = new Map<string, string>();
+  return {
+    getItem: (key: string) => map.get(key) ?? null,
+    setItem: (key: string, value: string) => {
+      map.set(key, value);
+    },
+    removeItem: (key: string) => {
+      map.delete(key);
+    },
+  };
+}
 
 describe("applyGamePresets", () => {
   beforeEach(() => {
@@ -86,6 +100,63 @@ describe("applyGamePresets", () => {
     ).toEqual(["e4", "e5", "Qh5", "Nc6", "Bc4", "Nf6"]);
     const root = state.tree.nodes[state.tree.rootId];
     expect(countDescendants(state.tree, root?.id ?? "")).toBe(7);
+  });
+
+  it("steps back from a mating line so the visitor has a legal move", () => {
+    const result = applyGamePresets(useGameStore.getState(), {
+      moves: ["e4", "e5", "Qh5", "Nc6", "Bc4", "Nf6", "Qxf7#"],
+    });
+    expect(result.ok).toBe(true);
+    expect(result.message).toBe("Started from the last playable position.");
+    const state = useGameStore.getState();
+    expect(getCurrentNode(state.tree).move?.san).toBe("Nf6");
+    expect(state.humanColor).toBe("w");
+    expect(state.session.mode).toBe("playerTurn");
+  });
+
+  it("seats Myers Variation as Black on playerTurn", () => {
+    const result = applyGamePresets(useGameStore.getState(), {
+      moves: ["b4", "d5", "Bb2", "c6", "a4"],
+    });
+    expect(result.ok).toBe(true);
+    const state = useGameStore.getState();
+    expect(state.session.mode).toBe("playerTurn");
+    expect(state.humanColor).toBe("b");
+    expect(state.urlPresetApplied).toBe(true);
+  });
+
+  it("does not let a later hydrate overwrite a content CTA into reviewing", async () => {
+    const storage = memoryStorage();
+    const repo = createLocalStorageGameRepository({ storage });
+    useGameStore.getState().startGame();
+    useGameStore.getState().playMove("e2e4");
+    await useGameStore.getState().persist(repo);
+
+    applyGamePresets(useGameStore.getState(), {
+      moves: ["b4", "d5", "Bb2", "c6", "a4"],
+    });
+    expect(useGameStore.getState().session.mode).toBe("playerTurn");
+
+    const hydrated = await useGameStore.getState().hydrate(repo);
+    expect(hydrated).toBe(false);
+    const state = useGameStore.getState();
+    expect(state.session.mode).toBe("playerTurn");
+    expect(state.humanColor).toBe("b");
+    expect(
+      getMoveHistory(state.tree, state.tree.currentNodeId).map((m) => m.san),
+    ).toEqual(["b4", "d5", "Bb2", "c6", "a4"]);
+  });
+
+  it("rejects a terminal FEN without a playable ancestor", () => {
+    const result = applyGamePresets(useGameStore.getState(), {
+      fen: "8/8/8/8/8/5k2/5p2/5K2 w - - 0 1",
+    });
+    expect(result.ok).toBe(false);
+    expect(result.message).toBe("That position is already finished.");
+    expect(useGameStore.getState().session.mode).toBe("playerTurn");
+    expect(getCurrentNode(useGameStore.getState().tree).fen).toMatch(
+      /^rnbqkbnr\/pppppppp/,
+    );
   });
 });
 

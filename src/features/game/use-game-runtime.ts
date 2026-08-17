@@ -80,7 +80,10 @@ export function useGameRuntime(options: GameRuntimeOptions = {}): GameRuntime {
   useEffect(() => {
     // Deep-links start a fresh position. Loading a saved game first would
     // leave the shell in reviewing and can clobber the preset on remount.
-    if (parseGameSearch(window.location.search)) {
+    if (
+      parseGameSearch(window.location.search) ||
+      useGameStore.getState().urlPresetApplied
+    ) {
       useGameStore.setState({ hydrated: true, resumed: false });
       return;
     }

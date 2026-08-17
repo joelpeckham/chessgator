@@ -10,6 +10,7 @@ export const metadata: Metadata = contentMetadata({
   description:
     "Browse 3,800+ ECO-classified chess openings with diagrams and links to practice each line against Maia.",
   path: "/openings",
+  type: "website",
 });
 
 export default function OpeningsHubPage() {

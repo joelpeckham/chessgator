@@ -1,5 +1,6 @@
 import type { Color } from "@/domain/game";
 import { isValidFen } from "@/domain/game";
+import { isTerminalFen } from "@/lib/fen-from-moves";
 import type { GamePreset } from "@/lib/game-href";
 
 export type GamePresetStore = {
@@ -9,6 +10,9 @@ export type GamePresetStore = {
   readyToMove: () => void;
   goToNode: (nodeId: string) => boolean;
   getCurrentNodeId: () => string;
+  getCurrentFen: () => string;
+  getParentNodeId: () => string | null;
+  markUrlPresetApplied: () => void;
 };
 
 export type ApplyGamePresetsResult = {
@@ -35,6 +39,7 @@ export function applyGamePresets(
   if (fen && !isValidFen(fen)) {
     store.startGame({ humanColor });
     if (!preset.color) store.readyToMove();
+    store.markUrlPresetApplied();
     return { ok: false, message: "That starting position was not valid." };
   }
 
@@ -62,10 +67,19 @@ export function applyGamePresets(
     store.goToNode(takeOverId);
   }
 
+  const steppedBack = seatOnPlayablePly(store);
+  if (steppedBack === "unplayable") {
+    store.startGame({ humanColor });
+    if (!preset.color) store.readyToMove();
+    store.markUrlPresetApplied();
+    return { ok: false, message: "That position is already finished." };
+  }
+
   // Openings and famous-game take-overs omit `color` so the visitor always
   // has the next move. An explicit color keeps Maia on the other side even
   // when a `ply` is also set — readyToMove would overwrite that seat.
   if (!preset.color) store.readyToMove();
+  store.markUrlPresetApplied();
 
   if (preset.moves && played < preset.moves.length) {
     return {
@@ -74,7 +88,23 @@ export function applyGamePresets(
     };
   }
 
+  if (steppedBack) {
+    return { ok: true, message: "Started from the last playable position." };
+  }
+
   return { ok: true, message: presetMessage(preset) };
+}
+
+/** Walk back from mate/stalemate so the visitor has a legal move. */
+function seatOnPlayablePly(store: GamePresetStore): boolean | "unplayable" {
+  let steppedBack = false;
+  while (isTerminalFen(store.getCurrentFen())) {
+    const parentId = store.getParentNodeId();
+    if (!parentId) return "unplayable";
+    store.goToNode(parentId);
+    steppedBack = true;
+  }
+  return steppedBack;
 }
 
 function presetMessage(preset: GamePreset): string | null {

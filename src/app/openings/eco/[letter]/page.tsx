@@ -16,7 +16,7 @@ type PageProps = {
 const ECO_BLURB: Record<EcoLetter, string> = {
   A: "Flank and irregular openings, including systems with an early Nf3, b3, or g3.",
   B: "Semi-open games after 1. e4 where Black avoids …e5—Sicilian, Caro-Kann, Alekhine, and related defenses.",
-  C: "Open games (1. e4 e5), French, Scandinavian, and several gambits.",
+  C: "Open games (1. e4 e5), the French Defense, and several gambits.",
   D: "Queen-pawn games: Queen's Gambit, Slav, Grünfeld, and closed structures.",
   E: "Indian defenses and related systems: King's Indian, Nimzo-Indian, Benoni, and more.",
 };
@@ -37,6 +37,7 @@ export async function generateMetadata({
     title: `ECO ${upper} openings`,
     description: `ECO volume ${upper}: ${ECO_BLURB[upper as EcoLetter]}`,
     path: `/openings/eco/${letter.toLowerCase()}`,
+    type: "website",
   });
 }
 

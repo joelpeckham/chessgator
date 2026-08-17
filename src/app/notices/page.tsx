@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { SitePage } from "@/components/site-page";
 import { contentMetadata } from "@/lib/page-metadata";
 
@@ -74,6 +75,38 @@ export default function NoticesPage() {
             className="text-primary underline-offset-4 hover:underline"
           >
             CSSLab/maia3
+          </a>
+          .
+        </p>
+      </section>
+
+      <section className="space-y-2">
+        <h2 className="font-heading text-lg font-semibold tracking-tight">
+          Lichess chess-openings
+        </h2>
+        <p className="text-muted-foreground">
+          Opening names, ECO codes, and move orders on{" "}
+          <Link
+            href="/openings"
+            className="text-primary underline-offset-4 hover:underline"
+          >
+            /openings
+          </Link>{" "}
+          come from the{" "}
+          <a
+            href="https://github.com/lichess-org/chess-openings"
+            className="text-primary underline-offset-4 hover:underline"
+            rel="noopener noreferrer"
+          >
+            Lichess chess-openings
+          </a>{" "}
+          dataset, dedicated to the public domain under{" "}
+          <a
+            href="https://creativecommons.org/publicdomain/zero/1.0/"
+            className="text-primary underline-offset-4 hover:underline"
+            rel="noopener noreferrer"
+          >
+            CC0
           </a>
           .
         </p>

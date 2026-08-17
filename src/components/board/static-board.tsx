@@ -2,6 +2,7 @@ import {
   BOARD_DARK,
   BOARD_HIGHLIGHT,
   BOARD_LIGHT,
+  type BoardOrientation,
   parseFenPlacement,
   pieceGlyph,
 } from "@/lib/board-svg";
@@ -12,6 +13,7 @@ export type StaticBoardProps = {
   title?: string;
   highlights?: readonly string[];
   labels?: boolean;
+  orientation?: BoardOrientation;
   className?: string;
 };
 
@@ -24,6 +26,7 @@ export function StaticBoard({
   title = "Chess position",
   highlights,
   labels = true,
+  orientation = "white",
   className,
 }: StaticBoardProps) {
   const cells = parseFenPlacement(fen);
@@ -51,8 +54,10 @@ export function StaticBoard({
     >
       <title>{title}</title>
       {cells.map((cell) => {
-        const x = cell.file * sq;
-        const y = (7 - cell.rank) * sq;
+        const file = orientation === "black" ? 7 - cell.file : cell.file;
+        const rank = orientation === "black" ? 7 - cell.rank : cell.rank;
+        const x = file * sq;
+        const y = (7 - rank) * sq;
         const fill = highlight.has(cell.square)
           ? BOARD_HIGHLIGHT
           : cell.dark
@@ -87,7 +92,9 @@ export function StaticBoard({
               fill="#3d4f3a"
               fontFamily="ui-sans-serif, system-ui, sans-serif"
             >
-              {String.fromCharCode(97 + file)}
+              {String.fromCharCode(
+                97 + (orientation === "black" ? 7 - file : file),
+              )}
             </text>
           ))
         : null}
@@ -103,7 +110,7 @@ export function StaticBoard({
               fill="#3d4f3a"
               fontFamily="ui-sans-serif, system-ui, sans-serif"
             >
-              {rank + 1}
+              {orientation === "black" ? 8 - rank : rank + 1}
             </text>
           ))
         : null}

@@ -106,7 +106,7 @@ export const SOURCE_GAMES: readonly GameSource[] = [
     takeOverColor: "black",
     takeOverElo: 1500,
     comments: {
-      "21": "11...Na4 hits the queen and the c3-knight at once.",
+      "22": "11...Na4 hits the queen and the c3-knight at once.",
       "26": "The e-pawn falls and White’s king is stuck in the center.",
       "34": "17...Be6 leaves the queen en prise. Taking it walks into a discovered check.",
       "40": "The knight windmill wins the queen back with interest.",
@@ -141,8 +141,8 @@ export const SOURCE_GAMES: readonly GameSource[] = [
     takeOverElo: 1700,
     comments: {
       "47": "24.Rxd4 is the offer. Taking it leaves the black king on an open board.",
-      "51": "25.Re7+ begins the walk. Every check takes a square away.",
-      "55": "27.b4+ keeps the king on the a-file, where the queen can join.",
+      "49": "25.Re7+ begins the walk. Every check takes a square away.",
+      "53": "27.b4+ keeps the king on the a-file, where the queen can join.",
       "71": "36.Bf1 is quiet: the bishop waits for the rook to land on d2.",
       "87": "44.Qa7 ends it. The king never found a hole.",
     },
@@ -175,9 +175,9 @@ export const SOURCE_GAMES: readonly GameSource[] = [
     takeOverColor: "white",
     takeOverElo: 1600,
     comments: {
-      "10": "5.Ng5 is the line that later became a warning in the Caro-Kann.",
-      "16": "8.Nxe6 is the piece offer. Black’s king will be stuck on d8.",
-      "20": "10.Bg6+ keeps the king in the center.",
+      "9": "5.Ng5 is the line that later became a warning in the Caro-Kann.",
+      "15": "8.Nxe6 is the piece offer. Black’s king will be stuck on d8.",
+      "19": "10.Bg6+ keeps the king in the center.",
       "37": "Kasparov resigns a piece down with no development left.",
     },
     pgn: `[Event "IBM Deep Blue Rematch"]
@@ -395,9 +395,9 @@ export const SOURCE_GAMES: readonly GameSource[] = [
     takeOverColor: "black",
     takeOverElo: 1600,
     comments: {
-      "39": "20...Ng4 and 21...Qh4 put every black piece on the white king.",
-      "43": "22...Rxc3. Taking the rook loses to ...Rd2 and mate on the long diagonal.",
-      "47": "24...Bxe4+ and 25...Rh3 leave White no check and no defense of h2.",
+      "40": "20...Ng4 and 21...Qh4 put every black piece on the white king.",
+      "44": "22...Rxc3. Taking the rook loses to ...Rd2 and mate on the long diagonal.",
+      "48": "24...Bxe4+ and 25...Rh3 leave White no check and no defense of h2.",
     },
     pgn: `[Event "Lodz"]
 [White "Rotlewi, Georg"]
@@ -453,8 +453,8 @@ export const SOURCE_GAMES: readonly GameSource[] = [
     takeOverColor: "black",
     takeOverElo: 1500,
     comments: {
-      "41": "21...Rxf2 is the exchange offer that plants a rook on the second rank.",
-      "47": "24...R8f5 and the bishop on d3 take the last squares from White’s queen.",
+      "42": "21...Rxf2 is the exchange offer that plants a rook on the second rank.",
+      "48": "24...R8f5 and the bishop on d3 take the last squares from White’s queen.",
       "50": "25...h6. Almost every white move loses a piece or allows ...R5f3. That is the point of the game.",
     },
     pgn: `[Event "Copenhagen"]
@@ -482,10 +482,10 @@ export const SOURCE_GAMES: readonly GameSource[] = [
     takeOverColor: "white",
     takeOverElo: 1500,
     comments: {
-      "42": "21.b4 shuts the queen out of a5 before the combination.",
-      "50": "25.Bf6. The bishop cannot be taken, and the queen on h5 is now loose.",
+      "41": "21.b4 shuts the queen out of a5 before the combination.",
+      "49": "25.Bf6. The bishop cannot be taken, and the queen on h5 is now loose.",
       "52": "The first check of the windmill. Each discovered check picks something up.",
-      "64": "32.Rxh5 is the payoff. White is a piece up.",
+      "63": "32.Rxh5 is the payoff. White is a piece up.",
     },
     pgn: `[Event "Moscow"]
 [White "Torre, Carlos"]
@@ -729,7 +729,7 @@ export const SOURCE_GAMES: readonly GameSource[] = [
     takeOverColor: "white",
     takeOverElo: 1600,
     comments: {
-      "49": "25...Rc2 looks winning. White has already seen past it.",
+      "50": "25...Rc2 looks winning. White has already seen past it.",
       "55": "28.Qb4. The queen leaves d2 and the whole attack works.",
       "57": "29.Rf8+ forces the king onto the long diagonal.",
       "65": "33.Qxe7. White is a queen up.",
@@ -790,9 +790,9 @@ export const SOURCE_GAMES: readonly GameSource[] = [
     takeOverColor: "black",
     takeOverElo: 1500,
     comments: {
-      "47": "24...exf3 starts the pawn roll that the game is remembered for.",
-      "67": "34...d2 and the pawns are one file from promotion.",
-      "73": "37...e2. Three pawns on the second rank; the queen cannot stop them all.",
+      "48": "24...exf3 starts the pawn roll that the game is remembered for.",
+      "68": "34...d2 and the pawns are one file from promotion.",
+      "74": "37...e2. Three pawns on the second rank; the queen cannot stop them all.",
     },
     pgn: `[Event "London"]
 [White "McDonnell, Alexander"]
@@ -823,7 +823,7 @@ export const SOURCE_GAMES: readonly GameSource[] = [
     comments: {
       "28": "14...Nb4 heads for the hole on d3.",
       "50": "25...Nbd3. The knight sits on the same square as in Moscow the year before.",
-      "54": "28.Bxh6 takes the pawn in front of the king. The knight on d3 does not defend h6.",
+      "55": "28.Bxh6 takes the pawn in front of the king. The knight on d3 does not defend h6.",
       "81": "41.Nxf7. The d-pawn is one square from a queen.",
     },
     pgn: `[Event "World Championship"]
@@ -856,7 +856,7 @@ export const SOURCE_GAMES: readonly GameSource[] = [
     comments: {
       "29": "15.Qxd8+ is the trade Carlsen wanted. The ending is what he plays for.",
       "39": "20.cxb6 and 21.b7 make a passed pawn on the seventh.",
-      "114": "58.h4. A second passed pawn starts. Anand resigns.",
+      "115": "58.h4. A second passed pawn starts. Anand resigns.",
     },
     pgn: `[Event "World Championship"]
 [White "Carlsen, Magnus"]
@@ -889,7 +889,7 @@ export const SOURCE_GAMES: readonly GameSource[] = [
     takeOverColor: "white",
     takeOverElo: 1600,
     comments: {
-      "21": "11...Bf6 asks for a repetition. White does not repeat.",
+      "22": "11...Bf6 asks for a repetition. White does not repeat.",
       "23": "12.Qxf6. The queen is taken after a knight check. Two pieces and the dark squares are the payment.",
       "41": "21.Nxf6 keeps giving pieces to keep the bind.",
       "57": "29.Rh8+ forces the king into a fork that wins the queen back.",
@@ -953,8 +953,8 @@ export const SOURCE_GAMES: readonly GameSource[] = [
     takeOverColor: "white",
     takeOverElo: 1500,
     comments: {
-      "14": "7.Be3 and 8.N1c3 dare Black to push ...f4.",
-      "20": "10.Nbc7+ is the fork that decides the opening.",
+      "13": "7.Be3 and 8.N1c3 dare Black to push ...f4.",
+      "19": "10.Nbc7+ is the fork that decides the opening.",
       "30": "The king is on f6 and every white piece still has a check.",
     },
     pgn: `[Event "Paris"]

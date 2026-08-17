@@ -30,6 +30,18 @@ describe("takeOverSeat", () => {
     expect(game!.plies[33]?.san).toBe("Be6");
   });
 
+  it("attaches numbered comments to the ply they name", () => {
+    for (const source of SOURCE_GAMES) {
+      for (const [key, text] of Object.entries(source.comments)) {
+        const named = /^(\d+)\.(\.\.)?/.exec(text);
+        if (!named?.[1]) continue;
+        const moveNo = Number(named[1]);
+        const expected = named[2] ? moveNo * 2 : moveNo * 2 - 1;
+        expect(Number(key), `${source.slug}: ${text}`).toBe(expected);
+      }
+    }
+  });
+
   it("keeps every source comment on a real ply", () => {
     const games = listGames();
     for (const source of SOURCE_GAMES) {

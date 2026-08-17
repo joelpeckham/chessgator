@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { listGames } from "@/app/games/catalog";
 import { ContentPage } from "@/components/content-page";
-import { articleJsonLd, JsonLd } from "@/lib/json-ld";
+import { collectionPageJsonLd, JsonLd } from "@/lib/json-ld";
 import { contentMetadata } from "@/lib/page-metadata";
 
 const title = "Famous chess games";
@@ -13,6 +13,7 @@ export const metadata: Metadata = contentMetadata({
   title,
   description,
   path: "/games",
+  type: "website",
 });
 
 export default function GamesHubPage() {
@@ -24,11 +25,10 @@ export default function GamesHubPage() {
       breadcrumbs={[{ name: "Games", path: "/games" }]}
     >
       <JsonLd
-        data={articleJsonLd({
-          headline: title,
+        data={collectionPageJsonLd({
+          name: title,
           description,
           path: "/games",
-          datePublished: "2026-08-16",
         })}
       />
       <p className="text-muted-foreground">

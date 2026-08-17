@@ -149,21 +149,17 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     if (presets) {
       const applied = applyGamePresets(state, presets);
       if (applied.message) queueNav(applied.message);
-      void useGameStore
-        .getState()
-        .persist()
-        .then(() => {
-          const url = new URL(window.location.href);
-          if (url.search) {
-            window.history.replaceState(
-              window.history.state,
-              "",
-              `${url.pathname}${url.hash}`,
-            );
-          }
-        });
+      const url = new URL(window.location.href);
+      if (url.search) {
+        window.history.replaceState(
+          window.history.state,
+          "",
+          `${url.pathname}${url.hash}`,
+        );
+      }
       return;
     }
+    if (state.urlPresetApplied) return;
     if (state.resumed && state.session.mode === "reviewing") {
       resumePlay();
       queueNav("Resumed local game");

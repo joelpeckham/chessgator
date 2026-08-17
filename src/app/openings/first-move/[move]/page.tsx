@@ -48,6 +48,7 @@ export async function generateMetadata({
       description:
         "Chess openings grouped by less common first moves—flank lines, gambits, and rare systems.",
       path: "/openings/first-move/others",
+      type: "website",
     });
   }
   if (!isFeaturedFirstMove(move)) {
@@ -58,6 +59,7 @@ export async function generateMetadata({
     title: `Openings after ${label}`,
     description: `ECO-classified chess openings that begin with ${label}.`,
     path: `/openings/first-move/${move}`,
+    type: "website",
   });
 }
 

@@ -49,6 +49,24 @@ export function SiteCrash({
               >
                 Back to the board
               </Link>
+              <Link
+                className={buttonVariants({ variant: "outline" })}
+                href="/learn"
+              >
+                Learn
+              </Link>
+              <Link
+                className={buttonVariants({ variant: "outline" })}
+                href="/openings"
+              >
+                Openings
+              </Link>
+              <Link
+                className={buttonVariants({ variant: "outline" })}
+                href="/games"
+              >
+                Games
+              </Link>
             </div>
           </div>
         </div>

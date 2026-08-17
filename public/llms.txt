@@ -8,11 +8,14 @@ chessgator is a free static website at https://chessgator.com. There are no acco
 
 - [Home](https://chessgator.com/): What the site is, what Maia is, how the coach works, and a short comparison with Chess.com and Lichess
 - [Play](https://chessgator.com/game): The board — play Maia with local Stockfish coaching, no sign-up
-- [Play by level](https://chessgator.com/play/beginner): Start a beginner-strength Maia game (Elo 1200); other levels live under /play
+- [Play levels](https://chessgator.com/play): Maia strength ladder from Elo 1100 to 1900
+- [Play beginner](https://chessgator.com/play/beginner): Start a beginner-strength Maia game (Elo 1200)
 - [Maia](https://chessgator.com/maia): What Maia is and why it plays like a human
 - [Learn](https://chessgator.com/learn): How the coach explains moves
-- [Openings](https://chessgator.com/openings): Opening practice
-- [Games](https://chessgator.com/games): Example games
+- [Openings](https://chessgator.com/openings): Lichess CC0 encyclopedia of ECO-classified openings
+- [Openings by ECO](https://chessgator.com/openings/eco/a): Browse openings by ECO volume (A–E)
+- [Openings by first move](https://chessgator.com/openings/first-move/e4): Browse openings that start with 1. e4 and other first moves
+- [Games](https://chessgator.com/games): Annotated famous games you can take over against Maia
 - [About](https://chessgator.com/about): How a session works and engine credits
 - [FAQ](https://chessgator.com/faq): Play Maia outside Lichess, free move explanations, chess vs a computer with no sign-up
 - [Privacy](https://chessgator.com/privacy): No accounts; games stay on the device
