@@ -189,8 +189,11 @@ const eslintConfig = defineConfig([
     },
   },
   {
-    // Sole components → features bridge for the RSC/client shell.
-    files: ["src/components/game/game-shell-client.tsx"],
+    // Sole components → features bridges for the RSC/client shells.
+    files: [
+      "src/components/game/game-shell-client.tsx",
+      "src/components/landing/landing-hero-client.tsx",
+    ],
     rules: {
       "boundaries/dependencies": "off",
     },

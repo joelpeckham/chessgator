@@ -1,12 +1,15 @@
 import {
-  BOARD_DARK,
-  BOARD_HIGHLIGHT,
-  BOARD_LIGHT,
   type BoardOrientation,
   parseFenPlacement,
   pieceGlyph,
 } from "@/lib/board-svg";
 import { cn } from "@/lib/utils";
+
+/** Same tokens as ChessboardAdapter / board-surface — never a second palette. */
+const SQUARE_LIGHT = "var(--board-light)";
+const SQUARE_DARK = "var(--board-dark)";
+const SQUARE_HIGHLIGHT = "var(--board-arrow)";
+const LABEL_FILL = "var(--foreground)";
 
 export type StaticBoardProps = {
   fen: string;
@@ -59,10 +62,10 @@ export function StaticBoard({
         const x = file * sq;
         const y = (7 - rank) * sq;
         const fill = highlight.has(cell.square)
-          ? BOARD_HIGHLIGHT
+          ? SQUARE_HIGHLIGHT
           : cell.dark
-            ? BOARD_DARK
-            : BOARD_LIGHT;
+            ? SQUARE_DARK
+            : SQUARE_LIGHT;
         return (
           <g key={cell.square}>
             <rect x={x} y={y} width={sq} height={sq} fill={fill} />
@@ -89,7 +92,7 @@ export function StaticBoard({
               y={size + 13}
               textAnchor="middle"
               fontSize={11}
-              fill="#3d4f3a"
+              fill={LABEL_FILL}
               fontFamily="ui-sans-serif, system-ui, sans-serif"
             >
               {String.fromCharCode(
@@ -107,7 +110,7 @@ export function StaticBoard({
               textAnchor="middle"
               dominantBaseline="central"
               fontSize={11}
-              fill="#3d4f3a"
+              fill={LABEL_FILL}
               fontFamily="ui-sans-serif, system-ui, sans-serif"
             >
               {orientation === "black" ? 8 - rank : rank + 1}

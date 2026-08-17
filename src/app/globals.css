@@ -86,6 +86,18 @@
   outline-offset: 2px;
 }
 
+/* 8×8 using the same tokens as board-surface, so a hydrating adapter
+   never flashes a library default through transparent squares. */
+.board-checkered,
+.chessboard-adapter {
+  background-color: var(--board-light);
+  background-image: repeating-conic-gradient(
+    var(--board-dark) 0% 25%,
+    var(--board-light) 0% 50%
+  );
+  background-size: 25% 25%;
+}
+
 [data-board-square="true"][data-last-move="from"] {
   background: color-mix(in oklch, var(--primary) 18%, transparent);
   outline: 2px solid color-mix(in oklch, var(--primary) 55%, transparent);
@@ -236,6 +248,31 @@
   from {
     transform: scale(0);
     opacity: 0;
+  }
+}
+
+/* Landing hero: faint drifting checkerboard behind the playable demo. */
+.hero-board-texture {
+  background-image: repeating-conic-gradient(
+    var(--board-dark) 0% 25%,
+    var(--board-light) 0% 50%
+  );
+  background-size: 88px 88px;
+  opacity: 0.05;
+  mask-image: radial-gradient(closest-side, black 40%, transparent);
+  animation: hero-board-drift 60s linear infinite;
+}
+
+@keyframes hero-board-drift {
+  to {
+    /* Multiples of the tile size so the loop is seamless. */
+    background-position: 176px 88px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-board-texture {
+    animation: none;
   }
 }
 
