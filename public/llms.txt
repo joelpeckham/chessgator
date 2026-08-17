@@ -27,3 +27,10 @@ chessgator is a free static website at https://chessgator.com. There are no acco
 - Engines run in the visitor's browser (WASM); analysis is not computed on the server
 - The site is a static Next.js export
 - Brand name is chessgator; people search for human-like chess bots, playing Maia, and a free chess coach, not the brand
+
+## Also by Joel Peckham
+
+- [Joel Peckham](https://jpeckham.com/) — Software portfolio — full-stack and AI developer in Laramie, Wyoming. — [llms.txt](https://jpeckham.com/llms.txt)
+- [lyriic](https://lyriic.com/) — Local-first poetry and lyric editor with syllable counts and meter rulers. — [llms.txt](https://lyriic.com/llms.txt)
+- [uwyoschedule](https://uwyoschedule.org/) — Independent University of Wyoming class schedule planner. — [llms.txt](https://uwyoschedule.org/llms.txt)
+- [No Bullshit QR](https://qr.jpeckham.com/) — Free QR code generator. Export real SVG and PNG. No paywall. — [llms.txt](https://qr.jpeckham.com/llms.txt)

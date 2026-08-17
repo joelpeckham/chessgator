@@ -7,20 +7,21 @@ import { StatTicker } from "@/components/landing/stat-ticker";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
 import { buttonVariants } from "@/components/ui/button";
-import { JsonLd } from "@/lib/json-ld";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import {
+  JsonLd,
+  personJsonLd,
+  webApplicationJsonLd,
+  websiteJsonLd,
+} from "@/lib/json-ld";
+import { SITE_DESCRIPTION } from "@/lib/site";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: SITE_NAME,
-  url: SITE_URL,
-  description: SITE_DESCRIPTION,
-};
+const websiteLd = websiteJsonLd();
+const appLd = webApplicationJsonLd({ description: SITE_DESCRIPTION });
+const personLd = personJsonLd();
 
 const FEATURES = [
   {
@@ -55,7 +56,9 @@ const COMPARISON = [
 export default function LandingPage() {
   return (
     <div className="flex min-h-dvh flex-1 flex-col bg-background">
-      <JsonLd data={jsonLd} />
+      <JsonLd data={websiteLd} />
+      <JsonLd data={appLd} />
+      <JsonLd data={personLd} />
       <noscript>
         <style>{`[data-reveal]{opacity:1 !important;transform:none !important}`}</style>
       </noscript>

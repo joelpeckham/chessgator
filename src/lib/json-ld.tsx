@@ -1,4 +1,12 @@
-import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { personRef, relatedApps } from "@/lib/product-graph";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+
+const CHESSGATOR_APP_ID = "https://chessgator.com/#app";
+const CHESSGATOR_WEBSITE_ID = "https://chessgator.com/#website";
+const CHESSGATOR_SAME_AS = [
+  "https://jpeckham.com/projects/chessgator/",
+  "https://github.com/joelpeckham/chessgator",
+] as const;
 
 type JsonLdProps = {
   data: unknown;
@@ -58,11 +66,7 @@ export function articleJsonLd(args: {
       "@type": "WebPage",
       "@id": url,
     },
-    author: {
-      "@type": "Organization",
-      name: SITE_NAME,
-      url: SITE_URL,
-    },
+    author: personRef(),
     publisher: {
       "@type": "Organization",
       name: SITE_NAME,
@@ -87,5 +91,52 @@ export function collectionPageJsonLd(args: {
     name: args.name,
     description: args.description,
     url: absoluteUrl(args.path),
+  };
+}
+
+export function personJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    ...personRef(),
+  };
+}
+
+export function websiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": CHESSGATOR_WEBSITE_ID,
+    name: SITE_NAME,
+    url: SITE_URL,
+    description: SITE_DESCRIPTION,
+    author: personRef(),
+    publisher: personRef(),
+  };
+}
+
+export function webApplicationJsonLd(args: {
+  description: string;
+  path?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "@id": CHESSGATOR_APP_ID,
+    name: SITE_NAME,
+    url: args.path ? absoluteUrl(args.path) : SITE_URL,
+    description: args.description,
+    applicationCategory: "GameApplication",
+    operatingSystem: "Any",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
+    browserRequirements:
+      "Requires a modern browser with WebAssembly and Web Workers.",
+    author: personRef(),
+    creator: personRef(),
+    sameAs: [...CHESSGATOR_SAME_AS],
+    isRelatedTo: relatedApps("chessgator"),
   };
 }

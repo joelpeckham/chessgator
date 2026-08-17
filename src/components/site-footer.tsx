@@ -45,6 +45,7 @@ export function SiteFooter({ className }: { className?: string }) {
         made by{" "}
         <a
           href="https://jpeckham.com"
+          rel="author"
           className="underline-offset-4 hover:text-foreground hover:underline"
         >
           jpeckham.com

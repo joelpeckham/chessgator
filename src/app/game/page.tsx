@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { GameShellClient } from "@/components/game/game-shell-client";
-import { JsonLd } from "@/lib/json-ld";
+import { JsonLd, webApplicationJsonLd } from "@/lib/json-ld";
 import { contentMetadata } from "@/lib/page-metadata";
-import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 const GAME_DESCRIPTION =
   "Play chess against a computer with no sign-up. Maia is a human-like bot (Elo 1100–1900); a Stockfish coach explains your moves in the browser.";
@@ -14,22 +13,10 @@ export const metadata: Metadata = contentMetadata({
   type: "website",
 });
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  name: SITE_NAME,
-  url: `${SITE_URL}/game`,
+const jsonLd = webApplicationJsonLd({
   description: GAME_DESCRIPTION,
-  applicationCategory: "GameApplication",
-  operatingSystem: "Any",
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "USD",
-  },
-  browserRequirements:
-    "Requires a modern browser with WebAssembly and Web Workers.",
-};
+  path: "/game",
+});
 
 /**
  * Build-time static shell. All browser APIs, workers, and interactivity live
