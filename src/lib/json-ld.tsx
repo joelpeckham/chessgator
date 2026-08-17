@@ -1,4 +1,4 @@
-import { personRef, relatedApps } from "@/lib/product-graph";
+import { personProfile, personRef, relatedApps } from "@/lib/product-graph";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
 const CHESSGATOR_APP_ID = "https://chessgator.com/#app";
@@ -97,7 +97,7 @@ export function collectionPageJsonLd(args: {
 export function personJsonLd() {
   return {
     "@context": "https://schema.org",
-    ...personRef(),
+    ...personProfile(),
   };
 }
 
