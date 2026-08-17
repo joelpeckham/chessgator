@@ -23,6 +23,7 @@ import { useGameStore } from "@/features/game/game-store";
 import { createMaiaSession } from "@/features/game/maia-session";
 import { deriveBoardInteractivity } from "@/features/game/turn-controller";
 import { pickBookReply } from "@/features/landing/hero-book";
+import { finalizeHeroHandoff } from "@/features/landing/hero-handoff";
 
 /** Delay before a book reply lands, so it reads as a thought, not a glitch. */
 const BOOK_REPLY_DELAY_MS = 450;
@@ -221,25 +222,9 @@ export function useHeroDemo(): HeroDemo {
     return true;
   }
 
-  /**
-   * Normalize + persist so /game picks the live game up mid-flight. Marking
-   * the preset flag makes /game trust the in-memory tree instead of
-   * re-hydrating (the flag clears on the next played move).
-   */
-  function finalizeHandoff(): void {
-    if (!hasPlayedRef.current) return;
-    const state = useGameStore.getState();
-    // A pending book reply dies with this component; let Maia answer instead.
-    if (state.session.mode === "analyzing") {
-      state.setMode("opponentThinking");
-    }
-    void state.persist();
-    state.markUrlPresetApplied();
-  }
-
   function continueOnFullBoard(): void {
     clearReplyTimer();
-    finalizeHandoff();
+    finalizeHeroHandoff();
     router.push("/game");
   }
 
@@ -294,11 +279,13 @@ export function useHeroDemo(): HeroDemo {
         window.clearTimeout(replyTimer.current);
         replyTimer.current = null;
       }
-      finalizeHandoff();
+      if (hasPlayedRef.current) {
+        void useGameStore.getState().persist();
+      }
       void maiaSession.dispose();
       void coach.dispose();
     };
-    // Dispose-only cleanup; finalizeHandoff reads the store imperatively.
+    // Dispose-only cleanup; persist reads the store imperatively.
     // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [maiaSession, coach]);
 

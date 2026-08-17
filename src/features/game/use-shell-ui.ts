@@ -159,7 +159,10 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
       }
       return;
     }
-    if (state.urlPresetApplied) return;
+    if (state.urlPresetApplied) {
+      if (state.session.mode === "reviewing") resumePlay();
+      return;
+    }
     if (state.resumed && state.session.mode === "reviewing") {
       resumePlay();
       queueNav("Resumed local game");

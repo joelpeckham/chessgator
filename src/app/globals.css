@@ -87,9 +87,12 @@
 }
 
 /* 8×8 using the same tokens as board-surface, so a hydrating adapter
-   never flashes a library default through transparent squares. */
+   never flashes a library default through transparent squares.
+   Clip to the board radius or the checkered fill squares the corners. */
 .board-checkered,
 .chessboard-adapter {
+  overflow: hidden;
+  border-radius: var(--radius);
   background-color: var(--board-light);
   background-image: repeating-conic-gradient(
     var(--board-dark) 0% 25%,
