@@ -1,21 +1,25 @@
 import type { Metadata } from "next";
 import { GameShellClient } from "@/components/game/game-shell-client";
 import { JsonLd } from "@/lib/json-ld";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { contentMetadata } from "@/lib/page-metadata";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Play",
-  description: SITE_DESCRIPTION,
-  alternates: { canonical: "/game" },
-  openGraph: { url: "/game" },
-};
+const GAME_DESCRIPTION =
+  "Play chess against a computer with no sign-up. Maia is a human-like bot (Elo 1100–1900); a Stockfish coach explains your moves in the browser.";
+
+export const metadata: Metadata = contentMetadata({
+  title: "Play Chess vs a Computer — No Sign Up",
+  description: GAME_DESCRIPTION,
+  path: "/game",
+  type: "website",
+});
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   name: SITE_NAME,
   url: `${SITE_URL}/game`,
-  description: SITE_DESCRIPTION,
+  description: GAME_DESCRIPTION,
   applicationCategory: "GameApplication",
   operatingSystem: "Any",
   offers: {

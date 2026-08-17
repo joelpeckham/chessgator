@@ -20,7 +20,10 @@
       "!**/package-lock.json",
       "!**/assets.lock.json",
       "!**/scripts/fixtures",
-      "!**/assets"
+      "!**/assets",
+      "!**/.vercel",
+      "!**/src/app/openings/data/openings.json",
+      "!**/src/app/games/data/games.json"
     ]
   },
   "formatter": {

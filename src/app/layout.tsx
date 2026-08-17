@@ -3,7 +3,13 @@ import type { Metadata, Viewport } from "next";
 import { Figtree, Merriweather } from "next/font/google";
 import type { ReactNode } from "react";
 import "./globals.css";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import {
+  SITE_DESCRIPTION,
+  SITE_KEYWORDS,
+  SITE_NAME,
+  SITE_TITLE,
+  SITE_URL,
+} from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 const merriweatherHeading = Merriweather({
@@ -19,26 +25,18 @@ const figtree = Figtree({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — local-only chess coach`,
+    default: SITE_TITLE,
     template: `%s · ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
-  keywords: [
-    "chess",
-    "chess coach",
-    "Maia",
-    "Stockfish",
-    "local chess",
-    "browser chess",
-    "chess training",
-  ],
+  keywords: [...SITE_KEYWORDS],
   category: "games",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: SITE_NAME,
+    title: SITE_TITLE,
     description: SITE_DESCRIPTION,
     url: "/",
     siteName: SITE_NAME,
@@ -47,8 +45,6 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: SITE_NAME,
-    description: SITE_DESCRIPTION,
   },
 };
 

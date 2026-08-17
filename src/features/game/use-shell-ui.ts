@@ -9,6 +9,7 @@ import {
   getCurrentNode,
   type PruneScope,
 } from "@/domain/game";
+import { applyGamePresets } from "@/features/game/apply-game-presets";
 import {
   playHumanMove,
   realizeSuggestedMove,
@@ -23,6 +24,7 @@ import {
   opponentTargetKey,
 } from "@/features/game/turn-controller";
 import type { GameRuntime } from "@/features/game/use-game-runtime";
+import { parseGameSearch } from "@/lib/game-href";
 
 export type ShellChrome = {
   promotion: { from: string; to: string } | null;
@@ -143,6 +145,25 @@ export function useShellUi(runtime: GameRuntime): ShellUi {
     bootstrappedRef.current = true;
 
     const state = useGameStore.getState();
+    const presets = parseGameSearch(window.location.search);
+    if (presets) {
+      const applied = applyGamePresets(state, presets);
+      if (applied.message) queueNav(applied.message);
+      void useGameStore
+        .getState()
+        .persist()
+        .then(() => {
+          const url = new URL(window.location.href);
+          if (url.search) {
+            window.history.replaceState(
+              window.history.state,
+              "",
+              `${url.pathname}${url.hash}`,
+            );
+          }
+        });
+      return;
+    }
     if (state.resumed && state.session.mode === "reviewing") {
       resumePlay();
       queueNav("Resumed local game");

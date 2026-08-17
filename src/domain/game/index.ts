@@ -4,6 +4,8 @@ export {
   resetNodeIdSequenceForTests,
 } from "@/domain/game/id";
 export { movesToPgn, pgnResultTag } from "@/domain/game/pgn";
+export type { ParsedPgn, ParsedPgnMove } from "@/domain/game/pgn-import";
+export { parsePgn } from "@/domain/game/pgn-import";
 export {
   createChess,
   DEFAULT_POSITION,

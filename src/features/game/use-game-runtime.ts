@@ -10,6 +10,7 @@ import {
   createMaiaSession,
   type MaiaSession,
 } from "@/features/game/maia-session";
+import { parseGameSearch } from "@/lib/game-href";
 
 const COACH_UNAVAILABLE_FALLBACK =
   "Coach analysis unavailable — play continues without post-move feedback.";
@@ -77,6 +78,12 @@ export function useGameRuntime(options: GameRuntimeOptions = {}): GameRuntime {
     coaching.phase === "idle";
 
   useEffect(() => {
+    // Deep-links start a fresh position. Loading a saved game first would
+    // leave the shell in reviewing and can clobber the preset on remount.
+    if (parseGameSearch(window.location.search)) {
+      useGameStore.setState({ hydrated: true, resumed: false });
+      return;
+    }
     void hydrate();
   }, [hydrate]);
 

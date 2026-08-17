@@ -1,5 +1,12 @@
+import { SITE_NAME, SITE_URL } from "@/lib/site";
+
 type JsonLdProps = {
   data: unknown;
+};
+
+export type BreadcrumbItem = {
+  name: string;
+  path: string;
 };
 
 /** Serializes structured data and escapes `<` so the payload cannot break out of the script tag. */
@@ -13,4 +20,45 @@ export function JsonLd({ data }: JsonLdProps) {
       }}
     />
   );
+}
+
+function absoluteUrl(path: string): string {
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+  return `${SITE_URL}${normalized}`;
+}
+
+export function breadcrumbJsonLd(items: readonly BreadcrumbItem[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: absoluteUrl(item.path),
+    })),
+  };
+}
+
+export function articleJsonLd(args: {
+  headline: string;
+  description: string;
+  path: string;
+  datePublished?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: args.headline,
+    description: args.description,
+    url: absoluteUrl(args.path),
+    mainEntityOfPage: absoluteUrl(args.path),
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    ...(args.datePublished ? { datePublished: args.datePublished } : {}),
+  };
 }

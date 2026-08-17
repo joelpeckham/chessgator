@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import { SitePage } from "@/components/site-page";
 import { JsonLd } from "@/lib/json-ld";
+import { contentMetadata } from "@/lib/page-metadata";
 import { FAQ_ITEMS } from "./questions";
 
-export const metadata: Metadata = {
-  title: "FAQ",
-  description: "Common questions about chessgator, the local-only chess coach.",
-  alternates: { canonical: "/faq" },
-  openGraph: { url: "/faq" },
-};
+export const metadata: Metadata = contentMetadata({
+  title: "Free Chess Coach FAQ",
+  description:
+    "Can I play Maia outside Lichess? Is there a free chess coach that explains moves? How do I play chess vs a computer with no sign-up?",
+  path: "/faq",
+  type: "website",
+});
 
 const faqJsonLd = {
   "@context": "https://schema.org",

@@ -1,21 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SitePage } from "@/components/site-page";
+import { contentMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
-  title: "About",
-  description: "What chessgator is and how it coaches your chess.",
-  alternates: { canonical: "/about" },
-  openGraph: { url: "/about" },
-};
+export const metadata: Metadata = contentMetadata({
+  title: "How This Free Chess Coach Works",
+  description:
+    "A free browser chess coach: play a human-like Maia bot, get Stockfish explanations after every move, and keep games on your device. No account.",
+  path: "/about",
+  type: "website",
+});
 
 export default function AboutPage() {
   return (
-    <SitePage title="About">
+    <SitePage title="How this free chess coach works">
       <p className="text-muted-foreground">
-        chessgator helps you learn by playing. You take on Maia, a human-like
-        opponent, while a coach mascot explains the ideas behind better moves.
-        Analysis stays on your device.
+        chessgator is a free chess coach in the browser. You play Maia, a
+        human-like bot from Elo 1100 to 1900, while a coach explains the ideas
+        behind better moves. There is no account. Analysis stays on your device.
       </p>
       <section className="space-y-2">
         <h2 className="font-heading text-lg font-semibold tracking-tight">
@@ -46,6 +48,30 @@ export default function AboutPage() {
           page.
         </p>
       </section>
+      <p className="text-muted-foreground">
+        More on{" "}
+        <Link
+          href="/maia"
+          className="text-primary underline-offset-4 hover:underline"
+        >
+          Maia
+        </Link>
+        ,{" "}
+        <Link
+          href="/learn"
+          className="text-primary underline-offset-4 hover:underline"
+        >
+          how the coach explains moves
+        </Link>
+        , and the{" "}
+        <Link
+          href="/faq"
+          className="text-primary underline-offset-4 hover:underline"
+        >
+          FAQ
+        </Link>
+        .
+      </p>
     </SitePage>
   );
 }

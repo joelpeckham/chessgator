@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { SitePage } from "@/components/site-page";
+import { contentMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
-  title: "Notices",
-  description: "Licenses and source for the engines chessgator ships.",
-  alternates: { canonical: "/notices" },
-  openGraph: { url: "/notices" },
-};
+export const metadata: Metadata = contentMetadata({
+  title: "Licenses for Maia, Stockfish, and ONNX Runtime",
+  description:
+    "Source and licenses for the Maia chess bot, Stockfish coach, and ONNX Runtime that chessgator runs in your browser.",
+  path: "/notices",
+  type: "website",
+});
 
 export default function NoticesPage() {
   return (

@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { SitePage } from "@/components/site-page";
+import { contentMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
-  title: "Privacy",
-  description: "How chessgator handles your games and data.",
-  alternates: { canonical: "/privacy" },
-  openGraph: { url: "/privacy" },
-};
+export const metadata: Metadata = contentMetadata({
+  title: "Privacy — No Accounts, Games Stay on Your Device",
+  description:
+    "chessgator has no accounts. Games stay in your browser. This page covers device storage, Vercel hosting logs, and cookieless analytics.",
+  path: "/privacy",
+  type: "website",
+});
 
 export default function PrivacyPage() {
   return (

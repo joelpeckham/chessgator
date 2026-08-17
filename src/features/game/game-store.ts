@@ -68,6 +68,9 @@ export type GameStoreState = {
   resign: () => boolean;
   setMode: (mode: SessionMode, errorMessage?: string | null) => boolean;
   setMaiaElo: (elo: number) => void;
+  /** Seat the human on the side to move and enter playerTurn. */
+  readyToMove: () => void;
+  getCurrentNodeId: () => string;
   setLesson: (nodeId: string, insight: TeachingInsight) => void;
 
   hydrate: (repository?: GameRepository) => Promise<boolean>;
@@ -313,6 +316,19 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       },
     });
   },
+
+  readyToMove: () => {
+    const { tree, session } = get();
+    if (session.mode === "gameOver") return;
+    const turn = getTurn(getCurrentNode(tree).fen);
+    set({
+      humanColor: turn,
+      session: sessionState("playerTurn"),
+      lastError: null,
+    });
+  },
+
+  getCurrentNodeId: () => get().tree.currentNodeId,
 
   setLesson: (nodeId, insight) => {
     set({

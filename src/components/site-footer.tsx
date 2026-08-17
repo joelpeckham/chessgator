@@ -8,6 +8,10 @@ import { cn } from "@/lib/utils";
 export const SITE_FOOTER_H = 32;
 
 const LINKS = [
+  { href: "/learn", label: "Learn" },
+  { href: "/openings", label: "Openings" },
+  { href: "/games", label: "Games" },
+  { href: "/maia", label: "Maia" },
   { href: "/faq", label: "FAQ" },
   { href: "/about", label: "About" },
   { href: "/privacy", label: "Privacy" },
@@ -45,7 +49,7 @@ export function SiteFooter({ className }: { className?: string }) {
           jpeckham.com
         </a>
       </p>
-      <ul className="flex shrink-0 items-center gap-3">
+      <ul className="flex min-w-0 shrink items-center gap-3 overflow-x-auto">
         {LINKS.map((link) => (
           <li key={link.href}>
             <Link

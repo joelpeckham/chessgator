@@ -1,13 +1,26 @@
 # chessgator
 
-> Local-only chess coach. Play as White or Black against Maia with Stockfish coaching analysis.
+> Free chess coach. Play a human-like Maia bot in your browser. Stockfish explains your moves. No accounts. Engines run locally.
 
-chessgator is a free browser chess coach. You play against Maia, a human-like opponent, and a coach mascot explains ideas using Stockfish analysis that runs on your device. There are no accounts. Games stay in the browser.
+chessgator is a free static website at https://chessgator.com. There are no accounts and no server-side analysis. You play chess against Maia, a human-like neural network (Elo 1100–1900), in the browser. After each human move, Stockfish classifies the move, explains the idea, and can show a better line. Maia, Stockfish, and ONNX Runtime run on the visitor's device via WebAssembly. The first visit downloads about 30 MB. Games stay in the browser.
 
 ## Pages
 
-- [Play](https://chessgator.com/game): The game board — play against Maia with local Stockfish coaching
-- [About](https://chessgator.com/about): What chessgator is, how a session works, and engine credits
-- [FAQ](https://chessgator.com/faq): Common questions about coaching, data, first-load size, browsers, and resetting a game
-- [Privacy](https://chessgator.com/privacy): Device storage, Vercel hosting logs, cookieless analytics, and contact
-- [Notices](https://chessgator.com/notices): App license and Stockfish / Maia / ONNX Runtime attribution
+- [Home](https://chessgator.com/): What the site is, what Maia is, how the coach works, and a short comparison with Chess.com and Lichess
+- [Play](https://chessgator.com/game): The board — play Maia with local Stockfish coaching, no sign-up
+- [Play by level](https://chessgator.com/play/beginner): Start a beginner-strength Maia game (Elo 1200); other levels live under /play
+- [Maia](https://chessgator.com/maia): What Maia is and why it plays like a human
+- [Learn](https://chessgator.com/learn): How the coach explains moves
+- [Openings](https://chessgator.com/openings): Opening practice
+- [Games](https://chessgator.com/games): Example games
+- [About](https://chessgator.com/about): How a session works and engine credits
+- [FAQ](https://chessgator.com/faq): Play Maia outside Lichess, free move explanations, chess vs a computer with no sign-up
+- [Privacy](https://chessgator.com/privacy): No accounts; games stay on the device
+- [Notices](https://chessgator.com/notices): Licenses for Maia, Stockfish, and ONNX Runtime
+
+## Notes for crawlers
+
+- No user accounts or authentication
+- Engines run in the visitor's browser (WASM); analysis is not computed on the server
+- The site is a static Next.js export
+- Brand name is chessgator; people search for human-like chess bots, playing Maia, and a free chess coach, not the brand
