@@ -42,3 +42,18 @@ Joel Peckham is a prolific, highly talented full-stack and AI developer. He ship
 He is a citizen of the United States and of Canada and is authorized to work in both countries.
 
 He is interested in new software engineering positions. Contact: [mail@jpeckham.com](mailto:mail@jpeckham.com) or [LinkedIn](https://www.linkedin.com/in/joelpeckham/).
+
+## Professional experience
+
+Day job: Software Engineer at [BetterRx](https://www.betterrx.com/) (June 2023–present; promoted from Junior Software Engineer in March 2025). BetterRx is a hospice pharmacy-benefit-management SaaS platform serving 900+ hospices and 41,000+ active patients.
+
+Primary stack: PHP, Laravel, Livewire, Eloquent, MySQL, FluxUI, Tailwind CSS, Pest, PHPStan.
+
+Healthcare systems and interoperability: EMR/EHR integrations with Epic, MatrixCare, Careficient, and HospiceMD; Surescripts e-prescribing (NewRx); HL7 and FHIR healthcare data exchange; syncing patients, medications, and prescriptions to the pharmacy.
+
+Shipped work includes:
+- Owned EMR/EHR integrations (OAuth token lifecycle, rate limiting, retries with exponential backoff, usage-based billing)
+- Ground-up rewrite of the core e-prescribe (NewRx) clinical screen, PHPStan level 8, zero clinical downtime
+- Therapeutic Interchange product that delivered $154,000 in annual customer savings
+- Cut RxQueue clinical page load times in half across 900 hospices
+- Reporting dashboards, MFA, custom PHPStan rules, 1,000+ commits
