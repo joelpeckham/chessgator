@@ -398,39 +398,33 @@ export function CoachMascot({
             animate={headState}
             data-head-state={headState}
           >
-            <motion.span
-              key={expression}
-              className="relative block h-full w-full"
-              initial={{ scale: 0.82, opacity: 0.4 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={popSpring}
+            {/* No key/remount on expression change: swapping only the image
+                src keeps the previous face visible until the new one paints. */}
+            <Image
+              src={gatorSrc(expression)}
+              alt=""
+              width={Math.round(head.width)}
+              height={Math.round(head.height)}
+              className="block h-full w-full select-none"
+              draggable={false}
+              loading="eager"
+            />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 block overflow-hidden"
+              style={neckMirrorStyle()}
             >
               <Image
                 src={gatorSrc(expression)}
                 alt=""
                 width={Math.round(head.width)}
                 height={Math.round(head.height)}
-                className="block h-full w-full select-none"
+                className="block w-full -scale-y-100 select-none"
+                style={{ height: head.height }}
                 draggable={false}
                 loading="eager"
               />
-              <span
-                aria-hidden
-                className="pointer-events-none absolute inset-x-0 block overflow-hidden"
-                style={neckMirrorStyle()}
-              >
-                <Image
-                  src={gatorSrc(expression)}
-                  alt=""
-                  width={Math.round(head.width)}
-                  height={Math.round(head.height)}
-                  className="block w-full -scale-y-100 select-none"
-                  style={{ height: head.height }}
-                  draggable={false}
-                  loading="eager"
-                />
-              </span>
-            </motion.span>
+            </span>
           </motion.span>
         </motion.button>
         <Image

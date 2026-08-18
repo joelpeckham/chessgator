@@ -14,7 +14,7 @@ import { TeachingCard } from "@/components/coach/teaching-card";
 import { HERO_GATOR_SCALE, HeroFrame } from "@/components/landing/hero-frame";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useHeroDemo } from "@/features/landing/use-hero-demo";
-import { bouncySpring, popSpring } from "@/lib/motion-presets";
+import { bouncySpring } from "@/lib/motion-presets";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
 
 /** Ms without pointer/keyboard activity before the gator dozes off. */
@@ -85,19 +85,14 @@ function HeroGator({
         variants={reducedMotion ? undefined : HEAD_VARIANTS}
         animate={reducedMotion ? undefined : state}
       >
-        <motion.div
-          key={expression}
-          initial={reducedMotion ? false : { scale: 0.82, opacity: 0.4 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={popSpring}
-        >
-          <GatorPeek
-            expression={expression}
-            scale={HERO_GATOR_SCALE}
-            positioned={false}
-            layers="head"
-          />
-        </motion.div>
+        {/* No key/remount on expression change: swapping only the image src
+            keeps the previous face visible until the new one paints. */}
+        <GatorPeek
+          expression={expression}
+          scale={HERO_GATOR_SCALE}
+          positioned={false}
+          layers="head"
+        />
       </motion.div>
       {/* Claws stay planted on the ledge while the head moves. */}
       <div className="absolute inset-0">
@@ -177,40 +172,30 @@ export function LandingHeroDemo() {
     onBlur: () => setCtaHover(false),
   };
 
-  const actions =
-    demo.phase === "resumed" ? (
-      <>
-        <Button size="lg" onClick={demo.continueOnFullBoard} {...hoverProps}>
-          Continue your game
-        </Button>
-        <Button size="lg" variant="outline" onClick={demo.startFreshGame}>
-          Start fresh here
-        </Button>
-      </>
-    ) : demo.gameOver ? (
-      <>
-        <Button size="lg" onClick={demo.startFreshGame} {...hoverProps}>
-          Play again
-        </Button>
-        <Button size="lg" variant="outline" onClick={demo.continueOnFullBoard}>
-          Review on the full board
-        </Button>
-      </>
-    ) : (
-      <>
-        <Button size="lg" onClick={demo.continueOnFullBoard} {...hoverProps}>
-          {demo.hasPlayed
-            ? "Keep playing on the full board"
-            : "Play on the full board"}
-        </Button>
-        <Link
-          className={buttonVariants({ variant: "outline", size: "lg" })}
-          href="/play/beginner"
-        >
-          Start at beginner
-        </Link>
-      </>
-    );
+  const actions = demo.gameOver ? (
+    <>
+      <Button size="lg" onClick={demo.startFreshGame} {...hoverProps}>
+        Play again
+      </Button>
+      <Button size="lg" variant="outline" onClick={demo.continueOnFullBoard}>
+        Review on the full board
+      </Button>
+    </>
+  ) : (
+    <>
+      <Button size="lg" onClick={demo.continueOnFullBoard} {...hoverProps}>
+        {demo.hasPlayed
+          ? "Keep playing on the full board"
+          : "Play on the full board"}
+      </Button>
+      <Link
+        className={buttonVariants({ variant: "outline", size: "lg" })}
+        href="/play/beginner"
+      >
+        Start at beginner
+      </Link>
+    </>
+  );
 
   return (
     <HeroFrame

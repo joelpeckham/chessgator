@@ -87,8 +87,9 @@ export function useGameRuntime(options: GameRuntimeOptions = {}): GameRuntime {
       useGameStore.setState({ hydrated: true, resumed: false });
       return;
     }
-    // The landing hero may already have hydrated this store. Reloading it
-    // would reset a live turn back to reviewing.
+    // The landing hero may have already started a game in this store
+    // (hydrated is set by startGame). Reloading it would reset a live turn
+    // back to reviewing.
     if (useGameStore.getState().hydrated) return;
     void hydrate();
   }, [hydrate]);

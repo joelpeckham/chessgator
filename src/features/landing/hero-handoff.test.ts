@@ -1,10 +1,14 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import {
   createInitialTree,
   jumpToNode,
   playMoveOnTree,
 } from "@/domain/game/tree";
-import { playableLeafId } from "@/features/landing/hero-handoff";
+import { useGameStore } from "@/features/game/game-store";
+import {
+  handOffHeroGame,
+  playableLeafId,
+} from "@/features/landing/hero-handoff";
 
 describe("playableLeafId", () => {
   it("stays on a leaf", () => {
@@ -22,5 +26,28 @@ describe("playableLeafId", () => {
     tree = jumpToNode(tree, e4)!;
     expect(tree.currentNodeId).toBe(e4);
     expect(playableLeafId(tree)).toBe(e5);
+  });
+});
+
+describe("handOffHeroGame", () => {
+  beforeEach(() => {
+    useGameStore.setState({ ...useGameStore.getInitialState() });
+  });
+
+  it("leaves the store untouched when the visitor never played", () => {
+    handOffHeroGame(false);
+    const state = useGameStore.getState();
+    expect(state.hydrated).toBe(false);
+    expect(state.urlPresetApplied).toBe(false);
+    expect(state.session.mode).toBe("loading");
+  });
+
+  it("finalizes the hero game after a move so /game trusts it", () => {
+    useGameStore.getState().startGame({ humanColor: "w" });
+    useGameStore.getState().playMove("e2e4", { afterMode: "analyzing" });
+    handOffHeroGame(true);
+    const state = useGameStore.getState();
+    expect(state.urlPresetApplied).toBe(true);
+    expect(state.session.mode).toBe("opponentThinking");
   });
 });

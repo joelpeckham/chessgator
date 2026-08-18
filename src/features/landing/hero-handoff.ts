@@ -15,10 +15,19 @@ export function playableLeafId(tree: GameTree): string {
 }
 
 /**
+ * Hand the hero game to /game, but only when the visitor actually played
+ * here. An untouched store lets /game hydrate any saved game as usual.
+ */
+export function handOffHeroGame(hasPlayed: boolean): void {
+  if (!hasPlayed) return;
+  finalizeHeroHandoff();
+}
+
+/**
  * Seat a live turn, persist, and mark the preset flag so /game trusts this
  * tree instead of re-hydrating back into reviewing.
  */
-export function finalizeHeroHandoff(): void {
+function finalizeHeroHandoff(): void {
   const state = useGameStore.getState();
   if (state.session.mode !== "gameOver") {
     const leafId = playableLeafId(state.tree);

@@ -21,17 +21,14 @@ import { createCoachingController } from "@/features/game/coaching-controller";
 import { playHumanMove, requestOpponentMove } from "@/features/game/game-flow";
 import { useGameStore } from "@/features/game/game-store";
 import { createMaiaSession } from "@/features/game/maia-session";
-import { deriveBoardInteractivity } from "@/features/game/turn-controller";
 import { pickBookReply } from "@/features/landing/hero-book";
-import { finalizeHeroHandoff } from "@/features/landing/hero-handoff";
+import { handOffHeroGame } from "@/features/landing/hero-handoff";
+import { heroBoardView } from "@/features/landing/hero-view";
 
 /** Delay before a book reply lands, so it reads as a thought, not a glitch. */
 const BOOK_REPLY_DELAY_MS = 450;
 
-export type HeroPhase = "booting" | "resumed" | "playing";
-
 export type HeroDemo = {
-  phase: HeroPhase;
   board: {
     fen: string;
     interactive: boolean;
@@ -57,14 +54,12 @@ export type HeroDemo = {
   warmEngines: () => void;
   /** Persist + hand the live game to /game. */
   continueOnFullBoard: () => void;
-  /** Fresh demo game (resumed greeting or post-game rematch). */
+  /** Fresh demo game (post-game rematch). */
   startFreshGame: () => void;
 };
 
 export const HERO_INTRO_COPY =
   "I'm your coach. Play a move — I'll tell you what I think of it. Try 1. e4.";
-const HERO_RESUMED_COPY =
-  "Welcome back! Your game is saved right where you left it.";
 const HERO_COACH_DOWN_COPY =
   "The coach couldn't start, but Maia still plays. The full board has a retry.";
 
@@ -82,10 +77,13 @@ function gameOverNotice(args: {
 }
 
 /**
- * Landing-page playable demo on top of the real game store. Engines stay
- * cold until the visitor touches the board; a small opening book answers
- * instantly while Maia warms up. Once the visitor has played, the game
- * persists like any other, so /game resumes it seamlessly.
+ * Landing-page playable demo on top of the real game store. It is always a
+ * fresh game: the board shows the starting position and accepts moves
+ * immediately, never hydrating (or locking on) a saved game — that stays
+ * intact for /game unless the visitor plays here. Engines stay cold until
+ * the visitor touches the board; a small opening book answers instantly
+ * while Maia warms up. Once the visitor has played, the game persists like
+ * any other, so /game resumes it seamlessly.
  */
 export function useHeroDemo(): HeroDemo {
   const router = useRouter();
@@ -95,18 +93,15 @@ export function useHeroDemo(): HeroDemo {
   const lessons = useGameStore((s) => s.lessons);
   const maiaElo = useGameStore((s) => s.preferences.maiaElo);
   const lastError = useGameStore((s) => s.lastError);
-  const hydrate = useGameStore((s) => s.hydrate);
   const persist = useGameStore((s) => s.persist);
 
   const [maiaSession] = useState(() => createMaiaSession());
   const [coach] = useState(() => createCoachingController());
-  const [phase, setPhase] = useState<HeroPhase>("booting");
   const [hasPlayed, setHasPlayed] = useState(false);
   const [coachPending, setCoachPending] = useState(false);
 
   const hasPlayedRef = useRef(false);
   const enginesStartedRef = useRef(false);
-  const bootstrappedRef = useRef(false);
   const replyTimer = useRef<number | null>(null);
   const persistTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const requestSeq = useRef(0);
@@ -121,26 +116,6 @@ export function useHeroDemo(): HeroDemo {
     coach.getState,
     coach.getState,
   );
-
-  useEffect(() => {
-    if (bootstrappedRef.current) return;
-    bootstrappedRef.current = true;
-    // A stale /game preset flag would make hydrate a no-op on the landing page.
-    useGameStore.setState({ urlPresetApplied: false });
-    void hydrate().then(() => {
-      const state = useGameStore.getState();
-      const inProgress =
-        state.resumed &&
-        state.session.mode !== "gameOver" &&
-        Object.keys(state.tree.nodes).length > 1;
-      if (inProgress) {
-        setPhase("resumed");
-        return;
-      }
-      state.startGame({ humanColor: "w" });
-      setPhase("playing");
-    });
-  }, [hydrate]);
 
   function clearReplyTimer(): void {
     if (replyTimer.current != null) {
@@ -183,6 +158,11 @@ export function useHeroDemo(): HeroDemo {
 
   function handleMove(move: BoardMove): boolean {
     warmEngines();
+    if (!hasPlayedRef.current) {
+      // First hero move: only now does the demo claim the shared store.
+      // The board showed the starting position, so this seats the same one.
+      useGameStore.getState().startGame({ humanColor: "w" });
+    }
     const played = playHumanMove(move);
     if (!played.ok) return false;
     if (!hasPlayedRef.current) {
@@ -224,7 +204,7 @@ export function useHeroDemo(): HeroDemo {
 
   function continueOnFullBoard(): void {
     clearReplyTimer();
-    finalizeHeroHandoff();
+    handOffHeroGame(hasPlayedRef.current);
     router.push("/game");
   }
 
@@ -234,7 +214,6 @@ export function useHeroDemo(): HeroDemo {
     coach.cancelPending();
     coach.clearFeedback();
     useGameStore.getState().startGame({ humanColor: "w" });
-    setPhase("playing");
   }
 
   useEffect(() => {
@@ -290,21 +269,20 @@ export function useHeroDemo(): HeroDemo {
   }, [maiaSession, coach]);
 
   const currentNode = getCurrentNode(tree);
-  const fen = currentNode.fen;
   const status = getStatusAtNode(tree, tree.currentNodeId);
   const mode = session.mode;
-  const gameOver = mode === "gameOver";
 
-  const interactive =
-    phase === "playing" &&
-    deriveBoardInteractivity({
-      liveMode: mode,
-      liveFen: fen,
-      humanColor,
-      maiaFailed: maia.phase === "failed",
-    });
+  const view = heroBoardView({
+    started: hasPlayed,
+    liveMode: mode,
+    liveFen: currentNode.fen,
+    humanColor,
+    maiaFailed: maia.phase === "failed",
+  });
+  const fen = view.fen;
+  const gameOver = view.gameOver;
 
-  const isCheck = status.isCheck && !status.isGameOver;
+  const isCheck = hasPlayed && status.isCheck && !status.isGameOver;
   const boardMarks = styleBoardAnnotations(coaching.annotations);
   const analyzing = coachPending || coaching.phase === "analyzing";
 
@@ -316,8 +294,9 @@ export function useHeroDemo(): HeroDemo {
       })
     : (coaching.insight?.classification ?? "idle");
 
-  const notice =
-    mode === "error"
+  const notice = !hasPlayed
+    ? null
+    : mode === "error"
       ? (lastError ?? "Something went wrong. The full board has a retry.")
       : gameOver
         ? gameOverNotice({ result: status.result, humanColor })
@@ -328,20 +307,19 @@ export function useHeroDemo(): HeroDemo {
           : null;
 
   const emptyCopy =
-    phase === "resumed"
-      ? HERO_RESUMED_COPY
-      : coaching.phase === "failed"
-        ? HERO_COACH_DOWN_COPY
-        : hasPlayed
-          ? null
-          : HERO_INTRO_COPY;
+    coaching.phase === "failed"
+      ? HERO_COACH_DOWN_COPY
+      : hasPlayed
+        ? null
+        : HERO_INTRO_COPY;
 
   return {
-    phase,
     board: {
       fen,
-      interactive,
-      lastMove: lastMoveSquares(currentNode.move?.uci ?? null),
+      interactive: view.interactive,
+      lastMove: hasPlayed
+        ? lastMoveSquares(currentNode.move?.uci ?? null)
+        : null,
       isCheck,
       checkSquare: isCheck ? findKingSquare(fen, status.turn) : null,
       highlightSquares: boardMarks.highlightSquares,

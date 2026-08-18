@@ -1,5 +1,9 @@
 import type { CSSProperties, ReactNode } from "react";
-import type { GatorExpression } from "@/components/coach/gator-expression";
+import { preload } from "react-dom";
+import {
+  type GatorExpression,
+  gatorSrc,
+} from "@/components/coach/gator-expression";
 import { gatorPeekLiftPx } from "@/components/coach/gator-layout";
 import { cn } from "@/lib/utils";
 
@@ -50,6 +54,11 @@ export function HeroFrame({
   className,
   style,
 }: HeroFrameProps) {
+  // Warm every face so an expression swap never paints a blank frame.
+  for (const expression of HERO_EXPRESSIONS) {
+    preload(gatorSrc(expression), { as: "image" });
+  }
+
   return (
     <div
       className={cn("relative w-full max-w-xl", className)}
