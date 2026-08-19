@@ -59,7 +59,7 @@ export type HeroDemo = {
 };
 
 export const HERO_INTRO_COPY =
-  "I'm your coach. Play a move — I'll tell you what I think of it. Try 1. e4.";
+  "I'm your coach. Play a move and I'll tell you what I think of it. Try 1. e4.";
 const HERO_COACH_DOWN_COPY =
   "The coach couldn't start, but Maia still plays. The full board has a retry.";
 
