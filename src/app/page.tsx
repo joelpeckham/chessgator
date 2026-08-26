@@ -83,8 +83,9 @@ export default function LandingPage() {
             </h1>
             <p className="max-w-xl text-lg text-muted-foreground text-pretty">
               This is the real thing, not a screenshot: play Maia, a human-like
-              chess bot, right here. After each move, the gator tells you what he thinks of it. Go to the full board to time-travel through your moves
-              and try different ideas.
+              chess bot, right here. After each move, the gator tells you what
+              he thinks of it. Go to the full board to time-travel through your
+              moves and try different ideas.
             </p>
           </div>
           <LandingHeroClient />
