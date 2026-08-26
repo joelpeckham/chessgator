@@ -73,7 +73,7 @@ export function articleJsonLd(args: {
       url: SITE_URL,
       logo: {
         "@type": "ImageObject",
-        url: `${SITE_URL}/opengraph-image`,
+        url: `${SITE_URL}/opengraph-image.png`,
       },
     },
     ...(args.datePublished ? { datePublished: args.datePublished } : {}),

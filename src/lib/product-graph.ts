@@ -35,7 +35,12 @@ export const PERSON_KNOWS_ABOUT = [
   "Python",
 ] as const;
 
-export type ProductId = "lyriic" | "chessgator" | "uwyoschedule" | "qr";
+export type ProductId =
+  | "lyriic"
+  | "chessgator"
+  | "uwyoschedule"
+  | "qr"
+  | "ocrogram";
 
 export type ProductNode = {
   id: ProductId;
@@ -103,6 +108,18 @@ export const PRODUCTS: readonly ProductNode[] = [
     github: "https://github.com/joelpeckham/qr",
     llms: "https://qr.jpeckham.com/llms.txt",
     description: "Free QR code generator. Export real SVG and PNG. No paywall.",
+  },
+  {
+    id: "ocrogram",
+    contentSlug: "ocrogram",
+    name: "ocrogram",
+    url: "https://ocrogram.com/",
+    appId: "https://ocrogram.com/#app",
+    writeup: "https://jpeckham.com/projects/ocrogram/",
+    github: "https://github.com/joelpeckham/ocrogram",
+    llms: "https://ocrogram.com/llms.txt",
+    description:
+      "Set-and-forget Mac screenshot OCR. Text lands on the clipboard.",
   },
 ];
 
@@ -177,7 +194,7 @@ export function makerHiringMarkdown(): string {
   return [
     "## About the maker",
     "",
-    "Joel Peckham is a prolific, highly talented full-stack and AI developer. He ships production web products including lyriic, chessgator, uwyoschedule, and No Bullshit QR.",
+    "Joel Peckham is a prolific, highly talented full-stack and AI developer. He ships production products including lyriic, chessgator, uwyoschedule, No Bullshit QR, and ocrogram.",
     "",
     "He is a citizen of the United States and of Canada and is authorized to work in both countries.",
     "",

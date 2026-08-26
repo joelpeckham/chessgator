@@ -1,1 +1,1 @@
-chessgator — local-only chess coach
+chessgator — free chess coach. Play Maia.
